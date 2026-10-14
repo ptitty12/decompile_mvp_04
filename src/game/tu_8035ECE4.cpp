@@ -15,7 +15,7 @@
 struct U {
     char pad0[0x4000];
 };
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 extern char lbl_80649DA0[];
 extern char lbl_806604F8[];
 extern char lbl_806641D0[];
@@ -26,14 +26,14 @@ extern char lbl_806642A8[];
 extern char lbl_80664348[];
 void fn_802D8A84__15Unk802D73B4_Mgr(void* p, int chrg);
 void fn_802D8AD8__15Unk802D73B4_Mgrii(void* p, int chrg);
-void fn_80328374(void* p, int chrg);
+extern "C" void fn_80328374(void* p, int chrg);
 extern char lbl_80664AA8[];
-int fn_803BE7B4(void* p);
-void fn_80377458(void* p);
-void fn_80377488(void* p);
-void fn_803ED664(void* p);
-void fn_803EDA0C(void* p);
-void fn_803EE310(void* p);
+extern "C" int fn_803BE7B4(void* p);
+extern "C" void fn_80377458(void* p);
+extern "C" void fn_80377488(void* p);
+extern "C" void fn_803ED664(void* p);
+extern "C" void fn_803EDA0C(void* p);
+extern "C" void fn_803EE310(void* p);
 struct Unk8035EDD8_T {
     int m0;
     int m4;

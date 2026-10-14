@@ -10,7 +10,7 @@
 #include "game/tu_80008540.h"
 
 extern "C" void* fn_803FFC58(void* dst, int val, unsigned int n);   /* memset */
-void fn_80377408(void* p);                                          /* __builtin_delete */
+extern "C" void fn_80377408(void* p);                                          /* __builtin_delete */
 void* operator new[](unsigned int size, int heap);                  /* 0x803774A8 */
 extern int lbl_806EFA04;
 /* 12-byte record of the buffer at +0x10 of Unk802DC9F8 (frame, pad index, value, float). */

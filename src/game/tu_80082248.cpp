@@ -52,7 +52,7 @@ void fn_80353110();
 
 
 
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 
 void fn_80082308(Link* l);
 Tree* fn_80082318(Tree* self);
@@ -127,8 +127,8 @@ void fn_80083160(Tree* t, char** cursor, int v, Stream* s);
 void fn_80083D10(Holder* self, char** cursor, Stream* s);
 void fn_80079FC0(void* self, char** cursor, void* dst, int n);
 int fn_80078A38(int self, int id);
-const char* fn_802B9300(const char* s, int a, int b, unsigned int* outn);
-void fn_802B961C(const char* p, int a);
+extern "C" const char* fn_802B9300(const char* s, int a, int b, unsigned int* outn);
+extern "C" void fn_802B961C(const char* p, int a);
 extern char lbl_805B4254[];
 
 
@@ -147,10 +147,10 @@ struct P8 {
 };
 extern P8 lbl_805B4244;
 extern P8 lbl_805B424C;
-void fn_80082A90(Node** root, Node** cur, P8* a, P8* b);
+extern "C" void fn_80082A90(Node** root, Node** cur, P8* a, P8* b);
 
 
-void fn_800826D0(Node** root, Node** cur, P8* a, P8* b);
+extern "C" void fn_800826D0(Node** root, Node** cur, P8* a, P8* b);
 
 
 extern "C" void fn_8040A208(void* base, int n, int size, int (*cmp)(short*, short*));

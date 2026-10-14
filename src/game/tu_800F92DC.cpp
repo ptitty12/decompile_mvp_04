@@ -202,7 +202,7 @@ struct UiTbl96E0 {
 extern "C" int sprintf(char* buf, const char* fmt, ...);
 extern char lbl_805BC1A8[];
 extern char lbl_805BE1C4[];
-int fn_800B53A4(UiTbl96E0* t, int i);
+extern "C" int fn_800B53A4(UiTbl96E0* t, int i);
 
 void fn_800F96E0(UiS96E0* self)
 {
@@ -260,9 +260,9 @@ struct UiMgr988C {
     char pad118[0x12C - 0x118];
     int a12C[5];
 };
-int fn_800B1FCC(void* mgr);
-int fn_800B21C0(void* mgr);
-int fn_800B3150(void* mgr, int idx);
+extern "C" int fn_800B1FCC(void* mgr);
+extern "C" int fn_800B21C0(void* mgr);
+extern "C" int fn_800B3150(void* mgr, int idx);
 extern char lbl_805B751C[];
 extern char lbl_805BE6C8[];
 extern char lbl_805BE6B4[];

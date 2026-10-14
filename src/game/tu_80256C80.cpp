@@ -14,7 +14,7 @@ extern "C++" {
 void fn_8025707C(Unk80256C80_M* self);
 void fn_8025707C(Unk80256C80_M* self, int a);
 char* fn_8035E8CC(char* p, unsigned i);
-float fn_8014E40C(Unk8024EF40_P* p, int k);
+extern "C" float fn_8014E40C(Unk8024EF40_P* p, int k);
 int fn_801A2034(Unk8024EF40_Q* q, int k);
 void fn_8025E55C(Unk80256C80_Inner* i, Unk8024EF40_P* p);
 Unk8024EF40_P* fn_80257B40(Unk80256C80_M* self);
@@ -24,7 +24,7 @@ struct Unk801A6DB8_R {
     int m18;
 };
 void fn_8025505C(Unk8024EF40_A* a, int v, int w);
-int fn_8018AD20(Unk8024EF40_P* p);
+extern "C" int fn_8018AD20(Unk8024EF40_P* p);
 int fn_8018AD2C(Unk8024EF40_P* p);
 void fn_80242E28(Unk8024EF40_P* p, float f);
 void fn_8025C9B8(void* f);
@@ -34,8 +34,8 @@ void fn_8025A6B4(void* o, Unk8024EF40_Q* q);
 void fn_8035E704(char* t, int i);
 extern float lbl_805DAC3C;
 void fn_8026B94C(Unk80256C80_Inner* i, int k);
-Unk801A6DB8_R* fn_801A6DB8(Unk8024EF40_Q* q);
-void fn_8025777C(Unk80256C80_M* self, Unk8024EF40_P* p, int a);
+extern "C" Unk801A6DB8_R* fn_801A6DB8(Unk8024EF40_Q* q);
+extern "C" void fn_8025777C(Unk80256C80_M* self, Unk8024EF40_P* p, int a);
 void fn_80268564(void* p);
 struct Unk80258390_C {
     char pad0[0x10];
@@ -43,8 +43,8 @@ struct Unk80258390_C {
     char pad14[0x3A4 - 0x14];
     char* m3A4;
 };
-int fn_801D0294(void* p);
-int fn_801C1638(Unk8024EF40_Q* q, int k);
+extern "C" int fn_801D0294(void* p);
+extern "C" int fn_801C1638(Unk8024EF40_Q* q, int k);
 extern int* lbl_8061B9C4;
 struct Unk80257458_E {
     int m0;
@@ -54,29 +54,29 @@ struct Unk80257458_E {
 extern char lbl_80660F68[];
 extern char lbl_80661818[];
 extern int lbl_8061D5FC;
-void* fn_8037D768(void* x);
-float fn_80382BB8(void* p);
+extern "C" void* fn_8037D768(void* x);
+extern "C" float fn_80382BB8(void* p);
 void fn_8023ECD4(int self, int k, int b);
-void fn_8037EB3C(void* p, int a);
+extern "C" void fn_8037EB3C(void* p, int a);
 void fn_8037B424(void* self, int a);
-void fn_80255974(int a, int b);
-void fn_8035AB00(void* self);
+extern "C" void fn_80255974(int a, int b);
+extern "C" void fn_8035AB00(void* self);
 struct Unk8025CDFC_Obj {
     char d[0x548];
 };
-Unk80256C80_Inner* fn_8025CDFC(Unk8025CDFC_Obj* p, Unk80256C80_M* m, int a, int b);
+extern "C" Unk80256C80_Inner* fn_8025CDFC(Unk8025CDFC_Obj* p, Unk80256C80_M* m, int a, int b);
 void fn_8025CF64(Unk80256C80_Inner* i, int a);
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 void fn_80265858(Unk80256C80_Inner* i);
-void fn_802649B4(Unk80256C80_Inner* i);
-void fn_80265A80(Unk80256C80_Inner* i);
+extern "C" void fn_802649B4(Unk80256C80_Inner* i);
+extern "C" void fn_80265A80(Unk80256C80_Inner* i);
 void fn_8026BA30(Unk80256C80_Inner* i);
 void fn_80269DE4(void* p);
 typedef Unk80256C80_M M;
 typedef Unk80256C80_Inner I;
 typedef Unk8024EF40_Q Q;
 Unk8024EF40_Q* fn_802570D4(Unk80256C80_M* self);
-void* fn_801A4B34(void* w);
+extern "C" void* fn_801A4B34(void* w);
 
 inline P* Roster(Q* q, unsigned i) { if (i <= 0xC) return q->m65C[i]; return 0; }
 
@@ -91,22 +91,22 @@ int fn_8035E630(void* p, int a);
 int fn_8035E8CC(void* p, int a);
 void fn_80264844(I* i);
 int fn_80254EA4(A* a, int b);
-int fn_8014E310(int a);
+extern "C" int fn_8014E310(int a);
 void fn_8025480C(A* a, int b);
 void fn_8025D054(I* i, int a);
-void fn_8025EA9C(I* i);
+extern "C" void fn_8025EA9C(I* i);
 void fn_8025E924(I* i, int a, int b);
 void fn_8025ED44(I* i);
-void fn_8025E7E4(I* i);
+extern "C" void fn_8025E7E4(I* i);
 void fn_8025E4B4(I* i);
-void fn_8026BAD8(I* i);
+extern "C" void fn_8026BAD8(I* i);
 void fn_80268928(void* p);
 void fn_80259E3C(void* p);
 void fn_802449F4(P* p);
 void fn_80255910(A* a);
-int fn_801C1950(int a);
+extern "C" int fn_801C1950(int a);
 int fn_8017C94C(Unk8024EF40_Ctx* c);
-int fn_801BBF04(int a);
+extern "C" int fn_801BBF04(int a);
 int fn_80259330(M* self);
 int fn_802676C0(void* p);
 int fn_80266784(void* p);

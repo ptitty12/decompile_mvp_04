@@ -16,7 +16,7 @@ struct Unk8016C2D0_Obj {
     float mC;
 };
 
-float fn_801510A8(Unk8016C2D0_Obj* o, int a, float t);
+extern "C" float fn_801510A8(Unk8016C2D0_Obj* o, int a, float t);
 
 struct Unk8016C1C4_Ent {
     float fn_8016C2D0(int flag);

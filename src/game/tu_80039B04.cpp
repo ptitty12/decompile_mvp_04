@@ -65,12 +65,12 @@ extern const char lbl_805A7594[];
 extern const char lbl_805A75A8[];
 
 void fn_80306AC0(int a, int b);
-void fn_80039790(float f);
-Unk80039B04_Mgr* fn_80038EB4();
+extern "C" void fn_80039790(float f);
+extern "C" Unk80039B04_Mgr* fn_80038EB4();
 int fn_8040ABA0();
 void* fn_8004072C();
 int fn_800412AC(void* o, int a, int b, int c, int d, int e);
-void fn_8004181C(void* o, int a, int b, int c, int d, int e, int f);
+extern "C" void fn_8004181C(void* o, int a, int b, int c, int d, int e, int f);
 void fn_80040DCC(void* o, int a, int b);
 Unk800475EC_Obj* fn_800475EC();
 int fn_8003E844(Unk8003A5DC* self);
@@ -85,7 +85,7 @@ void fn_8003B674(Unk8003A5DC* self);
 extern int lbl_806EF9B4;
 void fn_8001B2A4();
 void fn_8001B8F8(int a);
-void fn_8037B7E4(Unk8037B3E8* self, int a);
+extern "C" void fn_8037B7E4(Unk8037B3E8* self, int a);
 
 void fn_80039B94(int a, int b);
 void fn_80039C20(Unk80039B04_Mgr* self);

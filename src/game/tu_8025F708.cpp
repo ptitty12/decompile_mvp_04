@@ -32,7 +32,7 @@ struct Unk8025F708_C {
 
 extern "C++" {
 int fn_8026BE3C(I* self, P* p);
-void fn_8025F89C(I* self, P* p);
+extern "C" void fn_8025F89C(I* self, P* p);
 }
 
 inline int EntLevel(Unk8024EF40_Ent* e)

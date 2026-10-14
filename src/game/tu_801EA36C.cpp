@@ -147,7 +147,7 @@ struct Unk801EA880_Cx {
     float mBDC;
 };
 float fn_80410CE8(float y, float x);
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 float fn_8024902C();
 extern "C" float fn_8024796C(P* p, float f, int a, int b, int c, int d, float* e, float* g, int h);
 

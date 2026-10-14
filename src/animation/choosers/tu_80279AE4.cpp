@@ -71,9 +71,9 @@ extern int lbl_8061B9C8;
 extern int lbl_806242B4;
 extern char lbl_8061EC9C;
 
-float fn_804028E4(float x);               /* square root */
-float fn_80382BB8(Unk80271DBC_Link* p);
-void fn_8037D768(Unk80270BA0_X* x);
+extern "C" float fn_804028E4(float x);               /* square root */
+extern "C" float fn_80382BB8(Unk80271DBC_Link* p);
+extern "C" void fn_8037D768(Unk80270BA0_X* x);
 void* fn_8040B320(void* dst, int c, unsigned int n);     /* memset */
 int fn_8040B100(const void* a, const void* b, unsigned int n);   /* memcmp */
 

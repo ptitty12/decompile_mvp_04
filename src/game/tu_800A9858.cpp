@@ -5,7 +5,7 @@
 #include "game/chooser.h"
 #include "game/tu_800A8684.h"
 
-int fn_8057CE00(int v);
+extern "C" int fn_8057CE00(int v);
 
 /* Singleton (0x10 bytes) at lbl_80619C64: three ints, then the vptr at +0xC
  * (lbl_8065BE58). Evidence: ctor fn_800AA0B4, dtor fn_800AA0D4, fn_800AA2FC. */

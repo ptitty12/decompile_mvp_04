@@ -152,8 +152,8 @@ struct Unk801F3244_G {
 };
 int fn_801BBC78(int a);
 void fn_8024FAE0(void* sub, int a);
-void fn_8024F930(void* sub, int a, int b);
-Unk801EE438_Player* fn_801A497C(Unk801F3244_Ow* o, int k);
+extern "C" void fn_8024F930(void* sub, int a, int b);
+extern "C" Unk801EE438_Player* fn_801A497C(Unk801F3244_Ow* o, int k);
 void fn_80211CAC(void* l);
 int fn_80211D78(void* l);
 float fn_80211DE0(void* l);
@@ -395,7 +395,7 @@ int fn_8026D7B4(Unk8026C414_O* self, Unk8026C414_X* ctx);
 int fn_8026D8BC(Unk8026C414_O* self, Unk8026C414_X* ctx);
 void fn_802595B8(Unk80256C80_M* m, int o);
 }
-int fn_80250724(void* p);
+extern "C" int fn_80250724(void* p);
 int fn_801F3B7C(Scr* p, void* pl);
 extern const Unk801EE438_Vec lbl_805D676C;
 

@@ -15,7 +15,7 @@
 struct U {
     char pad0[0x4000];
 };
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 extern char lbl_8064A550[];
 extern char lbl_80655808[];
 struct UiScrRaw;

@@ -16,9 +16,9 @@ extern void* (*lbl_8062C668)(unsigned int size, int flags);
 extern unsigned char lbl_806158B8[];
 
 void fn_8000C704(short x, short y, unsigned short w, unsigned char* base, const char* s, unsigned short color);
-void fn_80432FD4(void* p, unsigned int n);
+extern "C" void fn_80432FD4(void* p, unsigned int n);
 int fn_804089B4(char* buf, const char* fmt, ...);
-void fn_803E7320(int ch, const char* s, ...);
+extern "C" void fn_803E7320(int ch, const char* s, ...);
 void fn_8043D380(void* fb);
 void fn_8043D250();
 int fn_80409C4C(char* buf, int n, const char* fmt, va_list ap);
@@ -182,7 +182,7 @@ void fn_8000C704(short x, short y, unsigned short w, unsigned char* base, const 
     }
 }
 
-float fn_804028E4(float x);                  /* square root */
+extern "C" float fn_804028E4(float x);                  /* square root */
 
 extern const Unk8000C840_Vec3 lbl_805A3D9C[4];   /* point table (7.5, 0, 1072.5) ... */
 extern const Unk8000C840_Vec3 lbl_805A3DCC;      /* (513.3595, 0, 513.3595) */

@@ -16,14 +16,14 @@
 #include "game/goals/tu_8027A84C.h"
 
 Unk80273498_Vec3 fn_8014E388(unsigned int idx);
-float fn_804028E4(float x);
-float fn_80382BB8(Unk80271DBC_Link* p);
-float fn_8041171C(float x);
-double fn_80410634(double x);
+extern "C" float fn_804028E4(float x);
+extern "C" float fn_80382BB8(Unk80271DBC_Link* p);
+extern "C" float fn_8041171C(float x);
+extern "C" double fn_80410634(double x);
 extern float lbl_8061E6A0;
 extern float lbl_8061E6A4;
 extern float lbl_8061E6A8;
-float fn_80411554(float x);
+extern "C" float fn_80411554(float x);
 float fn_80410CE8(float y, float x);
 
 inline Unk80273498_Vec3 GetPos(const Unk8037B128_Mtx* m)

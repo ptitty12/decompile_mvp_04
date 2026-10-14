@@ -186,7 +186,7 @@ struct Unk80236C9C_P {
     int b;
 };
 extern Unk80236C9C_P lbl_8060558C;
-void fn_802366E8(char* slot, Unk8014D8AC_Ctx* c, Unk80236C9C_P* r, int flag);
+extern "C" void fn_802366E8(char* slot, Unk8014D8AC_Ctx* c, Unk80236C9C_P* r, int flag);
 char* fn_80236DB0(Unk802362A8_Slots* s, int k);
 Unk80236C9C_P fn_80236C9C(Unk802362A8_Slots* s, int k)
 {
@@ -266,7 +266,7 @@ int fn_80236F34(void* p, int k)
     return 0;
 }
 
-int fn_801D7A3C(void* p, int k);
+extern "C" int fn_801D7A3C(void* p, int k);
 inline void Unk80236FD8_Put(char* b, int off, int v)
 {
     *(int*)(b + off) = v;
@@ -770,7 +770,7 @@ inline float Unk80239DFC_AbsF(float v)
 {
     return (float)__builtin_fabs(v);
 }
-int fn_8018AA98(int a);
+extern "C" int fn_8018AA98(int a);
 float Unk802362A8_Cpu::fn_80239DFC(int a)
 {
     float u0 = 0.05f;
@@ -789,7 +789,7 @@ float Unk802362A8_Cpu::fn_80239DFC(int a)
     return r;
 }
 
-double fn_804103C0(double x);
+extern "C" double fn_804103C0(double x);
 
 float fn_80239F58(float a, float b, float c, float d)
 {

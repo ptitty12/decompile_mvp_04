@@ -32,8 +32,8 @@ inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_V
 }
 
 extern Unk80273498_Vec3 lbl_806055AC;       /* 0xc bytes in another unit's .rodata (default direction) */
-float fn_8041171C(float x);
-float fn_80411554(float x);
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
 
 inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
 {

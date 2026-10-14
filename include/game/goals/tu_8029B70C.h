@@ -208,7 +208,7 @@ struct Unk8029B70C_Pos {
 /* Goal state functions of this unit, called before their definition. */
 int fn_8029D184(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f);
 int fn_8029D7F4(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int a, int b, int c, int d);
-Unk8029B70C_Req fn_8029DB14(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int a, int b, int c);
+extern "C" Unk8029B70C_Req fn_8029DB14(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int a, int b, int c);
 int fn_8029E6BC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link, int a, int b, Unk8029B70C_Req r);
 Unk8029B70C_Req fn_8029E4AC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int kind, int a, int b, Unk8029B70C_Req o);
 int fn_8029EC30(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link, int kind, int a, int b, Unk8029B70C_Req o);
@@ -220,17 +220,17 @@ extern int lbl_806242B0;
 float fn_8029CF14(Unk8029B70C_Goal* g, Unk80270BA0_X* x);
 int fn_8029D7C4(Unk8029B70C_Goal* g);
 
-float fn_80382BB8(Unk80271DBC_Link* l);       /* current animation time/angle */
+extern "C" float fn_80382BB8(Unk80271DBC_Link* l);       /* current animation time/angle */
 float fn_80410CE8(float y, float x);          /* atan2 */
-double fn_80410634(double x);                 /* floor */
+extern "C" double fn_80410634(double x);                 /* floor */
 void fn_80244858(Unk80270BA0_X* x, float v);
-int fn_8024D504(Unk80270BA0_X* x, int a, int b, int c, int d);
-int fn_801DC658(int a, Unk80273498_Vec3* pos, float* out);
+extern "C" int fn_8024D504(Unk80270BA0_X* x, int a, int b, int c, int d);
+extern "C" int fn_801DC658(int a, Unk80273498_Vec3* pos, float* out);
 extern const Unk80273498_Vec3 lbl_806055AC;     /* zero vector */
 extern const Unk80273498_Vec3 lbl_805DED58;     /* (513.3595, 0, 513.3595) */
 
 Unk80273498_Vec3 fn_8023F29C(Unk80270BA0_X* x);
-int fn_8024B99C(Unk80270BA0_X* x, Unk80273498_Vec3* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c, int d, int e);
+extern "C" int fn_8024B99C(Unk80270BA0_X* x, Unk80273498_Vec3* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c, int d, int e);
 Unk8014D8AC_Ctx* fn_8027A918(Unk8029B70C_Goal* g);        /* tu_8027A84C.cpp */
 
 int fn_802A2604(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f, int a);
@@ -242,10 +242,10 @@ int fn_8026D6AC(Unk80270BA0_X* x, int a);
 int fn_8026DC18(Unk80270BA0_X* x, int a);
 int fn_8026D7E0(Unk80270BA0_X* x, int a);
 int fn_8027B1A0(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* pos);   /* tu_8027A84C.cpp */
-int fn_80381E9C(Unk80271DBC_Link* link, unsigned int hash, int a, int b);
+extern "C" int fn_80381E9C(Unk80271DBC_Link* link, unsigned int hash, int a, int b);
 int fn_8024D218(Unk80270BA0_X* x);
 int fn_8026DB3C(Unk80270BA0_X* x, int a);
-int fn_802D7DB4(int a, int b);
+extern "C" int fn_802D7DB4(int a, int b);
 unsigned int fn_8029D2E0(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int kind, int a);
 
 void fn_802A2A64(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80273498_Pos* p);

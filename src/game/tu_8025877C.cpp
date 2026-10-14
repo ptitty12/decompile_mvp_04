@@ -59,7 +59,7 @@ void fn_802686E4(void* p, int a);
 float fn_80259EE8(void* p, int a, int b, int c);
 void fn_80268DB0(void* p);
 void fn_80265D24(I* i, int a);
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 }
 
 struct Unk80259E3C_F {
@@ -72,8 +72,8 @@ struct Unk8025A1A0_O {
     char pad0[0x50];
     Q* m50;
 };
-void fn_8025A1A0(Unk8025A1A0_O* o, float v);
-void fn_8025A3DC(Unk8025A1A0_O* o, float v);
+extern "C" void fn_8025A1A0(Unk8025A1A0_O* o, float v);
+extern "C" void fn_8025A3DC(Unk8025A1A0_O* o, float v);
 extern float lbl_805DADBC;
 extern float lbl_805DADC0;
 extern float lbl_805DAD00;
@@ -89,7 +89,7 @@ float fn_80259FFC(void* p, int idx);
 float fn_80259FB8(void* p, P* idx, int c);
 int fn_8025D9E0(I* i);
 int fn_8025A664(void* self, P* p);
-void fn_801DC8E8(int a);
+extern "C" void fn_801DC8E8(int a);
 }
 extern int lbl_8061B9C8;
 extern const Unk80273498_Vec3 lbl_8068CE14;
@@ -103,23 +103,23 @@ char* fn_8035E8CC(char* p, unsigned i);
 
 inline P* Roster(Q* q, unsigned i) { if (i <= 0xC) return q->m65C[i]; return 0; }
 
-int fn_801BBF24(int a);
+extern "C" int fn_801BBF24(int a);
 int fn_8035E318(A* a);
 void fn_80255314(A* a, int b, int c);
 void fn_80266420(void* l, P* p);
 void fn_8026647C(void* l);
-int fn_8014E310(int a);
-int fn_801C1950(int a);
-int fn_8014E2B4(int a);
+extern "C" int fn_8014E310(int a);
+extern "C" int fn_801C1950(int a);
+extern "C" int fn_8014E2B4(int a);
 P* fn_8026B8C0(I* i, unsigned k);
-void fn_8025888C(M* self, P* p, int a, int b);
+extern "C" void fn_8025888C(M* self, P* p, int a, int b);
 void fn_8025D054(I* i, int a);
 void* fn_8035E604(void* p);
 int fn_8035E630(void* p, int a);
 int fn_80254984(A* a);
 int fn_80254EA4(A* a, int b);
 int fn_802576E4(M* self, P* p, int k);
-void fn_802574DC(M* self, P* p, int k);
+extern "C" void fn_802574DC(M* self, P* p, int k);
 Unk8027C728_Goal* fn_80244C84(Unk80270BA0_X* x);
 int fn_8027D390(Unk8027C728_Goal* g, float* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c, float* d);
 float fn_80266D70(void* o, int k);
@@ -149,7 +149,7 @@ extern float lbl_805DAD58;
 extern float lbl_805DAD5C;
 float fn_8025454C(Unk8024EF40_W* w, int k);
 float fn_80254618(Unk8024EF40_W* w, int k);
-P* fn_801C1638(Q* q, int k);
+extern "C" P* fn_801C1638(Q* q, int k);
 inline float RandK_9FFC(Q* q, const char* f, int line)
 {
     float k = lbl_805DAD44;

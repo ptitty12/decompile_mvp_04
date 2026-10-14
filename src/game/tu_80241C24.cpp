@@ -267,8 +267,8 @@ struct Unk80243CDC_S {
     char pad244[0x44C - 0x244];
     Unk80243CDC_Ctx* m44C;
 };
-void* fn_801A4CE8(Unk80243CDC_Ctx* c, int a);
-void fn_80188920(Unk80243CDC_V* out, int a);
+extern "C" void* fn_801A4CE8(Unk80243CDC_Ctx* c, int a);
+extern "C" void fn_80188920(Unk80243CDC_V* out, int a);
 extern float lbl_8061D488;
 
 void fn_80243CDC(Unk80243CDC_S* self, int i)

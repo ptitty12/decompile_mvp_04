@@ -330,7 +330,7 @@ struct Unk8034449C {
     }
 };
 void fn_803444D0(Unk8034449C* m, int c);
-Unk8027C728_Goal* fn_801B9438(P* p, int ev, Vec3 pos);
+extern "C" Unk8027C728_Goal* fn_801B9438(P* p, int ev, Vec3 pos);
 
 /* near-miss: same code; the 0..6 / 0xA..0xE / 0x10..0x11 event-id range tests lay out differently (one blt vs b). */
 extern "C" void fn_801B9620(U* u, const Vec3* pos, int ev)

@@ -19,19 +19,19 @@ typedef Unk8007F198_E E;
 
 int fn_805A19C8(Tbl* t);
 int fn_805A19C8(Tbl* t, int y);
-int fn_805A196C(Tbl* t, int i, int x);
-int fn_8053B210(Rec* r, int a);
-int fn_8053B450(Rec* r, int a);
-int fn_8053B064(Rec* r);
-int fn_8053B824(Rec* r, int a);
-int fn_8053B85C(Rec* r, int a);
-int fn_8053B8C0(Rec* r);
-int fn_8053B6A4(Rec* r);
-int fn_8053B900(Rec* r, int a);
-int fn_8053B934(Rec* r, int a, int b, int c);
-int fn_8053B980(Rec* r, int a, int b);
-int fn_8053BA1C(Rec* r, int a);
-int fn_8053BAD0(Rec* r, int a, int b, int c);
+extern "C" int fn_805A196C(Tbl* t, int i, int x);
+extern "C" int fn_8053B210(Rec* r, int a);
+extern "C" int fn_8053B450(Rec* r, int a);
+extern "C" int fn_8053B064(Rec* r);
+extern "C" int fn_8053B824(Rec* r, int a);
+extern "C" int fn_8053B85C(Rec* r, int a);
+extern "C" int fn_8053B8C0(Rec* r);
+extern "C" int fn_8053B6A4(Rec* r);
+extern "C" int fn_8053B900(Rec* r, int a);
+extern "C" int fn_8053B934(Rec* r, int a, int b, int c);
+extern "C" int fn_8053B980(Rec* r, int a, int b);
+extern "C" int fn_8053BA1C(Rec* r, int a);
+extern "C" int fn_8053BAD0(Rec* r, int a, int b, int c);
 
 static inline Rec* Cur(Tbl* t)
 {
@@ -145,9 +145,9 @@ int fn_8007F724(A* self, int a, int x, int y, int z)
     return fn_8053BAD0(Cur(self->m58), x, y, z);
 }
 
-int fn_805A0530(Item* it, int x, int y);
-void fn_805A06F0(List* l);
-void fn_805A06A4(List* l);
+extern "C" int fn_805A0530(Item* it, int x, int y);
+extern "C" void fn_805A06F0(List* l);
+extern "C" void fn_805A06A4(List* l);
 
 int fn_8007F784(B* self, unsigned i, int x, int y)
 {
@@ -193,12 +193,12 @@ int fn_8007F87C(B* self, int val)
     return 0;
 }
 
-void fn_8052BA70(Obj* o);
-void fn_8052BE28(Obj* o, int a, int b, int c, int d, int e);
-void fn_8052BED8(Obj* o, int a);
-S12 fn_8052BD58(Obj* o);
-void fn_8052BCC8(Obj* o);
-void fn_8052BD40(Obj* o);
+extern "C" void fn_8052BA70(Obj* o);
+extern "C" void fn_8052BE28(Obj* o, int a, int b, int c, int d, int e);
+extern "C" void fn_8052BED8(Obj* o, int a);
+extern "C" S12 fn_8052BD58(Obj* o);
+extern "C" void fn_8052BCC8(Obj* o);
+extern "C" void fn_8052BD40(Obj* o);
 int fn_8007FA1C(C* self, int* a, int* b);
 
 void fn_8007F8E4(C* self, int idx)
@@ -356,17 +356,17 @@ int fn_8007FDA8(C* self, int a, int c)
     return self->mC[c]->m8[a].w0.c != 0;
 }
 
-void fn_80086DFC(Unk8007F198_DI* p);
-void fn_8059A580(Unk8007F198_EI* p);
-void fn_8059A16C(Unk8007F198_EI* p);
-void fn_8059A0C8(Unk8007F198_EI* p);
-void fn_8059A108(Unk8007F198_EI* p);
-void fn_8059A14C(Unk8007F198_EI* p);
-void fn_8059A1DC(Unk8007F198_EI* p);
-void fn_8059A360(Unk8007F198_EI* p);
-void fn_8059A384(Unk8007F198_EI* p);
-void fn_8059A3A8(Unk8007F198_EI* p);
-void fn_8059A40C(Unk8007F198_EI* p);
+extern "C" void fn_80086DFC(Unk8007F198_DI* p);
+extern "C" void fn_8059A580(Unk8007F198_EI* p);
+extern "C" void fn_8059A16C(Unk8007F198_EI* p);
+extern "C" void fn_8059A0C8(Unk8007F198_EI* p);
+extern "C" void fn_8059A108(Unk8007F198_EI* p);
+extern "C" void fn_8059A14C(Unk8007F198_EI* p);
+extern "C" void fn_8059A1DC(Unk8007F198_EI* p);
+extern "C" void fn_8059A360(Unk8007F198_EI* p);
+extern "C" void fn_8059A384(Unk8007F198_EI* p);
+extern "C" void fn_8059A3A8(Unk8007F198_EI* p);
+extern "C" void fn_8059A40C(Unk8007F198_EI* p);
 
 void fn_8007FDD4(D* self)
 {

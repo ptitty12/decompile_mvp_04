@@ -980,8 +980,8 @@ extern "C" int fn_801EA118(I* s, int a, P* p)
     return 0;
 }
 
-Unk801DB948_Rt* fn_801A6DB8(Unk801DB948_Game* g);
-void fn_801EC5F8(I* s, int v);
+extern "C" Unk801DB948_Rt* fn_801A6DB8(Unk801DB948_Game* g);
+extern "C" void fn_801EC5F8(I* s, int v);
 void fn_802456C8(P* p, int a, int b, float f);
 extern const float lbl_805D4A30;
 extern const float lbl_805D4A40;

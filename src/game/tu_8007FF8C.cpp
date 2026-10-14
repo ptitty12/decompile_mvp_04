@@ -43,17 +43,17 @@ struct Unk8007B2B0_Screen {
 };
 struct Unk8007DB74_A;
 
-void fn_8059A490(EI* p);
-void fn_8059A4B4(EI* p);
-void fn_8059A4D8(EI* p);
-void fn_8059A4FC(EI* p);
-void fn_8052DEE8(List* l);
-void fn_8052DFDC(List* l);
-void fn_8052DE9C(List* l);
-void fn_8052A404(Slot* s, float f, int x);
-void fn_8052A894(Slot* s, int x);
-void fn_8059AB5C(void* p);
-void fn_8059AB6C(void* p);
+extern "C" void fn_8059A490(EI* p);
+extern "C" void fn_8059A4B4(EI* p);
+extern "C" void fn_8059A4D8(EI* p);
+extern "C" void fn_8059A4FC(EI* p);
+extern "C" void fn_8052DEE8(List* l);
+extern "C" void fn_8052DFDC(List* l);
+extern "C" void fn_8052DE9C(List* l);
+extern "C" void fn_8052A404(Slot* s, float f, int x);
+extern "C" void fn_8052A894(Slot* s, int x);
+extern "C" void fn_8059AB5C(void* p);
+extern "C" void fn_8059AB6C(void* p);
 void fn_80329FA0(Unk8007FF8C_Pair* out, unsigned short v, ...);
 
 
@@ -104,7 +104,7 @@ static inline int Used(void* self, int a, int n)
 void fn_80071604(I* self);
 void fn_80071688(I* self, int flags);
 void* fn_8007366C(const char* a, const char* b);
-void fn_8040074C(void* p, int n);
+extern "C" void fn_8040074C(void* p, int n);
 extern char lbl_8064AFE8[];
 extern char lbl_805B3B4C[];
 extern char lbl_805B40B8[];
@@ -134,10 +134,10 @@ static inline int CallSlot(I* self, int k, int a)
 
 
 
-void fn_80096AB4(void* p);
-void fn_80096C10(void* p);
-void fn_8009C398(void* p);
-void fn_800999CC(void* p, int v, int q); /* indexes +0x17C with r5 */
+extern "C" void fn_80096AB4(void* p);
+extern "C" void fn_80096C10(void* p);
+extern "C" void fn_8009C398(void* p);
+extern "C" void fn_800999CC(void* p, int v, int q); /* indexes +0x17C with r5 */
 void fn_80082034(Y* self);
 
 
@@ -145,15 +145,15 @@ void fn_80082034(Y* self);
 
 void fn_80096204(void* p);
 void fn_80096204(void* p, int x);
-void fn_80096770(void* self, int a, int b, int c);
-void fn_800966CC(void* self, int a, int b);
-void fn_800965E8(void* self);
-void fn_80096544(void* self, int a, int b, int c, float f);
+extern "C" void fn_80096770(void* self, int a, int b, int c);
+extern "C" void fn_800966CC(void* self, int a, int b);
+extern "C" void fn_800965E8(void* self);
+extern "C" void fn_80096544(void* self, int a, int b, int c, float f);
 void fn_80080BFC(Y* self);
 Q* fn_80081CF8(Y* self, int i);
 void fn_80081C94(Y* self, int i, int a, int b, int c);
 extern "C" void fn_80081D88(Y* self);
-void fn_800810E8(Y* self);
+extern "C" void fn_800810E8(Y* self);
 
 
 
@@ -176,7 +176,7 @@ void fn_80082308(Node* n);
 
 
 void fn_80082200(Y* self);
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 
 
 

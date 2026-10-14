@@ -19,7 +19,7 @@ public:
   virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
   virtual void v26(); virtual void v27(); virtual UiS* v28(const char* s); virtual int v29(int a);
 };
-UiS* fn_804D2310(char* p);
+extern "C" UiS* fn_804D2310(char* p);
 extern char lbl_805BE140[];
 extern char lbl_805BE154[];
 void fn_800EBF84(UiS* self, int flag)
@@ -106,7 +106,7 @@ struct UiList1C4 {
     char pad0[0x34];
     UiS* a34[1];
 };
-UiS* fn_80142410();
+extern "C" UiS* fn_80142410();
 extern char lbl_805BAA20[];
 inline UiS* PtrAtB(char* b, int off)
 {
@@ -325,8 +325,8 @@ struct UiSelfB0 {
     UiS* m64;
     char pad68[4];
 };
-int fn_800CFC28(UiNode8EC* n, float t);
-void fn_800CFD1C(UiNode8EC* n, int* a, int* b, float* c, float t);
+extern "C" int fn_800CFC28(UiNode8EC* n, float t);
+extern "C" void fn_800CFD1C(UiNode8EC* n, int* a, int* b, float* c, float t);
 extern int lbl_8061A328;
 inline void SetIntAt(char* b, int off, int v)
 {
@@ -571,10 +571,10 @@ extern "C" UiN* fn_800ED2B0(UiS* self, const char* name)
     return 0;
 }
 
-void fn_800C7E90();
-UiS* fn_800C804C(UiS* p);
-UiS* fn_800C8050(UiS* p);
-UiS* fn_800C805C(UiS* p);
+extern "C" void fn_800C7E90();
+extern "C" UiS* fn_800C804C(UiS* p);
+extern "C" UiS* fn_800C8050(UiS* p);
+extern "C" UiS* fn_800C805C(UiS* p);
 class UiV39 : public UiS0 {
 public:
   virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();

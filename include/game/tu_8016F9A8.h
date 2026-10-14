@@ -142,7 +142,7 @@ public:
 extern "C" {
 void fn_8040074C(void* p, unsigned n);                  /* clears n bytes */
 }
-void fn_8016E1B4(int a, int b);
+extern "C" void fn_8016E1B4(int a, int b);
 
 /* Entry returned by fn_80170034(info, idx): {buffer pointer, size}. */
 struct Unk8016FF40_Entry {

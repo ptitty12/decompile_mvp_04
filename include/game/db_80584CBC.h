@@ -80,7 +80,7 @@ struct Db805822D0_Base {
 extern "C" Db805822D0_Base* fn_805822D0(Db805822D0_Base* self);
 struct Db800B555C_Obj;
 Db800B555C_Obj* fn_800B555C();
-int fn_800B5758(Db800B555C_Obj* o);
+extern "C" int fn_800B5758(Db800B555C_Obj* o);
 void fn_8058233C(void* self);
 int fn_80582DF4(int a, int b, Db80586420_Tri t);
 }

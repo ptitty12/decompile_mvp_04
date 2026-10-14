@@ -21,16 +21,16 @@ extern int lbl_805E1B34[];
 extern const char lbl_805E1884[];
 extern const char lbl_805E1898[];
 
-void fn_803EDA0C(int p);
-void fn_80377408(void* p);
-void fn_80377488(void* p);
-void* fn_803774A8(unsigned n, int heap);
-int fn_80401904(int h);
-void fn_804017B0(int h, int p);
-void fn_80433004(int p, int n);
+extern "C" void fn_803EDA0C(int p);
+extern "C" void fn_80377408(void* p);
+extern "C" void fn_80377488(void* p);
+extern "C" void* fn_803774A8(unsigned n, int heap);
+extern "C" int fn_80401904(int h);
+extern "C" void fn_804017B0(int h, int p);
+extern "C" void fn_80433004(int p, int n);
 void* fn_8040B190(void* dst, const void* src, ...);
-int fn_802B9300(const char* name, int a, int b, unsigned int* outn);
-void fn_802CA5AC(int a, int b);
+extern "C" int fn_802B9300(const char* name, int a, int b, unsigned int* outn);
+extern "C" void fn_802CA5AC(int a, int b);
 void fn_80314D60(int h);
 extern const char lbl_805E186C[];
 extern int lbl_806EE9F0;
@@ -52,17 +52,17 @@ extern const void* lbl_80664250[];
 extern int lbl_806EE9F0;
 extern float lbl_805E1920;
 extern const char lbl_8060D1CC[];
-void fn_802C7C08(Unk802C7B54* o, int n, int i, char* p, int t);
+extern "C" void fn_802C7C08(Unk802C7B54* o, int n, int i, char* p, int t);
 void fn_802C7EF8(Unk802C7B54* o);
 void fn_802C86B8(Unk802C7B54* o);
-void fn_802C9EF4(void* p);
-void fn_802C8748(Unk802C7B54* o, int n, int i, char* p, int t, char* q, int u);
+extern "C" void fn_802C9EF4(void* p);
+extern "C" void fn_802C8748(Unk802C7B54* o, int n, int i, char* p, int t, char* q, int u);
 int fn_802C91DC(int v);
 int fn_804089B4(char* buf, const char* fmt, ...);
-int fn_803ED634(const char* name, int size, int flags);
-int fn_803ED604(const char* name, int size, int flags);
+extern "C" int fn_803ED634(const char* name, int size, int flags);
+extern "C" int fn_803ED604(const char* name, int size, int flags);
 void fn_803D74A0(int a, const char* b, int c);
-void fn_803E9A54(int a, const char* b, int* c, int* d);
+extern "C" void fn_803E9A54(int a, const char* b, int* c, int* d);
 int fn_802C8484(const char* name, int size);
 void fn_802C85AC(char* p);
 float fn_802AEAA0(Unk802AEB4C* o, int id);
@@ -452,7 +452,7 @@ char* strcat(char* d, const char* s);
 extern const char lbl_805E1858[];
 extern const char lbl_805E1860[];
 extern int lbl_8061E9F4;
-void fn_802C8BC8(Unk802C7B54* o, Unk802C920C_Req* req, void* rec, int c);
+extern "C" void fn_802C8BC8(Unk802C7B54* o, Unk802C920C_Req* req, void* rec, int c);
 
 struct Unk802C9284_Rec {
     int m0;
@@ -785,7 +785,7 @@ void fn_802C9EA4(Unk802C9618* o, int a)
 
 extern const char lbl_8060D1C4[];
 char* fn_8040B448(char* d, const char* s);
-void fn_803E910C(int a, const char* b, char* c, int** d);
+extern "C" void fn_803E910C(int a, const char* b, char* c, int** d);
 
 int fn_802CA518(int a, const char* b, int c)
 {
@@ -907,7 +907,7 @@ void fn_802CB7DC()
 }
 
 extern "C" float atan2f(float y, float x);
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 extern const Unk8000E618_Vec3 lbl_806055AC;
 
 inline Unk8000E618_Vec3 Sub(const Unk8000E618_Vec3& a, const Unk8000E618_Vec3& b)

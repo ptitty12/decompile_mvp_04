@@ -15,14 +15,14 @@
 struct U {
     char pad0[0x4000];
 };
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 extern char lbl_80649DA0[];
 extern char lbl_80661800[];
 extern char lbl_80661880[];
 extern char lbl_80664020[];
 extern char lbl_80664068[];
 extern char lbl_80664008[];
-void fn_8014D9C4(void* p);
+extern "C" void fn_8014D9C4(void* p);
 int fn_8035E654(int* a, int i);
 int fn_8035E6B0(int* a, int i, int v);
 char* fn_8035E8CC(char* p, unsigned i);
@@ -122,8 +122,8 @@ struct Unk8035E78C {
     Unk8035E78C_P* m0;
 };
 extern "C" int fn_8026A75C(Unk8035E704_E* a, Unk8035E704_E* b);
-void fn_8037B16C(void* p, float v);
-void fn_8037D768(void* p);
+extern "C" void fn_8037B16C(void* p, float v);
+extern "C" void fn_8037D768(void* p);
 struct Unk8035EB7C_M {
     int w[16];
 };

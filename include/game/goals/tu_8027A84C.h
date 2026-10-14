@@ -87,15 +87,15 @@ struct Unk8027A9AC_Req {
 
 extern const Unk8037B128_Mtx lbl_8060E938;       /* identity-like initial matrix (other unit's .rodata) */
 
-Unk80273498_Vec3 fn_8037B128(const Unk8037B128_Mtx* m);   /* position (row 3) */
-float fn_8037B1F0(const Unk8037B128_Mtx* m);              /* heading */
-void fn_8037D768(Unk80270BA0_X* x);
+extern "C" Unk80273498_Vec3 fn_8037B128(const Unk8037B128_Mtx* m);   /* position (row 3) */
+extern "C" float fn_8037B1F0(const Unk8037B128_Mtx* m);              /* heading */
+extern "C" void fn_8037D768(Unk80270BA0_X* x);
 Unk80273498_Vec3 fn_8018959C(float f, Unk8018959C_Obj* o);
 Unk80273498_Vec3 fn_80189618(float f, Unk8018959C_Obj* o);
 int fn_8024D41C(Unk80270BA0_X* x);
-int fn_80380964(Unk80271DBC_Link* link);
-int fn_801BBC30(int v);
-int fn_801BBEFC(int v);
+extern "C" int fn_80380964(Unk80271DBC_Link* link);
+extern "C" int fn_801BBC30(int v);
+extern "C" int fn_801BBEFC(int v);
 int fn_8018AD2C(Unk80273498_Pos* p);
 void fn_80249B40(Unk80270BA0_X* x, float f, int a, int b, int c);
 void fn_80249DF8(Unk80270BA0_X* x, int a);

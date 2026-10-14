@@ -15,7 +15,7 @@
 struct U {
     char pad0[0x4000];
 };
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 extern char lbl_80649DA0[];
 extern char lbl_806608E0[];
 extern char lbl_80660910[];
@@ -37,14 +37,14 @@ extern const float lbl_805D6748;
 extern const float lbl_805D674C;
 extern const float lbl_805D6750;
 extern const float lbl_805D6754;
-void fn_80211B58(void* p, int chrg);
+extern "C" void fn_80211B58(void* p, int chrg);
 extern char lbl_806608F8[];
 extern char lbl_80660940[];
 extern char lbl_80660A18[];
 extern char lbl_80660AA8[];
-void fn_8035D710(void* p);
-void fn_8020DF6C(void* p);
-void fn_80211C04(void* p);
+extern "C" void fn_8035D710(void* p);
+extern "C" void fn_8020DF6C(void* p);
+extern "C" void fn_80211C04(void* p);
 void fn_8035D85C(void* p);
 void fn_8035B940(U* self, int v);
 extern float lbl_805D6758;

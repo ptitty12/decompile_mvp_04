@@ -15,15 +15,15 @@ extern int lbl_8062087C;
 extern int lbl_8061C3A4;
 extern int lbl_8061C3A8;
 extern int lbl_8062151C;
-int fn_801DC10C(void* p);
+extern "C" int fn_801DC10C(void* p);
 int fn_80259330(void* p);
 void fn_8016C4A0(void* p);
-void fn_80327214(Unk801527C8_Sub* s);
-void fn_80327274(Unk801527C8_Sub* s);
+extern "C" void fn_80327214(Unk801527C8_Sub* s);
+extern "C" void fn_80327274(Unk801527C8_Sub* s);
 Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
-Unk801527C8_Actor* fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
-Unk801527C8_Actor* fn_801A4910(Unk801527C8_Actor* a, int k, int v);
-int fn_8014E310(int id);
+extern "C" Unk801527C8_Actor* fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
+extern "C" Unk801527C8_Actor* fn_801A4910(Unk801527C8_Actor* a, int k, int v);
+extern "C" int fn_8014E310(int id);
 /* Pair8 layout and C return ABI are shared with tu_8022BB90. */
 struct Pair8 {
     float x;
@@ -1019,10 +1019,10 @@ public:
     int mC;
     int m10;
 };
-int fn_80166BD0(void* self);
-void fn_80166FEC(void* self, int a, int b, int c, int d);
-int fn_8018240C(void* p, int f);
-int fn_803EE348(int a);
+extern "C" int fn_80166BD0(void* self);
+extern "C" void fn_80166FEC(void* self, int a, int b, int c, int d);
+extern "C" int fn_8018240C(void* p, int f);
+extern "C" int fn_803EE348(int a);
 void fn_80303CA0(const char* s, float a, float b, float c, ...);
 extern "C" void fn_8037893C(void* q, int id, void* e, int a, int b);
 

@@ -289,7 +289,7 @@ struct Unk801A4C20_Ret {
     int mB48;
 };
 Unk801A4C20_Ret* fn_801A4C20();
-void fn_801C3D44(Unk8027107C_Inner* p, float* a, float* b);
+extern "C" void fn_801C3D44(Unk8027107C_Inner* p, float* a, float* b);
 float fn_8024BFEC(Unk80270BA0_X* x, float v);
 float fn_8026FDB0(Unk80270BA0_Obj* obj);
 
@@ -515,7 +515,7 @@ int fn_8026FB60(const float* a, const float* b)
     return *a > *b;
 }
 
-float fn_804028E4(float x);               /* square root */
+extern "C" float fn_804028E4(float x);               /* square root */
 void fn_8040A208(void* base, int count, int size, int (*cmp)(const float*, const float*));
 extern char lbl_806EF9C7;
 

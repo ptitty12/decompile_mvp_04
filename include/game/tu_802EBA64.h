@@ -7,6 +7,6 @@
  * two-argument-swapping wrapper that passes r5 through.
  */
 
-void fn_802EBA90(void* a, void* b, void* c);
+extern "C" void fn_802EBA90(void* a, void* b, void* c);
 
 #endif

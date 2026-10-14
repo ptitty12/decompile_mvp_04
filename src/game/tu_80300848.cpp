@@ -264,7 +264,7 @@ struct Unk80301E44_O {
 };
 extern Unk80301E44_V lbl_805E77EC;
 extern float lbl_8061F924;
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 extern "C" float fn_8018514C(void* o, Unk80301E44_V* v, void* out);
 static inline Unk80301E44_V Sub80301E44(const Unk80301E44_V& a, const Unk80301E44_V& b)
 {

@@ -382,7 +382,7 @@ void fn_80341998(Unk80341928* p, int c);
 void fn_803418DC(Unk8034186C* p, int c);
 void fn_80341820(Unk803417B0* p, int c);
 void fn_80341764(Unk803416F4* p, int c);
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 struct Unk800575E4_E1 {
     char pad0[0xC];
     virtual ~Unk800575E4_E1();

@@ -28,8 +28,8 @@ int fn_80088234(void* o, int i);
 
 extern const float lbl_805D7D0C;
 extern const float lbl_805D7D10;
-Unk8022FE34_X6D* fn_801A6DB8(Unk8022FE34_Ctx* c);
-void fn_8023AC54(int a, int b);
+extern "C" Unk8022FE34_X6D* fn_801A6DB8(Unk8022FE34_Ctx* c);
+extern "C" void fn_8023AC54(int a, int b);
 
 struct Unk8023A6C8_Pt {
     char pad0[0x14];
@@ -456,7 +456,7 @@ struct Unk8023C514_O {
 };
 extern char lbl_8061D228[];
 extern char lbl_8061D264[];
-int fn_8009E1D4(void* p, int a, int b);
+extern "C" int fn_8009E1D4(void* p, int a, int b);
 int fn_80084114(int a);
 void fn_8023C514(Unk8023C514_O* o, Unk8023C514_C* c)
 {
@@ -584,7 +584,7 @@ int fn_801A2034(Unk8019F8C0_Owner* o, int k);
 int fn_802536D0(Unk8024EF40_P* p);
 void fn_8025374C(Unk8024EF40_P* p);
 float fn_8024D0F8(Unk80270BA0_X* x, int k);
-int fn_801DCB48(int a);
+extern "C" int fn_801DCB48(int a);
 inline float Unk8023C868_Lerp(float a, float t, float b)
 {
     return t * (b - a) + a;
@@ -686,7 +686,7 @@ int* fn_8023CB44()
     return &lbl_8068CCFC;
 }
 
-void fn_8023CD70(void* p);
+extern "C" void fn_8023CD70(void* p);
 
 class Unk8023DB44_Q {
 public:

@@ -16,7 +16,7 @@ struct Unk8005B0EC_Ev {
 extern char lbl_80649DA0[];
 extern char lbl_80649BE0[];
 int fn_8005C6E0(Unk8005BA1C_Obj* o, int ch);
-void fn_8037893C(void* self, int id, Unk8005B0EC_Ev* e, int a, int b);
+extern "C" void fn_8037893C(void* self, int id, Unk8005B0EC_Ev* e, int a, int b);
 
 int fn_8005ADD0(Unk8005ADD0_Obj* o, int ch)
 {

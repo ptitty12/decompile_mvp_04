@@ -71,7 +71,7 @@ struct Unk802A36B0_Ctx {
  * shape as the ones in tu_8029B70C.h. */
 UNK8029B70C_MIRROR(Unk8029B70C_Mirror90, int, 0x90)
 
-float fn_804028E4(float f);
+extern "C" float fn_804028E4(float f);
 int fn_8026DC18(Unk80270BA0_X* x, int a);
 int fn_8026D988(Unk80270BA0_X* x, int a);
 int fn_8026D578(Unk80270BA0_X* x, int a);
@@ -125,9 +125,9 @@ struct Unk802A3408_Player {
     Unk80273498_Vec3 m320;
 };
 
-int fn_801CEADC(Unk8027107C_Inner* p);
-void fn_801CEA44(Unk80273498_Vec3* out, Unk8027107C_Inner* p, int k);
-int fn_802A30B0(Unk802A309C_Goal* g, Unk80270BA0_X* x);
+extern "C" int fn_801CEADC(Unk8027107C_Inner* p);
+extern "C" void fn_801CEA44(Unk80273498_Vec3* out, Unk8027107C_Inner* p, int k);
+extern "C" int fn_802A30B0(Unk802A309C_Goal* g, Unk80270BA0_X* x);
 void fn_802A36B0(Unk802A309C_Goal* g);
 extern const float lbl_805DE118;
 
@@ -181,8 +181,8 @@ struct Unk802A1790_Pos {
     int m390;
 };
 
-float fn_8041171C(float a);        /* sin */
-float fn_80411554(float a);        /* cos */
+extern "C" float fn_8041171C(float a);        /* sin */
+extern "C" float fn_80411554(float a);        /* cos */
 
 /* Unary minus on a vector: three negations (fn_802A1790). */
 inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a)
@@ -235,9 +235,9 @@ inline Unk802A1790_V3 operator+(const Unk80273498_Vec3& a, const Unk802A1790_V3&
 }
 
 float fn_8024D0C4(Unk80270BA0_X* x, int a, float f1, float f2);
-int fn_8024D408(Unk80270BA0_X* x);
+extern "C" int fn_8024D408(Unk80270BA0_X* x);
 int fn_8026D654(Unk80270BA0_X* x, int a);
-void fn_80191068(Unk802A1790_Pos* p, Unk80273498_Vec3* v, int a, float* out, float f1, float f2);
+extern "C" void fn_80191068(Unk802A1790_Pos* p, Unk80273498_Vec3* v, int a, float* out, float f1, float f2);
 extern float lbl_8061E858;
 extern float lbl_8061E85C;
 extern float lbl_8061E850;
@@ -267,9 +267,9 @@ int fn_8029D7D4(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int a, int b, int c, int 
 
 void fn_802771A0(int a);
 void fn_802D7B88(int a, int b, float f, int c);
-float fn_804028E4(float f);
-int fn_80380964(Unk80271DBC_Link* link);
+extern "C" float fn_804028E4(float f);
+extern "C" int fn_80380964(Unk80271DBC_Link* link);
 float fn_80249188(Unk80270BA0_X* x, float f);
-void fn_801CE9D8(Unk8027107C_Inner* p);
+extern "C" void fn_801CE9D8(Unk8027107C_Inner* p);
 
 #endif /* GAME_GOALS_TU_8029EE50_H */

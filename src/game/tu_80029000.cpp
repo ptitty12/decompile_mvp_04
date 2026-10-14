@@ -183,8 +183,8 @@ extern "C" void fn_80029480(Unk80023AC4_Obj* x)
 }
 
 
-void fn_8003514C(int d, int a, int b, int c, int e);
-void fn_80034FE4(int d, int a, int b, int c, int e);
+extern "C" void fn_8003514C(int d, int a, int b, int c, int e);
+extern "C" void fn_80034FE4(int d, int a, int b, int c, int e);
 void fn_8003B914(int m, int a, int b, int c, int d);
 extern const float lbl_805A6304;
 
@@ -277,7 +277,7 @@ extern "C" void fn_80029958(Unk80023AC4_Obj* x)
     x->m6BC = 0;
 }
 
-void fn_80034F3C(int a, int b, int c, int d, int e);
+extern "C" void fn_80034F3C(int a, int b, int c, int d, int e);
 void fn_8003BDE8(int a, int b, int c);
 void fn_8003B6D0(int a, int b, int c, int d, int e);
 struct Unk8022FE34_U {
@@ -364,8 +364,8 @@ extern "C" void fn_80029DB8(Unk80023AC4_Obj* x)
     fn_80023F98(x);
 }
 
-void fn_80034EA8(int d, int a, unsigned b, int c);
-void fn_80036064(int a, int b, int c, int d);
+extern "C" void fn_80034EA8(int d, int a, unsigned b, int c);
+extern "C" void fn_80036064(int a, int b, int c, int d);
 void fn_8003C270(int m, int r);
 void fn_8003C188(int m);
 void fn_8003BFE0(int m, int r, int s, int t);
@@ -571,7 +571,7 @@ extern "C" void fn_8002A920(Unk80023AC4_Obj* x)
     }
 }
 
-void fn_80039A3C(int a, int b, int c);
+extern "C" void fn_80039A3C(int a, int b, int c);
 
 extern "C" void fn_8002AA5C(Unk80023AC4_Obj* x)
 {

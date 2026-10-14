@@ -85,7 +85,7 @@ struct Unk80271DBC_Link {
     char pad83C[0x888 - 0x83C];
     float m888;
 };
-float fn_80382BB8(Unk80271DBC_Link* p);                  /* returns m888 */
+extern "C" float fn_80382BB8(Unk80271DBC_Link* p);                  /* returns m888 */
 
 /* Second argument of the warps' slots 11, 13 and 14; only its first virtual is
  * used here (same layout as chooser.h's Unk80270BA0_Obj). */

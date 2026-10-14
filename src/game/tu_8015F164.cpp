@@ -16,7 +16,7 @@ extern "C" void fn_8015FC00(Unk80159F28* self, Unk8015ABB8_Rec r, Unk8016D9A0_Re
 int fn_80166440(void* self, int v);
 extern "C" void fn_8015F918(Unk80159F28* self, int a);
 int fn_801A4F40(Unk8019F8C0_Owner* o);
-int fn_803EE348(int a);
+extern "C" int fn_803EE348(int a);
 extern "C" int fn_80166BD0(Unk80159F28* self);
 void fn_80303CA0(const char* s, float a, float b, float c, ...);
 extern "C" int fn_8017706C__FP13Unk8017706C_Ti(void* t, int i);
@@ -41,7 +41,7 @@ inline int Chance2_801609EC(void* rng, float k)
 struct Ev8015F348 { int m0; float m4; int m8; int mC; int m10; int m14; };
 inline int IsValidId(int id) { return id != 0xC7; }
 inline int Has8015F348(int v, int bit) { return (v & bit) != 0; }
-int fn_80324D74(void* e, int i);
+extern "C" int fn_80324D74(void* e, int i);
 enum E1_8015F508 { E1_Neg = -1, E1_9 = 9, E1_12 = 12 };
 inline int Chance80162C28(void* rng, float k)
 {
@@ -83,7 +83,7 @@ public:
     int m708;
 };
 extern "C" Obj708_8015F164* fn_801C1638(Unk801527C8_Actor* a, int i);
-int fn_8018240C(void* a, int b);
+extern "C" int fn_8018240C(void* a, int b);
 inline int IsValid(const Unk80326F44_Out& o)
 {
     return o.m0 != 0xC7;

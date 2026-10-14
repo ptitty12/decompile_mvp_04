@@ -125,7 +125,7 @@ struct Unk8028F178_Ctx {
     Unk8028F178_Pos6CC* m6CC;
 };
 
-int fn_802977FC(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk80279BB8* r, int a, int b, int c, int d, float f);
+extern "C" int fn_802977FC(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk80279BB8* r, int a, int b, int c, int d, float f);
 void fn_802987C8(Unk8028F178_Goal* a, Unk8028F178_Goal* b);
 
 int fn_8029771C(Unk8028F178_Goal* g);
@@ -148,21 +148,21 @@ float fn_80248FC8(Unk80270BA0_X* x, int a);
 float fn_802966DC(Unk8028F178_Goal* g, Unk80270BA0_X* x);
 int fn_8026D5A4(Unk80270BA0_X* x, int a);
 int fn_80247858(Unk80270BA0_X* x, int a);
-int fn_80294EE4(Unk8028F178_Goal* g, Unk80270BA0_X* x);
-void fn_80296C78(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk8028F178_Ctx* ctx);
+extern "C" int fn_80294EE4(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern "C" void fn_80296C78(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk8028F178_Ctx* ctx);
 int fn_80297764(Unk8028F178_Goal* g);
 int fn_802977B0(Unk8028F178_Goal* g);
 void fn_80296924(Unk8028F178_Goal* g, Unk80270BA0_X* x);
-int fn_8027C2D0(Unk8028F178_Goal* g, Unk80270BA0_X* x, int a);
-int fn_8029543C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern "C" int fn_8027C2D0(Unk8028F178_Goal* g, Unk80270BA0_X* x, int a);
+extern "C" int fn_8029543C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
 int fn_802914C8(Unk8028F178_Goal* g, Unk80270BA0_X* x);
-int fn_8029155C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
-int fn_80291F74(Unk8028F178_Goal* g, Unk80270BA0_X* x);
-int fn_802924D4(Unk8028F178_Goal* g, Unk80270BA0_X* x);
-int fn_80292ABC(Unk8028F178_Goal* g, Unk80270BA0_X* x);
-int fn_80293EE0(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern "C" int fn_8029155C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern "C" int fn_80291F74(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern "C" int fn_802924D4(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern "C" int fn_80292ABC(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern "C" int fn_80293EE0(Unk8028F178_Goal* g, Unk80270BA0_X* x);
 int fn_802931B0(Unk8028F178_Goal* g, Unk80270BA0_X* x);
-int fn_8029055C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern "C" int fn_8029055C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
 extern Unk80273498_Vec3 lbl_805DED28[];
 int fn_8027B55C(Unk8028F178_Goal* g, Unk80270BA0_X* x, int a, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int b, int c,
                 int* d, int* e, float f);
@@ -190,8 +190,8 @@ class cMatrixChooser {
 public:
     int fn_8026FB80(Unk80270BA0_Obj* obj, float* out);
 };
-Unk8028F220_Entry* fn_80384A48(unsigned int hash);
-Unk8028F220_Chooser* fn_8037D028(Unk8037C7FC* mgr, int a);
+extern "C" Unk8028F220_Entry* fn_80384A48(unsigned int hash);
+extern "C" Unk8028F220_Chooser* fn_8037D028(Unk8037C7FC* mgr, int a);
 extern int lbl_8061E770[2];
 extern int lbl_806242B4;
 extern int lbl_806242B8;

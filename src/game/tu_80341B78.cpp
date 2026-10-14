@@ -4,8 +4,8 @@
  */
 #include "game/tu_803401A8.h"
 
-void fn_80377488(void* p);
-void fn_80377408(void* p);
+extern "C" void fn_80377488(void* p);
+extern "C" void fn_80377408(void* p);
 
 struct Unk80341B5C {
     int m0;
@@ -251,8 +251,8 @@ unsigned short fn_80341FF4(Unk80341FF4* self)
     return self->mC;
 }
 
-void* fn_803774A8(int size, int heap);
-int fn_803EE7BC();
+extern "C" void* fn_803774A8(int size, int heap);
+extern "C" int fn_803EE7BC();
 
 struct Unk803416F4 {
     void* m0;

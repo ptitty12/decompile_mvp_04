@@ -13,10 +13,10 @@
 #include "game/tu_8003EF18.h"
 
 void* fn_800B555C();
-int fn_800B57EC(void* p);
-int fn_8009E1D4(void* p, int a, int b);
-int fn_800B5898(void* p);
-int fn_800B55A8(void* p);
+extern "C" int fn_800B57EC(void* p);
+extern "C" int fn_8009E1D4(void* p, int a, int b);
+extern "C" int fn_800B5898(void* p);
+extern "C" int fn_800B55A8(void* p);
 int fn_8006A1B4(void* p);
 int fn_80046828(float f);
 int fn_800467C0(float f);

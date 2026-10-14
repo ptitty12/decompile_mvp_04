@@ -393,7 +393,7 @@ int fn_802871D8(int a)
     return r;
 }
 
-void fn_802872AC(Unk80283934_Goal* g, int a, int b, int c, int d, ...);
+extern "C" void fn_802872AC(Unk80283934_Goal* g, int a, int b, int c, int d, ...);
 
 Unk80283934_Goal* fn_80287250(Unk80283934_Goal* g, int a, int b, int c, int d)
 {

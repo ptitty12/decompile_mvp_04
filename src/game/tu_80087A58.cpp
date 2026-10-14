@@ -168,7 +168,7 @@ void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
 void fn_80071604(void* self);
 void fn_80071688(void* self, int flags);
 void* fn_8007366C(const char* a, const char* b);
-void fn_8040074C(void* p, int n);
+extern "C" void fn_8040074C(void* p, int n);
 extern char lbl_805B3B4C[];
 extern char lbl_805B4BAC[];
 extern char lbl_8064AE98[];

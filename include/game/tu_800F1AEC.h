@@ -888,9 +888,9 @@ struct Ui800B555C {
     int m668;
 };
 Ui800B555C* fn_800B555C();
-int fn_800B57EC(Ui800B555C* p);
-UiX* fn_804D2ED0(UiObj* self, int a);
-UiObj* fn_8051F42C(UiX* x);
+extern "C" int fn_800B57EC(Ui800B555C* p);
+extern "C" UiX* fn_804D2ED0(UiObj* self, int a);
+extern "C" UiObj* fn_8051F42C(UiX* x);
 
 int fn_800F5AE0(UiObj* self, int a);
 int fn_800F7C34(UiScr13C* self, int a);
@@ -1037,12 +1037,12 @@ struct Ui8011AA24 {
     char pad78C[4];
     int m790;
 };
-Ui8011AA24* fn_8011AA24(int a);
+extern "C" Ui8011AA24* fn_8011AA24(int a);
 struct Ui800C33D0 {
     char pad0[0x5DA4];
     int m5DA4;
 };
-Ui800C33D0* fn_800C33D0();
+extern "C" Ui800C33D0* fn_800C33D0();
 /* lbl_8068B618 -> +8 -> +0x564 -> +0x14 (fn_80105AB8). */
 struct Ui8068B618_C {
     char pad0[0x14];
@@ -1062,7 +1062,7 @@ struct Ui801A6D84 {
     int m3D90;
 };
 Ui801A6D84* fn_801A6D84(void* a, int b);
-void fn_8011C15C(UiObj* self);
+extern "C" void fn_8011C15C(UiObj* self);
 extern Ui8068B618_A* lbl_8068B618;
 
 /* Derived widget: base UiWRaw (ctor fn_800FEC00) then +0x30. */
@@ -1071,7 +1071,7 @@ struct UiW2 : UiWRaw {
     int m30;
     UiW2();
 };
-void fn_8011BFAC(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" void fn_8011BFAC(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
 
 /* lbl_8061B8C0: global object, +0x24 cleared by fn_800FCFAC. */
 struct Ui8061B8C0 {
@@ -1098,10 +1098,10 @@ inline UiMsgMgr* UiGetMsgMgr()
         lbl_8061A32C = new (0) UiMsgMgr;
     return lbl_8061A32C;
 }
-void fn_8035682C(UiMsg* m);
-void fn_800B7B4C(UiMsgMgr* mgr, UiMsg* m, UiObj* ctx);
+extern "C" void fn_8035682C(UiMsg* m);
+extern "C" void fn_800B7B4C(UiMsgMgr* mgr, UiMsg* m, UiObj* ctx);
 struct UiV_140i_148_14C;
-UiV_140i_148_14C* fn_800B7AB8(UiMsgMgr* mgr, const char* name);
+extern "C" UiV_140i_148_14C* fn_800B7AB8(UiMsgMgr* mgr, const char* name);
 
 /* Ring of byte indices at screen +0x168 (fn_800F26A0). */
 struct UiRing {
@@ -1153,9 +1153,9 @@ struct UiScr3FCC {
     char m678[0x7F0 - 0x678];
     const void* m7F0;
 };
-void fn_804D3DD0(char* p, int a);
-void fn_804D61F4(char* p, int a);
-void fn_80360F48(char* p, int a);
+extern "C" void fn_804D3DD0(char* p, int a);
+extern "C" void fn_804D61F4(char* p, int a);
+extern "C" void fn_80360F48(char* p, int a);
 void fn_800EC5F4(UiSub1CC* p, int a);
 void fn_8035686C(UiScr3FCC* self, int a);
 
@@ -1164,15 +1164,15 @@ struct Ui800ABF3C {
     char pad0[0x18];
     int m18;
 };
-Ui800ABF3C* fn_800ABF3C(int a, Ui8011AA24* b);
-void fn_800AB5C8(int a);
-void* fn_800AEC80();
-int fn_800B1FCC();
-void fn_800C80C0(UiObj* o, int a);
+extern "C" Ui800ABF3C* fn_800ABF3C(int a, Ui8011AA24* b);
+extern "C" void fn_800AB5C8(int a);
+extern "C" void* fn_800AEC80();
+extern "C" int fn_800B1FCC();
+extern "C" void fn_800C80C0(UiObj* o, int a);
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(int, UiObj*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
 int fn_80403DE4(char* buf, const char* fmt, ...);
 int fn_80090880(int a, int b);
-UiObj* fn_800C8040(int a);
+extern "C" UiObj* fn_800C8040(int a);
 
 struct Ui8010B1E0 {
     char pad0[0x704];
@@ -1180,19 +1180,19 @@ struct Ui8010B1E0 {
     int m708;
 };
 int fn_8025416C(char* p, int a);
-int fn_800DE274(short* p, int a, int b); /* tail-returns fn_800DE6A8 */
+extern "C" int fn_800DE274(short* p, int a, int b); /* tail-returns fn_800DE6A8 */
 int fn_800E5F38(int a);
-int fn_800E5E4C(int a);
-int fn_80097288(int a, int b);
+extern "C" int fn_800E5E4C(int a);
+extern "C" int fn_80097288(int a, int b);
 extern int lbl_8061977C;
 int fn_8010A7A0(int a);
 
 int fn_804089B4(char* buf, const char* fmt, ...);
-int fn_8011B6F8(int a, int b);
-float fn_8011B81C(int a, int b, int c);
-void fn_80119F48(char* buf, float f);
-float fn_8011B954(int a, int b);
-void fn_80119FF0(char* buf, float f);
+extern "C" int fn_8011B6F8(int a, int b);
+extern "C" float fn_8011B81C(int a, int b, int c);
+extern "C" void fn_80119F48(char* buf, float f);
+extern "C" float fn_8011B954(int a, int b);
+extern "C" void fn_80119FF0(char* buf, float f);
 
 /* Screen constructed by fn_8010A70C (fields up to +0x244). */
 struct UiScrA70C {
@@ -1219,16 +1219,16 @@ struct UiScrA70C {
     char m238[12];
 };
 void fn_800EC648(UiScrA70C* self, int a, int b, int c, int d, int e, int f, int g, int h);
-void fn_803FFC58(char* p, int v, int n);
+extern "C" void fn_803FFC58(char* p, int v, int n);
 
 extern int lbl_8061B3BC;
 void fn_8010098C(char* p, int a);
-int fn_802D7DB4(int a, int b);
-void fn_800C3DCC(Ui800C33D0* g, UiObj* o, int a);
+extern "C" int fn_802D7DB4(int a, int b);
+extern "C" void fn_800C3DCC(Ui800C33D0* g, UiObj* o, int a);
 void fn_80101A64(UiScr2A8* self);
 
 void fn_800FEB30(const char* s, int a);
-void fn_8011A1D4(Ui8010B1E0* a, int b, UiObj* c, int d);
+extern "C" void fn_8011A1D4(Ui8010B1E0* a, int b, UiObj* c, int d);
 
 /* Screen with flag at +0x14C and a record at +0x1AC (fn_8010750C). */
 struct UiScr8010750C : UiObj {
@@ -1241,26 +1241,26 @@ void fn_80108070(UiObj* self, int a);
 void fn_80105AE8(UiObj* self, int a, int b);
 void fn_80105048(UiObj* self, int idx, char* e);
 void fn_801051D0(UiObj* self, int a, int b);
-int fn_800B5520(int a);
+extern "C" int fn_800B5520(int a);
 int fn_80105AB8();
-int fn_800ED00C(UiObj* self);
-int fn_800C8070(UiObj* self);
+extern "C" int fn_800ED00C(UiObj* self);
+extern "C" int fn_800C8070(UiObj* self);
 int fn_8040B3B4(const char* a, const char* b);
 
 struct UiArr158 {
     char pad0[0x158];
     int m158[1];
 };
-UiObj* fn_800C8034(int a);
-void fn_800B7ADC(UiMsgMgr* mgr, UiObj* o);
+extern "C" UiObj* fn_800C8034(int a);
+extern "C" void fn_800B7ADC(UiMsgMgr* mgr, UiObj* o);
 void fn_801089E4(UiObj* self, int a);
 extern int lbl_80620298;
 
-int fn_801184F4(int a, int b, int c, int d, int e, int f, int g, int h, int i);
-int fn_8011B4E4();
+extern "C" int fn_801184F4(int a, int b, int c, int d, int e, int f, int g, int h, int i);
+extern "C" int fn_8011B4E4();
 void fn_802D7A74();
 void fn_802D8294(int a);
-UiObj* fn_800C8044(int a);
+extern "C" UiObj* fn_800C8044(int a);
 
 struct Ui144 {
     char pad0[0x38];
@@ -1274,11 +1274,11 @@ struct Ui4078 : UiObj {
     char pad40[0x138 - 0x40];
     Ui138* m138;
 };
-void fn_8055AC44(char* p, int a);
+extern "C" void fn_8055AC44(char* p, int a);
 void fn_800EB56C(UiObj* self);
-void fn_804D292C(Ui144* p, int a);
-void fn_80086EC0(Ui806192E0_C* p, int a, int b);
-void fn_8012E1C4(Ui138* p, int a, int b);
+extern "C" void fn_804D292C(Ui144* p, int a);
+extern "C" void fn_80086EC0(Ui806192E0_C* p, int a, int b);
+extern "C" void fn_8012E1C4(Ui138* p, int a, int b);
 
 int fn_8007E48C(int a, int b, int c);
 int fn_8040ABA0();
@@ -1302,10 +1302,10 @@ void fn_801A9D2C(Ui3C4* q, int a, int b);
 void fn_801A9CFC(Ui3C4* q, int a, int b);
 void fn_801A9D0C(Ui3C4* q, int a, int b);
 void fn_80106890(UiObj* self);
-int fn_8011B5A4();
+extern "C" int fn_8011B5A4();
 void fn_800FEC24(UiV_0i_4i* self, int a, int b);
 
-UiObj* fn_800B7A94(UiMsgMgr* mgr, const char* name);
+extern "C" UiObj* fn_800B7A94(UiMsgMgr* mgr, const char* name);
 void fn_80124FA8(UiObj* o, UiObj* self);
 void fn_801251CC(UiObj* o, int a, int b, int c);
 int fn_80125490(UiObj* o, int a, int b, int c, int d);
@@ -1316,60 +1316,60 @@ struct UiEvtRaw {
     int id;
     const void* vt;
 };
-void fn_8037893C(char* p, int id, UiEvtRaw* e, int a, int b);
-void fn_8017D378(Ui700* p, int a);
+extern "C" void fn_8037893C(char* p, int id, UiEvtRaw* e, int a, int b);
+extern "C" void fn_8017D378(Ui700* p, int a);
 
-int fn_80097318(char* e, int p);
-int fn_80097380(char* e, int p);
-int fn_800973E8(char* e, int p);
-int fn_80097450(char* e, int p);
-int fn_800974B8(char* e, int p);
+extern "C" int fn_80097318(char* e, int p);
+extern "C" int fn_80097380(char* e, int p);
+extern "C" int fn_800973E8(char* e, int p);
+extern "C" int fn_80097450(char* e, int p);
+extern "C" int fn_800974B8(char* e, int p);
 extern "C" void fn_8010D33C(UiObj* o, int a);
 
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(int, UiObj*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 int fn_8010671C();
 void fn_80106690(int a, UiObj* b);
 extern int lbl_8061EE14;
-void fn_801A750C(int a, int b);
-void fn_802D7ADC();
+extern "C" void fn_801A750C(int a, int b);
+extern "C" void fn_802D7ADC();
 void fn_802D7A64();
 
-int fn_804D3B18(UiObjC* self);
-void fn_804D2F9C(UiObjC* self);
-void fn_804D304C(UiObjC* self);
+extern "C" int fn_804D3B18(UiObjC* self);
+extern "C" void fn_804D2F9C(UiObjC* self);
+extern "C" void fn_804D304C(UiObjC* self);
 
-char* fn_801A4B34(int a);
-void fn_8011A14C(char* t, UiObj* o, const char* s, int a);
+extern "C" char* fn_801A4B34(int a);
+extern "C" void fn_8011A14C(char* t, UiObj* o, const char* s, int a);
 void fn_8011A268(char* t, UiObj* o, const char* s);
 
 void fn_800F595C(UiObj* self, int* p, int n);
 
-void fn_800B2390();
-void fn_800AB578(int a);
-void fn_800AEDDC();
-void fn_800B5364();
+extern "C" void fn_800B2390();
+extern "C" void fn_800AB578(int a);
+extern "C" void fn_800AEDDC();
+extern "C" void fn_800B5364();
 
-void fn_800FCB38(UiObj* self, int* m);
-void fn_800FCD0C(UiObj* self, int* m);
+extern "C" void fn_800FCB38(UiObj* self, int* m);
+extern "C" void fn_800FCD0C(UiObj* self, int* m);
 
-void fn_802DC9C0();
-int fn_8011AA4C();
+extern "C" void fn_802DC9C0();
+extern "C" int fn_8011AA4C();
 void fn_80124FA8(UiObj* self);
 void fn_800F96E0(UiObj* self);
 void fn_800F988C(UiObj* self);
 
-void fn_800F8698(UiObj* self);
-void fn_800F8AD8(UiObj* self);
+extern "C" void fn_800F8698(UiObj* self);
+extern "C" void fn_800F8AD8(UiObj* self);
 
-void fn_801268C4(UiObj* o, Ui6F8* p, int a, int b, int c, int d, int e, int f, void (*cb)(), int g, int h, int i, int j, int k, int l);
+extern "C" void fn_801268C4(UiObj* o, Ui6F8* p, int a, int b, int c, int d, int e, int f, void (*cb)(), int g, int h, int i, int j, int k, int l);
 
-int fn_8011BD94(Ui8011AA24* g, int p);
-int fn_8011BE1C(Ui8011AA24* g, int p);
-int fn_8011BF1C(Ui8011AA24* g, int p);
+extern "C" int fn_8011BD94(Ui8011AA24* g, int p);
+extern "C" int fn_8011BE1C(Ui8011AA24* g, int p);
+extern "C" int fn_8011BF1C(Ui8011AA24* g, int p);
 void fn_80109660(UiObj* self);
 void fn_80109A98(UiObj* self);
 void fn_8010A3FC(UiObj* self);
-void fn_80118A70(UiObj* o);
+extern "C" void fn_80118A70(UiObj* o);
 
 void fn_801A8198(int a);
 
@@ -1377,19 +1377,19 @@ struct Ui80619D10 {
     char pad0[0x444];
     int m444;
 };
-void fn_80102BD4(UiObj* self, int a, UiObj* b);
+extern "C" void fn_80102BD4(UiObj* self, int a, UiObj* b);
 void fn_80102B7C(UiV_134_138* self, int a);
 void fn_80102B0C(UiV_134_138* self, int a);
 
-void fn_80097620(int p, int a, unsigned char b, int c);
-void fn_80097EA4(int p, int a, unsigned char b, int c, int d);
+extern "C" void fn_80097620(int p, int a, unsigned char b, int c);
+extern "C" void fn_80097EA4(int p, int a, unsigned char b, int c, int d);
 
-void fn_800C3AB4(Ui800C33D0* g, int a);
-int fn_801A497C(Ui8011AA24* g, int a);
+extern "C" void fn_800C3AB4(Ui800C33D0* g, int a);
+extern "C" int fn_801A497C(Ui8011AA24* g, int a);
 int fn_801770E8(int a, int b);
-void fn_8010325C(UiObj* self, int a, int b, int c);
+extern "C" void fn_8010325C(UiObj* self, int a, int b, int c);
 
-void fn_800DFF0C(short* dst, const short* src);
+extern "C" void fn_800DFF0C(short* dst, const short* src);
 int fn_80403DE4(short* buf, const short* fmt, ...);
 
 struct Ui6F8_10b {
@@ -1434,8 +1434,8 @@ struct Ui72F0 {
 };
 void fn_800EC648(Ui72F0* self, int a, int b, int c, int d, int e, int f, int g, int h);
 
-int fn_8011BD3C(Ui8011AA24* g, int p);
-int fn_8011BD0C(Ui8011AA24* g, int p);
+extern "C" int fn_8011BD3C(Ui8011AA24* g, int p);
+extern "C" int fn_8011BD0C(Ui8011AA24* g, int p);
 int fn_8017C974(Ui700* p);
 
 struct Ui9F58 : UiObj {
@@ -1446,19 +1446,19 @@ struct Ui9F58 : UiObj {
     int m144;
 };
 int fn_80109F50();
-void fn_801321D4(UiObj* o, UiObj* self, void (*cb)(int, UiV_144s*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern "C" void fn_801321D4(UiObj* o, UiObj* self, void (*cb)(int, UiV_144s*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 void fn_8010A0A4(Ui9F58* self);
 
 void fn_800F1970(UiObj* self);
-int fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
-void fn_800ECF18(UiObj* self);
+extern "C" int fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
+extern "C" void fn_800ECF18(UiObj* self);
 void fn_80107C94(UiObj* self);
-void fn_800ED254(UiObj* self);
+extern "C" void fn_800ED254(UiObj* self);
 void fn_800EB7D4(UiObj* self);
-void fn_800C3BE0();
+extern "C" void fn_800C3BE0();
 int fn_800F9290(UiObj* self, int a);
 char* fn_8040B830(char* dst, const char* src, unsigned n);
-void fn_80100744(void* self);
+extern "C" void fn_80100744(void* self);
 void fn_800ED310(UiObj* self);
 void fn_80108958(UiObj* self, int a);
 void fn_801094AC(UiObj* self, int a);
@@ -1466,38 +1466,38 @@ void fn_80109E0C(void* self, int a);
 void fn_801A39B8(void* a, int b);
 void fn_801A3A54(void* a, int b);
 void fn_8035686C(UiScrRaw* self);
-void fn_800ECAA4(UiObj* self);
+extern "C" void fn_800ECAA4(UiObj* self);
 void fn_800EBEA8(UiObj* self);
 void fn_800F4A30(UiObj* self);
-void fn_80103920(UiObj* self);
+extern "C" void fn_80103920(UiObj* self);
 int fn_80101254(void* self);
 void fn_801018F4(UiScr2A8* self);
 void fn_8017E264(Ui700* a);
-void fn_800EB968(void* a, int b, int c);
+extern "C" void fn_800EB968(void* a, int b, int c);
 void fn_800F7EBC(UiObj* a);
 void fn_80105CA8(int a);
-void fn_800EC84C();
+extern "C" void fn_800EC84C();
 int fn_8017E030(Ui700* a, int b, int c);
 int fn_801059E4();
 void fn_80105CA4(int a);
 void fn_800DC50C(int a, float b, float c);
-int fn_800ED2B0(int a, const char* s);
-int fn_800CFB38();
+extern "C" int fn_800ED2B0(int a, const char* s);
+extern "C" int fn_800CFB38();
 int fn_800EC8B8(UiObj* self);
 
-void fn_800AB6B8(int a);
+extern "C" void fn_800AB6B8(int a);
 void fn_8035686C(UiScrRaw* self, int a);
-void fn_802D7ACC();
+extern "C" void fn_802D7ACC();
 void fn_801A3704(Ui8011AA24* a, int b);
-UiV_2F0i* fn_804D2D50(UiObj* self);
-UiObj* fn_804D2CE0(UiObj* self);
-void fn_80096830(char* e, int v);
-void fn_804D3328(UiObj* self, int a);
+extern "C" UiV_2F0i* fn_804D2D50(UiObj* self);
+extern "C" UiObj* fn_804D2CE0(UiObj* self);
+extern "C" void fn_80096830(char* e, int v);
+extern "C" void fn_804D3328(UiObj* self, int a);
 void fn_800F50B8(int a, UiV_17Ci* b);
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(int, UiV_17Ci*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
-void fn_804D3164(UiObj* self);
-void fn_804D2DC0(UiObj* self, int a);
-void fn_804D3CA8(UiObj* self, int a);
+extern "C" void fn_804D3164(UiObj* self);
+extern "C" void fn_804D2DC0(UiObj* self, int a);
+extern "C" void fn_804D3CA8(UiObj* self, int a);
 void fn_800F289C(UiObj* self);
 extern int lbl_80619D10;
 
@@ -1505,13 +1505,13 @@ void fn_800F817C(int a, UiObj* b);
 void fn_8010B658(int unused, UiObj* list, int a);
 void fn_800ED310(UiObj* self, int a);
 void fn_80100A98(UiWM* self);
-UiObj* fn_800C8054(int a);
-UiObj* fn_800C8038(int a);
-UiObj* fn_800C8044(int a);
+extern "C" UiObj* fn_800C8054(int a);
+extern "C" UiObj* fn_800C8038(int a);
+extern "C" UiObj* fn_800C8044(int a);
 void fn_80100A08(UiV_30b* self, int a);
 void fn_80100668(UiV_2Ci* self, int a);
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(UiObj*, UiObj*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
-int fn_800C8060(int a);
+extern "C" int fn_800C8060(int a);
 void fn_80100A98(UiWM* self, int a, int b);
 void fn_800F84F4(UiObj* self);
 void fn_8010D258();

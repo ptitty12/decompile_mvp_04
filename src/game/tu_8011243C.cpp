@@ -40,7 +40,7 @@ extern const char lbl_805BA6D8[];
 extern const char lbl_805BADC8[];
 
 // PROTOS-BEGIN
-void fn_8011AEB0(int a, int b, int c);
+extern "C" void fn_8011AEB0(int a, int b, int c);
 
 struct UnkQ4 {
     int m[4];
@@ -48,11 +48,11 @@ struct UnkQ4 {
 extern UnkQ4 lbl_805BFA98;
 extern const char lbl_805BFAF8[];
 extern const char lbl_805BAFF0[];
-int fn_80125180(Unk800C7B40_Widget* self, int a, int id);
-void fn_80116AA8(Scr* self);
-void fn_80116CA8(Scr* self);
-void fn_80116EE8(Scr* self);
-void fn_80117288(Scr* self);
+extern "C" int fn_80125180(Unk800C7B40_Widget* self, int a, int id);
+extern "C" void fn_80116AA8(Scr* self);
+extern "C" void fn_80116CA8(Scr* self);
+extern "C" void fn_80116EE8(Scr* self);
+extern "C" void fn_80117288(Scr* self);
 extern "C" UnkTextBox* fn_80115D9C(Scr* self, int a);
 
 extern const char lbl_805BFAF0[];

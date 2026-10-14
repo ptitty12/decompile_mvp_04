@@ -11,9 +11,9 @@
 
 void* operator new(unsigned int size, int heap); /* 0x80377428 */
 void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
-void fn_80377408(void* p);                       /* __builtin_delete */
-void fn_80377488(void* p);                       /* __builtin_vec_delete */
-double fn_80410634(double x);                    /* floor */
+extern "C" void fn_80377408(void* p);                       /* __builtin_delete */
+extern "C" void fn_80377488(void* p);                       /* __builtin_vec_delete */
+extern "C" double fn_80410634(double x);                    /* floor */
 float fn_80410CE8(float a, float b);             /* atan2 */
 float __builtin_fabsf(float x);
 double __builtin_fabs(double x);
@@ -178,17 +178,17 @@ extern int lbl_8061B9C8;
 
 struct Unk80084910_W;
 int fn_80086D34(Unk80084910_W* self, int i);
-void fn_802D6304(int a, int b);
+extern "C" void fn_802D6304(int a, int b);
 extern "C" void* fn_803FFC58(void* dst, int val, unsigned int n);
 struct Unk800085B0;
 int fn_80008540(Unk800085B0** arr, int n);
-void fn_802D8B64(Unk802D73B4_Pad* p);
+extern "C" void fn_802D8B64(Unk802D73B4_Pad* p);
 int fn_802DC5C0(Unk802D73B4_Pad* p);
-void fn_802DC61C(Unk802D73B4_Pad* p);
+extern "C" void fn_802DC61C(Unk802D73B4_Pad* p);
 void fn_802DC8E4(Unk802D73B4_Pad* p);
 void fn_802DC974(Unk802D73B4_Pad* p);
-void fn_802CBE04(int a, float* b, float* c, float* d);
-void fn_8037893C(void* q, int id, Unk80649DA0* ev, int a, int b);
+extern "C" void fn_802CBE04(int a, float* b, float* c, float* d);
+extern "C" void fn_8037893C(void* q, int id, Unk80649DA0* ev, int a, int b);
 extern int lbl_8061F674;
 /* Called under their plain names from already-compiled units. */
 extern "C" {
@@ -208,8 +208,8 @@ int fn_802D7890(int a);
 int fn_802D78D8(int a);
 int fn_802D7C70();
 void fn_800085AC();
-int fn_80400DA4();
-void fn_80400CE4(int a);
+extern "C" int fn_80400DA4();
+extern "C" void fn_80400CE4(int a);
 float fn_802DC1D8(Unk802D73B4_Pad* p, short b);
 float fn_802DC3E8(Unk802D73B4_Pad* p, short b);
 float fn_802D81A4(int a, int b);

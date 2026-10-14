@@ -72,17 +72,17 @@ struct Unk8026CCF8_M {
 
 extern "C++" {
 int fn_8026D55C(O* self, X* ctx);
-void fn_8026AA0C(int a, int b);
+extern "C" void fn_8026AA0C(int a, int b);
 int fn_80247858(O* o, float* f);
-void fn_8037D92C(M* m, char** pp);
-void fn_8037DAD0(M* m, char** pp);
+extern "C" void fn_8037D92C(M* m, char** pp);
+extern "C" void fn_8037DAD0(M* m, char** pp);
 int fn_8026CE60(int a, float* v);
-void fn_8031925C(void* x);
+extern "C" void fn_8031925C(void* x);
 /* near-miss: retail emits the flag read-modify-write before loading the 0.0f constant; ours hoists the lfs and orders the stores differently */
 void fn_8026CB30(M* self, int i);
 void fn_8026CCF8(M* self, int i, int* a, int* b);
-float fn_8037B1F0(X* x);
-float fn_80382BB8(W* w);
+extern "C" float fn_8037B1F0(X* x);
+extern "C" float fn_80382BB8(W* w);
 float fn_80382BD8(W* w, int a);
 }
 

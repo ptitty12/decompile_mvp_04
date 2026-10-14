@@ -11,7 +11,7 @@
  */
 #include "game/tu_8001CACC.h"
 
-float fn_8025356C(char* p);
+extern "C" float fn_8025356C(char* p);
 float fn_80253434(char* p);
 int fn_80046380(float a, float b);
 void fn_8004335C(int a);

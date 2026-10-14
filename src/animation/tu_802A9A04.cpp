@@ -76,7 +76,7 @@ public:
     virtual int fn_vslot14();
 };
 
-void fn_8037893C(void* queue, int id, Unk8037B3E8* ev, int a, int b);
+extern "C" void fn_8037893C(void* queue, int id, Unk8037B3E8* ev, int a, int b);
 
 /* ---- event classes ---- */
 

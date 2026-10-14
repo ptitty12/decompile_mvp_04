@@ -31,7 +31,7 @@
 struct Unk8037893C_Mgr;
 struct Unk8037893C_Target;
 class Unk8038B7E4;
-void fn_8037893C(Unk8037893C_Mgr* mgr, int type, Unk8038B7E4* ev, int arg, Unk8037893C_Target* t);
+extern "C" void fn_8037893C(Unk8037893C_Mgr* mgr, int type, Unk8038B7E4* ev, int arg, Unk8037893C_Target* t);
 
 /* Event mid class: vtable 0x806850A0, dtor 0x8038B7E4 (stores the vptr and calls
  * the root dtor 0x8037B424). The ctor is inline, so the event classes call the

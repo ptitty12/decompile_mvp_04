@@ -95,7 +95,7 @@ public:
 
 float __builtin_fabsf(float x);
 float fn_80410CE8(float a, float b);                           /* other unit */
-float fn_80382BB8(Unk80271DBC_Link* l);                        /* other unit (see tu_80272B20.cpp) */
+extern "C" float fn_80382BB8(Unk80271DBC_Link* l);                        /* other unit (see tu_80272B20.cpp) */
 float fn_80382BD8(Unk80271DBC_Link* l, int a);                 /* other unit */
 extern float lbl_8061E6CC;                                     /* .data 0x8061E6CC = 0.6f */
 
@@ -108,8 +108,8 @@ inline float AngleDiff(float a, float b)
     return d;
 }
 
-void fn_80381B38(Unk80271DBC_Link* l);                         /* other unit */
-void fn_80381E9C(Unk80271DBC_Link* l, int v, int a, int b);   /* other unit */
+extern "C" void fn_80381B38(Unk80271DBC_Link* l);                         /* other unit */
+extern "C" void fn_80381E9C(Unk80271DBC_Link* l, int v, int a, int b);   /* other unit */
 /* Slot reached through Unk8027DE3C_Holder+0x934: a goal embedded at +0x18,
  * valid when +0x10 is 6 (fn_8027F28C). */
 struct Unk8027DE3C_Slot {
@@ -125,8 +125,8 @@ public:
 
     int fn_8026D940(int a);                                    /* other unit */
 };
-float fn_801DC5C4(int id);                                     /* other unit */
-Unk8027DE3C_Holder* fn_801DC570(int id);                       /* other unit */
+extern "C" float fn_801DC5C4(int id);                                     /* other unit */
+extern "C" Unk8027DE3C_Holder* fn_801DC570(int id);                       /* other unit */
 Unk80273498_Vec3 fn_80189618(Unk80273498_Pos* p, float f);     /* other unit */
 int fn_8026DAA4(Unk80270BA0_X* x, int a);                      /* other unit */
 Unk80273498_Vec3 fn_8018959C(Unk80273498_Pos* p, float f);     /* other unit */

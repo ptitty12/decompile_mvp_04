@@ -7,7 +7,7 @@
 
 extern int lbl_8061ECAC[];
 Unk802CC580_T* fn_801A04A8(Unk802CC580_Data* d, int k);
-int fn_803272D0(char* tbl, int idx);
+extern "C" int fn_803272D0(char* tbl, int idx);
 extern const char lbl_805E2568[];
 extern const char lbl_805E331C[];
 extern const char lbl_805E32DC[];
@@ -32,11 +32,11 @@ extern const char lbl_805E33E4[];
 extern const char lbl_805E33FC[];
 extern Unk802CF70C_Flags* lbl_8061B8C0;
 float fn_802CF5CC(int a, int b, float x, float y, float z);
-void fn_802CC0E8(Unk802CC48C* o, Unk802CC48C_Mat* out);
+extern "C" void fn_802CC0E8(Unk802CC48C* o, Unk802CC48C_Mat* out);
 
-void fn_802CBE5C(Unk802CBD04* o, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b, Unk802CBD04_Vec3* c);
-void fn_80402A04(int a, int b, Unk802CBD04_Vec3* c, void* d);
-void fn_80402B0C(void* m, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b);
+extern "C" void fn_802CBE5C(Unk802CBD04* o, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b, Unk802CBD04_Vec3* c);
+extern "C" void fn_80402A04(int a, int b, Unk802CBD04_Vec3* c, void* d);
+extern "C" void fn_80402B0C(void* m, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b);
 class Unk802CC608_Obj;
 void fn_802CC748(Unk802CC608_Obj* o, Unk802CC608_Obj** best, float* bestD, Unk802CBD04_Vec3* p);
 extern "C" void* fn_8037CF5C(Unk8037C7FC* c, unsigned int hash, void* obj);
@@ -163,7 +163,7 @@ public:
     virtual Unk802CC608_Obj* s6();
 };
 extern int lbl_806202F8;
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 inline Unk802CBD04_Vec3 Unk802CC608_Sub(const Unk802CBD04_Vec3& a, const Unk802CBD04_Vec3& b)
 {
     Unk802CBD04_Vec3 r;
@@ -402,9 +402,9 @@ void fn_802CF4B4(Unk802CF4B4_Self* self, Unk8037B3E8* reg)
     reg->fn_8037B830(lbl_805E3358);
 }
 
-float fn_80323848(int p);
-double fn_80410634(double x);
-float fn_8041171C(float x);
+extern "C" float fn_80323848(int p);
+extern "C" double fn_80410634(double x);
+extern "C" float fn_8041171C(float x);
 extern "C" int rand();
 
 float fn_802CF5CC(int a, int b, float x, float y, float z)

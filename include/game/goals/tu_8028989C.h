@@ -133,22 +133,22 @@ struct Unk8028989C_Obj36C {
 float fn_80410CE8(float x, float z);                       /* heading of (x, z) */
 void fn_80244858(Unk80270BA0_X* x, float angle);
 void fn_80242E6C(Unk80270BA0_X* x);
-void fn_80381E9C(Unk80271DBC_Link* link, int hash, int a, int b);
+extern "C" void fn_80381E9C(Unk80271DBC_Link* link, int hash, int a, int b);
 float fn_80249298(Unk80270BA0_X* x, int a, int b);
 void fn_80249B40(Unk80270BA0_X* x, int a, int b, int c, float f);
 float fn_80382BD8(Unk80271DBC_Link* link, int a);
 struct Unk8028989C_Goal;
 Unk8027A8F0_Ret* fn_8027A8F0(Unk8028989C_Goal* g);
 Unk80270BA0_X* fn_8027A90C(Unk8028989C_Goal* g);
-Unk80273498_Vec3 fn_8037B128(Unk80279BB8* q);
+extern "C" Unk80273498_Vec3 fn_8037B128(Unk80279BB8* q);
 void fn_80386188(Unk80271DBC_Link* link, Unk80279BB8* q, int a, int b, float* f1, int c, int d,
                  Unk80273498_Vec3* e, Unk80273498_Vec3* g, int h, int i);
 int fn_80386110(Unk80271DBC_Link* link, Unk8035EB7C* q, int a, int b, float* out, int c);
 
 /* Not a member in retail (r3 = query, f1 = yaw / r4 = vector): called by the
  * inline SetYaw / SetPos below. */
-void fn_8037B16C(Unk80279BB8* q, float yaw);
-void fn_8037B10C(Unk80279BB8* q, Unk80273498_Vec3* v);
+extern "C" void fn_8037B16C(Unk80279BB8* q, float yaw);
+extern "C" void fn_8037B10C(Unk80279BB8* q, Unk80273498_Vec3* v);
 inline void Unk80279BB8::SetYaw(float yaw)
 {
     fn_8037B16C(this, yaw);
@@ -170,7 +170,7 @@ inline unsigned int UnkCtx4C(Unk8014D8AC_Ctx* c)
 {
     return *(unsigned int*)((char*)c + 0x4C);
 }
-float fn_80382BB8(Unk80271DBC_Link* link);
+extern "C" float fn_80382BB8(Unk80271DBC_Link* link);
 void fn_80242E6C(Unk80270BA0_X* x);
 
 #define UNK8028989C_STATE_A 0x75027FEF

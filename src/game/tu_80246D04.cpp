@@ -96,7 +96,7 @@ extern const float lbl_805D93B4;
 extern const float lbl_805D93CC;
 extern const float lbl_805D9440;
 extern float lbl_8061D4B4;
-void fn_8014E498(Unk80273498_Vec3 v);
+extern "C" void fn_8014E498(Unk80273498_Vec3 v);
 float fn_80249070(Unk80270BA0_X* x);
 void fn_80249750(Unk80270BA0_X* x);
 extern "C" void fn_80249B40(Unk80270BA0_X* x, Unk80273498_Pos* p, int a, int b, float f);
@@ -131,7 +131,7 @@ void fn_8027D368(Unk8027C728_Goal* g);
 extern const float lbl_805D9270;
 void fn_8024A674(Unk80270BA0_X* x, Unk80273498_Pos* p);
 extern "C" void fn_80255058__Fv(void* p);
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 
 int fn_8024778C(Unk80270BA0_X* x, Unk80273498_Vec3* p)
 {
@@ -150,8 +150,8 @@ void fn_80247858(Unk80270BA0_X* x)
     fn_8014E498(x->m60);
 }
 
-float fn_804028E4(float x);
-float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g, Unk80273498_Vec3* h, float dist);
+extern "C" float fn_804028E4(float x);
+extern "C" float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g, Unk80273498_Vec3* h, float dist);
 extern "C" float atan2f(float y, float x);
 extern "C" float fn_802478A0(void* o, void* p, int a, int b)
 {
@@ -529,7 +529,7 @@ inline void Unk80249750_Set(Unk80249750_Q* q, float v)
 }
 int fn_8026DAE8(Unk8026C414_O* o, Unk8026C414_X* a);
 int fn_8026D890(Unk8026C414_O* o, Unk8026C414_X* a);
-int fn_80380964(Unk80271DBC_Link* link);
+extern "C" int fn_80380964(Unk80271DBC_Link* link);
 void fn_80249750(Unk80270BA0_X* x)
 {
     Unk8024B99C_V* v = (Unk8024B99C_V*)x;

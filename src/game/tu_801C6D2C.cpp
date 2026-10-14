@@ -67,7 +67,7 @@ struct Unk801C6D2C_G {
 extern Unk801C6D2C_G lbl_8068C420;
 extern int lbl_80620358;
 extern float lbl_8062035C;
-float fn_801CD068(Z* z);
+extern "C" float fn_801CD068(Z* z);
 extern int lbl_80620378;
 extern int lbl_8062034C;
 extern int lbl_8068C6C8;

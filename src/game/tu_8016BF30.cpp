@@ -36,7 +36,7 @@ void fn_802D74FC();
 int fn_80359964(char* p);
 extern "C" int fn_8031C6A8();
 extern "C" void fn_8031C6C0(int a, int b, int c, int d);
-void fn_8017CD04(Unk8017A930_T* t, int k, int z);
+extern "C" void fn_8017CD04(Unk8017A930_T* t, int k, int z);
 extern Unk8016D850_G* lbl_8061B8C0;
 void fn_8016D924(void* self, Unk8016ACAC* m);
 #include "game/clampiter.h"
@@ -68,7 +68,7 @@ Unk801A6D84_Obj* fn_801A6D84(Unk801527C8_Actor* a, int i);
 
 extern "C" char* strcat(char* d, const char* s);
 extern "C" char* strcpy(char* d, const char* s);
-void fn_8037CA20(Unk8037C7FC* mgr, const char* name);
+extern "C" void fn_8037CA20(Unk8037C7FC* mgr, const char* name);
 
 /* Dtor-only views of two script classes whose vtables (0x8065E968, 0x8065E8F0) are emitted elsewhere;
  * the mid class stores vtable 0x8065EC68 and the root dtor follows. */
@@ -109,7 +109,7 @@ public:
 };
 
 extern const char lbl_8065EBA8[];
-void* fn_803282A8(void* p, int a);
+extern "C" void* fn_803282A8(void* p, int a);
 
 extern float lbl_805CAD78;
 extern const char lbl_805CAD7C[];
@@ -126,14 +126,14 @@ extern const float lbl_805CAD70;
 extern const float lbl_805CAD94;
 
 int fn_8040B6A0(const char* s);
-void* fn_803272D0(Unk801527C8_Sub* s, unsigned int idx);
+extern "C" void* fn_803272D0(Unk801527C8_Sub* s, unsigned int idx);
 int fn_80169DC4(const char* b);
 int fn_8040B574(const char* a, const char* b);
-void fn_80359948(Unk8016C1C4_List* l, int a);
+extern "C" void fn_80359948(Unk8016C1C4_List* l, int a);
 int fn_804089B4(char* buf, const char* fmt, ...);
 void fn_80303BC4(const char* fmt, ...);
 char* fn_8040B61C(char* d, const char* s);
-void fn_8037EBE8(void* p);
+extern "C" void fn_8037EBE8(void* p);
 void fn_803814A4(void* p, float f, int a, int b);
 void fn_8017C75C(void* a, Unk8016C788_Obj* o);
 Unk8016C788_Obj* fn_80178E6C(void* sl, int a, int b);
@@ -143,10 +143,10 @@ struct Unk8016CF38_X {
     void* m700;
 };
 void fn_802AEBCC(void* mgr, const char* s);
-void fn_80244A64(Unk8016C788_Obj* o, int a, int b);
+extern "C" void fn_80244A64(Unk8016C788_Obj* o, int a, int b);
 extern void* lbl_8061E978;
-void fn_80359910(Unk8016C1C4_List* l);
-void fn_803596DC(void* p);
+extern "C" void fn_80359910(Unk8016C1C4_List* l);
+extern "C" void fn_803596DC(void* p);
 
 void fn_8016BF30(void* self, const char* s) /* 8016BF30 */
 {

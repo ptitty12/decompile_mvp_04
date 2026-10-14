@@ -28,15 +28,15 @@ typedef Unk8000E618_Vec3 Vec3;
 
 /* EA core-library memory manager entry points (fn_8043D960 and fn_8043D9FC
  * set up the virtual-memory pool and a callback; fn_803ED720 creates a heap). */
-void fn_8043D960(int a, int b, int c);
-void fn_8043D9FC(void (*cb)(int, int, int, int));
-void fn_8043E038(int a, int b);
-int fn_803ED9D4();
-void fn_803ED720(int h, const char* name, int a, int b, int c, int d, int e, int f, int g, int h2);
-void fn_8043DCFC();
+extern "C" void fn_8043D960(int a, int b, int c);
+extern "C" void fn_8043D9FC(void (*cb)(int, int, int, int));
+extern "C" void fn_8043E038(int a, int b);
+extern "C" int fn_803ED9D4();
+extern "C" void fn_803ED720(int h, const char* name, int a, int b, int c, int d, int e, int f, int g, int h2);
+extern "C" void fn_8043DCFC();
 void* operator new(unsigned int, int);
 
-float fn_804028E4(float x); /* square root */
+extern "C" float fn_804028E4(float x); /* square root */
 extern const Vec3 lbl_806055AC;
 extern int lbl_8061E9F4;
 

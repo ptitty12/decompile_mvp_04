@@ -13,9 +13,9 @@
 #include "game/tu_8001B190.h"
 #include "game/tu_8001BA78.h"
 
-void* fn_803ED8EC(int);
-int fn_803ED9D4();
-void fn_803ED720(int h, const char* name, void* buf, int a, int b, int c, int d, int e, int f, int g);
+extern "C" void* fn_803ED8EC(int);
+extern "C" int fn_803ED9D4();
+extern "C" void fn_803ED720(int h, const char* name, void* buf, int a, int b, int c, int d, int e, int f, int g);
 int fn_80020BCC(int);
 extern const char lbl_805A50B8[];
 extern Unk8001BA78* lbl_806164E8;
@@ -221,7 +221,7 @@ struct Unk8011AA24 {
     char pad0[0x6F8];
     Unk6F8* m6F8;
 };
-Unk8011AA24* fn_8011AA24(int a);
+extern "C" Unk8011AA24* fn_8011AA24(int a);
 int fn_8007FE04(int a);
 void fn_80086D44(int h, int idx, float v);
 extern Unk8061A32C* lbl_8061A32C;
@@ -250,9 +250,9 @@ void Unk8001BC8C::fn_8001C05C(int idx, float value, int flag)
 }
 
 extern int lbl_80616F10;
-void fn_800395B0(Unk80038EB4* o, int a);
-void fn_800396D0(Unk80038EB4* o, int a);
-void fn_80039854(Unk80038EB4* o, int a, float v);
+extern "C" void fn_800395B0(Unk80038EB4* o, int a);
+extern "C" void fn_800396D0(Unk80038EB4* o, int a);
+extern "C" void fn_80039854(Unk80038EB4* o, int a, float v);
 void fn_8005B87C(Unk8005ACE4* o, int i, int on);
 
 void fn_8001C128(float v)
@@ -332,15 +332,15 @@ Unk8001C314::~Unk8001C314()
 {
 }
 
-void fn_80030948(Unk80030938* o);
+extern "C" void fn_80030948(Unk80030938* o);
 void fn_8005AD34(Unk8005ACE4* o);
 void fn_80047898(Unk800475EC* o);
-void fn_8003922C(Unk80038EB4* o);
+extern "C" void fn_8003922C(Unk80038EB4* o);
 void fn_8005BDA8(Unk8005BA9C* o);
 void fn_800408A0(Unk8004072C* o);
 struct Unk803AC134;
-Unk803AC134* fn_803AC134();
-void fn_803B9DC8(Unk803AC134* o);
+extern "C" Unk803AC134* fn_803AC134();
+extern "C" void fn_803B9DC8(Unk803AC134* o);
 void fn_8005BE30(Unk8005BA9C* o);
 
 void Unk8001C314::fn_8001C410()
@@ -383,15 +383,15 @@ void Unk8001C314::fn_8001C50C()
     fn_80030938()->m34 = 1;
 }
 
-void fn_8005BB10(Unk8005BA9C* o);
+extern "C" void fn_8005BB10(Unk8005BA9C* o);
 int fn_8005BEE4(Unk8005BA9C* o, int idx);
 
 void fn_800407EC(Unk8004072C* o);
-void fn_80038F28(Unk80038EB4* o);
-void fn_80316614(int h, int a, float v);
+extern "C" void fn_80038F28(Unk80038EB4* o);
+extern "C" void fn_80316614(int h, int a, float v);
 void fn_800477D4(Unk800475EC* o);
 void fn_8005AD30(Unk8005ACE4* o);
-void fn_80030944(Unk80030938* o);
+extern "C" void fn_80030944(Unk80030938* o);
 extern int lbl_8061FEDC;
 extern const float lbl_805A5114;
 extern const float lbl_805A5118;
@@ -420,11 +420,11 @@ extern const Unk805B10B4 lbl_805B10B4[];
 extern int lbl_80616500;
 extern int lbl_80616504;
 extern int lbl_80618FBC;
-void fn_803EE7BC();
+extern "C" void fn_803EE7BC();
 void fn_800644D4(int h);
 void fn_80064F78(int h);
 int fn_80040958(Unk8004072C* o, int idx);
-int fn_800392A8(Unk80038EB4* o, int idx);
+extern "C" int fn_800392A8(Unk80038EB4* o, int idx);
 int fn_80047958(Unk800475EC* o, int idx);
 int fn_8005ADD0(Unk8005ACE4* o, int idx);
 void fn_80020C5C(int h);
@@ -517,8 +517,8 @@ int Unk8001C314::fn_8001C620(int idx)
 
 void fn_80047D40(Unk800475EC* o, int idx);
 void fn_8005AEB0(Unk8005ACE4* o, int idx);
-void fn_800393B0(Unk80038EB4* o, int idx);
-void fn_800410D8(Unk8004072C* o, int idx);
+extern "C" void fn_800393B0(Unk80038EB4* o, int idx);
+extern "C" void fn_800410D8(Unk8004072C* o, int idx);
 void fn_8005C0C8(Unk8005BA9C* o, int idx);
 
 void Unk8001C314::fn_8001C89C(int idx)
@@ -554,8 +554,8 @@ void Unk8001C314::fn_8001C89C(int idx)
 void fn_8004801C(Unk800475EC* o, int idx);
 void fn_8005B414(Unk8005ACE4* o);
 void fn_8005C868(Unk8005BA9C* o);
-void fn_80039434(Unk80038EB4* o);
-void fn_80031000(Unk80030938* o);
+extern "C" void fn_80039434(Unk80038EB4* o);
+extern "C" void fn_80031000(Unk80030938* o);
 
 void Unk8001C314::fn_vslot5()
 {
@@ -578,7 +578,7 @@ extern int lbl_806164F8;
 extern const char lbl_805A511C[];
 extern const float lbl_805A5130;
 extern const float lbl_805A5134;
-int fn_80400DA4();
+extern "C" int fn_80400DA4();
 void fn_80303BC4(const char* fmt, float a, float b, ...);
 
 void fn_8001CA78()

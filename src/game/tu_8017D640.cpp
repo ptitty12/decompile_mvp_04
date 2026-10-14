@@ -105,7 +105,7 @@ struct Unk8017FCE4_T {
     int m1FC;
 };
 int fn_8025416C(void* p, int a);
-void* fn_801A497C(void* c, int a, int b);
+extern "C" void* fn_801A497C(void* c, int a, int b);
 struct Unk8017FB04_Sub {
     char pad0[0x1C];
     int m1C;
@@ -156,7 +156,7 @@ float fn_8017FCE4(Unk8017F744_T* p);
 float fn_8017FB04(Unk8017F744_T* p);
 float fn_8017F7F0(Unk8017F744_T* p, unsigned n);
 void fn_8017F8A0(Unk8017F8A0_T* p);
-void fn_80034C68(void* p, float f);
+extern "C" void fn_80034C68(void* p, float f);
 struct Unk8017DF2C_A {
     unsigned char* m0;
     unsigned int m4;
@@ -188,7 +188,7 @@ struct Unk8017DE28_Obj {
     int m708;
 };
 void fn_801AE17C(void* p, int a);
-void fn_80099AA0(void* p, int a);
+extern "C" void fn_80099AA0(void* p, int a);
 void fn_80252DD8(void* p, int a);
 void fn_802531FC(void* p);
 void fn_8023276C(void* p, int a);

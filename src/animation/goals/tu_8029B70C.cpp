@@ -325,7 +325,7 @@ struct Unk801A4CE8_Obj {
     char pad0[0x128];
     char m128[1];
 };
-Unk801A4CE8_Obj* fn_801A4CE8(Unk8014D8AC_Ctx* ctx, int a);
+extern "C" Unk801A4CE8_Obj* fn_801A4CE8(Unk8014D8AC_Ctx* ctx, int a);
 extern "C" int strcmp(const char* a, const char* b);
 Unk80273498_Vec3 fn_8014E388(int idx);
 int fn_8029D6DC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* t);
@@ -531,7 +531,7 @@ Unk8029B70C_Req fn_8029E4AC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int kind, int
     return s;
 }
 
-float fn_8018CA78(Unk80273498_Pos* p);
+extern "C" float fn_8018CA78(Unk80273498_Pos* p);
 
 #define UNK8029E6BC_CHK(f, h) (r.f != 0 && fn_80381E9C(link, h, 0, 0))
 

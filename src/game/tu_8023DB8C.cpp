@@ -7,13 +7,13 @@
 extern int lbl_8061D420[];
 extern int lbl_8061E9F4;
 void fn_802546E4(void* p);
-int fn_80319330(void* p, int id);
+extern "C" int fn_80319330(void* p, int id);
 void fn_8023EC24(Unk8023DB8C_P* p);
 int fn_8023DDD0(Unk8023DB8C_P* p);
 void fn_8023E448(Unk8023DB8C_P* p);
 extern int lbl_8061B9C8;
 int fn_8023EB94(Unk8023DB8C_P* p, int a, int b);
-void fn_8024CA08(Unk8023DB8C_P* p);
+extern "C" void fn_8024CA08(Unk8023DB8C_P* p);
 struct Unk8023E348_V {
     float m0;
     float m4;
@@ -159,8 +159,8 @@ inline Unk8023E448_V Pos8023E448(Unk8023E448_P* p)
 {
     return p->m320;
 }
-void fn_80183A44(Unk8023E448_V* out, int a, unsigned b, int c);
-int fn_801850B4(int a, Unk8023E448_V* out, unsigned b, float* z);
+extern "C" void fn_80183A44(Unk8023E448_V* out, int a, unsigned b, int c);
+extern "C" int fn_801850B4(int a, Unk8023E448_V* out, unsigned b, float* z);
 
 void fn_8023E448(Unk8023DB8C_P* pp)
 {
@@ -323,9 +323,9 @@ struct Unk8023F29C_O {
     void* m618;
 };
 
-float fn_80382BB8(void* p);
-float fn_8041171C(float x);
-float fn_80411554(float x);
+extern "C" float fn_80382BB8(void* p);
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
 
 inline Unk8023ECD4_V Direction(float angle)
 {
@@ -403,8 +403,8 @@ public:
 };
 struct Unk8019F8C0_Owner;
 void* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
-void fn_8031EE20(Unk8024015C_V* out, void* m, Unk8024015C_V* in);
-float fn_80313F28(int h, int id);
+extern "C" void fn_8031EE20(Unk8024015C_V* out, void* m, Unk8024015C_V* in);
+extern "C" float fn_80313F28(int h, int id);
 void fn_80303BC4(int id, float a, float b, ...);
 extern int lbl_8061FEDC;
 extern float lbl_805D8F5C;

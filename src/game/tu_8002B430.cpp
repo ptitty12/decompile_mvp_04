@@ -72,7 +72,7 @@ extern "C" int fn_8002B82C(Unk80023AC4_Obj* x)
 
 extern Unk801A4B34_Vec3 lbl_805B1A00;
 extern "C" int fn_80022708(int unused, int idx);
-void fn_80035420(int a, int b, int c, int d);
+extern "C" void fn_80035420(int a, int b, int c, int d);
 
 extern "C" void fn_8002B850(Unk80023AC4_Obj* x)
 {
@@ -279,8 +279,8 @@ extern "C" void fn_8002C2CC()
 {
 }
 
-void fn_800359BC(int a, int b, int c, int d);
-void fn_800354B8(int a, int b, int c, int d, int e);
+extern "C" void fn_800359BC(int a, int b, int c, int d);
+extern "C" void fn_800354B8(int a, int b, int c, int d, int e);
 void fn_8003E960(int a);
 extern "C" int fn_80022730(int unused, int b, int c);
 

@@ -31,7 +31,7 @@ void fn_800F181C(void* t);
 int fn_800F1740(void* t);
 int fn_800F17B4(void* t, const char* s);
 void fn_800F13C0(void* t, int a, int b);
-int fn_804D3BA0();
+extern "C" int fn_804D3BA0();
 void fn_800F1AEC(UiS* self);
 void fn_800F1A6C();
 extern char lbl_805BADC8[];
@@ -46,11 +46,11 @@ extern char lbl_805BACB4[];
 int fn_800F15A4();
 void fn_800F15AC(int a, void* b);
 void fn_800F14F8(UiS* self);
-int fn_8011AA4C();
-void fn_800C3BE0(void* p);
-void* fn_800C33D0();
-int fn_8011AB48(int a);
-void fn_800EE63C(UiS* p);
+extern "C" int fn_8011AA4C();
+extern "C" void fn_800C3BE0(void* p);
+extern "C" void* fn_800C33D0();
+extern "C" int fn_8011AB48(int a);
+extern "C" void fn_800EE63C(UiS* p);
 
 
 extern char lbl_805BE32C[];
@@ -64,5 +64,5 @@ struct UiStr4 {
 extern UiStr4 lbl_805BE2DC;
 extern UiStr4 lbl_805BE2FC;
 extern int lbl_8061A328;
-void fn_8011ABDC(int a, int b);
+extern "C" void fn_8011ABDC(int a, int b);
 #endif

@@ -350,14 +350,14 @@ struct UiScrRaw {
     int m1AC;
 };
 extern "C" UiScrRaw* fn_800EC648(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
-int fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
+extern "C" int fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_8035686C(UiScrRaw* self);
 void fn_8035686C(UiScrRaw* self, int a);
-UiScrRaw* fn_800CEEF0(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, float l);
-void fn_800CEFEC(UiScrRaw* self, int a);
+extern "C" UiScrRaw* fn_800CEEF0(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, float l);
+extern "C" void fn_800CEFEC(UiScrRaw* self, int a);
 extern char lbl_8065C788[];
 extern float lbl_805BE168;
-void fn_80356838(UiScrRaw* self, int a);
+extern "C" void fn_80356838(UiScrRaw* self, int a);
 
 extern char lbl_80659DC0[];
 extern char lbl_80655EB0[];
@@ -400,27 +400,27 @@ void fn_8006C698(UiW* p);
 int fn_8040ABA0();
 Unk8001BC8C* fn_8001BC4C();
 int fn_8040B574(const char* a, const char* b);
-void fn_804D3164(UiScrRaw* p);
-void fn_804D2DC0(UiScrRaw* p, int a);
-void fn_804D3CA8(UiScrRaw* p, int a);
-void fn_800EC8EC(UiS* p);
+extern "C" void fn_804D3164(UiScrRaw* p);
+extern "C" void fn_804D2DC0(UiScrRaw* p, int a);
+extern "C" void fn_804D3CA8(UiScrRaw* p, int a);
+extern "C" void fn_800EC8EC(UiS* p);
 void fn_800ECB0C(UiS* p);
 extern "C" UiN* fn_800ED2B0(UiS* p, const char* name);
-void fn_800C7E0C(UiS* p, int a);
-void fn_800CFB38(UiN* n);
-void fn_800C6794(UiS* p);
-void* fn_800C6CEC(UiS* p, const char* name);
-void* fn_800C8040(void* p);
-int fn_804D3B18(UiS* p);
-void fn_804D32A0(UiS* p, int a);
-void* fn_800B8144();
-void fn_800B83F8(void* p, int a, int b);
+extern "C" void fn_800C7E0C(UiS* p, int a);
+extern "C" void fn_800CFB38(UiN* n);
+extern "C" void fn_800C6794(UiS* p);
+extern "C" void* fn_800C6CEC(UiS* p, const char* name);
+extern "C" void* fn_800C8040(void* p);
+extern "C" int fn_804D3B18(UiS* p);
+extern "C" void fn_804D32A0(UiS* p, int a);
+extern "C" void* fn_800B8144();
+extern "C" void fn_800B83F8(void* p, int a, int b);
 struct UiGlob {
     char pad0[0x204];
     int m204;
 };
 extern UiGlob* lbl_8061FEDC;
-UiS* fn_800C8060(UiS* p);
+extern "C" UiS* fn_800C8060(UiS* p);
 struct Ui800B555C {
     int m0;
     int m4;
@@ -460,7 +460,7 @@ inline UiMsgMgr* UiGetMsgMgr()
         lbl_8061A32C = new (0) UiMsgMgr;
     return lbl_8061A32C;
 }
-void fn_800B7ADC(UiMsgMgr* mgr, UiS* o);
+extern "C" void fn_800B7ADC(UiMsgMgr* mgr, UiS* o);
 
 struct UiP13C {
     char pad0[0x13C];
@@ -469,11 +469,11 @@ struct UiP13C {
 struct UiMsg {
     char name[16];
 };
-void fn_8035682C(UiMsg* m);
+extern "C" void fn_8035682C(UiMsg* m);
 char* fn_8040B830(char* dst, const char* src, unsigned n);
-void fn_800B7B4C(UiMsgMgr* mgr, UiMsg* m, UiS* ctx);
-UiS* fn_804D2D50(UiS* self);
-void fn_80132438(UiS* o, UiS* self, int (*cb)(), void (*cb2)(UiS*), void (*cb3)(), int a, int b, int c, float d);
+extern "C" void fn_800B7B4C(UiMsgMgr* mgr, UiMsg* m, UiS* ctx);
+extern "C" UiS* fn_804D2D50(UiS* self);
+extern "C" void fn_80132438(UiS* o, UiS* self, int (*cb)(), void (*cb2)(UiS*), void (*cb3)(), int a, int b, int c, float d);
 struct Ui8061B8C0 {
     char pad0[0x20];
     int m20;
@@ -502,17 +502,17 @@ struct Ui8011AA24 {
     int m708;
     char pad70C[0x710 - 0x70C];
 };
-Ui8011AA24* fn_8011AA24(int a);
-void fn_8037893C(char* p, int id, UiEvtRaw* e, int a, int b);
-UiLabel* fn_800C8048(UiLabel* p);
-UiS* fn_800B7A94(UiMsgMgr* mgr, const char* name);
+extern "C" Ui8011AA24* fn_8011AA24(int a);
+extern "C" void fn_8037893C(char* p, int id, UiEvtRaw* e, int a, int b);
+extern "C" UiLabel* fn_800C8048(UiLabel* p);
+extern "C" UiS* fn_800B7A94(UiMsgMgr* mgr, const char* name);
 int fn_80125490(UiS* o, int a, int b, int c, int d);
 void fn_801251CC(UiS* o, int a, int b, int c);
-void fn_80125084(UiS* o, int a);
+extern "C" void fn_80125084(UiS* o, int a);
 void fn_80131F34(UiS* o, UiS* self, void (*cb)(int, void*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 void fn_80131F34(UiS* o, UiS* self, void (*cb)(int, void*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
-void fn_800C80C0(UiS* o, int a);
-UiS* fn_800B7AB8(UiMsgMgr* mgr, const char* name);
+extern "C" void fn_800C80C0(UiS* o, int a);
+extern "C" UiS* fn_800B7AB8(UiMsgMgr* mgr, const char* name);
 void fn_80124FA8(UiS* o, UiS* self);
 struct UiR3D90 {
     char pad0[0x3D90];
@@ -520,10 +520,10 @@ struct UiR3D90 {
 };
 UiR3D90* fn_801A6D84(Ui8011AA24* a, int b);
 void fn_8016C4A0(UiR3D90* p);
-int fn_802D7CE0(int a, int b);
+extern "C" int fn_802D7CE0(int a, int b);
 extern "C" void fn_800ECF18(UiS* self);
 extern "C" void fn_800ED310(UiS* self, int a);
-int fn_800B57EC(Ui800B555C* p);
+extern "C" int fn_800B57EC(Ui800B555C* p);
 struct UiOwn708 {
     char pad0[0x708];
     int m708;
@@ -537,13 +537,13 @@ struct UiEvtPlain {
     int id;
     const void* vt;
 };
-void fn_800CEF98(UiS* self);
-UiS* fn_800C8044(UiS* p);
-void fn_804D27B4(char* sub, int a);
-void fn_804D233C(char* sub);
-void fn_804D292C(char* sub, int a);
+extern "C" void fn_800CEF98(UiS* self);
+extern "C" UiS* fn_800C8044(UiS* p);
+extern "C" void fn_804D27B4(char* sub, int a);
+extern "C" void fn_804D233C(char* sub);
+extern "C" void fn_804D292C(char* sub, int a);
 void fn_800DD204(void* a, void* b);
-void* fn_800C8038(UiS* p);
+extern "C" void* fn_800C8038(UiS* p);
 extern "C" void fn_800ECAA4(UiS* self);
 struct UiRec12 {
     int m0;

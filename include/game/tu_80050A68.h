@@ -56,14 +56,14 @@ struct Unk80050A68_Rec {
     int m40;
 };
 
-void fn_800883E4(int a, int* b, int* c, int* d);
+extern "C" void fn_800883E4(int a, int* b, int* c, int* d);
 unsigned fn_80044FAC(unsigned a);
 unsigned fn_80044FF0(unsigned a);
 void fn_80019CE8(int a, int b);
 void fn_8000FE0C();
 void fn_800B555C();
-int fn_800B57EC();
-void fn_800521D0(Unk800493D4_Sm* s, int idx, Unk80050A68_Rec* r, int k);
+extern "C" int fn_800B57EC();
+extern "C" void fn_800521D0(Unk800493D4_Sm* s, int idx, Unk80050A68_Rec* r, int k);
 void fn_80014ED4();
 void fn_80014834(int a);
 /* Another view of the third argument of the callbacks above: four 0x24-byte slots at +0x70 (m0 owner, m4, m8 state),
@@ -88,14 +88,14 @@ struct Unk80050A68_Obj {
 };
 void fn_80011588(int a);
 extern "C" int rand(void);
-int fn_8001F510(Unk80044C10_A* a);
-int fn_8001F788(Unk80044C10_A* a);
+extern "C" int fn_8001F510(Unk80044C10_A* a);
+extern "C" int fn_8001F788(Unk80044C10_A* a);
 int fn_80046780(int a);
 int fn_8004390C(int a);
 void fn_80018E24(int a, int b, int c, int d);
 void fn_80018E98(int a, int b, int c, int d);
 void fn_80018FE4(int a, int b);
-int fn_8001F954(Unk80044C10_A* a);
+extern "C" int fn_8001F954(Unk80044C10_A* a);
 int fn_8001D974(Unk80044C10_A* a);
 void fn_8001A664();
 void fn_800119A4();

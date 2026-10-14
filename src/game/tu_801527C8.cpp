@@ -101,17 +101,17 @@ extern void* lbl_8061EA74;
 
 void fn_801A4F40(Unk801527C8_Actor* a);
 Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
-int fn_80097190(Unk801527C8_Team* t, int a);
-int fn_80097300(Unk801527C8_Team* t, int a);
-int fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
+extern "C" int fn_80097190(Unk801527C8_Team* t, int a);
+extern "C" int fn_80097300(Unk801527C8_Team* t, int a);
+extern "C" int fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
 void fn_80178F64(void* p, int v);
-void fn_80327274(Unk801527C8_Sub* s);
+extern "C" void fn_80327274(Unk801527C8_Sub* s);
 int fn_804089B4(char* buf, const char* fmt, ...);
-int fn_80326E64(Unk801527C8_Sub* s, int a);
+extern "C" int fn_80326E64(Unk801527C8_Sub* s, int a);
 void fn_8016D3DC(Unk801527C8_Ctx* ctx, int a);
 void fn_8016C660(Unk801527C8_Ctx* ctx, int a);
-void fn_801515AC(int* a, int* b, int* c);
-int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
+extern "C" void fn_801515AC(int* a, int* b, int* c);
+extern "C" int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
 void fn_802B2518(void* o, int a, float t);
 
 inline void SetM4C(Unk8061FEDC_Obj* o, float v)

@@ -58,15 +58,15 @@ struct Unk8014E388 {
 extern Unk80619D10* lbl_80619D10;
 void fn_8016B8CC(void* o, int v);
 void fn_8014E388(Unk8014E388* b, int v);
-Unk8027C728_Goal* fn_801B9438(Unk8016C788_Obj* o, int v, Unk8014E388* b);
+extern "C" Unk8027C728_Goal* fn_801B9438(Unk8016C788_Obj* o, int v, Unk8014E388* b);
 void fn_802D5618(void* o);
 void fn_802D59C0(void* o, int a, int b);
-void* fn_801A4CE8(Unk801527C8_Actor* a, int i);
+extern "C" void* fn_801A4CE8(Unk801527C8_Actor* a, int i);
 void fn_802D57E4(void* o, int a, int b, int c, int d);
-void fn_8031E1A0(Unk801527C8_Actor* a, int v);
+extern "C" void fn_8031E1A0(Unk801527C8_Actor* a, int v);
 void* fn_801A6D84(Unk801527C8_Actor* a, int i);
-int fn_8031C6A8();
-void fn_8031C6C0(int a, int b, int c, int d);
+extern "C" int fn_8031C6A8();
+extern "C" void fn_8031C6C0(int a, int b, int c, int d);
 
 extern const char lbl_805C5FD4[];
 extern const char lbl_805C7518[];
@@ -346,8 +346,8 @@ extern "C" Unk80326F44_Out* fn_8033ACE8();
 extern "C" void fn_803296AC();
 extern "C" void* fn_803285F4(void* p);
 extern "C" void fn_80328E50(void* t, int a, int b);
-int fn_80326DF0(Unk801527C8_Sub* s, int a);
-int fn_80326E64(Unk801527C8_Sub* s, int a);
+extern "C" int fn_80326DF0(Unk801527C8_Sub* s, int a);
+extern "C" int fn_80326E64(Unk801527C8_Sub* s, int a);
 
 /* near-miss (97.7%): everything matches except the scheduling/registers of the 24-byte copy of lbl_805EBA10 into e (retail keeps
    the lis for lbl_805EBA10 in r9 and addi r9,r9,lo in place, loads words 0,3,5,1,2,4; we use r11/r9 and a different load order).
@@ -752,8 +752,8 @@ struct Unk80150FC0_Marker {
     Unk80273498_Vec3 m4;
     float m10;
 };
-Unk80150FC0_Marker* fn_80150FC0(int id);
-void fn_80244A64(Unk8016C788_Obj* o, int a, int b);
+extern "C" Unk80150FC0_Marker* fn_80150FC0(int id);
+extern "C" void fn_80244A64(Unk8016C788_Obj* o, int a, int b);
 void fn_80299B98(Unk80270BA0_X* x, const Unk80273498_Vec3& pos, float* ang);
 
 /* near-miss: the Vec3 sum is formed with all loads hoisted here; retail adds each component in place right after the copy (27 diff lines); 6 variants tried */

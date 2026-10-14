@@ -66,9 +66,9 @@ struct Unk802F4F40_Q {
     char pad6D0[0x700 - 0x6D0];
     Unk802F44D0_Own* m700;
 };
-float fn_80190F0C(Unk802F4F40_P* p);
-int fn_80328648(Unk802F4F40_Q* q);
-void fn_802FD0F8(Unk802FD088* m);
+extern "C" float fn_80190F0C(Unk802F4F40_P* p);
+extern "C" int fn_80328648(Unk802F4F40_Q* q);
+extern "C" void fn_802FD0F8(Unk802FD088* m);
 extern Unk802F4F40_V3 lbl_806055AC;
 
 class Unk802F42A4 : public Unk803282A8 {
@@ -140,7 +140,7 @@ struct Unk802F4628_Q {
     float mC;
 };
 Unk802F4628_Q fn_802B0ACC(int a, int b);
-int fn_802B0850(int a, int b, int c);
+extern "C" int fn_802B0850(int a, int b, int c);
 extern int lbl_8061E978;
 extern int lbl_8061F804[];
 extern int lbl_806E0DD8[];

@@ -31,7 +31,7 @@ struct Unk8007DB74_A;
 void fn_8007DEF8(Unk8007DB74_A* a, int id, int k, int m, int x);
 void fn_8007F2EC(Unk8007F198_A* a, int id, int b);
 
-int fn_800A2AE8(void* g);
+extern "C" int fn_800A2AE8(void* g);
 /* end Q18 types */
 
 extern "C" {

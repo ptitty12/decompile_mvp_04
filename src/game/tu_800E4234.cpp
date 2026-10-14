@@ -215,7 +215,7 @@ void fn_800E49A4()
     s->m51C = 0;
 }
 
-int fn_800A1C54(void* g, int b, int c, int d, int e, int f);
+extern "C" int fn_800A1C54(void* g, int b, int c, int d, int e, int f);
 extern "C" void fn_800A19E4(int a, int flag);
 extern int lbl_8061A308;
 void fn_800E63A4(Ue63A4* t);

@@ -44,17 +44,17 @@ void fn_802663B8(void* p);
 void fn_802663D8(R4* r);
 void fn_80266434(R4* r, P* p, int a);
 void fn_80266CC0(void* p);
-void fn_8037893C(void* p, int a, int b, int c, int d);
+extern "C" void fn_8037893C(void* p, int a, int b, int c, int d);
 void fn_8025713C(void* list, int a);
 void fn_8025D054(I* self, int a);
 void fn_80265DDC(I* self);
 void fn_80265E40(I* self);
-void fn_80267458(void* self, P** a, int* b);
+extern "C" void fn_80267458(void* self, P** a, int* b);
 void fn_80251124(P* p);
 void fn_8025124C(P* p);
 void fn_80251374(P* p);
 void fn_8025147C(P* p);
-int fn_801DC1CC(int a, int b, int c);
+extern "C" int fn_801DC1CC(int a, int b, int c);
 }
 
 
@@ -243,10 +243,10 @@ inline void Unk80266568_Rec::Reset()
 }
 
 extern "C++" {
-int fn_801DC67C(int a);
-int fn_801BBF24(int a);
+extern "C" int fn_801DC67C(int a);
+extern "C" int fn_801BBF24(int a);
 void fn_80266CC0(void* p);
-float fn_80266FE8(T* t, int k);
+extern "C" float fn_80266FE8(T* t, int k);
 }
 
 P* fn_80264844(I* self)

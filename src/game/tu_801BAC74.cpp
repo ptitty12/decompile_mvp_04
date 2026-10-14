@@ -907,9 +907,9 @@ extern "C" int fn_801BC660(A* a, P* q, P* p3, int mode, int flag)
     return r;
 }
 
-int fn_801BCA0C(A* a, P* q);
-void fn_801BFCEC(void* o, P* p);
-float fn_8018CBA4(P* p);
+extern "C" int fn_801BCA0C(A* a, P* q);
+extern "C" void fn_801BFCEC(void* o, P* p);
+extern "C" float fn_8018CBA4(P* p);
 extern "C" void fn_801BCF88(A* a);
 struct Unk80256C80_M;
 void fn_80257F3C(Unk80256C80_M* m, int i);

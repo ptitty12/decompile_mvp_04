@@ -45,14 +45,14 @@ struct Unk80038EB4 {
     char pad0[0x5288];
     int m5288;
 };
-Unk80038EB4* fn_80038EB4();
+extern "C" Unk80038EB4* fn_80038EB4();
 
 /* fn_80030938(): +0x34 written in fn_8001C50C. */
 struct Unk80030938 {
     char pad0[0x34];
     int m34;
 };
-Unk80030938* fn_80030938();
+extern "C" Unk80030938* fn_80030938();
 
 /*
  * Element of the 0xB0-byte table at lbl_805B10B4 (8 entries, indexed by the

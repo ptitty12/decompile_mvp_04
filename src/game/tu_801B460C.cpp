@@ -6,13 +6,13 @@
 #include "game/tu_801B23A8.h"
 #include "game/chooser.h"
 inline int Unk801B460C_KeyAt(char* base, int off) { return *(int*)(base + off); }
-float fn_8025356C(void* p);
+extern "C" float fn_8025356C(void* p);
 int fn_80253DF4(void* p, int a, int b);
 extern "C" int fn_801A49F0(Unk8019F8C0_Owner* o, int team, int key);
 extern float lbl_805CF6E8[];
 extern int lbl_805CF6F8[];
 void fn_801B6778(void* p);
-void fn_801B8D1C(void* p, int n);
+extern "C" void fn_801B8D1C(void* p, int n);
 extern "C" void* fn_801A4910(Unk8019F8C0_Owner* o, int team, unsigned char slot);
 void fn_801B6A24(void* p)
 {
@@ -85,12 +85,12 @@ extern char lbl_8065F0E8[];
 extern float lbl_805CF8E4;
 extern float lbl_805CF8E8;
 extern Unk801B6604_V3 lbl_806055AC;
-void fn_8023CB50(Unk801B6604_T* self, int a, int b, int c, unsigned char d);
-void fn_8023DBB0(Unk801B6604_T* self, int inchrg);
-void fn_8023CD70(Unk801B6604_T* self);
-void fn_801B9034(void* p, int n);
-void* fn_801B9014(void* mem, Unk801B6604_T* self);
-void fn_801B901C(void* p);
+extern "C" void fn_8023CB50(Unk801B6604_T* self, int a, int b, int c, unsigned char d);
+extern "C" void fn_8023DBB0(Unk801B6604_T* self, int inchrg);
+extern "C" void fn_8023CD70(Unk801B6604_T* self);
+extern "C" void fn_801B9034(void* p, int n);
+extern "C" void* fn_801B9014(void* mem, Unk801B6604_T* self);
+extern "C" void fn_801B901C(void* p);
 int fn_801B6A44(void* p);
 void* operator new(unsigned int size, int heap);
 
@@ -131,15 +131,15 @@ public:
     virtual int fn_vslot24();
 };
 Unk801B460C_Ob* fn_801B63A0(Unk801AB63C_P* p, int t);
-void fn_801B8D1C(void* p, int v);
+extern "C" void fn_801B8D1C(void* p, int v);
 void fn_80249B08(void* p, int a, float f);
 extern float lbl_805CF8EC;
 struct Unk801B6A44_T {
     char pad0[0x70C];
     unsigned char m70C;
 };
-void fn_8023DF58(void* p);
-void fn_801B905C(void* p);
+extern "C" void fn_8023DF58(void* p);
+extern "C" void fn_801B905C(void* p);
 struct Unk801B460C_Ent {
     int a;
     float b;
@@ -153,7 +153,7 @@ struct Unk801B460C_Tbl {
 extern "C" unsigned fn_8014D8AC(void* a, int b, const char* c, int d);
 extern char lbl_805CF800[];
 extern float lbl_805CF7FC;
-int fn_8014E2B4(int a);
+extern "C" int fn_8014E2B4(int a);
 struct Unk801B6438_Sub {
     char pad0[4];
     unsigned m4;
@@ -186,7 +186,7 @@ struct Unk801B460C_F {
     int m48;
 };
 extern Unk801B460C_Five lbl_805CF778;
-int fn_801C192C(void* a, int b);
+extern "C" int fn_801C192C(void* a, int b);
 extern Unk801B460C_Five lbl_805CF78C;
 extern Unk801B460C_Five lbl_805CF7A0;
 int fn_801B3850(Unk801AB63C_P* p, Unk801B23A8_Q* q, int c);
@@ -203,7 +203,7 @@ int fn_801B3FD8(void* a, Unk801B23A8_Q* q);
 unsigned fn_801B608C(void* a, Unk801B23A8_Q* q);
 int fn_801B380C(void* a, Unk801B23A8_Q* q);
 int fn_801B5F70(Unk801AB63C_P* p);
-int fn_801C1870(void* a, int b, int c);
+extern "C" int fn_801C1870(void* a, int b, int c);
 int fn_801B5EDC(void* a, int b, int c);
 extern int lbl_8068BECC;
 extern char lbl_805CF874[];
@@ -402,8 +402,8 @@ struct Unk801B4F14_O {
 };
 extern Unk801B4F14_Pair lbl_805CF7E0;
 extern Unk801B4F14_Pair lbl_805CF7D8;
-float fn_8024F048(char* p, int a, int b, int c, int d);
-float fn_8024F20C(char* p, int a, int b, int c, int d);
+extern "C" float fn_8024F048(char* p, int a, int b, int c, int d);
+extern "C" float fn_8024F20C(char* p, int a, int b, int c, int d);
 inline float Unk801B4F14_Norm(float lo, float t, float hi)
 {
     float span = hi - lo;
@@ -482,7 +482,7 @@ struct Unk801B5298_T3 {
 extern Unk801B5298_T3 lbl_805CF7F0;
 unsigned fn_801B2834(Unk801AB63C_P* p, Unk801B23A8_Q* q);
 int fn_801B5DE8(void* a, void* q, int c);
-int fn_801C1638(Unk8019F8C0_Owner* o, int i);
+extern "C" int fn_801C1638(Unk8019F8C0_Owner* o, int i);
 int fn_801B5298(Unk801AB63C_P* p, Unk801B23A8_Q* q)
 {
     int v = 0;
@@ -863,7 +863,7 @@ int fn_801B608C(Unk801AB63C_P* p, Unk801B23A8_Q* q)
 /* near-miss: 29 vs 28 insns; the three flag tests (q[10..12] != 0) are laid out differently. */
 struct Unk8024EF40_W;
 float fn_80253EC4(Unk8024EF40_W* w, int a, int b, int c);
-float fn_80097F68(Unk8019F8C0_Inner* t, int a, int b, int c, int d);
+extern "C" float fn_80097F68(Unk8019F8C0_Inner* t, int a, int b, int c, int d);
 inline int Unk801B616C_B(unsigned char* b, int i) { return b[i]; }
 
 /* near-miss: same code; in the 128-byte sum loop retail keeps the counter in r11 with the index in r0 (here r10/r9). */
@@ -1100,8 +1100,8 @@ struct Unk801B6830_R {
 extern int lbl_8061D460;
 extern int lbl_8061D468;
 extern int lbl_8061B9BC;
-int fn_80337830(int i);
-int fn_80337844(int i);
+extern "C" int fn_80337830(int i);
+extern "C" int fn_80337844(int i);
 int fn_8023EB80(void* p, int i);
 void fn_801B6830(Unk801B6830_P* p, Unk801B6830_R* r, int slot)
 {

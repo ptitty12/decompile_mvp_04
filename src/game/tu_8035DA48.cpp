@@ -15,7 +15,7 @@
 struct U {
     char pad0[0x4000];
 };
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 extern char lbl_80649DA0[];
 extern char lbl_80660E18[];
 extern char lbl_80660E48[];
@@ -41,8 +41,8 @@ extern char lbl_80661510[];
 extern char lbl_806615A0[];
 extern char lbl_80661618[];
 extern const float lbl_805D7D90;
-void fn_8026C864(void* p, int chrg);
-void fn_8014E310(void* p);
+extern "C" void fn_8026C864(void* p, int chrg);
+extern "C" void fn_8014E310(void* p);
 struct Unk8035DD24_Heap {
     int m0;
     virtual void v1();

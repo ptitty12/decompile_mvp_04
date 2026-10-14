@@ -76,7 +76,7 @@ struct Unk801C2C64_F1 {
     float m0;
 };
 extern Unk801C2C64_F1 lbl_8068C7A8;
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 Vec3 fn_80189618(P* p, float f);
 extern float lbl_8068C4C4;
 extern Vec3 lbl_8068C3DC;

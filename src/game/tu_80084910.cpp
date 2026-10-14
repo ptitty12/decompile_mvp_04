@@ -19,7 +19,7 @@ void fn_80071688(void* self, int flags);
  * (self, a, obj) and calls obj's slot 1 itself (r4/r5 used without a copy). */
 void fn_80071E2C(void* self, int a, void* obj);
 void* fn_8007366C(const char* a, const char* b);
-void fn_8040074C(void* p, int n);
+extern "C" void fn_8040074C(void* p, int n);
 extern char lbl_805B3B4C[];
 extern char lbl_8064B388[];
 extern char lbl_8064B318[];
@@ -75,7 +75,7 @@ extern float lbl_805B4460;
 
 
 
-void* fn_803FFA60(void* s, int a, int n);
+extern "C" void* fn_803FFA60(void* s, int a, int n);
 
 
 
@@ -113,7 +113,7 @@ struct Unk80084910_R {
 };
 
 extern char lbl_8064B5B8[];
-void fn_800864D4(Unk80084910_R* self, int a);
+extern "C" void fn_800864D4(Unk80084910_R* self, int a);
 
 
 struct Unk80084910_W {
@@ -126,8 +126,8 @@ struct Unk80084910_W {
 extern int lbl_80619418[];
 
 
-int fn_80403060(const short* s);
-void fn_8040316C(short* dst, const short* src, int n);
+extern "C" int fn_80403060(const short* s);
+extern "C" void fn_8040316C(short* dst, const short* src, int n);
 
 struct Unk80084910_Str {
     char pad0[0x204];
@@ -286,7 +286,7 @@ void* fn_8040B61C(char* dst, const char* src);
 
 
 extern int lbl_806193B8[];
-void fn_804031BC(short* dst, const char* src);
+extern "C" void fn_804031BC(short* dst, const char* src);
 
 
 extern "C" double fn_804103C0(double x);

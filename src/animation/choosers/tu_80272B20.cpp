@@ -13,10 +13,10 @@
  */
 #include "game/chooser_base.h"
 
-float fn_804028E4(float x);               /* square root */
-float fn_8041171C(float x);
-float fn_80411554(float x);
-float fn_80382BB8(Unk80271DBC_Link* p);
+extern "C" float fn_804028E4(float x);               /* square root */
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
+extern "C" float fn_80382BB8(Unk80271DBC_Link* p);
 void fn_8024D178(Unk80270BA0_X* x, Unk80270BA0_X* target);
 void fn_8024D1A4(Unk80270BA0_X* x, Unk80273498_Vec3* v);
 

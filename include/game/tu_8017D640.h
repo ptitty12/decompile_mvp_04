@@ -143,7 +143,7 @@ struct Unk8017F744_T {
     int m1DC;
     int m1E0;
 };
-void fn_80034CA4(void* p);
+extern "C" void fn_80034CA4(void* p);
 
 struct Unk8017E030_Rec {
     char pad0[0x1CC9];
@@ -153,7 +153,7 @@ struct Unk8017E030_Rec {
 };
 int fn_8006BE18(void* a);
 int fn_80081B60(void* p);
-int fn_80096988(void* p, int a, int b);
+extern "C" int fn_80096988(void* p, int a, int b);
 
 struct Unk8017DCCC_Obj {
     char pad0[0x704];
@@ -170,17 +170,17 @@ struct Unk8017E2E8_T {
     void* m3C8;
 };
 void fn_8023522C(void* p, int a, int b, int c);
-void fn_801DBE30(void* p, int a, int b, int c);
+extern "C" void fn_801DBE30(void* p, int a, int b, int c);
 void fn_8017F67C(char* p, int a, int b, int c);
 void fn_801ABC14(void* p);
 int fn_802491D8(int p);
 
-int fn_8017E374(Unk8017A930_T* p, int a, char* b, int c, int d, int e);
+extern "C" int fn_8017E374(Unk8017A930_T* p, int a, char* b, int c, int d, int e);
 void fn_8017C72C(Unk8017A930_T* p);
 void fn_80252C1C(char* p);
 void fn_801A6820(void* p);
-int fn_80099B50(void* p, int i);
-int fn_801A49F0(void* ctx, int a, int b);
+extern "C" int fn_80099B50(void* p, int i);
+extern "C" int fn_801A49F0(void* ctx, int a, int b);
 
 /* Event class, 0x70 bytes, hash 0xEF8A9748 (vtable 0x806602A8). */
 class Unk8017EF7C : public Unk8037B3E8 {

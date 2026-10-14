@@ -143,9 +143,9 @@ struct Unk802914C8_Goal : public Unk8027A84C {
 struct Unk80283934_Goal;
 int fn_80285498(Unk80283934_Goal* g);                          /* other unit (tu_80283934.cpp) */
 
-float fn_804028E4(float x);                                    /* square root */
-float fn_8041171C(float x);
-float fn_80411554(float x);
+extern "C" float fn_804028E4(float x);                                    /* square root */
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
 float fn_80410CE8(float y, float x);
 float fn_80249298(Unk80270BA0_X* x, int a, int b);              /* other unit */
 void fn_80244858(Unk80270BA0_X* x, float v);                   /* other unit */
@@ -241,7 +241,7 @@ inline float Lerp(float a, float t, float b)
 int fn_8026D9D0(Unk80270BA0_X* x, int a);                      /* other unit */
 int fn_8026D890(Unk80270BA0_X* x, int a);                      /* other unit */
 int fn_8026D940(Unk80270BA0_X* x, int a);                      /* other unit */
-void fn_80381E9C(Unk80271DBC_Link* l, int v, int a, int b);   /* other unit */
+extern "C" void fn_80381E9C(Unk80271DBC_Link* l, int v, int a, int b);   /* other unit */
 float fn_80249188(Unk80270BA0_X* x, float f);                  /* other unit */
 extern int lbl_806242B4;                                       /* other units' .data */
 

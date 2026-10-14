@@ -11,16 +11,16 @@ typedef Unk8024EF40_P P;
 extern "C++" {
 int fn_80254EA4(A* self, int a);
 int fn_8035E318(A* a);
-int fn_8014E374(int a);
-int fn_8014E310(int a);
+extern "C" int fn_8014E374(int a);
+extern "C" int fn_8014E310(int a);
 int fn_8026D730(P* p, int a);
-int fn_801BBEFC(int a);
-int fn_801BBF04(int a);
+extern "C" int fn_801BBEFC(int a);
+extern "C" int fn_801BBF04(int a);
 int fn_8017C94C(Unk8024EF40_Ctx* c);
 int fn_80257458(void* list, P* p);
-void* fn_801A497C(void* q, int a, int b);
+extern "C" void* fn_801A497C(void* q, int a, int b);
 void fn_80081C94(void* y, int a, int b, int c, int d);
-void fn_8037893C(void* q, int id, void* o, int a, int b);
+extern "C" void fn_8037893C(void* q, int id, void* o, int a, int b);
 void fn_8035E214(void* o, int a);
 P* fn_80257BD0(void* list, P* p, int a);
 P* fn_80257DFC(void* list, P* p, int a);
@@ -29,8 +29,8 @@ void fn_8017BA50(Unk8024EF40_Ctx* c, P* p, int a, int b);
 void fn_802491D8(P* p);
 void fn_80255314(A* self, int a, int b);
 void fn_802553BC(A* self, int a);
-void fn_801BD3BC(int a, int b);
-void fn_801BCF88(int a, int b, int c);
+extern "C" void fn_801BD3BC(int a, int b);
+extern "C" void fn_801BCF88(int a, int b, int c);
 void fn_802550A8(A* self, int a, int b);
 }
 
@@ -648,7 +648,7 @@ struct Unk80256A14_S618 {
     void* m618;
 };
 extern Unk80256A14_Vec3 lbl_806055AC;
-float fn_80382BB8(void* p);
+extern "C" float fn_80382BB8(void* p);
 
 Unk80256A14_Vec3 fn_80256A14(Unk80256A14_S618* self)
 {

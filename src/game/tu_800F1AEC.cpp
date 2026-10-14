@@ -57,7 +57,7 @@ public:
     UiColor4 m8C;
     UiColor4 m9C;
 };
-UiColor4* fn_8014DBA0(UiColor4* out, int r, int g, int b, int a);
+extern "C" UiColor4* fn_8014DBA0(UiColor4* out, int r, int g, int b, int a);
 void fn_800F2068(int unused, UiX35* self, int on)
 {
     UiColor4 c;
@@ -82,8 +82,8 @@ struct UiV21D4 : UiObj {
     char pad1B8[0x1C4 - 0x1B8];
     int m1C4;
 };
-int fn_800968C0(UiP16C* p, int a, int b);
-int fn_8009692C(UiP16C* p, int a);
+extern "C" int fn_800968C0(UiP16C* p, int a, int b);
+extern "C" int fn_8009692C(UiP16C* p, int a);
 struct UiV2298 : UiObj {
     char pad40[0x194 - 0x40];
     int m194;
@@ -92,7 +92,7 @@ struct UiV2298 : UiObj {
     int m1B0;
     int m1B4;
 };
-int fn_800F2148(UiV2298* self);
+extern "C" int fn_800F2148(UiV2298* self);
 int fn_800F21D4(UiV21D4* self, int idx, UiP16C* p)
 {
     unsigned char x = fn_8009692C(p, fn_800968C0(p, self->m1C4, 1));
@@ -113,7 +113,7 @@ int fn_800F21D4(UiV21D4* self, int idx, UiP16C* p)
 
 
 extern int lbl_805C3D24[];
-int fn_800F1DF4(UiV2298* self, int a, int b, int c, int d);
+extern "C" int fn_800F1DF4(UiV2298* self, int a, int b, int c, int d);
 int fn_800F2298(UiV2298* self, int a, int b, int c)
 {
     int ok = 1;
@@ -338,13 +338,13 @@ extern char lbl_806800B0[];
 extern char lbl_80655E98[];
 extern char lbl_80655BA8[];
 UiScrRaw* fn_800EB518(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
-int fn_804D4704(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
-int fn_804D7FE0(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
-int fn_804D6184(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
-void fn_804D3D74(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
-void fn_804D24E8(char* self, char* sub);
-void fn_8040074C(void* p, unsigned n);
-void fn_800C3AB4(Ui800C33D0* p, int a);
+extern "C" int fn_804D4704(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" int fn_804D7FE0(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" int fn_804D6184(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" void fn_804D3D74(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" void fn_804D24E8(char* self, char* sub);
+extern "C" void fn_8040074C(void* p, unsigned n);
+extern "C" void fn_800C3AB4(Ui800C33D0* p, int a);
 extern char lbl_8064B298[];
 extern char lbl_8064A550[];
 extern char lbl_8064A4C8[];
@@ -441,12 +441,12 @@ void fn_800F4078(Ui4078* self)
 struct UiS;
 void fn_800EB704(UiS* self);
 void fn_800DD204(UiS* a, UiS* b);
-void* fn_800B8144();
-void fn_800B83F8(void* self, int a, int b);
-int fn_80125128(UiObj* o, int a);
+extern "C" void* fn_800B8144();
+extern "C" void fn_800B83F8(void* self, int a, int b);
+extern "C" int fn_80125128(UiObj* o, int a);
 int fn_801251CC(UiV_140i_148_14C* o, int a, int b, int c);
-int fn_80125154(UiObj* o, int a);
-void fn_804D28B4(void* p);
+extern "C" int fn_80125154(UiObj* o, int a);
+extern "C" void fn_804D28B4(void* p);
 extern char lbl_805BAFF0[];
 extern char lbl_805BE43C[];
 class UiX94v : public UiBase {
@@ -558,8 +558,8 @@ inline int UiIntAtF(char* b, int i)
     int o = i * 4;
     return *(int*)(b + o);
 }
-int fn_804D24B0(UiSub144* s);
-void fn_80126CF4(UiScrH* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern "C" int fn_804D24B0(UiSub144* s);
+extern "C" void fn_80126CF4(UiScrH* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 extern char lbl_805BE454[];
 extern "C" void fn_800F4A30(UiS4A30* self)
 {

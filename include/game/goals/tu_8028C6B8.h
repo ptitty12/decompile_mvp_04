@@ -99,7 +99,7 @@ struct Unk8028C6B8_X {
 void fn_8025596C(void* p, int n);
 float fn_80248FC8(Unk8028C6B8_X* x, int a);
 float fn_80410CE8(float a, float b);
-float fn_80382BB8(Unk8028C6B8_Link* p);
+extern "C" float fn_80382BB8(Unk8028C6B8_Link* p);
 Unk80273498_Vec3 fn_8014E388(int a);
 
 /* Heading of the player relative to pi/2. fn_8028DA0C calls it and drops the
@@ -274,6 +274,6 @@ inline Unk80273498_Vec3 Unk8028E9E8_Sub(Unk80273498_Vec3 a, Unk80273498_Vec3 b)
 }
 
 /* Returns a position for an object (sret): Unk80273498_Vec3 by value. */
-Unk80273498_Vec3 fn_801837F4(void* obj, int idx);
+extern "C" Unk80273498_Vec3 fn_801837F4(void* obj, int idx);
 
 #endif /* GAME_GOALS_TU_8028C6B8_H */

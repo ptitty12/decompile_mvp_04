@@ -224,7 +224,7 @@ void fn_8021C424(Task* t, int a)
     e->mD4 = a;
 }
 
-void fn_801837F4(Vec3f* out, int a, int b);
+extern "C" void fn_801837F4(Vec3f* out, int a, int b);
 struct Unk8021C4E0_Obj {
     char pad0[0x60];
     Vec3f m60;

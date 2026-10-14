@@ -24,7 +24,7 @@ extern char lbl_80692F08[];
 
 unsigned fn_8007F198(Unk8007F198_A* a, int x);
 int fn_8007F24C(Unk8007F198_A* a, int x, unsigned char i);
-int fn_8055FD00(int a);
+extern "C" int fn_8055FD00(int a);
 /* end Q18 types */
 
 extern "C" {

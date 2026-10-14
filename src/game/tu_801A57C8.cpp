@@ -5,33 +5,33 @@
 #include "game/tu_801A57C8.h"
 #include "game/clampiter.h"
 
-void fn_801A57C8(Unk8019F8C0_Owner* o, int a);
+extern "C" void fn_801A57C8(Unk8019F8C0_Owner* o, int a);
 int fn_801A57B8();
 void fn_801A62D0(Unk8019F8C0_Owner* o, int a);
 void fn_801B2538(Unk8019F8C0_Owner* o);
 void fn_80235AD4(void* p);
-void fn_8033E5C4(void* a, int n);
+extern "C" void fn_8033E5C4(void* a, int n);
 Unk8019F8C0_Sub* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
-void* fn_803FFC58(void* p, int v, int n);
-void fn_8037893C(void* a, int b, void* c, void* d, int e);
+extern "C" void* fn_803FFC58(void* p, int v, int n);
+extern "C" void fn_8037893C(void* a, int b, void* c, void* d, int e);
 void fn_801AA038(void* p, int n);
 void fn_801AA248(void* p);
 extern Unk801A57C8_G lbl_8068BF34;
 void fn_8023C514(void* a, Unk8019F8C0_Owner* o);
 void fn_8033E958(const char* s, ...);
-void fn_801A5394(Unk8019F8C0_Owner* o);
+extern "C" void fn_801A5394(Unk8019F8C0_Owner* o);
 void fn_801A5708(Unk8019F8C0_Owner* o);
 void fn_801A57B4(Unk8019F8C0_Owner* o);
 void fn_801A5014(Unk8019F8C0_Owner* o);
-void fn_8006F918(int a, int b);
-int fn_800A8874(void* m, int a, int b, int c);
+extern "C" void fn_8006F918(int a, int b);
+extern "C" int fn_800A8874(void* m, int a, int b, int c);
 void fn_801A594C(Unk8019F8C0_Owner* o, int i);
 /* near-miss: same code; retail forms o+0x6B0 inside the branch (r30/r31 roles swap), keeps buf at sp+8 with a
  * recomputed address, and holds idx in r7 (about 3 extra insns here). */
 void fn_801A5D3C(Unk8019F8C0_Owner* o);
 void fn_801A5C1C(Unk8019F8C0_Owner* o);
 void fn_801A5B44(Unk8019F8C0_Owner* o);
-void fn_80378A34(void* a, void* b);
+extern "C" void fn_80378A34(void* a, void* b);
 extern char lbl_8068CCA8[];
 extern char lbl_805CEA04[];
 extern char lbl_805CEA28[];
@@ -44,8 +44,8 @@ struct Unk801A7764_St {
 };
 Unk801A7764_St* fn_800B555C();
 extern char lbl_805CEAD4[];
-int fn_80400E84();
-int fn_80400DA4();
+extern "C" int fn_80400E84();
+extern "C" int fn_80400DA4();
 void fn_80107F74(int a, int b, int c);
 
 struct Unk801A57C8_Ob {
@@ -57,7 +57,7 @@ struct Unk801A57C8_Ob {
 };
 float fn_802D7E2C(int a, int b);
 void fn_801A81A4(Unk801A57C8_Ob* o);
-void fn_801A82A8(Unk801A57C8_Ob* o, int x);
+extern "C" void fn_801A82A8(Unk801A57C8_Ob* o, int x);
 void fn_801A8198(char* p);
 
 /* Short string buffer (ctor 0x8035682C), copied into with fn_8040B830 and terminated at +0xF. */
@@ -74,7 +74,7 @@ public:
 };
 void* operator new(unsigned int size, int heap);
 void fn_8040B830(void* dst, const char* src, int n);
-void fn_800B7B4C(Unk800B64BC* q, Unk8035682C* s, int n);
+extern "C" void fn_800B7B4C(Unk800B64BC* q, Unk8035682C* s, int n);
 extern Unk800B64BC* lbl_8061A32C;
 extern char lbl_805CEB0C[];
 
@@ -87,7 +87,7 @@ struct Unk801A78E4_Rec {
     int m10;
     int m14;
 };
-void fn_80326F44(Unk801A78E4_Rec* out, char* obj, int a, int b, float f);
+extern "C" void fn_80326F44(Unk801A78E4_Rec* out, char* obj, int a, int b, float f);
 extern float lbl_805CEAF0;
 
 /* Owner's mode objects, as fn_801A72E0 sees them (+0x58C sub-record with state words at +0x40/+0x44). */
@@ -115,8 +115,8 @@ struct Unk801A745C_T {
     char pad20[0x38 - 0x20];
     int m38;
 };
-int fn_80326E64(void* p, int a);
-int fn_80326DF0(void* p, int a);
+extern "C" int fn_80326E64(void* p, int a);
+extern "C" int fn_80326DF0(void* p, int a);
 extern float lbl_805CEAE8;
 extern float lbl_805CEAEC;
 void fn_801A0790(Unk8019F8C0_Owner* o, float v);
@@ -160,7 +160,7 @@ void fn_8024BE80(Unk801A5A9C_Obj* o, int a);
 extern char lbl_805CE8E8[];
 extern int lbl_805CEA60[];
 void fn_802B8888(void* mgr, Unk8019F8C0_Inner* t, int v);
-int fn_80097300(Unk8019F8C0_Inner* t, int v);
+extern "C" int fn_80097300(Unk8019F8C0_Inner* t, int v);
 extern void* lbl_8061E978;
 
 /* Timer-like object of fn_801A9428: owner at +0, flags at +0x18 and +0x20. */
@@ -200,8 +200,8 @@ struct Unk801A94EC_T {
     char pad18[0x38 - 0x18];
     int m38;
 };
-float fn_80301E44(void* o, Unk801A94EC_V* v);
-void fn_802FFAD4(Unk801A94EC_V* v, int a, int b, float f);
+extern "C" float fn_80301E44(void* o, Unk801A94EC_V* v);
+extern "C" void fn_802FFAD4(Unk801A94EC_V* v, int a, int b, float f);
 extern float lbl_805CEB94;
 extern Unk801A734C_V3 lbl_806055AC;
 extern float lbl_805CEA98;
@@ -219,9 +219,9 @@ struct Unk801A62D0_X {
     char pad0[0x460];
     int m460;
 };
-void fn_8014E09C(Unk801A62D0_It* it, Unk8019F8C0_Owner* o, int a);
-void fn_8014E108(Unk801A62D0_It* it);
-int fn_802D7DB4(int a, int b);
+extern "C" void fn_8014E09C(Unk801A62D0_It* it, Unk8019F8C0_Owner* o, int a);
+extern "C" void fn_8014E108(Unk801A62D0_It* it);
+extern "C" int fn_802D7DB4(int a, int b);
 
 struct Unk801A7048_T744 {
     char pad0[0x20];
@@ -243,8 +243,8 @@ struct Unk801A6750_V {
     float y;
     float z;
 };
-void fn_80198E70(void* o, int a);
-void fn_8019A5E0(void* o, int a, Unk801A6750_V* v, int c);
+extern "C" void fn_80198E70(void* o, int a);
+extern "C" void fn_8019A5E0(void* o, int a, Unk801A6750_V* v, int c);
 
 void* fn_802AE7D4(void* mgr, Unk8019F8C0_Owner* a, int i, Unk8019F8C0_Owner* c);
 int fn_804089B4(char* dst, const char* fmt, ...);
@@ -256,8 +256,8 @@ extern char lbl_805CE9A0[];
 extern char lbl_805CE918[];
 extern char lbl_805CE924[];
 
-int fn_803270C4(char* p, int a, int b, float f);
-int fn_8014E2B4(int a);
+extern "C" int fn_803270C4(char* p, int a, int b, float f);
+extern "C" int fn_8014E2B4(int a);
 extern float lbl_805CEA5C;
 struct Unk801A71D0_Sub {
     char pad0[4];
@@ -276,8 +276,8 @@ struct Unk801A7950_C {
     char pad390[0x3F4 - 0x390];
     float m3F4;
 };
-int fn_80326C20(void* p);
-float fn_80190F0C(Unk801A7950_C* c);
+extern "C" int fn_80326C20(void* p);
+extern "C" float fn_80190F0C(Unk801A7950_C* c);
 extern float lbl_805CEAF4;
 extern float lbl_805CEB00;
 extern float lbl_805CEB04;
@@ -305,7 +305,7 @@ void fn_801A58FC(Unk8019F8C0_Owner* o, int a)
 extern char lbl_805CE8A4[];
 extern char lbl_805CE8C0[];
 extern char lbl_805CE8CC[];
-void fn_801A656C(Unk8019F8C0_Owner* o, Unk801A5A9C_Obj* x, int k);
+extern "C" void fn_801A656C(Unk8019F8C0_Owner* o, Unk801A5A9C_Obj* x, int k);
 
 void fn_801A594C(Unk8019F8C0_Owner* o, int team)
 {
@@ -400,7 +400,7 @@ struct Unk801A5E50_Obj {
     char pad0[0x618];
     int m618;
 };
-int fn_80381E9C(int obj, unsigned hash, int a, int b);
+extern "C" int fn_80381E9C(int obj, unsigned hash, int a, int b);
 void fn_803814A4(int obj, int a, int b, float f);
 extern char lbl_805CE9AC[];
 extern char lbl_805CE9D4[];
@@ -595,8 +595,8 @@ struct Unk801A6874_T {
 };
 extern int lbl_80620298;
 void fn_801A06A8(Unk8019F8C0_Owner* o);
-float fn_80323848(int p);
-float fn_8032388C(int p);
+extern "C" float fn_80323848(int p);
+extern "C" float fn_8032388C(int p);
 inline float Unk801A6874_G4C(Unk8019F8C0_Sub* c)
 {
     int t;

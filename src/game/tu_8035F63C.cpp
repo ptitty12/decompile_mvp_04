@@ -15,7 +15,7 @@
 struct U {
     char pad0[0x4000];
 };
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 extern char lbl_8064A550[];
 extern char lbl_80665D88[];
 extern char lbl_80666EC0[];
@@ -23,21 +23,21 @@ extern char lbl_806655E8[];
 extern char lbl_80665DD8[];
 extern char lbl_80665E08[];
 extern char lbl_80666EC0[];
-void fn_80330870(void* p, int chrg);
+extern "C" void fn_80330870(void* p, int chrg);
 void fn_8035686C(void* p, int chrg);
 extern char lbl_8064B298[];
 extern char lbl_806646F0[];
 extern char lbl_80665DC0[];
 extern char lbl_80666548[];
 #include "game/chooser.h"
-void fn_803E47E8(void* p);
+extern "C" void fn_803E47E8(void* p);
 void fn_802D1278(void* p);
-void fn_803BD1F4(void* p);
-void fn_80330870(void* p, int chrg);
+extern "C" void fn_803BD1F4(void* p);
+extern "C" void fn_80330870(void* p, int chrg);
 void fn_80360004(void* p, int chrg);
 void fn_80360080(void* p, int chrg);
-void* fn_803774A8(unsigned size, int heap);
-void fn_80377488(void* p);
+extern "C" void* fn_803774A8(unsigned size, int heap);
+extern "C" void fn_80377488(void* p);
 struct Unk80310934_Z;
 void fn_80312064(Unk80310934_Z* p);
 void fn_8031208C(void* p, int chrg);
@@ -75,7 +75,7 @@ struct Unk8035FC78 : Unk80330870 {
     char padFEC[0x1300 + 4 - 0xFEC];
     ~Unk8035FC78();
 };
-void fn_80359604(void* p, int chrg);
+extern "C" void fn_80359604(void* p, int chrg);
 
 extern "C" void fn_8037B424(void*, int);
 

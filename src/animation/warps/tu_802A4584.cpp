@@ -33,7 +33,7 @@
  */
 #include "game/warp_b.h"
 
-float fn_80382BB8(Unk80271DBC_Link* p);
+extern "C" float fn_80382BB8(Unk80271DBC_Link* p);
 void fn_80244858(Unk80270BA0_X* x, float v);
 
 inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
@@ -66,14 +66,14 @@ inline Unk80273498_Vec3 operator*(const Unk80273498_Vec3& v, float s)
 extern Unk80273498_Vec3 lbl_806055AC;    /* shared constant vector */
 extern int lbl_8061B9C8;                 /* integer converted to float and scaled by 1/60 (frame rate?) */
 float fn_8026FDB0(Unk80270BA0_Obj* o);
-float fn_80382348(Unk80271DBC_Link* link, unsigned int hash, int flag);
+extern "C" float fn_80382348(Unk80271DBC_Link* link, unsigned int hash, int flag);
 unsigned int fn_80378568(const char* token, int len);
 
 /* Lazily computed hash of "cReleaseBall" (.bss 0x8068CE60) and its done flag (0x8068CE64). */
 static unsigned int lbl_8068CE60;
 static int lbl_8068CE64;
 
-int fn_8023F330(Unk80270BA0_X* x, int a, int b, void* c, void* d, int e, int f, int g, int h);
+extern "C" int fn_8023F330(Unk80270BA0_X* x, int a, int b, void* c, void* d, int e, int f, int g, int h);
 
 /* Accessors for the two vectors the limb/translation warps read from the player.
  * Matching note: copying through a getter that returns the member (one struct
@@ -389,9 +389,9 @@ Unk8037B3E8* cGenericTimeWarp::fn_vslot5()
     return new (lbl_806EF9B4) cGenericTimeWarp;
 }
 
-float fn_804028E4(float x);               /* square root */
-float fn_8041171C(float x);               /* sine */
-float fn_80411554(float x);               /* cosine */
+extern "C" float fn_804028E4(float x);               /* square root */
+extern "C" float fn_8041171C(float x);               /* sine */
+extern "C" float fn_80411554(float x);               /* cosine */
 extern float lbl_8061E88C;
 extern float lbl_8061E890;
 

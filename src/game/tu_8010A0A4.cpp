@@ -51,9 +51,9 @@ extern char lbl_805BDC84[];
 extern char lbl_805BDC38[];
 extern char lbl_805BDDB8[];
 extern char lbl_805BFA54[];
-void fn_8010F550(UiObj* a);
-void fn_8011820C(UiObj* a);
-void fn_8010F9CC(UiObj* a, int b);
+extern "C" void fn_8010F550(UiObj* a);
+extern "C" void fn_8011820C(UiObj* a);
+extern "C" void fn_8010F9CC(UiObj* a, int b);
 struct Ui10D33C : UiObj {
     char pad40[0x138 - 0x40];
     UiObj* m138;
@@ -70,10 +70,10 @@ struct Ui10D33C : UiObj {
     int a16C[25];
     int a1D0[25];
 };
-void fn_80125084(UiObj* o, int a);
-void fn_80125180(UiObj* o, int a, int id);
-void fn_80125300(UiObj* o, int a, int b, int c);
-int fn_8010EAF4(Ui10D33C* self);
+extern "C" void fn_80125084(UiObj* o, int a);
+extern "C" void fn_80125180(UiObj* o, int a, int id);
+extern "C" void fn_80125300(UiObj* o, int a, int b, int c);
+extern "C" int fn_8010EAF4(Ui10D33C* self);
 struct Ui10A3FC : UiObj {
     char pad40[0x134 - 0x40];
     UiObj* m134;
@@ -118,8 +118,8 @@ void fn_8010A808(Ui10C51C* self);
 void fn_8010B6B8(Ui10C51C* self);
 void fn_8010BF88(Ui10C51C* self);
 int fn_800E6058(int a);
-int fn_8008CFD8(char* p, int a, int b);
-void fn_8040321C(short* a, int b, short* buf, int c);
+extern "C" int fn_8008CFD8(char* p, int a, int b);
+extern "C" void fn_8040321C(short* a, int b, short* buf, int c);
 
 extern char lbl_80649DA0[];
 extern char lbl_8065B990[];
@@ -153,19 +153,19 @@ struct UiEvt10A150 : UiEvtBase10A150 {
     ~UiEvt10A150() { vt = lbl_80649DA0; }
 };
 extern "C" int fn_800DE440(short* buf, int a, int b);
-int fn_800968C0(char* e, int a, int b);
-int fn_80097148(char* e, int a);
-int fn_80097210(char* e, int a);
+extern "C" int fn_800968C0(char* e, int a, int b);
+extern "C" int fn_80097148(char* e, int a);
+extern "C" int fn_80097210(char* e, int a);
 int fn_801A4A94(Ui8011AA24* g, int a);
-void fn_804031F8(short* a, int b, short* buf);
+extern "C" void fn_804031F8(short* a, int b, short* buf);
 struct Ui10C7F0 : UiObj {
     char pad40[0x140 - 0x40];
     int m140;
     char pad144[0x150 - 0x144];
     int m150;
 };
-void fn_8010F494(void* a, int b);
-void fn_8010F2CC(void* a);
+extern "C" void fn_8010F494(void* a, int b);
+extern "C" void fn_8010F2CC(void* a);
 int fn_8010D1C8();
 void fn_8010D1D0();
 extern char lbl_805BA6D8[];
@@ -185,7 +185,7 @@ struct Ui10AF80 {
     int m708;
 };
 struct Unk800DB840_Slot;
-int fn_800DBAE0(Unk800DB840_Slot* o, int a, int idx, int b);
+extern "C" int fn_800DBAE0(Unk800DB840_Slot* o, int a, int idx, int b);
 
 void fn_8010A0A4(UiV_138_13C* self)
 {

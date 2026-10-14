@@ -31,7 +31,7 @@ extern const char lbl_805BFB3C[];
 extern const char lbl_805BFB4C[];
 extern const char lbl_805BE1B0[];
 int fn_801A71D0();
-int* fn_800ED2B0(void* container, const char* name);
+extern "C" int* fn_800ED2B0(void* container, const char* name);
 extern const float lbl_805BFB38;
 Unk8001BC8C* fn_8001BC4C();
 extern const char lbl_805BC1A8[];
@@ -89,7 +89,7 @@ inline void SetSub(Wid* w, int v)
 extern const char lbl_805BC19C[];
 extern const char lbl_805BF19C[];
 int fn_8011AD00(int mode, int idx);
-int fn_8011AE28(int mode, int idx);
+extern "C" int fn_8011AE28(int mode, int idx);
 
 struct Ui1A0 {
     char pad0[0x50];
@@ -103,14 +103,14 @@ struct Ui1A0 {
 struct Unk80084910_W;
 void fn_80086D24(Unk80084910_W* w, int i, int v);
 
-int fn_802D7CE0(int a, int b);
+extern "C" int fn_802D7CE0(int a, int b);
 int fn_802D7D64(int a);
 int fn_80086D34(Unk80084910_W* w, int i);
 
 extern const char lbl_805BEFE4[];
 extern const char lbl_805BDD9C[];
 extern const char lbl_805BD934[];
-void fn_8011A518(int a, Wid* w, const char* name);
+extern "C" void fn_8011A518(int a, Wid* w, const char* name);
 
 struct Unk800ABDC4_R {
     char pad0[8];
@@ -127,16 +127,16 @@ extern const char lbl_805BFC9C[];
 extern const char lbl_805BFCA8[];
 extern const char lbl_805BFCB4[];
 extern const char lbl_805BDC84[];
-int fn_801C1638(UnkGame* g, int a);
-int fn_801A4B34(UnkGame* g);
-Unk800ABDC4_R* fn_800ABDC4(int a, UnkGame* g);
-int fn_800ABC58(int a, UnkGame* g);
-int fn_80144BF4(int a);
+extern "C" int fn_801C1638(UnkGame* g, int a);
+extern "C" int fn_801A4B34(UnkGame* g);
+extern "C" Unk800ABDC4_R* fn_800ABDC4(int a, UnkGame* g);
+extern "C" int fn_800ABC58(int a, UnkGame* g);
+extern "C" int fn_80144BF4(int a);
 
 extern const float lbl_805BFB08;
 
 extern const char lbl_805BF5CC[];
-float fn_80097F68(UnkPlayerRec* r, int a, unsigned char i, int b, int c);
+extern "C" float fn_80097F68(UnkPlayerRec* r, int a, unsigned char i, int b, int c);
 int fn_80097A70(UnkPlayerRec* r, int a, unsigned char i, int b);
 
 extern "C" {

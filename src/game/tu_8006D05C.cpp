@@ -66,11 +66,11 @@ struct Unk8006F784_G {
 };
 extern Unk8006F784_G* lbl_8061930C;
 extern const int lbl_805B62F8[];
-Unk8006F784_O* fn_8058F11C(Unk8006F784_B* b, int a);
-void* fn_8058F1F0(Unk8006F784_B* b, int a);
-int fn_80590188(void* p, int a);
-int fn_80593E7C(void* p, int a);
-int fn_805948D0(void* p, int a, int b);
+extern "C" Unk8006F784_O* fn_8058F11C(Unk8006F784_B* b, int a);
+extern "C" void* fn_8058F1F0(Unk8006F784_B* b, int a);
+extern "C" int fn_80590188(void* p, int a);
+extern "C" int fn_80593E7C(void* p, int a);
+extern "C" int fn_805948D0(void* p, int a, int b);
 struct Unk8006DF80_R {
     char pad0[0x20];
     virtual void v1();
@@ -96,7 +96,7 @@ struct Unk8006DF80_S {
     char pad960[0xC9C - 0x960];
     char mC9C[0x30];
 };
-int fn_8008CFD8(char* p, int a, int b);
+extern "C" int fn_8008CFD8(char* p, int a, int b);
 
 void* operator new[](unsigned int size, int heap);
 void* operator new(unsigned int size, int heap);
@@ -138,7 +138,7 @@ struct Unk8006F690_Obj {
     char pad0[8];
     void* m8;
 };
-void fn_80378620(Unk8006F690_Obj* self, int chrg);
+extern "C" void fn_80378620(Unk8006F690_Obj* self, int chrg);
 struct Unk8006F9EC_Obj {
     char pad0[0x40];
     int m40;
@@ -146,14 +146,14 @@ struct Unk8006F9EC_Obj {
 };
 Unk80071604* fn_80071604(Unk80071604* self, const char* name, Obj* type, unsigned count);
 void fn_80071688(Unk80071604* self, int chrg);
-void fn_8040074C(void* p, unsigned n);
+extern "C" void fn_8040074C(void* p, unsigned n);
 unsigned fn_8007366C(const char* a, const char* b);
 int fn_80075E7C(int x);
 void fn_8008928C(void* ctx);
 void fn_8006F74C(Unk8006902C_Ctx* c);
 void fn_80089094(void* ctx, int a);
 int fn_80353870(Unk8006902C_Side* s);
-int fn_80097210(Unk8006902C_Side* s, int k);
+extern "C" int fn_80097210(Unk8006902C_Side* s, int k);
 void fn_800881FC(void* ctx, int side, int a, int b, int c);
 void fn_80353C60(void* ctx, int k);
 void fn_80353CB4(void* ctx, int k);
@@ -179,19 +179,19 @@ float fn_80070880(void* self, int a);
 float fn_80070BC8(void* self, int a);
 int fn_80080724(void* l, int k, int c);
 void fn_80080828(void* l, int k, int c, int v);
-int fn_800968C0(Unk8006902C_Side* s, int e, int k);
-int fn_80097620(Unk8006902C_Side* s, int a, int b, int c);
-void fn_8009757C(Unk8006902C_Side* s, int a, int b, int c, int d);
+extern "C" int fn_800968C0(Unk8006902C_Side* s, int e, int k);
+extern "C" int fn_80097620(Unk8006902C_Side* s, int a, int b, int c);
+extern "C" void fn_8009757C(Unk8006902C_Side* s, int a, int b, int c, int d);
 int fn_8006FB28(void* l, int k, int c);
 void fn_8006FC40(void* l, int k, int c, int v);
-int fn_8008B42C(void* l, int k, int c);
-void fn_8008B690(void* l, int k, int c, int v);
-int fn_80099620(Unk8006902C_Side* s);
-int fn_8009764C(Unk8006902C_Side* s, int a, int b, int c);
-void fn_800975A8(Unk8006902C_Side* s, int a, int b, int c, int d);
+extern "C" int fn_8008B42C(void* l, int k, int c);
+extern "C" void fn_8008B690(void* l, int k, int c, int v);
+extern "C" int fn_80099620(Unk8006902C_Side* s);
+extern "C" int fn_8009764C(Unk8006902C_Side* s, int a, int b, int c);
+extern "C" void fn_800975A8(Unk8006902C_Side* s, int a, int b, int c, int d);
 
 unsigned char* fn_80081CF8(Unk8007FF8C_Y* y, int i);
-void fn_8009984C(Unk8006902C_Side* s, int a, int b, int c, int d, int e);
+extern "C" void fn_8009984C(Unk8006902C_Side* s, int a, int b, int c, int d, int e);
 
 inline int SumRowI(Unk8006902C_Side* s)
 {

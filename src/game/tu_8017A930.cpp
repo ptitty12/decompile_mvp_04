@@ -59,12 +59,12 @@ inline Unk8017B6C0_Pair Unk8017B6C0_Now()
 {
     return fn_8022EA60();
 }
-void fn_801BB544(void* p, int a, int b);
-void fn_801DBC00(void* p, int a, int b);
+extern "C" void fn_801BB544(void* p, int a, int b);
+extern "C" void fn_801DBC00(void* p, int a, int b);
 void fn_80258194(void* p, int a, int b);
 void fn_802358D0(void* p, int a, int b);
-void fn_801C2B84(void* p, int a, int b);
-void fn_801BBB34(void* p);
+extern "C" void fn_801C2B84(void* p, int a, int b);
+extern "C" void fn_801BBB34(void* p);
 extern int lbl_80620864;
 struct Unk8017B238_O {
     char pad0[0x2C];
@@ -74,19 +74,19 @@ void fn_8017EE58(Unk8017EE24_T* p);
 void fn_8017EED0(void* p);
 void fn_801A4884(void* p);
 void fn_80235618(void* p);
-void fn_801C21EC(void* p);
+extern "C" void fn_801C21EC(void* p);
 void fn_801B0334(void* p);
 void fn_801ABB0C(void* p);
 void fn_801B127C(void* p);
-void fn_801BAFA4(void* p);
-void fn_801DBAE4(void* p);
+extern "C" void fn_801BAFA4(void* p);
+extern "C" void fn_801DBAE4(void* p);
 void fn_80258668(void* p);
 void fn_80178CA8(void* p);
-void fn_8017BEAC(void* p, char* q);
+extern "C" void fn_8017BEAC(void* p, char* q);
 void fn_80258E70(void* p, int q);
-void fn_801DBC24(void* p, int a);
-void fn_801C2A18(void* p, int a);
-void fn_8024F930(void* p, int a, int b);
+extern "C" void fn_801DBC24(void* p, int a);
+extern "C" void fn_801C2A18(void* p, int a);
+extern "C" void fn_8024F930(void* p, int a, int b);
 extern char lbl_8065F9C8[];
 struct Unk8017BCB4_R {
     char pad0[0x1C];
@@ -123,9 +123,9 @@ void fn_801A0790(Unk8017B0A4_Ctx* o, float v);
 void fn_8017EE54();
 void fn_801A9700(void* p);
 void fn_801AB63C(void* p);
-void fn_801DBB08(void* p);
+extern "C" void fn_801DBB08(void* p);
 void fn_80235300(void* p);
-void fn_801C2120(void* p);
+extern "C" void fn_801C2120(void* p);
 void fn_80176884(void* p);
 void fn_80178BBC(void* p);
 
@@ -186,22 +186,22 @@ struct Unk8017A930_E {
     void* m378;
 };
 void fn_801A0790(Unk8017B0A4_Ctx* o, float v);
-void fn_8017C068(void* p);
+extern "C" void fn_8017C068(void* p);
 void fn_8017D22C(Unk8017A930_T* p);
 void fn_8017D190(Unk8017A930_T* p);
 void fn_80176F4C(void* p);
 void fn_80259DF0(void* p);
-void fn_801BAB5C(void* p);
-void fn_801AE760(void* p);
+extern "C" void fn_801BAB5C(void* p);
+extern "C" void fn_801AE760(void* p);
 void fn_801A9980(void* p);
 void fn_80257104(void* p);
 void* fn_80257B40(void* p);
 void* fn_80257BD0(void* p, void* o, int a);
-void fn_8025777C(void* p, void* o, int a);
-void fn_801DBDD0(void* p);
+extern "C" void fn_8025777C(void* p, void* o, int a);
+extern "C" void fn_801DBDD0(void* p);
 void fn_801B25BC(void* p);
-void fn_80339F60(int a);
-int fn_8033E420(void* p);
+extern "C" void fn_80339F60(int a);
+extern "C" int fn_8033E420(void* p);
 void fn_80178CF4();
 
 void fn_8017A930(void* self)

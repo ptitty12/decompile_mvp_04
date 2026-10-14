@@ -16,19 +16,19 @@ int fn_801B5F8C(Unk801AB63C_P* a);
 int fn_801B62E4(Unk801AB63C_P* a, int i);
 int fn_801B3B90(void* a, void* b);
 int fn_801B3A34(void* a, void* b);
-int fn_800974B8(Unk8019F8C0_Inner* t, int v);
-int fn_80097450(Unk8019F8C0_Inner* t, int v);
+extern "C" int fn_800974B8(Unk8019F8C0_Inner* t, int v);
+extern "C" int fn_80097450(Unk8019F8C0_Inner* t, int v);
 int fn_8017D640(void* a, int b, Unk801B23A8_Q* c, int d, int e);
 extern float lbl_805CF740;
 extern float lbl_805CF754;
 extern float lbl_805CF744;
 extern float lbl_805CF748;
-float fn_8024EF40(void* a, void* b, int c);
-float fn_8024F048(void* a, void* b, void* c, int d, int e);
-float fn_8024F20C(void* a, void* b, void* c, int d, int e);
-int fn_80097380(Unk8019F8C0_Inner* t, int v);
-int fn_800973E8(Unk8019F8C0_Inner* t, int v);
-int fn_80097318(Unk8019F8C0_Inner* t, int v);
+extern "C" float fn_8024EF40(void* a, void* b, int c);
+extern "C" float fn_8024F048(void* a, void* b, void* c, int d, int e);
+extern "C" float fn_8024F20C(void* a, void* b, void* c, int d, int e);
+extern "C" int fn_80097380(Unk8019F8C0_Inner* t, int v);
+extern "C" int fn_800973E8(Unk8019F8C0_Inner* t, int v);
+extern "C" int fn_80097318(Unk8019F8C0_Inner* t, int v);
 int fn_801B3E48(void* a, Unk801B23A8_Q* q, int c);
 int fn_801B3FD0(void* a, Unk801B23A8_Q* q, int c);
 int fn_801B40DC(void* a, Unk801B23A8_Q* q);
@@ -55,7 +55,7 @@ void fn_801AE180(void* a, Unk801B23A8_Q* q, int c);
 
 float fn_801B3580(void* a, Unk801B23A8_Q* q);
 void fn_800B555C();
-int fn_800B55A8();
+extern "C" int fn_800B55A8();
 int fn_80075808(int v);
 extern int lbl_8061CB3C;
 extern float lbl_805CF74C;
@@ -103,7 +103,7 @@ public:
 extern "C" void* fn_801A497C(Unk8019F8C0_Owner* o, int f, int n);
 Unk801B4190_Q* fn_801B63A0(Unk801AB63C_P* p, int t);
 int fn_801B45D8(Unk801AB63C_P* p, int a, Unk801B23A8_Q* q);
-int fn_801A4910(Unk8019F8C0_Owner* o, int team, int slot);
+extern "C" int fn_801A4910(Unk8019F8C0_Owner* o, int team, int slot);
 void fn_801B43BC(Unk801B23A8_V* p, int team, int idx, Unk801B23A8_Q* q, int flag);
 
 /* Iterator object (ctor 0x8014E09C, advance 0x8014E108); current index at +8. */
@@ -115,14 +115,14 @@ struct Unk801B25E4_It {
     int m10;
     int m14;
 };
-void fn_8014E09C(Unk801B25E4_It* it, Unk8019F8C0_Owner* o, int a);
-void fn_8014E108(Unk801B25E4_It* it);
-int fn_80097148(Unk8019F8C0_Inner* t, int v);
+extern "C" void fn_8014E09C(Unk801B25E4_It* it, Unk8019F8C0_Owner* o, int a);
+extern "C" void fn_8014E108(Unk801B25E4_It* it);
+extern "C" int fn_80097148(Unk8019F8C0_Inner* t, int v);
 int fn_801B26D0(Unk801AB63C_P* p, Unk801B4190_Q* q);
 
-int fn_801C1870(void* a, int b, int c);
-int fn_801C1880(void* a, int b, int c);
-int fn_801C18C4(void* a, int b, int c);
+extern "C" int fn_801C1870(void* a, int b, int c);
+extern "C" int fn_801C1880(void* a, int b, int c);
+extern "C" int fn_801C18C4(void* a, int b, int c);
 
 struct Unk801B2FB0_Rec {
     int m0;
@@ -135,8 +135,8 @@ int fn_801B4190(Unk801AB63C_P* a, Unk801B4190_Q* q, Unk801B4190_Q* r);
 extern float lbl_805CF730;
 extern float lbl_805CF734;
 
-int fn_80097190(Unk8019F8C0_Inner* t, int v);
-int fn_80097300(Unk8019F8C0_Inner* t, int v);
+extern "C" int fn_80097190(Unk8019F8C0_Inner* t, int v);
+extern "C" int fn_80097300(Unk8019F8C0_Inner* t, int v);
 
 class Unk80069F0C {
 public:
@@ -159,16 +159,16 @@ struct Unk801B460C_Tbl {
 void fn_801B564C(Unk801B460C_Tbl* t);
 void fn_801B5688(Unk801B460C_Tbl* t, int id, int limit, float v);
 int fn_801B5700(Unk801B460C_Tbl* t, int k);
-int fn_801C184C(void* a, int b, int c);
-float fn_80097F68(Unk8019F8C0_Inner* t, int a, int b, int c, int d);
-int fn_801C1894(void* a, int b, int c);
-int fn_801C18A4(void* a, int b, int c, int d);
-float fn_8025356C(void* p);
-int fn_800968C0(Unk8019F8C0_Inner* t, int key, int c);
-int fn_8009692C(Unk8019F8C0_Inner* t, int v);
+extern "C" int fn_801C184C(void* a, int b, int c);
+extern "C" float fn_80097F68(Unk8019F8C0_Inner* t, int a, int b, int c, int d);
+extern "C" int fn_801C1894(void* a, int b, int c);
+extern "C" int fn_801C18A4(void* a, int b, int c, int d);
+extern "C" float fn_8025356C(void* p);
+extern "C" int fn_800968C0(Unk8019F8C0_Inner* t, int key, int c);
+extern "C" int fn_8009692C(Unk8019F8C0_Inner* t, int v);
 extern float lbl_805CF758;
 extern float lbl_805CF75C;
-int fn_801C18D8(void* a, int b, int c);
+extern "C" int fn_801C18D8(void* a, int b, int c);
 inline int Unk801B3FD8_B(unsigned char* b, int i) { return b[i]; }
 
 struct Unk801B2470_T {

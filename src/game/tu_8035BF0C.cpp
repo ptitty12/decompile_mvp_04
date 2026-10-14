@@ -15,7 +15,7 @@
 struct U {
     char pad0[0x4000];
 };
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 extern "C" void fn_8033CD28(void* p, int in_chrg);
 extern "C" void fn_8037B424(void* p, int in_chrg);
 struct Unk8035D710_V {
@@ -59,7 +59,7 @@ struct Unk8035D710 {
 };
 extern char lbl_80660850[];
 extern const float lbl_805D675C;
-void fn_801DD420(void* p, int chrg);
+extern "C" void fn_801DD420(void* p, int chrg);
 #include "game/clampiter.h"
 void fn_8035D868(U* self);
 void fn_8035D8F4(void* p);

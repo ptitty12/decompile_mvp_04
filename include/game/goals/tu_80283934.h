@@ -114,9 +114,9 @@ struct Unk80283934_Slot {
 
 /* fn_8026F590 is a cMatrixChooser method (tu_8026DDE8.cpp); here it is reached
  * through the chooser fn_8037D028 returns, so it is declared as a free function. */
-int fn_8026F590(Unk8037B3E8* chooser, Unk80270BA0_Obj* obj, unsigned char* buf);
-Unk8037B3E8* fn_8037D028(Unk8037C7FC* c, int key);
-Unk80283934_Ent* fn_80384A48(unsigned int hash);
+extern "C" int fn_8026F590(Unk8037B3E8* chooser, Unk80270BA0_Obj* obj, unsigned char* buf);
+extern "C" Unk8037B3E8* fn_8037D028(Unk8037C7FC* c, int key);
+extern "C" Unk80283934_Ent* fn_80384A48(unsigned int hash);
 
 inline Vec3 operator-(const Vec3& a, const Vec3& b)
 {
@@ -137,15 +137,15 @@ inline float AngleDiff(float a, float b)
     return d;
 }
 
-float fn_80382BB8(Unk80271DBC_Link* p);
+extern "C" float fn_80382BB8(Unk80271DBC_Link* p);
 float fn_80410CE8(float y, float x);
 void fn_80244858(Unk80270BA0_X* x, float v);
 
-float fn_804028E4(float x);               /* square root */
+extern "C" float fn_804028E4(float x);               /* square root */
 float fn_802958F4(Unk80283934_Ent* e, Unk80270BA0_X* x, int a, float b);
 
-float fn_8041171C(float x);
-float fn_80411554(float x);
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
 
 /* Unit vector for an angle (as in animation/choosers/tu_80272B20.cpp). */
 inline Vec3 Direction(float angle)
