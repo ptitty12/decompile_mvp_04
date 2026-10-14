@@ -3,15 +3,9 @@
  * placeholder TU). Define every function DB_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/db_8054FA04.h"
+#include "game/tu_80317B88.h"
 
-/* Calendar record passed by value to fn_80329E74 (month, day, year); see db_8053967C.h. */
-struct Db80565FD4_Date {
-    unsigned char m0;
-    unsigned char m1;
-    unsigned short m2;
-    Db80565FD4_Date() {}
-};
-extern "C" int fn_80329E74(Db80565FD4_Date d);
+extern "C" int fn_80329E74(FxDate* d);
 extern "C" int fn_8032A394(int a, int b);
 
 extern "C" void fn_80567B58(int a, int b, int c);
@@ -320,23 +314,23 @@ extern "C" DB_OVERLAY int fn_8056681C(Db80565CDC_S* s, int v)
 
 extern "C" DB_OVERLAY int fn_805668A4(Db80565CDC_S* s, int y)
 {
-    Db80565FD4_Date d;
+    FxDate d;
     unsigned char a = lbl_80692EF4[0];
     unsigned char b = lbl_80692EF4[1];
-    d.m0 = a;
-    d.m2 = y;
-    d.m1 = b;
-    int r = fn_80329E74(d);
+    d.a = a;
+    d.b = b;
+    d.c = y;
+    int r = fn_80329E74(&d);
     return fn_8032A394(r, 0);
 }
 
 extern "C" DB_OVERLAY int fn_805668F0(Db80565CDC_S* s, int y)
 {
-    Db80565FD4_Date d;
-    d.m0 = lbl_80692EF8[0];
-    d.m2 = y;
-    d.m1 = lbl_80692EF8[1];
-    return fn_8032A394(fn_80329E74(d), 0);
+    FxDate d;
+    d.a = lbl_80692EF8[0];
+    d.b = lbl_80692EF8[1];
+    d.c = y;
+    return fn_8032A394(fn_80329E74(&d), 0);
 }
 
 inline void Db80566E78_Step(int& v)
