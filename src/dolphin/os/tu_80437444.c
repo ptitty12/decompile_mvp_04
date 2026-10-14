@@ -29,7 +29,7 @@ extern void fn_80433838(OSContext* context, u32 pc, u32 newsp);   /* OSInitConte
 extern u32 fn_8043380C(void);          /* OSGetStackPointer */
 extern void fn_80435EC4(OSThread* thread);    /* __OSUnlockAllMutex */
 extern u32 lbl_806EF2D8;               /* __OSFpscrEnableBits */
-extern void* lbl_806DF090[17];         /* __OSErrorTable */
+extern OSErrorHandler lbl_806DF090[17]; /* __OSErrorTable */
 
 #define AddTail(queue, thread, link)       \
     do {                                   \

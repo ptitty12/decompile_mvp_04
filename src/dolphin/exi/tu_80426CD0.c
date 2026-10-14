@@ -39,15 +39,17 @@
 #define STATE_ATTACHED 8
 #define STATE_LOCKED   16
 
-/* Ecb[3] (EXIControl, 0x40 bytes each) at lbl_806DE358; fields as in include/dolphin/exi.h. */
-extern EXIControl lbl_806DE358[3];
+/* Ecb[3] (EXIControl, 0x40 bytes each) at lbl_806DE358; fields as in include/dolphin/exi.h. EXIBios.c's
+ * only .bss object: the unit owns it (splits.txt). IDSerialPort1 (.sbss) stays extern: see docs/DECISIONS.md
+ * on .sbss splits. */
+static EXIControl lbl_806DE358[3];
 extern u32 lbl_806EF720;  /* IDSerialPort1 */
 extern int lbl_806EF7C8;  /* __OSInIPL */
 extern const char* lbl_806EF218;  /* __EXIVersion */
 
 #define Ecb lbl_806DE358
 
-void fn_80435350(u32 mask);
+u32 fn_80435350(u32 mask);
 u32 fn_80434FF0(s32 interrupt);
 void OSClearContext(OSContext* context);
 void OSSetCurrentContext(OSContext* context);

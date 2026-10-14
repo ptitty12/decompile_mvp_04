@@ -28,9 +28,9 @@ extern void DBPrintf(char* msg, ...);
 extern void ICEnable(void);
 extern void DCEnable(void);
 extern void OSDumpContext(OSContext* context);
-extern s16 lbl_806EF818;               /* __OSLastInterrupt */
-extern u32 lbl_806EF814;               /* __OSLastInterruptSrr0 */
-extern s64 lbl_806EF820;               /* __OSLastInterruptTime */
+extern volatile __OSInterrupt lbl_806EF818;   /* __OSLastInterrupt */
+extern volatile u32 lbl_806EF814;             /* __OSLastInterruptSrr0 */
+extern volatile OSTime lbl_806EF820;          /* __OSLastInterruptTime */
 extern OSTime OSGetTime(void);
 extern u32 fn_8043380C(void);                          /* OSGetStackPointer (original code) */
 extern void fn_80433B9C(void);                         /* floating point unavailable handler (original code) */
@@ -256,7 +256,7 @@ void OSPanic(const char* file, int line, const char* msg, ...)
 }
 
 extern u32 lbl_806EF2D8;               /* __OSFpscrEnableBits */
-extern void* lbl_806DF090[17];         /* __OSErrorTable */
+extern OSErrorHandler lbl_806DF090[17]; /* __OSErrorTable */
 
 extern void fn_80433644(OSContext* context);           /* OSSaveFPUContext wrapper (original code) */
 
@@ -270,8 +270,8 @@ OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler)
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    oldHandler = (OSErrorHandler)lbl_806DF090[error];
-    lbl_806DF090[error] = (void*)handler;
+    oldHandler = lbl_806DF090[error];
+    lbl_806DF090[error] = handler;
 
     if (error == 16) {
         u32 msr;
@@ -326,7 +326,7 @@ typedef OSErrorHandler ErrHandler;
 /* __OSUnhandledException */
 void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
 {
-    void** table = lbl_806DF090;
+    OSErrorHandler* table = lbl_806DF090;
     OSTime tb = OSGetTime();
 
     if (!(context->srr1 & 2)) {

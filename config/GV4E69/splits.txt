@@ -2480,6 +2480,7 @@ dolphin/dsp/dsp_task.c:
 
 dolphin/dvd/tu_804227D4.c:
 	.text       start:0x804227D4 end:0x8042575C
+	.data       start:0x80633CB0 end:0x80633CF4
 
 dolphin/dvd/dvdqueue.c:
 	.text       start:0x8042575C end:0x80425954
@@ -2494,6 +2495,7 @@ dolphin/dvd/dvdidutils.c:
 dolphin/dvd/tu_80425BE4.c:
 	.text       start:0x80425BE4 end:0x80425E54
 	.data       start:0x80634310 end:0x80634380
+	.bss        start:0x806DE218 end:0x806DE288
 	.sdata      start:0x806EF200 end:0x806EF210
 
 dolphin/exi/tu_80425E54.c:
@@ -2501,6 +2503,7 @@ dolphin/exi/tu_80425E54.c:
 
 dolphin/exi/tu_80426CD0.c:
 	.text       start:0x80426CD0 end:0x804286AC
+	.bss        start:0x806DE358 end:0x806DE418
 
 dolphin/exi/tu_804286AC.c:
 	.text       start:0x804286AC end:0x80428C64

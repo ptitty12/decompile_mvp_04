@@ -76,7 +76,7 @@ void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
 void OSCancelAlarm(OSAlarm* alarm);
 void OSClearContext(OSContext* context);
 void OSSetCurrentContext(OSContext* context);
-void fn_80435350(u32 mask);
+u32 fn_80435350(u32 mask);
 void OSInitAlarm(void);
 DVDDiskID* DVDGetCurrentDiskID(void);
 void fn_80426C54(u32 type, u32 location);
