@@ -472,8 +472,8 @@ extern "C" int fn_803FF618()
 }
 
 
-/* EA readfile (reference-build name): queues a read request for the worker thread. near-miss (98%): the request fields
-   are volatile stores in retail's order; only li r4,0 and the last store (m48) are swapped. */
+/* EA readfile (reference-build name): queues a read request for the worker thread. near-miss (89.5%): the request fields
+   are volatile stores in retail's order; only li r4,0 and the last store (m48) are swapped (2 insns). */
 extern "C" int fn_803FF714(int a, int b, int c, int d)
 {
     ((volatile FsState*)&lbl_806ADEC0)->m3C = a;
