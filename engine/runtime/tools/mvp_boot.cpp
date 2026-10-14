@@ -6,7 +6,7 @@
 //   mvp-boot run [--until main|none|NAME|0xADDR] [--mmio N] [--log FILE] [--fifo FILE]
 //                [--max-entries N] [--max-ticks N] [--unnamed stop|log]
 //                [--input SCRIPT] [--frames N] [--ports MASK] [--frame-log FILE]
-//                [--ax-voices on|off]
+//                [--ax-voices on|off] [--trace on|off]
 //                       E0b items 7 and 8: boot with the IPL environment
 //                       (runtime/boot.h) and the hardware model (runtime/hw.h).
 //                       Prints the calls __start makes; logs every call from game
@@ -22,10 +22,14 @@
 //                       one line per frame poll goes to the frame log (default
 //                       frames.log). --ax-voices off freezes the AX voices
 //                       (E0b behaviour; runtime/ax.h).
+//                       E2: --trace off runs without the per-entry trace hook
+//                       (no SDK call log, --until and --max-entries unused): the
+//                       speed of the translated code alone, for measurements.
 //
 // Needs the disc (MVP_DISC) and a build with the translated code. Prints register
 // values, names and addresses only; the log stays under build/ (only its hash may
 // be committed).
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <map>
@@ -219,6 +223,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::string input_path, frame_log_path = "frames.log";
   std::size_t mmio_lines = 40;
   std::uint64_t max_entries = 20000000, max_ticks = 2000000000ull, max_frames = ~0ull;
+  bool trace = true;
   u32 ports = 1;
   HardwareConfig hw_cfg;
   for (int k = 2; k + 1 < argc; ++k) {
@@ -235,6 +240,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
     if (a == "--ports") ports = static_cast<u32>(std::strtoul(argv[k + 1], nullptr, 0)) & 0xF;
     if (a == "--frame-log") frame_log_path = argv[k + 1];
     if (a == "--ax-voices") hw_cfg.ax_voices = std::string(argv[k + 1]) != "off";
+    if (a == "--trace") trace = std::string(argv[k + 1]) != "off";
   }
   // Controller input (R14): a script, or port(s) connected with nothing pressed.
   std::string script_text = "mvp-input 1\n";
@@ -296,7 +302,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   t.log = std::fopen(log_path.c_str(), "wb");
   if (!t.log) std::fprintf(stderr, "mvp-boot: cannot write %s\n", log_path.c_str());
   g_trace = &t;
-  rt::g_entry_hook = &trace_hook;
+  rt::g_entry_hook = trace ? &trace_hook : nullptr;
   FrameTrace ft;
   ft.hooks = &hooks;
   ft.stop_at = max_frames;
@@ -307,6 +313,9 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   rt::g_frame_hook = &frame_hook;
   std::string why;
   int rc = 1;
+  // Host time spent running guest code (E2 speed measurements): printed only,
+  // never visible to the guest.
+  auto run_start = std::chrono::steady_clock::now();
   try {
     rt::run(m.cpu());
   } catch (const StopRun& s) {
@@ -315,6 +324,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   } catch (const ppc::GuestFault& f) {
     why = std::string("guest fault: ") + f.what() + " in " + t.name(f.pc());
   }
+  double run_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - run_start).count();
   rt::g_entry_hook = nullptr;
   rt::g_frame_hook = nullptr;
   rt::g_input = nullptr;
@@ -335,6 +345,9 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::printf("SDK call log: %s, %llu bytes, sha1 %s\n", log_path.c_str(), static_cast<unsigned long long>(t.log_bytes),
               Sha1::hex(t.log_sha.finish()).c_str());
   auto ull = [](std::uint64_t v) { return static_cast<unsigned long long>(v); };
+  // stderr: host time differs between runs; the reports on stdout must not (local_boot_twice).
+  std::fprintf(stderr, "host: %.3f s in rt::run, %.0f million guest instructions executed per second\n", run_seconds,
+               run_seconds > 0 ? static_cast<double>(m.cpu().ticks - hooks.idle_ticks_skipped) / run_seconds / 1e6 : 0.0);
   std::printf("clock: %llu instructions, time base %llu (%.3f s of guest time), %llu VI fields\n", ull(m.cpu().ticks),
               ull(hooks.time_base(m.cpu())), static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0,
               ull(hw.vi_fields()));
@@ -409,6 +422,6 @@ int main(int argc, char** argv) {
   if (cmd == "run") return run_boot(*in, argc, argv);
   std::fprintf(stderr, "usage: mvp-boot lockstep | run [--until main|none|NAME|0xADDR] [--mmio N] [--log FILE] [--fifo FILE] "
                        "[--max-entries N] [--max-ticks N] [--unnamed stop|log] [--input SCRIPT] [--frames N] "
-                       "[--ports MASK] [--frame-log FILE] [--ax-voices on|off]\n");
+                       "[--ports MASK] [--frame-log FILE] [--ax-voices on|off] [--trace on|off]\n");
   return 2;
 }

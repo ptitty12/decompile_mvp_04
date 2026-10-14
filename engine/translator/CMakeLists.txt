@@ -1,4 +1,4 @@
-add_library(engine_translator STATIC symbols.cpp cfg.cpp program.cpp emit_cpp.cpp units.cpp)
+add_library(engine_translator STATIC symbols.cpp cfg.cpp program.cpp emit_cpp.cpp wasm_emit.cpp units.cpp)
 target_link_libraries(engine_translator PUBLIC engine_ppc engine_vfs)
 target_compile_options(engine_translator PRIVATE ${ENGINE_WARN})
 set_source_files_properties(program.cpp PROPERTIES COMPILE_DEFINITIONS

@@ -1,10 +1,14 @@
-add_library(engine_ppc STATIC decode.cpp disasm.cpp fp.cpp interp.cpp)
+add_library(engine_ppc STATIC decode.cpp disasm.cpp effects.cpp fp.cpp interp.cpp)
 target_link_libraries(engine_ppc PUBLIC engine_common)
 target_compile_options(engine_ppc PRIVATE ${ENGINE_WARN})
 
 engine_test(test_ppc_decode SOURCES tests/test_decode.cpp LIBS engine_ppc)
 engine_test(test_ppc_fp SOURCES tests/test_fp.cpp LIBS engine_ppc)
 engine_test(test_ppc_sem SOURCES tests/test_sem.cpp LIBS engine_ppc)
+# Cross-build exactness (E2): native and WebAssembly must print the same digests.
+engine_test(test_ppc_digest SOURCES tests/test_digest.cpp LIBS engine_ppc)
+# Register effects (E2's wasm emitter) against the semantics.
+engine_test(test_ppc_effects SOURCES tests/test_effects.cpp LIBS engine_ppc)
 # Differential fuzzing against pureikyubu's interpreter (data-free).
 engine_test(test_ppc_fuzz_pk SOURCES tests/test_fuzz_pk.cpp tests/pk_oracle.cpp LIBS engine_ppc pureikyubu_core)
 if(MSVC)
