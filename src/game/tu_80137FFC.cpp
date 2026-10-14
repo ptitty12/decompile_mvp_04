@@ -908,6 +908,89 @@ extern "C" Scr* fn_80139B38(Scr* self, int a, int b, int c, int d, int e, int f,
     return self;
 }
 
+#include "game/tu_8007A4DC.h"
+/* Second screen class of this unit (fn_80139BA4 .. fn_8013B3DC): same base, different fields. */
+struct Unk80139BA4_Scr : Unk800C7B40_Widget {
+    Unk80138080_Node* m40;
+    char pad44[0xEC];
+    int m130;
+    int m134;
+    Unk800C7B40_Widget* m138;
+    Unk800C7B40_Widget* m13C;
+    Unk800C7B40_Widget* m140;
+    Unk800C7B40_Widget* m144;
+    Unk800C7B40_Widget* m148;
+    char pad14C[4];
+    int m150;
+};
+extern "C" {
+void fn_80125100(void* w);
+int fn_800DD204(void* w, void* v);
+void* fn_800C8038();
+void fn_8013B218(Scr* x);
+void fn_8013A5AC(Scr* x);
+}
+extern const char lbl_805C19A4[];
+extern const char lbl_805C19AC[];
+extern const char lbl_805C19B8[];
+extern const char lbl_805C19C4[];
+extern const char lbl_805C19D0[];
+extern const char lbl_805C19D8[];
+extern const char lbl_805BE43C[];
+
+extern "C" void fn_80139BA4(Scr* self)
+{
+    Unk80139BA4_Scr* x = (Unk80139BA4_Scr*)self;
+    char sp8[24];
+    fn_800ECF18(x);
+    Unk8007B2B0_Screen* g = (Unk8007B2B0_Screen*)lbl_8061930C;
+    FE();
+    Unk800C7B40_Widget* h = fn_800B7A94(lbl_8061A32C, lbl_805BA6D0);
+    fn_80124FA8(h, x);
+    fn_80125100(h);
+    x->m138 = fn_800C8044(x->fn_vslot32(lbl_805C19A4, 1));
+    x->m13C = fn_800C8040(x->fn_vslot32(lbl_805C19AC, 1));
+    x->m140 = fn_800C8044(x->fn_vslot32(lbl_805C19B8, 1));
+    x->m144 = fn_800C8044(x->m140->fn_vslot32(lbl_805C19C4, 1));
+    x->m148 = fn_800C8044(x->m140->fn_vslot32(lbl_805C19D0, 1));
+    x->m150 = g->fn_8007DA28();
+    g->fn_8007CF44(x->m150, (int)sp8, 9);
+    fn_800C8040(x->m138->fn_vslot32(lbl_805C19D8, 1))->fn_vslot28(sp8);
+    switch (*(int*)fn_800B555C()) {
+    case 0x50:
+        x->m134 = 1;
+        x->m13C->fn_vslot29((const char*)0x4151);
+        x->m148->fn_vslot8(1);
+        x->m144->fn_vslot8(0);
+        break;
+    case 0x51:
+        x->m134 = 0;
+        x->m13C->fn_vslot29((const char*)0x4153);
+        x->m148->fn_vslot8(1);
+        x->m144->fn_vslot8(0);
+        break;
+    case 0x52:
+        x->m134 = 2;
+        x->m13C->fn_vslot29((const char*)0x4154);
+        x->m148->fn_vslot8(1);
+        x->m144->fn_vslot8(0);
+        break;
+    case 0x53:
+        x->m134 = 3;
+        x->m13C->fn_vslot29((const char*)0x4152);
+        x->m148->fn_vslot8(0);
+        x->m144->fn_vslot8(1);
+        break;
+    }
+    Unk800C7B40_Widget* w = x->m13C;
+    x->fn_vslot32(lbl_805BE43C, 1);
+    fn_800DD204(w, fn_800C8038());
+    fn_8013B218(self);
+    fn_8013A5AC(self);
+    fn_8013B3DC(self);
+    fn_8013B0AC(self);
+}
+
 extern "C" void fn_80139EF4(Scr* x)
 {
     fn_800ECAA4(x);
