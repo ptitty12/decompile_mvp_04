@@ -34,7 +34,7 @@ extern s64 lbl_806EF820;               /* __OSLastInterruptTime */
 extern OSTime fn_80438628(void);       /* OSGetTime */
 extern u32 fn_8043380C(void);                          /* OSGetStackPointer (original code) */
 extern void fn_80433B9C(void);                         /* floating point unavailable handler (original code) */
-extern void* fn_80433E14(u16 error, void* handler);
+extern OSErrorHandler fn_80433E14(OSError error, OSErrorHandler handler);
 
 extern OSContext* __OSCurrentContextCached AT_ADDRESS(0x800000D4);
 extern OSContext* __OSFPUContextCached AT_ADDRESS(0x800000D8);
@@ -134,7 +134,7 @@ void fn_80433304(void)
         L2Enable();
         fn_80421C20("L2 cache initialized\n");
     }
-    fn_80433E14(1, (void*)fn_804331A4);
+    fn_80433E14(1, fn_804331A4);
     fn_80421C20("Locked cache machine check handler installed\n");
 }
 
@@ -260,18 +260,18 @@ extern void* lbl_806DF090[17];         /* __OSErrorTable */
 
 extern void fn_80433644(OSContext* context);           /* OSSaveFPUContext wrapper (original code) */
 
-void* fn_80433E14(u16 error, void* handler);
+OSErrorHandler fn_80433E14(OSError error, OSErrorHandler handler);
 void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar);
 
 /* OSSetErrorHandler */
-void* fn_80433E14(u16 error, void* handler)
+OSErrorHandler fn_80433E14(OSError error, OSErrorHandler handler)
 {
-    void* oldHandler;
+    OSErrorHandler oldHandler;
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    oldHandler = lbl_806DF090[error];
-    lbl_806DF090[error] = handler;
+    oldHandler = (OSErrorHandler)lbl_806DF090[error];
+    lbl_806DF090[error] = (void*)handler;
 
     if (error == 16) {
         u32 msr;
