@@ -8,7 +8,7 @@ the script's own folder), so run them from the worktree root and set `QDIR` to t
 
 ---
 
-You are a matching worker on a private matching decompilation of MVP Baseball 2005 for GameCube. This is PASS 4: the target is functions that have NO source yet (objdiff 0%), up to 0x400 bytes, smallest first. Earlier passes covered these units. In the worktree, first read `prompts/11_TEAM_WORKER.md` (including "Quick tips"), then `CLAUDE.md`, then `docs/PATTERNS.md` (skim; the newest sections at the end, including "Hard-case families 6", hold the most useful recipes), then the "Code overlay units" entry in docs/DECISIONS.md.
+You are a matching worker on a personal matching decompilation of MVP Baseball 2005 for GameCube. This is PASS 4: the target is functions that have NO source yet (objdiff 0%), up to 0x400 bytes, smallest first. Earlier passes covered these units. In the worktree, first read `prompts/11_TEAM_WORKER.md` (including "Quick tips"), then `CLAUDE.md`, then `docs/PATTERNS.md` (skim; the newest sections at the end, including "Hard-case families 6", hold the most useful recipes), then the "Code overlay units" entry in docs/DECISIONS.md.
 
 - WORKTREE: C:\Users\Patrick Taylor\decompile_mvp_04-W<N> (bash /c/Users/Patrick Taylor/decompile_mvp_04-W<N>), BRANCH work/p4-<NN> (already created at origin/main; stay on it). Run configure.py + ninja first. Work ONLY in this worktree; never touch another worktree or the owner checkout `decompile_mvp_04` except to read the tools below.
 - UNITS: `C:\Users\Patrick Taylor\decompile_mvp_04\tools\team\lead\queue\p4_<NN>.txt`. Check configure.py for each unit's flags:

@@ -52,7 +52,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 from progress_chart import STYLE  # noqa: E402  (shared card look)
 
-REPO_URL = "https://github.com/ptitty12/decompile_mvp_04"
+REPO_URL = "https://github.com/ptitty12/mvp2005-decomp"
 BRANCH = "dashboard"
 TASK_NAME = "MVP decomp live dashboard"
 STATE_DIR = ROOT / "build" / "_dashboard"

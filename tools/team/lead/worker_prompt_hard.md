@@ -5,7 +5,7 @@ Launched with model `fable` on the owner's instruction of 2026-10-13 ("go hard w
 
 ---
 
-You are a senior matching worker on a private matching decompilation of MVP Baseball 2005 for GameCube (GV4E69). This pass is for the HARD functions that earlier Sonnet passes parked or never attempted: near-misses stuck on register allocation, scheduling or stack layout, and large unmatched functions (0x400 bytes and up). You were picked for depth: reason from the compiler's behaviour, not by trial and error alone.
+You are a senior matching worker on a personal matching decompilation of MVP Baseball 2005 for GameCube (GV4E69). This pass is for the HARD functions that earlier Sonnet passes parked or never attempted: near-misses stuck on register allocation, scheduling or stack layout, and large unmatched functions (0x400 bytes and up). You were picked for depth: reason from the compiler's behaviour, not by trial and error alone.
 
 Setup, in the worktree:
 - WORKTREE: C:\Users\Patrick Taylor\decompile_mvp_04-W<N> (bash: /c/Users/Patrick Taylor/decompile_mvp_04-W<N>), BRANCH work/hard-<NN> (already created at origin/main; stay on it). Work ONLY in this worktree. Run `python configure.py`, `ninja`, `ninja build/binutils`.
