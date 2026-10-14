@@ -504,14 +504,14 @@ int fn_803194F4(FxReg* self, int a, int b, int c, int d) {
     return fn_80319490(self, (int*)self->m0, a, b, c, d);
 }
 
-/* near-miss: store order of the 0x34..0x58 fields (m34 lands one slot early) */
+/* m34 is written after m40 in source; that gives retail's store order. */
 FxCfg* fn_80319534(FxCfg* self) {
     new ((void*)self) Unk8037B3E8(0xCED26CE8U);
     self->m0 = lbl_80665860;
-    self->m34 = 0;
     self->m38 = 1;
     self->m3C = 1;
     self->m40 = 1;
+    self->m34 = 0;
     self->m44 = 0;
     self->m48 = 1;
     self->m4C = 1;
