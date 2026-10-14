@@ -24,7 +24,19 @@ class Machine {
   Machine& operator=(const Machine&) = delete;
 
   // Copies the DOL's sections into MEM1, zeroes .bss, sets the PC to the entry.
+  // Remembers the DOL for code_intact().
   void load_dol(const vfs::Dol& dol);
+
+  // Whether the 32-byte block at `ea` still holds the DOL's bytes (true outside
+  // the DOL's text sections). Translated code is only valid while it does: the
+  // icbi hook checks this for every block the guest invalidates (overlays the
+  // game reloads must be byte-identical to the DOL image).
+  bool code_intact(u32 ea) const;
+
+  // Real mode (MSR[IR]/[DR] clear) addresses physical memory directly: MEM1 is
+  // then also visible at 0x00000000. With translation on it is not (only the BAT
+  // windows at 0x80000000 and 0xC0000000 are), as on the console.
+  void set_real_mode(bool on);
 
   ppc::Cpu& cpu() { return cpu_; }
   ppc::Memory& memory() { return *mem_; }
@@ -32,6 +44,7 @@ class Machine {
   const u8* mem1() const { return mem1_.data(); }
 
  private:
+  const vfs::Dol* dol_ = nullptr;
   std::vector<u8> mem1_;
   std::unique_ptr<ppc::Memory> mem_;
   ppc::Cpu cpu_;

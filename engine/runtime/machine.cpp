@@ -11,7 +11,29 @@ Machine::Machine() : mem1_(kMem1Size + kGuard, 0), mem_(std::make_unique<ppc::Me
   cpu_.mem = mem_.get();
 }
 
+void Machine::set_real_mode(bool on) {
+  if (on) {
+    mem_->map(0x00000000u, mem1_.data(), kMem1Size);
+  } else {
+    for (u32 off = 0; off < kMem1Size; off += ppc::Memory::kPageSize) mem_->page[off >> ppc::Memory::kPageShift] = nullptr;
+  }
+}
+
+bool Machine::code_intact(u32 ea) const {
+  if (!dol_) return true;
+  u32 block = ea & ~31u;
+  for (const auto& s : dol_->sections()) {
+    if (!s.text || block + 32 <= s.address || block >= s.address + s.size) continue;
+    u32 lo = block < s.address ? s.address : block;
+    u32 hi = block + 32 > s.address + s.size ? s.address + s.size : block + 32;
+    if (std::memcmp(&mem1_[lo & 0x01FFFFFFu], dol_->bytes().data() + s.offset + (lo - s.address), hi - lo) != 0)
+      return false;
+  }
+  return true;
+}
+
 void Machine::load_dol(const vfs::Dol& dol) {
+  dol_ = &dol;
   for (const auto& s : dol.sections()) {
     u32 off = s.address & 0x3FFFFFFFu;
     if (off + s.size <= kMem1Size) std::memcpy(&mem1_[off], dol.bytes().data() + s.offset, s.size);

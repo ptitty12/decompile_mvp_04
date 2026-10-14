@@ -1,6 +1,8 @@
-add_library(engine_runtime STATIC native.cpp machine.cpp)
+add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp sys_hooks.cpp)
 target_link_libraries(engine_runtime PUBLIC engine_ppc engine_vfs)
 target_compile_options(engine_runtime PRIVATE ${ENGINE_WARN})
+
+engine_test(test_boot_hw SOURCES tests/test_boot_hw.cpp LIBS engine_runtime)
 
 # Lockstep checker (development): translated code against the interpreter.
 add_library(engine_lockstep STATIC lockstep.cpp)
@@ -64,4 +66,7 @@ if(MVP_DISC_PATH AND EXISTS "${MVP_DISC_PATH}")
   endif()
   add_test(NAME local_lockstep COMMAND mvp-boot lockstep)
   set_tests_properties(local_lockstep PROPERTIES SKIP_RETURN_CODE 77 LABELS local)
+  # E0b item 7: boot with the IPL environment until main.
+  add_test(NAME local_boot_main COMMAND mvp-boot run --until main --mmio 0)
+  set_tests_properties(local_boot_main PROPERTIES SKIP_RETURN_CODE 77 LABELS local)
 endif()

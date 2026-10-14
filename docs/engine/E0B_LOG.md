@@ -14,7 +14,7 @@ A later session resumes from "Next step".
 | 4 | Semantics library and reference interpreter | Done | see git log |
 | 5 | Functions and CFGs | Done | see git log |
 | 6 | IR and C++ emitter | Done | see git log |
-| 7 | Boot environment | | |
+| 7 | Boot environment | Done | see git log |
 | 8 | HLE boundary and SDK log | | |
 | 9 | Virtual clock, interrupts, threads (D4) | | |
 | 10 | Devices to the first retrace | | |
@@ -43,7 +43,7 @@ A later session resumes from "Next step".
 | `engine/vfs/` | Disc image sources (file, memory, CISO), GCM header + FST, DOL, ELF section headers, disc identity check; `mvp-disc` CLI |
 | `engine/ppc/` | Gekko ISA: opcode table (pattern + mask per opcode), decoder, disassembler (`isa.h`, `decode.cpp`, `disasm.cpp`); CPU state, guest memory page table, runtime hooks (`cpu.h`, `mem_access.h`); floating-point core (`fp.h/.cpp`); per-opcode semantics (`sem.h`); reference interpreter (`interp.h/.cpp`). Shared by translator and runtime, so it sits beside them (an addition to ARCHITECTURE §11) |
 | `engine/translator/` | Symbol map parser (`symbols.h/.cpp`), function and CFG recovery (`cfg.h/.cpp`), input loading (`program.h/.cpp`), `mvp-xlat` CLI |
-| `engine/runtime/` | `native.h/.cpp` (what translated code calls: entry hook, unwind, indirect calls, the entry table, the run loop), `machine.h/.cpp` (MEM1 + DOL loading), `lockstep.h/.cpp` (translated vs interpreter checker), `mvp-boot` CLI |
+| `engine/runtime/` | `native.h/.cpp` (what translated code calls: entry hook, unwind, indirect calls, the entry table, the run loop), `machine.h/.cpp` (MEM1, DOL loading, real-mode mapping, the code-intact check), `boot.h/.cpp` (IPL/apploader environment), `hw.h/.cpp` (hardware registers and device models), `sys_hooks.h/.cpp` (CPU hooks), `lockstep.h/.cpp` (translated vs interpreter checker), `mvp-boot` CLI |
 | `engine/third_party/` | Vendored code (`docs/REUSE.md` §6) |
 | `engine/tools/` | Build helpers |
 
@@ -270,6 +270,48 @@ A later session resumes from "Next step".
   past its call) and runs it in lockstep with MEM1 compared at every entry: it
   must unwind exactly once and store 14 expected results.
 
+### 7. Boot environment (done)
+
+- `rt::setup_boot_environment` (runtime/boot.h) leaves what the IPL and apploader
+  leave: the disc id and DVD magic at 0x80000000, boot magic 0x0D15EA5E, memory
+  size, console type 3 (retail), arena hi, the FST copied to the top of MEM1
+  (0x80000038/3C), the BI2 copy below it (0x800000F4; debug flag 0, no
+  arguments), TV mode NTSC (0x800000CC), ARAM size, bus and CPU clocks
+  162,000,000 and 486,000,000 (0x800000F8/FC, DETERMINISM R1). CPU: MSR
+  FP|IR|DR|RI, HID0, the BATs over MEM1 (cached and uncached), SRs. All are
+  configuration constants (R12), nothing from the host.
+  - DETERMINISM.md R12 says the 0x800000F4 pointer "stays null"; the real
+    apploader sets it to the BI2 copy (OSInit reads the debug flag and the PAD
+    spec from it). With the retail BI2 (debug flag 0, argument offset 0) `argc` and
+    `argv` are still 0, as R12 intends. Flagged for the lead.
+- Real mode: when the guest clears MSR[IR]/[DR] (OSInit's memory-protection setup
+  runs a stub through `rfi` at a physical address), MEM1 is also mapped at 0;
+  setting translation again unmaps it.
+- `icbi` checks that the invalidated block still holds the DOL's bytes (translated
+  code is only valid for them); a mismatch is a hard error. Outside the DOL's text
+  (the exception vectors OSInit copies to low memory) nothing is checked.
+- `sc` is a no-op (the OS system call only toggles HID0[ABE] and returns).
+- Hardware (runtime/hw.h), first part of item 10, as far as the boot needs:
+  - EXI: transfers complete at once with TCINT; channel 0 device 1 is the IPL
+    chip's RTC (a fixed date) and SRAM (a valid default image: checksums,
+    language English, flags 0x2C, not progressive); all other devices are absent
+    (no memory cards);
+  - DSP: reset and halt bits, the ARAM DMA with 16 MiB of ARAM, and the mail
+    0x80544348 that the IPL's DSP init microcode sends when unhalted;
+  - other registers store and read back what the guest writes; the write-gather
+    pipe is captured; every access is logged and counted; a register read a
+    million times in a row stops the run (an unanswered poll).
+- Exit evidence (2026-10-14), `mvp-boot run --until main` (`local_boot_main`):
+  `__start` calls fn_80003300, fn_80003334, fn_80003468, memset (x2),
+  fn_80003254, **DBInit**, **fn_8043188C (OSInit)**, fn_800032C0, fn_80003464
+  (x2), **fn_80438704 (__init_user)** and **reaches main (fn_8014D63C)** after 841
+  translated function entries, 102 MMIO accesses, 1 unwind (OSInit's real-mode
+  stub returns through `rfi`), 1 `sc`, 85 `icbi` blocks checked.
+- CI: `test_boot_hw` (synthetic disc: the low-memory layout, FST/BI2 copies and
+  CPU state; real-mode mapping; the icbi check; EXI RTC/SRAM by imm and DMA and an
+  SRAM write; absent devices; the DSP init handshake and ARAM DMA both ways; the
+  write-gather capture and the poll limit).
+
 ## Decisions to record (for the lead)
 
 - E0b-FP1: the FP model above (exact integer softfloat as the single source of
@@ -280,6 +322,5 @@ A later session resumes from "Next step".
 
 ## Next step
 
-Item 7: boot environment (low memory as the IPL/apploader leave it), then the run
-past the first MMIO access. Rebase onto origin/main first: the K1 names landed
-(f699f32f) and `local_disasm` resolves dtk's listing with symbols.txt.
+Item 8: HLE boundary and SDK call log (route calls by symbols.txt name, log
+every call into SDK units, stop at unnamed SDK functions).
