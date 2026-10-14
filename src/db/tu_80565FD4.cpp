@@ -182,7 +182,7 @@ struct Db8056792C_H : Db80566B38_D {
     virtual void v3();
     virtual Db8056792C_List* v4(int a);
 };
-float fn_8056FFB0();
+extern "C" float fn_8056FFB0();
 struct Db80567174_H : Db80566B38_D {
     virtual void v1();
     virtual void v2();

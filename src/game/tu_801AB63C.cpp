@@ -15,8 +15,8 @@ struct Unk801ADA8C_Q {
     char padA08[4];
     char mA0C[4];
 };
-float fn_8024F048(void* a, void* b, void* c, int d, int e);
-float fn_8024F20C(void* a, void* b, void* c, int d, int e);
+extern "C" float fn_8024F048(void* a, void* b, void* c, int d, int e);
+extern "C" float fn_8024F20C(void* a, void* b, void* c, int d, int e);
 float fn_80253434(int p);
 void fn_8017DD80(void* a, int x, int* b, int* c);
 extern float lbl_805CEF74;
@@ -31,8 +31,8 @@ struct Unk801AD254_It {
     int m10;
     int m14;
 };
-void fn_8014E09C(Unk801AD254_It* it, Unk8019F8C0_Owner* o, int a);
-void fn_8014E108(Unk801AD254_It* it);
+extern "C" void fn_8014E09C(Unk801AD254_It* it, Unk8019F8C0_Owner* o, int a);
+extern "C" void fn_8014E108(Unk801AD254_It* it);
 extern float lbl_805CF71C;
 float fn_801B35F0(Unk801AB63C_P* p, void* h, int i, int c);
 int fn_8025416C(void* a, int b);
@@ -49,17 +49,17 @@ struct Unk801AD044_Rec {
     int m0;
     float m4;
 };
-Unk801AD044_Rec fn_801B3094(Unk801AB63C_P* p, void* h, int a, int b, int c, int d, ...);
+extern "C" Unk801AD044_Rec fn_801B3094(Unk801AB63C_P* p, void* h, int a, int b, int c, int d, ...);
 extern float lbl_805CF714;
 
-int fn_801C1870(void* a, int b, int c);
+extern "C" int fn_801C1870(void* a, int b, int c);
 void* fn_801AD044(Unk801AB63C_P* p, int key, int* tbl);
 struct Unk801AD118_X {
     char pad0[0x10];
     float m10;
 };
 void fn_800B555C();
-int fn_800B57EC();
+extern "C" int fn_800B57EC();
 extern float lbl_805CEF70;
 void* fn_801AD254(Unk801AB63C_P* p, int key, int* tbl, int c);
 
@@ -76,26 +76,26 @@ void fn_8017DD80(void* a, int x, int* b, int* c);
 void fn_801AB748(Unk801AB63C_P* p, int v);
 int fn_801A7130(Unk8019F8C0_Owner* o, int i);
 void fn_8017D640(void* a, int b, Unk801AB63C_Q* c, int d, int e);
-int fn_8017D6B8(void* a, int b, Unk801AB63C_Q* c, int d, int e, int f);
+extern "C" int fn_8017D6B8(void* a, int b, Unk801AB63C_Q* c, int d, int e, int f);
 void fn_801B2944(void* a, int b, int c, int d, int e, int f, int g, int h);
 void fn_80235780(void* a, int b, int c, int d);
 int fn_801AD470(void* a, int b, int c);
 int fn_801AD900(void* a, int b, int c);
-int fn_801A4B34(Unk8019F8C0_Owner* o);
+extern "C" int fn_801A4B34(Unk8019F8C0_Owner* o);
 int fn_801B5DE8(void* a, void* q, int c);
 int fn_801AD31C(void* a, Unk801AB63C_Q* q, int c);
 int fn_801AD880(void* a, Unk801AB63C_Q* q, int c, int d);
 int fn_801B3FD8(void* a, Unk801AB63C_Q* q);
 int fn_801B5FC4(void* a, int b);
 int fn_801B62E4(void* a, int b);
-int fn_801C1894(void* a, int b, int c);
-int fn_801C18A4(void* a, int b, int c, int d);
-int fn_801C18D8(void* a, int b, int c);
-int fn_801C190C(void* a, int b);
+extern "C" int fn_801C1894(void* a, int b, int c);
+extern "C" int fn_801C18A4(void* a, int b, int c, int d);
+extern "C" int fn_801C18D8(void* a, int b, int c);
+extern "C" int fn_801C190C(void* a, int b);
 int fn_801B4144(void* a, Unk801AB63C_Q* q);
 int fn_801B5EDC(void* a, int b, int c);
 int fn_8017DD64(void* a, int b);
-int fn_801C185C(void* a, int b, int c);
+extern "C" int fn_801C185C(void* a, int b, int c);
 int fn_801B5F4C(Unk801AB63C_P* p);
 int fn_801B40F8(void* a, Unk801AB63C_Q* q);
 int fn_801B4190(void* a, Unk801AB63C_Q* q, void* r);
@@ -110,18 +110,18 @@ int fn_801ABCDC(Unk801AB63C_P* p, int i);
 void fn_801ACF2C(Unk801AB63C_P* p);
 void fn_801AD118(Unk801AB63C_P* p);
 void fn_801B25E4(Unk801AB63C_P* p, int n);
-int fn_8006BC74(void* m, int f);
+extern "C" int fn_8006BC74(void* m, int f);
 void fn_801AC594(Unk801AB63C_P* p, Unk801AB63C_Q* q);
-void fn_801AC7E4(Unk801AB63C_P* p, int f, int a, int b);
-void* fn_801A497C(Unk8019F8C0_Owner* o, int f, int n);
+extern "C" void fn_801AC7E4(Unk801AB63C_P* p, int f, int a, int b);
+extern "C" void* fn_801A497C(Unk8019F8C0_Owner* o, int f, int n);
 void fn_801AB914(Unk801AB63C_P* p, int x);
 int fn_801ACDCC(Unk801AB63C_P* p, Unk801AB63C_Q* h, Unk801AB63C_Q* s);
 void fn_801ABD10(Unk801AB63C_P* p, int a, Unk801AB63C_Q* c, int d);
 void fn_801AE0A0(Unk801AB63C_P* p, int i, int key);
-int fn_801A4B34(Unk8019F8C0_Owner* o);
+extern "C" int fn_801A4B34(Unk8019F8C0_Owner* o);
 int fn_801B454C(Unk801AB63C_P* p, Unk801AB63C_Q* q);
 void fn_8017DF2C(void* a, Unk801AB63C_Q* q);
-int fn_801C1880(void* a, int b, int c);
+extern "C" int fn_801C1880(void* a, int b, int c);
 int fn_801B5EDC(void* a, int b, int c);
 int fn_801B40F8(void* a, Unk801AB63C_Q* q);
 void fn_8017DF2C(void* a, int b);
@@ -164,8 +164,8 @@ int fn_801B62E4(Unk801AB63C_P* p, int i);
 int fn_801B5F4C(Unk801AB63C_P* p);
 int fn_801B5F70(Unk801AB63C_P* p);
 int fn_801B38A8(Unk801AB63C_P* p, int i, int c);
-int fn_801C184C(void* a, int b, int c);
-int fn_801C192C(void* a, int b);
+extern "C" int fn_801C184C(void* a, int b, int c);
+extern "C" int fn_801C192C(void* a, int b);
 struct Unk801AB748_H {
     char pad0[0x4C8];
     int m4C8;
@@ -336,9 +336,9 @@ int fn_801B5DE8(void* a, void* b, int c);
 int fn_801B5EDC(Unk801AB63C_P* p, int i, int c);
 int fn_801B5FC4(void* a, int b);
 Unk801AB63C_Q* fn_801B63A0(Unk801AB63C_P* p, int t);
-int fn_801C1870(void* a, int b, int c);
-int fn_801C18C4(void* a, int b, int c);
-int fn_801ACB68(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d);
+extern "C" int fn_801C1870(void* a, int b, int c);
+extern "C" int fn_801C18C4(void* a, int b, int c);
+extern "C" int fn_801ACB68(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d);
 int fn_801AD6FC(void* a, int b);
 int fn_801AD720(void* a, int b);
 int fn_801ADCE8(Unk801AB63C_P* p, int a);
@@ -420,9 +420,9 @@ struct Unk801ACDCC_G {
     char mA0C[4];
 };
 int fn_801B4244(Unk801AB63C_P* p, Unk801B23A8_Q* q, int c);
-int fn_801C18F8(void* a, int b);
+extern "C" int fn_801C18F8(void* a, int b);
 extern "C" int fn_80097190(void* o, int k);
-Unk801ACDCC_G* fn_801A4910(Unk8019F8C0_Owner* o, int a, int b);
+extern "C" Unk801ACDCC_G* fn_801A4910(Unk8019F8C0_Owner* o, int a, int b);
 
 int fn_801ACDCC(Unk801AB63C_P* p, Unk801AB63C_Q* h, Unk801AB63C_Q* s)
 {
@@ -598,7 +598,7 @@ int fn_801AD470(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c)
 int fn_801B5FA0(Unk801AB63C_P* p, int i);
 int fn_801B5F70(Unk801AB63C_P* p);
 int fn_801B62E4(Unk801AB63C_P* p, int i);
-int fn_801C18EC(void* a, int b);
+extern "C" int fn_801C18EC(void* a, int b);
 int fn_801B2AD4(Unk801AB63C_P* p, Unk801B23A8_Q* q);
 
 /* near-miss: same code; p and the result swap r30/r31 (as in fn_801AD744). */

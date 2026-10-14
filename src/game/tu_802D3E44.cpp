@@ -28,8 +28,8 @@ float fn_802CBD90(Unk802D56CC_Cam* c);
 void fn_802CC53C(Unk802D56CC_Cam* c);
 extern Unk802D5618_Blob lbl_8068B828;
 extern int lbl_80620150;
-void fn_8031E1A0(Unk802D5B64_View* v, int a);
-void fn_8031E1D4(Unk802D5B64_View* v, int a);
+extern "C" void fn_8031E1A0(Unk802D5B64_View* v, int a);
+extern "C" void fn_8031E1D4(Unk802D5B64_View* v, int a);
 void fn_8016BA48(int h, int c, int a, int b, Unk802D5618_Blob* blob, int d);
 void fn_8016C4A0(int h);
 extern char lbl_805E4284[];
@@ -45,12 +45,12 @@ extern float lbl_8061EDE8;
 extern float lbl_8061EDEC;
 extern const void* lbl_80664528[];
 extern const void* lbl_806643D0[];
-void fn_8033CD28(void* p, int c);
+extern "C" void fn_8033CD28(void* p, int c);
 void fn_802D3B40(void* p, int c);
 extern Unk802D58E8_Flags* lbl_8061B8C0;
 
-Unk802D58E8* fn_801A4CE8(void* owner, int k);
-Unk802D58E8_Pad* fn_801A6DB8(void* owner);
+extern "C" Unk802D58E8* fn_801A4CE8(void* owner, int k);
+extern "C" Unk802D58E8_Pad* fn_801A6DB8(void* owner);
 void fn_8017C72C(void* t);
 int fn_802CBDB4(Unk802CBD04* o);
 void fn_802CBDBC(Unk802CBD04* o, int a, int b, int kind);
@@ -67,7 +67,7 @@ Unk802D5B64_View* fn_801A04A8(void* owner, int k);
 int fn_801A2034(Unk802D58E8_Owner* ow, int f);
 
 void fn_8037B424(void* p, int c);
-void fn_802CBD04(void* p);
+extern "C" void fn_802CBD04(void* p);
 void fn_802D58E8(Unk802D58E8* o, int k);
 const char* fn_802D7218();
 const char* fn_802D7288();
@@ -79,7 +79,7 @@ const char* fn_802D4DE8(Unk802D58E8* o, int k);
 struct Unk802D4CC8_Rec;
 void fn_802D61AC(Unk802D58E8* o, int k, int a);
 Unk802D4CC8_Rec* fn_802D4CC8(Unk802D58E8* o, int k);
-void fn_802D4434(Unk802D58E8* o, int k);
+extern "C" void fn_802D4434(Unk802D58E8* o, int k);
 void fn_802D3E44(Unk802D58E8* o, int a, int b, int c)
 {
     if (fn_801A04A8(o->m60, 5) != o->m64) {
@@ -134,10 +134,10 @@ extern float lbl_805E406C;
 extern float lbl_805E4070;
 void fn_8018959C(Unk802D3F38_Vec* out, int obj, float f);
 int fn_8018AD2C(int a);
-int fn_801BBF24(int a);
-int fn_801D0314(int a);
-void fn_8037893C(void* p, int a, int b, int c, int d);
-float fn_804028E4(float v);
+extern "C" int fn_801BBF24(int a);
+extern "C" int fn_801D0314(int a);
+extern "C" void fn_8037893C(void* p, int a, int b, int c, int d);
+extern "C" float fn_804028E4(float v);
 inline float Unk802D3F38_LenSq(const Unk802D3F38_Vec* v)
 {
     return v->z * v->z + (v->x * v->x + v->y * v->y);
@@ -460,7 +460,7 @@ struct Unk802D505C_Ctl {
     int m38;
 };
 int fn_802CF1A4(void* hash);
-Unk802D4BD0_Obj* fn_803272D0(void* tbl, int id);
+extern "C" Unk802D4BD0_Obj* fn_803272D0(void* tbl, int id);
 
 int fn_802D505C(Unk802D58E8* o)
 {
@@ -819,8 +819,8 @@ struct Unk802D61F8_C {
 extern const void* lbl_80664430[];
 extern const char lbl_805E3FF4[];
 extern const void* lbl_806643D0[];
-void fn_803785E4(void* p);
-void* fn_802CB924(void* mem, int a);
+extern "C" void fn_803785E4(void* p);
+extern "C" void* fn_802CB924(void* mem, int a);
 void fn_802D6300();
 void* operator new(unsigned int n, int heap);
 inline void* operator new(unsigned int, void* p) { return p; }

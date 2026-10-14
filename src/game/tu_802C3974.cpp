@@ -10,9 +10,9 @@ extern unsigned char lbl_805E1B9A[];
 extern const void* lbl_80664238[];
 extern int lbl_8061D39C;
 
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 void* operator new(unsigned int n, int heap);
-void fn_802B961C(int p, int a);
+extern "C" void fn_802B961C(int p, int a);
 int fn_802C72F4(int a, int b, int c);
 void fn_802C3EC0(Unk802C3B60* o);
 extern const char lbl_805E15C4[];
@@ -44,10 +44,10 @@ extern const char lbl_805E15E0[];
 int fn_803EBD14(int h, const char* k);
 int fn_802B9954(int a, int b, int c);
 int fn_802B98AC(int a, int b);
-int fn_803EE310(int a);
-void fn_803FFA60(int dst, int src, int n);
-void fn_80433004(int p, int n);
-void fn_803EDA0C(int p);
+extern "C" int fn_803EE310(int a);
+extern "C" void fn_803FFA60(int dst, int src, int n);
+extern "C" void fn_80433004(int p, int n);
+extern "C" void fn_803EDA0C(int p);
 extern const char lbl_805DFC34[];
 extern const char lbl_805E144C[];
 extern const char lbl_805E1468[];
@@ -56,7 +56,7 @@ extern const char lbl_805E1498[];
 extern int lbl_8061EBF4[];
 extern int lbl_8061EBC0[];
 int fn_804089B4(char* buf, const char* fmt, ...);
-int fn_802B9300(const char* name, int a, int b, int c);
+extern "C" int fn_802B9300(const char* name, int a, int b, int c);
 void fn_802C6404(Unk802C3B60* o);
 int fn_803EBD14(int h, int k);
 void fn_803D74A0(int a, int b, int c);
@@ -65,9 +65,9 @@ void fn_802C4CB4(int a, int b, int c, int d);
 void fn_802C51C0(int a, int b, int c, int d);
 int fn_802C440C(Unk802C3B60* o, int* p, int x);
 int fn_802B9804(const char* path, int a);
-int fn_803FC4C0(int h);
-char* fn_803FC410(int h, int a, int b, int c, int* out);
-int fn_803FC034(char* name);
+extern "C" int fn_803FC4C0(int h);
+extern "C" char* fn_803FC410(int h, int a, int b, int c, int* out);
+extern "C" int fn_803FC034(char* name);
 int fn_8040B6A0(const char* s);
 int fn_8040B574(const char* a, const char* b);
 extern const char lbl_805E0E44[];
@@ -250,11 +250,11 @@ struct Unk802C3D2C_Elem {
 
 extern const char lbl_805E1438[];
 extern int lbl_806EE9F0;
-void* fn_803774A8(unsigned n, int heap);
+extern "C" void* fn_803774A8(unsigned n, int heap);
 void* fn_802BB19C();
 int fn_802BB27C(void* o, int idx);
-int fn_803ED604(const char* name, int size, int flags);
-int fn_803ED634(const char* name, int size, int flags);
+extern "C" int fn_803ED604(const char* name, int size, int flags);
+extern "C" int fn_803ED634(const char* name, int size, int flags);
 
 /* near-miss (101/101 insns, register names only): retail keeps the byte offset in r27, the array base in r28 and the label hi-part in r26; ours r28/r26/r27 */
 void fn_802C3D2C(Unk802C3B60* o, int n)
@@ -301,8 +301,8 @@ void fn_802C3D2C(Unk802C3B60* o, int n)
     }
 }
 
-void fn_803EC054(int h);
-void fn_80377488(void* p);
+extern "C" void fn_803EC054(int h);
+extern "C" void fn_80377488(void* p);
 
 void fn_802C3EC0(Unk802C3B60* o)
 {
@@ -1168,9 +1168,9 @@ struct Unk802C6BA4_Tex {
     unsigned int mC;
     int m10;
 };
-unsigned char* fn_803EC1C0(void* tex, int x, int y, int z);
+extern "C" unsigned char* fn_803EC1C0(void* tex, int x, int y, int z);
 Unk802C6BA4_Tex* fn_803EBF90(void* tex);
-int fn_803EC6F8(void* tex);
+extern "C" int fn_803EC6F8(void* tex);
 
 /* near-miss (129/129 insns, 125 words equal): in the format-8 index search retail keeps p in r11, idx in r10 and the byte offset in r9 (formed after p); ours r9/r11/r11 */
 void fn_802C6BA4(Unk802C6BA4_Tex* tex, int fmt)
@@ -1237,19 +1237,19 @@ struct Unk802C72F4_Tex {
     int m10;
 };
 
-int fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" int fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
 Unk802C72F4_Tex* fn_803EBF90();
-int fn_803EC984(int h);
-void fn_803EC054(int h);
+extern "C" int fn_803EC984(int h);
+extern "C" void fn_803EC054(int h);
 void fn_802C6BA4(int a, int b);
 
 unsigned fn_802C6B74(unsigned r, unsigned g, unsigned b);
 unsigned fn_802C6B8C(unsigned r, unsigned g, unsigned b);
-unsigned char* fn_803EC1C0(void* tex, int x, int y, int z);
-int fn_803EC6F8(void* tex);
-int fn_803EC03C(int h);
-int fn_803EC9D4();
-int fn_8014DD68(unsigned a, unsigned b, unsigned c, int d);
+extern "C" unsigned char* fn_803EC1C0(void* tex, int x, int y, int z);
+extern "C" int fn_803EC6F8(void* tex);
+extern "C" int fn_803EC03C(int h);
+extern "C" int fn_803EC9D4();
+extern "C" int fn_8014DD68(unsigned a, unsigned b, unsigned c, int d);
 
 void fn_802C7138(unsigned a, unsigned b, unsigned c, int h, int x0, int y0, int w, int hh)
 {
@@ -1313,7 +1313,7 @@ void fn_802BB948(Unk802BB948* o);
 struct Unk802C7B54;
 void fn_802C7B54(Unk802C7B54* o);
 extern const void* lbl_80664220[];
-void fn_80377408(void* p);
+extern "C" void fn_80377408(void* p);
 
 struct Unk802C75D0_E12 {
     char d[12];

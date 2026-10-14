@@ -10,19 +10,19 @@ extern Unk802BB4FC* lbl_8061EAF0;
 extern const void* lbl_80664080[];
 extern int lbl_8061E978;
 
-void fn_803EDA0C(int p);
+extern "C" void fn_803EDA0C(int p);
 extern const char lbl_805E11C4[];
 extern int lbl_8061F688;
 extern char lbl_8068D9D8[];
 void* operator new(unsigned int n, int heap);
 void fn_802E377C(void* p);
-void fn_802E3834(int a, char* b, int c);
+extern "C" void fn_802E3834(int a, char* b, int c);
 int fn_802E3F00(int a, int b, int c, int (*cb)(int, const char*, int*, char**));
-void fn_80377408(void* p);
-int fn_803EE3D4(int a);
-void fn_803E9744(void* p, int a);
+extern "C" void fn_80377408(void* p);
+extern "C" int fn_803EE3D4(int a);
+extern "C" void fn_803E9744(void* p, int a);
 void fn_8040B61C(void* dst, const void* src);
-void fn_802AF6F8(int a, void* b, int c);
+extern "C" void fn_802AF6F8(int a, void* b, int c);
 
 void fn_802BB4BC(Unk802BB1E4_Obj*)
 {
@@ -279,11 +279,11 @@ int fn_802B1EE8(Unk802B0ACC_T* t, const char* name);
 int fn_8040B574(const char* a, const char* b);
 int fn_8040B6A0(const char* s);
 char* fn_8040B61C(char* d, const char* s);
-void fn_80329AEC(const char** pp, const char** out, int* pn, int delim);
-int fn_80329C4C(const char** pp, int* pn, int* out, int lo, int hi, int delim);
-int fn_80329B98(const char** pp, int* pn, float* out, int delim);
+extern "C" void fn_80329AEC(const char** pp, const char** out, int* pn, int delim);
+extern "C" int fn_80329C4C(const char** pp, int* pn, int* out, int lo, int hi, int delim);
+extern "C" int fn_80329B98(const char** pp, int* pn, float* out, int delim);
 
-void* fn_803774A8(unsigned n, int heap);
+extern "C" void* fn_803774A8(unsigned n, int heap);
 
 int* fn_802BBB20(const char* text)
 {

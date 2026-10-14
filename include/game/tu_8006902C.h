@@ -244,6 +244,6 @@ struct Unk80069F0C {
     void fn_8006C7E8(int a);
 };
 
-void fn_8006902C(int initialize, int priority);
+extern "C" void fn_8006902C(int initialize, int priority);
 
 #endif

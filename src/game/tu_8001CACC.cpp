@@ -9,17 +9,17 @@
 #include "game/tu_8001CACC.h"
 #include "game/tu_8022FE34.h"
 
-void* fn_803774A8(unsigned n, int heap);
-int fn_803AC11C();
-int fn_803AD9BC();
-int fn_803AC164(int a, char* buf, int size);
-int fn_803B9D50(Unk8001BA78* a);
-int fn_803B9D84();
-int fn_803AC944();
-int fn_803ABEE4(int a);
-void fn_803ABDD0(int a, int b);
-void fn_803ABEDC(int a);
-void fn_803ABD58(int a);
+extern "C" void* fn_803774A8(unsigned n, int heap);
+extern "C" int fn_803AC11C();
+extern "C" int fn_803AD9BC();
+extern "C" int fn_803AC164(int a, char* buf, int size);
+extern "C" int fn_803B9D50(Unk8001BA78* a);
+extern "C" int fn_803B9D84();
+extern "C" int fn_803AC944();
+extern "C" int fn_803ABEE4(int a);
+extern "C" void fn_803ABDD0(int a, int b);
+extern "C" void fn_803ABEDC(int a);
+extern "C" void fn_803ABD58(int a);
 
 /* near-miss: r30/r31 are swapped (retail keeps `this` in r30 and the ok flag in r31); everything else is identical */
 int Unk8001C314::fn_8001CACC()
@@ -197,7 +197,7 @@ void Unk8001CE80::fn_8001CEA8(float* b, float* a)
 }
 
 void fn_8040A208(void* arr, int n, int sz, void (*f)(void*));
-void fn_8022F2C0(void* p);
+extern "C" void fn_8022F2C0(void* p);
 
 extern "C" int fn_8001CF18(Unk8001CE80* x, Unk8022FE34_Ent* arr)
 {
@@ -224,7 +224,7 @@ struct Unk806192E0 {
 extern Unk806192E0* lbl_806192E0;
 extern const float lbl_805A5154;
 extern const float lbl_805A5158;
-int fn_800968C0(char* e, int a, int b);
+extern "C" int fn_800968C0(char* e, int a, int b);
 int fn_80089AA0(char* e, int k, int v);
 float fn_8007189C(char* e, int k, int v);
 

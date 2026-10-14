@@ -57,7 +57,7 @@ extern "C" int fn_8001E4F4(Unk8001E444_Obj* x)
 
 
 extern int lbl_805B19E0[];
-int fn_80097520(Unk8001F5CC_Ent* row, int id);
+extern "C" int fn_80097520(Unk8001F5CC_Ent* row, int id);
 void fn_800446D8(float b, float c, int a);
 
 extern "C" void fn_8001E664(Unk8001E444_Obj* x)

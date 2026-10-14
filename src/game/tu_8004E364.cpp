@@ -17,7 +17,7 @@ int fn_80054D98(Unk80052794_Ctx* c);
 void fn_800527DC(Unk80052794_Ctx* c, int idx, Unk80052794_Obj* o);
 float fn_80254128(Unk8024EF40_W* w, int a, int b);
 void fn_8001251C(int a, int b, int c, int d, int e, int f);
-int fn_8001EFB4(Unk80044C10_A* a);
+extern "C" int fn_8001EFB4(Unk80044C10_A* a);
 struct Unk8005089C_Slot {
     int m0;
     int m4;
@@ -68,8 +68,8 @@ struct Unk800500B8_AV {
     char pad340[0x410 - 0x340];
     int m410;
 };
-int fn_8001F64C(Unk80044C10_A* a);
-int fn_8001F6C0(Unk80044C10_A* a);
+extern "C" int fn_8001F64C(Unk80044C10_A* a);
+extern "C" int fn_8001F6C0(Unk80044C10_A* a);
 void fn_80010630(int a, int b, int c, int d);
 void fn_80012EAC(int a);
 void fn_80012F08(int a);
@@ -77,7 +77,7 @@ void fn_80012F64(int a, int b);
 void fn_80013CE4(int a, int b);
 void fn_800172EC();
 void fn_800B555C();
-int fn_800B57EC();
+extern "C" int fn_800B57EC();
 void fn_80017AA4(int a, int b);
 extern "C" int rand();
 extern "C" int fn_800507A8(Unk80052794_Ctx* ctx, int idx);
@@ -87,7 +87,7 @@ void fn_80010A48(int a);
 void fn_80011324();
 int fn_80047584(int a);
 void fn_80017B74(int a, int b);
-int fn_8009E1D4(void* p, int a, int b);
+extern "C" int fn_8009E1D4(void* p, int a, int b);
 struct Unk8004FA94_AV {
     char pad0[0x20];
     int m20[2];

@@ -14,11 +14,11 @@ extern Unk8005EDCC_G* lbl_8061EA68;
 
 unsigned int fn_80253E7C(Unk8005DF2C_Stat* p, int a, int b, int c);
 int fn_8040ABA0();
-void fn_80235BE0(float* out, int a, ...);
-int fn_8022EA7C(int a, float* v, float s);
+extern "C" void fn_80235BE0(float* out, int a, ...);
+extern "C" int fn_8022EA7C(int a, float* v, float s);
 Unk8005EDCC_T* fn_801A6D84(Unk8005DF2C_O44C* p, int a);
-int fn_80324DB4(Ent* e, int a);
-int fn_80324E38(Ent* e, int a);
+extern "C" int fn_80324DB4(Ent* e, int a);
+extern "C" int fn_80324E38(Ent* e, int a);
 float fn_8005F20C(void* a, int b, int c, Ctx* ctx);
 float fn_8005F2FC(void* a, int b, int c, Ctx* ctx);
 

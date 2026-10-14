@@ -54,8 +54,8 @@ extern const char lbl_805E02B4[];
 extern const char lbl_805E02C0[];
 
 extern "C++" {
-int fn_80377F00(void* t, int* a, int* b, int key, int c);
-void fn_803EB330(void* p);
+extern "C" int fn_80377F00(void* t, int* a, int* b, int key, int c);
+extern "C" void fn_803EB330(void* p);
 char* fn_8040B8FC(const char* s, int c);
 char* fn_8040B61C(char* d, const char* s);
 char* fn_8040B448(char* d, const char* s);
@@ -63,19 +63,19 @@ unsigned int fn_80378568(const char* s, int n);
 int fn_8040B574(const char* a, const char* b);
 void fn_802B1D44(T* t);
 void* fn_802B98AC(const char* name, int a);
-int fn_800057D8();
-int fn_800057E4();
-void* fn_803EB2EC(void* p);
+extern "C" int fn_800057D8();
+extern "C" int fn_800057E4();
+extern "C" void* fn_803EB2EC(void* p);
 void* fn_802B23F0(void* p, void* a);
 int fn_80075E7C(int a);
 int fn_8040ABA0();
-void fn_80328234(void* p, int a, int b);
+extern "C" void fn_80328234(void* p, int a, int b);
 int fn_8040B6A0(const char* s);
 void fn_802B1E38(T* t, const char* s, int v);
 void fn_802B1FC0(T* t);
 void* fn_8040B320(void* p, int v, int n);
-void fn_802B2268(void* self, void* a, void* b);
-void fn_803DD73C(void* a, int b);
+extern "C" void fn_802B2268(void* self, void* a, void* b);
+extern "C" void fn_803DD73C(void* a, int b);
 }
 
 /* near-miss (parked, 58 vs 59 insns): retail joins the default and found paths before one 16-byte copy whose first word is loaded in each path */
@@ -262,14 +262,14 @@ extern void* (*lbl_8062C668)(int size, int heap);
 extern const char lbl_805E017C[];
 extern const char lbl_805DFC34[];
 extern char lbl_8060D190[];
-void* fn_802B9300(const char* name, int a, int b, int* n);
+extern "C" void* fn_802B9300(const char* name, int a, int b, int* n);
 void* fn_802B98AC(int a, int b);
 int fn_802B9A04(int a);
-void* fn_803E9640(void* a, void* b, int c, void* fn);
-void fn_8033E7A4();
-void fn_80312700();
-void fn_803E9994(void* a, char* tbl, int* n, void* z);
-void fn_803D6144(int a, int b);
+extern "C" void* fn_803E9640(void* a, void* b, int c, void* fn);
+extern "C" void fn_8033E7A4();
+extern "C" void fn_80312700();
+extern "C" void fn_803E9994(void* a, char* tbl, int* n, void* z);
+extern "C" void fn_803D6144(int a, int b);
 
 struct Unk802B10D4_Out {
     void* m0;
@@ -289,8 +289,8 @@ struct Unk802B10D4_M {
 
 struct Unk802BB948;
 void fn_802BB948(Unk802BB948* o);
-void fn_802B961C(int p, int a);
-void fn_80377408(void* p);
+extern "C" void fn_802B961C(int p, int a);
+extern "C" void fn_80377408(void* p);
 
 struct Unk802B0EE0_E12 {
     char d[12];
@@ -429,9 +429,9 @@ void* fn_802B11E0(Mgr* m, const char* s)
 }
 
 extern "C" char* strcpy(char* d, const char* s);
-void fn_80329AEC(const char** pp, const char** out, int* pn, int delim);
-int fn_80329C4C(const char** pp, int* pn, int* out, int lo, int hi, int delim);
-void* fn_803774A8(unsigned n, int heap);
+extern "C" void fn_80329AEC(const char** pp, const char** out, int* pn, int delim);
+extern "C" int fn_80329C4C(const char** pp, int* pn, int* out, int lo, int hi, int delim);
+extern "C" void* fn_803774A8(unsigned n, int heap);
 
 struct Unk802B136C_Rec {
     int m0;
@@ -719,7 +719,7 @@ Unk802B2C58_S* fn_802B2C58(Unk802B2C58_S* self)
 
 /* near-miss (2 slots): retail stores m10 before m8 among the float zeros; the head stores' order is the best found by search */
 void* fn_802AFA54(Mgr* m, const char* s);
-void* fn_803DD628(void* a, void* b);
+extern "C" void* fn_803DD628(void* a, void* b);
 extern void* (*lbl_8062C668)(int size, int heap);
 extern char lbl_8061EA98[];
 extern const char lbl_805E0324[];

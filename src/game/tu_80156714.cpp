@@ -19,8 +19,8 @@ int fn_8027D574(Unk8027C728_Goal* g);
 int fn_8027D670(Unk8027C728_Goal* g, Unk8027C728_Player* p, int flag);
 void fn_80185D80(void* o);
 void fn_8030D28C(void* o, int v);
-int fn_801525B0(int v);
-void fn_80359A40(int* p);
+extern "C" int fn_801525B0(int v);
+extern "C" void fn_80359A40(int* p);
 Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
 
 extern const char lbl_805C7BCC[];
@@ -84,14 +84,14 @@ void fn_8017CD04(void* p, int i, int j);
 }
 int fn_801A2034(Unk801527C8_Actor* a, int i);
 struct V2_80159E40 { float x; float y; };
-V2_80159E40 fn_8022EA60(void* a, ...);
+extern "C" V2_80159E40 fn_8022EA60(void* a, ...);
 inline float AbsF80159E40(float v) { return (float)__builtin_fabs(v); }
 extern int lbl_80619D10;
 extern const Unk8015AB2C_Blk lbl_8068B828;
-int fn_800AB528(int g);
-int fn_800AC330();
-void fn_800AC36C();
-void fn_8031E1D4(Unk801527C8_Actor* a, const char* s);
+extern "C" int fn_800AB528(int g);
+extern "C" int fn_800AC330();
+extern "C" void fn_800AC36C();
+extern "C" void fn_8031E1D4(Unk801527C8_Actor* a, const char* s);
 extern "C" int fn_80326C20(Unk801527C8_Sub* s);
 class Obj18_80159F28 {
 public:
@@ -125,8 +125,8 @@ extern const float lbl_805C8A08;
 extern const int lbl_8061BD88[];
 extern "C" void fn_80326ED4(Unk801527C8_Sub* s, Unk80156838_Entry** e, int* n);
 extern "C" Unk80326F44_Out* fn_8033ACE8();
-float fn_80323848(int p);
-int fn_80326E64(Unk801527C8_Sub* s, int a);
+extern "C" float fn_80323848(int p);
+extern "C" int fn_80326E64(Unk801527C8_Sub* s, int a);
 int cWait::fn_801567CC(Unk80156838_Entry* e) /* 801567CC */
 {
     switch (e->m0) {

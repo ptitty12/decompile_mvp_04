@@ -29,15 +29,15 @@ void fn_8001B798(int a, int b);
 void fn_8001B7F4(int a);
 void fn_8001B848(int a, int b);
 int fn_800473D4(int a);
-int fn_8009E1D4(void* p, int a, int b);
+extern "C" int fn_8009E1D4(void* p, int a, int b);
 void fn_8001B010(int a);
 void fn_8001B0D0(int a, int b);
 void fn_8001AE84();
 void fn_8001AFA4(int a, int b, int c, int d);
-int fn_8011B630(Unk8003FC18_Entry* e, int* out);
-int fn_8011B604(Unk8003FC18_Entry* e, int* out);
-int fn_8011B5D8(Unk8003FC18_Entry* e, int* out);
-Unk8003DF80_Pl* fn_801A49F0(Unk8003A5DC_Ctx* c, int idx, int out);
+extern "C" int fn_8011B630(Unk8003FC18_Entry* e, int* out);
+extern "C" int fn_8011B604(Unk8003FC18_Entry* e, int* out);
+extern "C" int fn_8011B5D8(Unk8003FC18_Entry* e, int* out);
+extern "C" Unk8003DF80_Pl* fn_801A49F0(Unk8003A5DC_Ctx* c, int idx, int out);
 int fn_80044820(int a);
 int fn_80044828(int a);
 void fn_8001B12C(int a, int b, int c);
@@ -45,8 +45,8 @@ void fn_8001B190(int a, int b, int c);
 void fn_8001B1F4(int a, int b, int c);
 void fn_8001B258();
 void* fn_800B555C();
-int fn_800B57EC(void* p);
-void fn_800B5898(void* p);
+extern "C" int fn_800B57EC(void* p);
+extern "C" void fn_800B5898(void* p);
 
 void fn_8003EF18(Unk8003A5DC* self)
 {

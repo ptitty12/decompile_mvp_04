@@ -63,7 +63,7 @@ struct Unk801A6D84_Obj {
     int m3D90;
 };
 Unk801A6D84_Obj* fn_801A6D84(Unk801527C8_Actor* a, int i);
-Unk80189300* fn_801A4B34(Unk801527C8_Actor* a);
+extern "C" Unk80189300* fn_801A4B34(Unk801527C8_Actor* a);
 
 /* Sub-object at +0x5F4 of the script runner (ctor 0x80359ACC). */
 struct Unk80359ACC {

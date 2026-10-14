@@ -4,23 +4,23 @@
  */
 #include "game/tu_802BF974.h"
 
-void fn_80377408(void* p);
-void fn_80377488(void* p);
-void fn_803FFA60(void* dst, void* src, int n);
-void fn_802B961C(const char* p, int a);
+extern "C" void fn_80377408(void* p);
+extern "C" void fn_80377488(void* p);
+extern "C" void fn_803FFA60(void* dst, void* src, int n);
+extern "C" void fn_802B961C(const char* p, int a);
 void fn_802C2254(Unk802C2188* o);
-void fn_802C2408(Unk802C2188* o, Unk802C2188_Pair* a);
+extern "C" void fn_802C2408(Unk802C2188* o, Unk802C2188_Pair* a);
 void fn_802C2A20(Unk802C2188* o, Unk802C2188_Pair* a, int b);
 void fn_802C2BB8(Unk802C2188* o, Unk802C2188_Pair* a);
 void fn_802C3974(Unk802C2188* o);
-void fn_802C2FF4(void* im, int w, int h, int fmt, int hw, int z);
-void* fn_803EBF2C(int h);
-int fn_803EC03C(void* im);
+extern "C" void fn_802C2FF4(void* im, int w, int h, int fmt, int hw, int z);
+extern "C" void* fn_803EBF2C(int h);
+extern "C" int fn_803EC03C(void* im);
 void fn_802C36DC(Unk802C2188* o);
 int fn_8040B6A0(const char* s);
-int fn_80329C4C(const char** cur, int* len, void* out, int lo, int hi, int base);
-int fn_80329B98(const char** cur, int* len, void* out, int n);
-void* fn_803774A8(unsigned n, int heap);
+extern "C" int fn_80329C4C(const char** cur, int* len, void* out, int lo, int hi, int base);
+extern "C" int fn_80329B98(const char** cur, int* len, void* out, int n);
+extern "C" void* fn_803774A8(unsigned n, int heap);
 struct Unk80084910_N;
 void fn_800861A8(Unk80084910_N* self, char* buf);
 int fn_802B96C4(const char* name, int a);
@@ -79,7 +79,7 @@ Unk802BF974::~Unk802BF974()
 }
 
 /* near-miss (73 vs 73 insns, schedule only): retail sets r3 = &sp8 last in each call; the pointer-local recipe made it worse. */
-int fn_802BFAA8(int a, int k, float* p, float* q, int c, int d, int e, float f);
+extern "C" int fn_802BFAA8(int a, int k, float* p, float* q, int c, int d, int e, float f);
 
 /* near-miss 97.5%: instructions identical, only the callee-saved registers of a0/a3/a4/a5 are permuted (retail: a0 r26, a3 r29, a4 r28, a5 r27) */
 int fn_802C0050(int a0, float* p, float* q, int a3, int a4, int a5, float f)
@@ -189,8 +189,8 @@ struct Unk802C1F7C_Set {
 struct Unk802C1F7C_Obj {
     Unk802C1F7C_Set* m0;
 };
-int fn_802C1D90(Unk802C1F7C_Obj* o, float* p, Unk802C1F7C_Tri* t);
-void fn_802C1500(float* p, Unk802C1F7C_Tri* t, int k);
+extern "C" int fn_802C1D90(Unk802C1F7C_Obj* o, float* p, Unk802C1F7C_Tri* t);
+extern "C" void fn_802C1500(float* p, Unk802C1F7C_Tri* t, int k);
 inline Unk802C1F7C_V GetA(const Unk802C1F7C_Tri* t) { return t->a; }
 inline Unk802C1F7C_V GetB(const Unk802C1F7C_Tri* t) { return t->b; }
 inline Unk802C1F7C_V GetC(const Unk802C1F7C_Tri* t) { return t->c; }
@@ -321,7 +321,7 @@ extern const char lbl_805DFC34[];
 extern const char* lbl_8061EB38[];
 struct Unk80084910_N;
 void fn_80086140(Unk80084910_N* self, char* buf);
-int fn_803EBC70(int h, const char* name);
+extern "C" int fn_803EBC70(int h, const char* name);
 int fn_800E1990(int a);
 int fn_800E19CC(int a);
 void fn_802C37F8(Unk802C2188* o);

@@ -245,7 +245,7 @@ void fn_800E9248(int a, UiS* x)
     }
 }
 
-int fn_800A3220(Ui80619948* g);
+extern "C" int fn_800A3220(Ui80619948* g);
 void fn_800E95FC(int a, UiS* x);
 void fn_800E93B8(UiS* x)
 {
@@ -660,9 +660,9 @@ const char* fn_800EAE8C(int a)
     return lbl_805B6F58;
 }
 
-int fn_80591378(int a, int b);
-int fn_800DF254(char* buf, int a, int b, float f);
-void fn_804031F8(char* dst, int a, int b);
+extern "C" int fn_80591378(int a, int b);
+extern "C" int fn_800DF254(char* buf, int a, int b, float f);
+extern "C" void fn_804031F8(char* dst, int a, int b);
 void fn_800EB0F4(int a, UiS* x);
 void fn_800EB248(int a, UiS* x);
 void fn_800EAEE4(UiS* x)
@@ -814,14 +814,14 @@ public:
 };
 struct Unk8007F198_B;
 void* fn_8007F7D0(Unk8007F198_B* s, unsigned i);
-int fn_8057CF60(void* a, int b);
-int fn_800B5C9C();
-int fn_800B57EC(Ui800B555C* p);
-void fn_804D2044(char* t, UiS* x, int a, int b);
-void fn_8051E7D0(int o, char* t, char* u);
-void fn_8051E878(int a, int b);
+extern "C" int fn_8057CF60(void* a, int b);
+extern "C" int fn_800B5C9C();
+extern "C" int fn_800B57EC(Ui800B555C* p);
+extern "C" void fn_804D2044(char* t, UiS* x, int a, int b);
+extern "C" void fn_8051E7D0(int o, char* t, char* u);
+extern "C" void fn_8051E878(int a, int b);
 void fn_804D21B8(char* p, UiP2 q);
-void fn_80126CF4(UiS* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern "C" void fn_80126CF4(UiS* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 extern UiP2 lbl_805B98E8;
 struct UiSel198 {
     char pad0[0x198];

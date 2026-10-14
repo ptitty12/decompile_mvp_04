@@ -166,14 +166,14 @@ void fn_80251E80(Unk8024EF40_P* p);
 }
 extern "C++" { int fn_8026DD60(Unk8026C414_O* o, Unk8026C414_X* x); }
 int fn_802110F8(Sub* t, int kind, void* o, int k);
-void fn_801EC5F8(Task* t, int a);
+extern "C" void fn_801EC5F8(Task* t, int a);
 void fn_80205450(TaskInner* g, int i);
 void fn_802123D4(Task* t, int a, int b);
 void fn_8021D4A4(Task* t);
 void fn_801F0EA8(Task* t, int a);
 void fn_801F0174(Task* t, int a, int b);
 void fn_802252F4(Task* t, int a, RecQueue* q);
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 extern const float lbl_805D6294;
 extern const float lbl_805D6298;
 extern const float lbl_805D629C;
@@ -322,7 +322,7 @@ int fn_802219EC(Task* t)
 }
 
 /* near-miss: loop pointer lives in r31 here; retail passes it in r3 and keeps a copy in r31 (3 slots) */
-unsigned fn_801BBF24(int x);
+extern "C" unsigned fn_801BBF24(int x);
 int fn_80204F8C(Rec* r);
 int fn_80204F30(Rec* r);
 struct Unk80221A70_Ow {

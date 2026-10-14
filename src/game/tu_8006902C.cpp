@@ -7,7 +7,7 @@
 extern Unk8007A4DC_Screen* lbl_8061930C;
 
 void* operator new(unsigned int size, int heap);
-void fn_8007824C(void* a, Unk80069F0C* b);
+extern "C" void fn_8007824C(void* a, Unk80069F0C* b);
 void fn_80089108(void* a, int b);
 void fn_80080BFC(Unk8006902C_Players* p);
 void fn_80080CEC(Unk8006902C_Players* p);
@@ -17,18 +17,18 @@ void fn_8006F74C(Unk8006902C_Ctx* c);
 int fn_80329FA0(int* out, int c, ...);
 void fn_80081CCC(Unk8006902C_Players* p, int i);
 void fn_80081D70(Unk8006902C_Players* p);
-void fn_8037893C(int a, int b, int c, int d, int e);
-void fn_8031883C(int a);
-int fn_800968C0(Unk8006902C_Side* s, int e, int k);
-int fn_80097A9C(Unk8006902C_Side* s, int a, int b, int c, int d);
-int fn_800971C8(Unk8006902C_Side* s, int r);
-int fn_80099704(Unk8006902C_Side* s);
-int fn_80099670(Unk8006902C_Side* s);
-void fn_80097174(Unk8006902C_Side* s, int r, int k);
-int fn_80099620(Unk8006902C_Side* s);
-int fn_8014D8AC(Unk8014D81C_Obj* o, int size, const char* file, int line);
+extern "C" void fn_8037893C(int a, int b, int c, int d, int e);
+extern "C" void fn_8031883C(int a);
+extern "C" int fn_800968C0(Unk8006902C_Side* s, int e, int k);
+extern "C" int fn_80097A9C(Unk8006902C_Side* s, int a, int b, int c, int d);
+extern "C" int fn_800971C8(Unk8006902C_Side* s, int r);
+extern "C" int fn_80099704(Unk8006902C_Side* s);
+extern "C" int fn_80099670(Unk8006902C_Side* s);
+extern "C" void fn_80097174(Unk8006902C_Side* s, int r, int k);
+extern "C" int fn_80099620(Unk8006902C_Side* s);
+extern "C" int fn_8014D8AC(Unk8014D81C_Obj* o, int size, const char* file, int line);
 extern const char lbl_805B39E0[];
-void fn_8008D850(void* attrs, int k, int id, int v);
+extern "C" void fn_8008D850(void* attrs, int k, int id, int v);
 int fn_8006FB28(void* l, int k, int c);
 unsigned char* fn_80081D08(Unk8006902C_Players* p, int k);
 void fn_8006FC40(void* l, int k, int c, int v);
@@ -39,10 +39,10 @@ struct Unk8061FEDC {
 extern Unk8061FEDC* lbl_8061FEDC;
 extern char lbl_8064A1B8[];
 extern char lbl_80649DB8[];
-void fn_803785E4(Unk80069F0C* self);
-void fn_80378620(Unk80069F0C* self, int chrg);
+extern "C" void fn_803785E4(Unk80069F0C* self);
+extern "C" void fn_80378620(Unk80069F0C* self, int chrg);
 void fn_8006F4D0(Unk8006902C_Handle* h);
-void fn_8014D81C(Unk8014D81C_Obj* p);
+extern "C" void fn_8014D81C(Unk8014D81C_Obj* p);
 Unk8006902C_Mode* fn_80086210(void* p);
 
 extern float lbl_805B3970[][2];
@@ -62,8 +62,8 @@ inline int SumBytes(Unk8006902C_Side* s)
 
 int fn_80075808(int id);
 void fn_80080DBC(Unk8006902C_Players* p);
-int fn_8008CFD8(void* attrs, int k, unsigned char j);
-void fn_80096EE8(Unk8006902C_Side* s, int a, int b);
+extern "C" int fn_8008CFD8(void* attrs, int k, unsigned char j);
+extern "C" void fn_80096EE8(Unk8006902C_Side* s, int a, int b);
 
 void fn_80069EE0(void)
 {

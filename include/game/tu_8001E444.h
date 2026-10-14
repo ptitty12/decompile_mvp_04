@@ -306,18 +306,18 @@ struct Unk800B555C_Obj {
 Unk800B555C_Obj* fn_800B555C();
 int fn_8001CF18(Unk8001E444_Obj* x, Unk80344538_Rec* arr);
 int fn_802F922C(int p);
-int fn_802F92CC(int p);
+extern "C" int fn_802F92CC(int p);
 int fn_802F92A4(int p);
 float fn_80254618(void* p, int a);
-int fn_80097318(Unk8001F5CC_Ent* e, int a);
+extern "C" int fn_80097318(Unk8001F5CC_Ent* e, int a);
 void fn_80046DCC(float f);
 void fn_80046D30(float f);
-int fn_80097210(Unk8001F5CC_Ent* e, int a);
+extern "C" int fn_80097210(Unk8001F5CC_Ent* e, int a);
 int fn_80097A70(Unk8001F5CC_Ent* e, int a, int b, int c);
 int fn_800638F0(Unk8001F5CC_Tbl* t, Unk8001F218_Pair* base, int idx, int a, int* outSize, int** outArr);
 void fn_8004378C(int a);
-Unk801A4B34_Pos* fn_801A4B34(Unk8001F2C4_World* w);
-Unk801A4B34_Pos* fn_801A497C(Unk8001F2C4_World* w, int a, int b);
+extern "C" Unk801A4B34_Pos* fn_801A4B34(Unk8001F2C4_World* w);
+extern "C" Unk801A4B34_Pos* fn_801A497C(Unk8001F2C4_World* w, int a, int b);
 int fn_80045BD8(Unk801A4B34_Pos* p);
 int fn_802540E4(void* p, int a, int b);
 void fn_80045F88(float f);
@@ -335,7 +335,7 @@ int fn_80253FDC(void* p, int a);
 int fn_8025405C(void* p, int a, int b);
 int fn_802540A0(void* p, int a, int b);
 void fn_80042E24(int a);
-int fn_800B57EC();
+extern "C" int fn_800B57EC();
 }
 
 int fn_8004618C(int a);

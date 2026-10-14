@@ -33,17 +33,17 @@
 
 typedef Unk8000E618_Vec3 Vec3;
 
-void* fn_803ED604(const char* name, int size, int flags);
-void fn_803EDA0C();
+extern "C" void* fn_803ED604(const char* name, int size, int flags);
+extern "C" void fn_803EDA0C();
 void fn_8033E958(const char* fmt, ...);
-void fn_803EDC74();
-int fn_803EE3D4(int a);
-int fn_80436404();
+extern "C" void fn_803EDC74();
+extern "C" int fn_803EE3D4(int a);
+extern "C" int fn_80436404();
 int fn_8043D6A8();
-void fn_80436F58(int a);
-int fn_80436EE8();
+extern "C" void fn_80436F58(int a);
+extern "C" int fn_80436EE8();
 void fn_80439618(Unk8000D6D4_Pad* pad);
-float fn_804028E4(float x); /* square root */
+extern "C" float fn_804028E4(float x); /* square root */
 extern const Vec3 lbl_806055AC;
 void fn_8000E624();
 

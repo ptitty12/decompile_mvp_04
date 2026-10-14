@@ -75,7 +75,7 @@ struct UnkMsgEv {
     char name[16];
     UnkEvR e;
 };
-void fn_8037893C(char* p, int id, UnkEvR* e, int a, int b);
+extern "C" void fn_8037893C(char* p, int id, UnkEvR* e, int a, int b);
 extern "C" void fn_8011452C(Scr* self);
 extern "C" void fn_80114664(Scr* self, int b);
 
@@ -89,10 +89,10 @@ extern "C" void fn_80111E50(Scr* self);
 extern "C" void fn_801120EC(Scr* self);
 
 extern "C" void fn_8010EE30(Scr* self, UnkPly* a, UnkPly* b);
-UnkPly* fn_801A49F0(UnkGame* g, int idx, int v);
+extern "C" UnkPly* fn_801A49F0(UnkGame* g, int idx, int v);
 void fn_8017D640(UnkGameP700* p, int a, UnkPly* b, UnkPly* c, int d);
-void fn_8017D984(UnkGameP700* p, int a, UnkPly* b, UnkPly* c);
-void fn_8017D6B8(UnkGameP700* p, int a, UnkPly* b, UnkPly* c, UnkPly* d, UnkPly* e);
+extern "C" void fn_8017D984(UnkGameP700* p, int a, UnkPly* b, UnkPly* c);
+extern "C" void fn_8017D6B8(UnkGameP700* p, int a, UnkPly* b, UnkPly* c, UnkPly* d, UnkPly* e);
 void fn_8017DF2C(UnkGameP700* p, UnkPly* a);
 void fn_8017DE28(UnkGameP700* p, UnkPly* a);
 

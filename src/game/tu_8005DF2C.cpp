@@ -11,11 +11,11 @@ typedef Unk8005DF2C_Ctx Ctx;
 
 int fn_800570D8(void* a, int n);
 int fn_80344138(int h, int v);
-int fn_801C1638(Unk8005DF2C_O44C* p, int idx);
-Unk8005DF2C_O3B0* fn_801A4B34(Unk8005DF2C_O44C* p);
+extern "C" int fn_801C1638(Unk8005DF2C_O44C* p, int idx);
+extern "C" Unk8005DF2C_O3B0* fn_801A4B34(Unk8005DF2C_O44C* p);
 Unk8005DF2C_O3B0* fn_801A4B7C(Unk8005DF2C_O44C* p, int a, int b);
-float fn_8024F048(char* p, int a, int b, int c, int d);
-float fn_8024F20C(char* p, int a, int b, int c, int d);
+extern "C" float fn_8024F048(char* p, int a, int b, int c, int d);
+extern "C" float fn_8024F20C(char* p, int a, int b, int c, int d);
 int fn_8008838C(int a, int b, int c);
 void fn_8005DA1C(Ctx* c, int* a, int* b, int* d, int* e);
 int fn_80088FFC(int a, int b);
@@ -23,8 +23,8 @@ int fn_8001CEA8(Ctx* c, float* a, float* b);
 int fn_8005CDC4(void* a, Ctx* c);
 float fn_8025454C(Unk8005DF2C_Stat* p, int idx);
 int fn_8004FF78(Unk8005DF2C_P* p, int a, int b);
-void fn_80235BE0(float* out, int a, ...);
-int fn_802F92CC(int a);
+extern "C" void fn_80235BE0(float* out, int a, ...);
+extern "C" int fn_802F92CC(int a);
 
 float fn_8005DF2C(void* a, int b, int c, Ctx* ctx)
 {

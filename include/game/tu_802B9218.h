@@ -5,8 +5,8 @@
 #ifndef GAME_TU_802B9218_H
 #define GAME_TU_802B9218_H
 
-void fn_80400828(void* p);
-void fn_8040084C(void* p);
+extern "C" void fn_80400828(void* p);
+extern "C" void fn_8040084C(void* p);
 
 /* File-IO error state at 0x8068B4F8: +0 is the last error flag, +4 the lock that guards it
  * (fn_80400828 locks, fn_8040084C unlocks). Evidence: fn_802B9EFC stores +0 under the lock,

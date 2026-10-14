@@ -172,7 +172,7 @@ struct Unk8022FE34_VObj : Unk8022FE34_VBase {
     virtual void v38();
     virtual void v40(int a);
 };
-Unk8022FE34_VObj* fn_801C1638(Unk8022FE34_Ctx* c, int i);
+extern "C" Unk8022FE34_VObj* fn_801C1638(Unk8022FE34_Ctx* c, int i);
 
 struct Unk8022FE34_U;
 

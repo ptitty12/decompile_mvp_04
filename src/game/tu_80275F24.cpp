@@ -38,8 +38,8 @@ inline float AbsF(float v)
 }
 
 extern "C++" {
-float fn_8037AF10(void* a, void* b, void* c, int d, int e);
-void fn_80278F1C(int a, int b, int c);
+extern "C" float fn_8037AF10(void* a, void* b, void* c, int d, int e);
+extern "C" void fn_80278F1C(int a, int b, int c);
 Unk8027C728_Goal* fn_8027D31C(Unk8027C728_Goal* g);
 }
 
@@ -108,7 +108,7 @@ int fn_80276758(Rec* a, Rec* b)
     return AbsF(a->m14) > AbsF(b->m14);
 }
 
-void fn_802770A4(Unk80276DB8* self, Unk80270BA0_Obj* o, Unk80270BA0_Result* out);
+extern "C" void fn_802770A4(Unk80276DB8* self, Unk80270BA0_Obj* o, Unk80270BA0_Result* out);
 
 int Unk80276DB8::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f)
 {
@@ -167,7 +167,7 @@ float fn_80278B10(void* a, void* b, void* c, float x)
     return x;
 }
 
-float fn_8037AC20(void* a, void* b, void* c, int d, int e);
+extern "C" float fn_8037AC20(void* a, void* b, void* c, int d, int e);
 
 float fn_80278B5C(int* out, float* a, float* b, char* c)
 {

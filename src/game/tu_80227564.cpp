@@ -249,8 +249,8 @@ extern const float lbl_805D6558;
 extern "C++" { void fn_8035B7B0(U* p); }
 int fn_8021157C(CmpPos* a, CmpPos* b);
 Vec3f fn_8018959C(Obj4_36C* o, float t);
-int fn_801DC658(void* o, Vec3f* v, int k);
-int fn_8024D408(void* p);
+extern "C" int fn_801DC658(void* o, Vec3f* v, int k);
+extern "C" int fn_8024D408(void* p);
 void qsort(void* a, unsigned n, unsigned es, int (*cmp)());
 
 struct Ent802281D0 {

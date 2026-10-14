@@ -12,11 +12,11 @@ extern "C" float atan2f(float y, float x);
 
 float lbl_8061E6D0 = 45.0f;
 extern Unk80273498_Vec3 lbl_805DED28;
-float fn_8041171C(float x);
-float fn_80411554(float x);
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
 
-void fn_80280418(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int d);
-int fn_802834E8(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c);
+extern "C" void fn_80280418(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int d);
+extern "C" int fn_802834E8(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c);
 
 int fn_8027FD64(Unk8027FD64_Goal* g, Unk80270BA0_X* x)
 {
@@ -192,11 +192,11 @@ struct Unk802817A0_Root {
 };
 void fn_8028F440(Unk802817A0_Root* g);
 void fn_8028F45C(Unk802817A0_Root* g, Unk80273498_Vec3 v);
-void fn_80281A7C(Unk8027FD64_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q);
+extern "C" void fn_80281A7C(Unk8027FD64_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q);
 int fn_8026D988(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
 int fn_8026D7B4(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
 int fn_8026D7E0(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
-float fn_80382BB8(Unk80271DBC_Link* l);
+extern "C" float fn_80382BB8(Unk80271DBC_Link* l);
 int fn_80386110(Unk80271DBC_Link* link, Unk80279BB8* q, int hash, int ev, float* out, int flags);
 extern int lbl_806242B4;
 

@@ -35,7 +35,7 @@ extern Unk802D116C lbl_8068DBE8;
 extern Unk802D116C lbl_8068DD20;
 extern Unk802D116C lbl_8068DD64;
 void fn_8037B424(void* p, int c);
-void fn_8033CD28(void* p, int c);
+extern "C" void fn_8033CD28(void* p, int c);
 extern int lbl_8068DBE4;
 extern int lbl_8068DD1C;
 extern int lbl_8068DD60;
@@ -50,16 +50,16 @@ void fn_802D3738();
 void fn_802D3794();
 void fn_802D37CC();
 extern Unk802D38E8_Cfg* lbl_8061FEDC;
-void fn_8014D9EC(void* buf, float a, float b, float c, float d, float e);
-void fn_803DFB48(Unk802D3958_Mat* m);
+extern "C" void fn_8014D9EC(void* buf, float a, float b, float c, float d, float e);
+extern "C" void fn_803DFB48(Unk802D3958_Mat* m);
 
 void* operator new(unsigned int n, int heap);
-void fn_802CFED4(void* o);
+extern "C" void fn_802CFED4(void* o);
 extern int lbl_80620418;
 float fn_802D7E2C(int h);
 struct Unk802D095C_Self;
 extern "C" void fn_802D095C(Unk802D095C_Self* o, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float* c, float t, float u);
-void fn_802D0D30(void* o);
+extern "C" void fn_802D0D30(void* o);
 extern "C" void fn_802D0F74(Unk802D0B4C* self, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float t);
 
 Unk802D0B4C::Unk802D0B4C()
@@ -84,7 +84,7 @@ struct Unk802D095C_Self {
     float m90;
     float m94;
 };
-double fn_80410634(double x);
+extern "C" double fn_80410634(double x);
 inline float Unk802D095C_Diff(float a, float b)
 {
     float d = a - b;
@@ -444,7 +444,7 @@ public:
 
 extern const void* lbl_80664528[];
 extern const char lbl_805E2700[];
-void fn_8033CCE0(void* p);
+extern "C" void fn_8033CCE0(void* p);
 
 struct Unk802D1EA4_F {
     const void* vptr;
@@ -860,7 +860,7 @@ struct Unk802D3B40_Self {
 };
 extern const void* lbl_80664430[];
 extern const void* lbl_80649DB8[];
-void fn_80378620(void* self, int chrg);
+extern "C" void fn_80378620(void* self, int chrg);
 
 struct Unk802D39EC_V {
     char pad0[0xC];
@@ -885,10 +885,10 @@ struct Unk802D39EC_S {
 };
 extern const void* lbl_80664430[];
 extern const char lbl_805E3FF4[];
-void fn_803785E4(void* p);
-void fn_80378A34(void* p, int q);
-void* fn_802CB924(void* mem, int a);
-void fn_802D3C80(void* p);
+extern "C" void fn_803785E4(void* p);
+extern "C" void fn_80378A34(void* p, int q);
+extern "C" void* fn_802CB924(void* mem, int a);
+extern "C" void fn_802D3C80(void* p);
 void fn_802CBDBC(Unk802CBD04* o, int a, int b, int kind);
 void* fn_802CF168(void* name);
 

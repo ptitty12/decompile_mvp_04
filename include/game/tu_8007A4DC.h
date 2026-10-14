@@ -251,7 +251,7 @@ struct Unk8007A4DC_Screen {
 
 int fn_8052FC1C(Unk8052_Obj* o);
 int fn_8052FC34(Unk8052_Obj* o);
-int fn_8052FC4C(Unk8052_Obj* o);
+extern "C" int fn_8052FC4C(Unk8052_Obj* o);
 int fn_8052FDC8(Unk8052_Obj* o);
 int fn_8052FDD8(Unk8052_Obj* o);
 int fn_8052FDFC(Unk8052_Obj* o);

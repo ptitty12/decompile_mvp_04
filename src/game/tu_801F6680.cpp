@@ -273,7 +273,7 @@ struct Unk801F83F0_G {
     Unk801F83F0_E m6B8[10];
 };
 extern const Unk801EE438_Vec lbl_805D4F5C;
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 extern "C" void fn_801F803C(Menu* m, int idx);
 inline float Len801F83F0(const Unk801EE438_Vec& v)
 {

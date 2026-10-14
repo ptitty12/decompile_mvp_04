@@ -251,7 +251,7 @@ struct Unk80299920_Req {
 };
 
 float fn_80410CE8(float y, float x);
-int fn_80381E9C(Unk80271DBC_Link* link, int a, int b, int c);
+extern "C" int fn_80381E9C(Unk80271DBC_Link* link, int a, int b, int c);
 void fn_803814A4(Unk80271DBC_Link* link, int a, float t, int b);
 void fn_80244858(Unk80270BA0_X* x, float v);
 extern const Vec3 lbl_806055AC;          /* the zero vector (shared) */
@@ -307,12 +307,12 @@ inline void Unk80299920_SetMB8(Unk802726BC_Angles* a, float f)
 {
     Unk80299920_SetPair(a, 0xB8, f);
 }
-float fn_804028E4(float x);               /* square root */
+extern "C" float fn_804028E4(float x);               /* square root */
 inline float Length(Vec3 v)
 {
     return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
 }
-int fn_80250724(char* p);
+extern "C" int fn_80250724(char* p);
 inline Vec3 CopyVec(const Vec3& v)
 {
     return v;
@@ -321,11 +321,11 @@ inline void SetVec(Vec3* dst, Vec3 v)
 {
     *dst = v;
 }
-float fn_80382BB8(Unk80271DBC_Link* p);
-int fn_80188EF4(Unk80299920_Pos* p);
+extern "C" float fn_80382BB8(Unk80271DBC_Link* p);
+extern "C" int fn_80188EF4(Unk80299920_Pos* p);
 void fn_8024D178(Unk80270BA0_X* x, int a);
-float fn_8041171C(float x);
-float fn_80411554(float x);
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
 extern "C" float fabsf(float x);          /* inlined as fabs */
 inline float Unk80299920_Abs(float v)
 {
@@ -433,7 +433,7 @@ public:
     Unk80270BA0_X* m8;
     int mC;
 };
-void fn_8037893C(void* queue, int id, Unk80649DA0* ev, int a, int b);
+extern "C" void fn_8037893C(void* queue, int id, Unk80649DA0* ev, int a, int b);
 int fn_8027D3E8(int a, int b, float* c, int d, int e, int f);
 int fn_8026D7B4(Unk80299920_XV* x, int a);
 extern const Vec3 lbl_805DED34;

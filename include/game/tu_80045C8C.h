@@ -23,7 +23,7 @@ extern float lbl_806177FC;
 
 int fn_8025416C(void* stats, int a);
 int fn_80253DF4(void* stats, int a, int b);
-Unk801A497C_Ret* fn_801A497C(Unk80044C10_B* o, int a, int b);
+extern "C" Unk801A497C_Ret* fn_801A497C(Unk80044C10_B* o, int a, int b);
 float fn_80410CE8(float a, float b);
 
 #endif

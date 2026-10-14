@@ -47,8 +47,8 @@ struct Unk80287600_Vec4 : public Unk80273498_Vec3 {
 
 void fn_80287A9C(Unk80270BA0_X* x, Unk80273498_Vec3* v);
 int fn_802871D8(int a);
-void fn_802872AC(float* out, int idx, int b, int c, int d, ...);
-float fn_804028E4(float x);               /* square root */
+extern "C" void fn_802872AC(float* out, int idx, int b, int c, int d, ...);
+extern "C" float fn_804028E4(float x);               /* square root */
 Unk80287600_Vec4 fn_80287600(Unk80270BA0_X* x, int a, int b, int c, int d, float* e);
 
 /* State record passed to fn_80386188 (offsets +0xD4 time, +0xD8 valid flag). */
@@ -60,14 +60,14 @@ struct Unk80287C70_State {
 
 float fn_80382BD8(Unk80271DBC_Link* link, int a);
 void fn_803814A4(Unk80271DBC_Link* link, int a, float t, int b);
-void fn_80381E9C(Unk80271DBC_Link* link, int a, int b, int c);
+extern "C" void fn_80381E9C(Unk80271DBC_Link* link, int a, int b, int c);
 void fn_80386188(Unk80271DBC_Link* link, Unk80287C70_State* st, int kind, int ev, float* dt,
                  int a, int b, int c, int d, int e, int flags);
 extern int lbl_806242B4;
-int fn_80380964(Unk80271DBC_Link* link);
+extern "C" int fn_80380964(Unk80271DBC_Link* link);
 float fn_80410CE8(float a, float b);
-float fn_80190F0C();
-int fn_801D0294(void* p);
+extern "C" float fn_80190F0C();
+extern "C" int fn_801D0294(void* p);
 int fn_8026D6AC(Unk80270BA0_X* x, int a);
 extern const Unk80273498_Vec3 lbl_805DED4C;   /* (7.5, 0, 7.5) */
 

@@ -16,9 +16,9 @@ template <class T> inline float Unk8028F178_Secs(T n)
     return (float)n * 0.016666668f;
 }
 
-float fn_804028E4(float x);               /* square root */
-float fn_8041171C(float x);
-float fn_80411554(float x);
+extern "C" float fn_804028E4(float x);               /* square root */
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
 float fn_80410CE8(float y, float x);
 
 inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)

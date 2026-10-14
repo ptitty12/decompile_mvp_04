@@ -7,7 +7,7 @@
 
 extern UiP2 lbl_805BE4B8;
 extern UiP2 lbl_805BE4C0;
-void fn_8011AF34(UiObj* o);
+extern "C" void fn_8011AF34(UiObj* o);
 void fn_800F5870(UiObj* a);
 extern char lbl_805BA6D0[];
 extern char lbl_805BE4B0[];
@@ -422,14 +422,14 @@ extern char lbl_805B9704[];
 extern char lbl_805B9710[];
 extern char lbl_805B9778[];
 extern char lbl_805BE598[];
-void fn_8011C04C();
+extern "C" void fn_8011C04C();
 extern "C" void* memset(void* p, int c, unsigned n, ...);
 void fn_800F7338(int unused, int a, UiObj* obj);
 extern char lbl_805B9704[];
 extern char lbl_805B9710[];
 extern char lbl_805B9778[];
 extern char lbl_805BE598[];
-void fn_8011C04C();
+extern "C" void fn_8011C04C();
 void fn_800F7338(int unused, int a, UiObj* obj);
 void fn_800F7614(int unused, int a, UiObj* obj);
 /* near-miss: only the placement of three lis (hi) instructions differs; retail hoists them above the earlier calls */
@@ -510,8 +510,8 @@ extern char lbl_805BE3BC[];
 extern char lbl_805BE5C0[];
 extern char lbl_805BE5C8[];
 extern "C" int sprintf(char* buf, const char* fmt, ...);
-void fn_8011A2AC(char* t, UiObj* o, const char* s);
-void fn_8011A2F4(char* t, int a, UiObj* o, const char* s, int b);
+extern "C" void fn_8011A2AC(char* t, UiObj* o, const char* s);
+extern "C" void fn_8011A2F4(char* t, int a, UiObj* o, const char* s, int b);
 void fn_800F7338(int unused, int a, UiObj* obj)
 {
     unsigned char buf[100];

@@ -113,7 +113,7 @@ inline float Unk80223628_Len2(Vec3f v)
 {
     return v.x * v.x + v.z * v.z;
 }
-void fn_801A656C(CtxOwner* c, Obj36C* o, int k);
+extern "C" void fn_801A656C(CtxOwner* c, Obj36C* o, int k);
 int fn_801F18A0(Task* t);
 void fn_8021BA44(Task* t);
 void fn_80223628(Task* t, int idx, RecQueue* q)

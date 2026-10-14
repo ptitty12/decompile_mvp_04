@@ -35,8 +35,8 @@ public:
     Unk803D7ED4Item* fn_803D7F74();
     void fn_803D803C(Unk803D7ED4Item* item);
 };
-Unk803D7ED4Item* fn_803D91F8(void* mem, Unk803D7ED4Pool* owner);
-Unk803D7ED4Item* fn_803E09B4(void* mem, Unk803D7ED4Pool* owner);
+extern "C" Unk803D7ED4Item* fn_803D91F8(void* mem, Unk803D7ED4Pool* owner);
+extern "C" Unk803D7ED4Item* fn_803E09B4(void* mem, Unk803D7ED4Pool* owner);
 extern "C" void fn_803D8094(Unk803D7ED4Pool* pool, Unk803D7ED4Item* item);
 
 extern int lbl_8062729C;

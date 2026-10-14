@@ -52,12 +52,12 @@ void fn_80019348(int a);
 void fn_80011D6C(int a, int b, int c);
 int fn_80042FE4(int a);
 void fn_800B555C();
-int fn_800B57EC();
+extern "C" int fn_800B57EC();
 extern "C" int rand();
 void fn_80011F78();
 void fn_800135A4(int a, int b);
 void fn_800136D0();
-int fn_800974B8(void* p, int a);
+extern "C" int fn_800974B8(void* p, int a);
 int fn_80253DF4(Unk8024EF40_W* w, int a, int b);
 int fn_80045C8C(Unk80044C10_A* a);
 struct Unk8004D56C_Slot {
@@ -126,7 +126,7 @@ struct Unk8004E14C_AV {
 };
 extern int* lbl_8061B9C4;
 void fn_8004FC60(Unk800493D4_Sm* s, Unk80044C10_A* a);
-void fn_80052A34(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a);
+extern "C" void fn_80052A34(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a);
 extern "C" int fn_800507A8(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a);
 void fn_80011430(int a);
 void fn_80010934(int a);

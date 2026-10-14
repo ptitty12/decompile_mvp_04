@@ -17,7 +17,7 @@ void fn_80071688(void* self, int flags);
  * (self, a, obj) and calls obj's slot 1 itself (r4/r5 used without a copy). */
 void fn_80071E2C(void* self, int a, void* obj);
 void* fn_8007366C(const char* a, const char* b);
-void fn_8040074C(void* p, int n);
+extern "C" void fn_8040074C(void* p, int n);
 extern char lbl_805B3B4C[];
 
 

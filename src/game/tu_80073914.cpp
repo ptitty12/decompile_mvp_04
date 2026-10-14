@@ -16,9 +16,9 @@ struct Unk800767DC_State {
 };
 struct Unk8007F198_B;
 Unk800767DC_State* fn_800B555C();
-int fn_80097210(void* p, int a);
-int fn_8008CFD8(void* p, int a, int b);
-int fn_800A65F4(void* g, int a, int b, int c, int d);
+extern "C" int fn_80097210(void* p, int a);
+extern "C" int fn_8008CFD8(void* p, int a, int b);
+extern "C" int fn_800A65F4(void* g, int a, int b, int c, int d);
 int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
 extern "C" int fn_8007B8A0__18Unk8007B2B0_Screen(Unk8007B2B0_Screen* s, int a, int b, int c, int d, int e, int f);
 
@@ -54,9 +54,9 @@ int fn_80075868(int id);
 int fn_80076058(int a, int b);
 int fn_80329FA0(int* out, int c, ...);
 int fn_804089B4(char* buf, const char* fmt, ...);
-void fn_80075A44(Unk8007B2B0_Screen* s, int a, int i);
+extern "C" void fn_80075A44(Unk8007B2B0_Screen* s, int a, int i);
 int fn_80075808(int id);
-int fn_80377E04(Obj* o, int* out, int id);
+extern "C" int fn_80377E04(Obj* o, int* out, int id);
 int fn_80075D48(int i);
 int fn_80075D64(int i);
 int fn_80075CC0(int y);

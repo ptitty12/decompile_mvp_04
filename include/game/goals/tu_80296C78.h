@@ -10,13 +10,13 @@
 
 typedef Unk80273498_Vec3 Vec3;
 
-float fn_80382BB8(Unk80271DBC_Link* l);
+extern "C" float fn_80382BB8(Unk80271DBC_Link* l);
 float fn_80382BD8(Unk80271DBC_Link* l, int a);
-float fn_804028E4(float x);               /* square root */
-float fn_8041171C(float x);
-float fn_80411554(float x);
+extern "C" float fn_804028E4(float x);               /* square root */
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
 float fn_80410CE8(float y, float x);
-double fn_80410634(double x);                 /* rounds down */
+extern "C" double fn_80410634(double x);                 /* rounds down */
 
 struct Unk80296C78_Goal;
 
@@ -251,6 +251,6 @@ int fn_802993D4(Unk80296C78_Goal* g, Unk80270BA0_X* x, Unk80270BA0_X* target);
 
 
 /* Link object reached through Unk80270BA0_X::m618 (see Unk80271DBC_Link). */
-void fn_80381E9C(Unk80271DBC_Link* l, int v, int a, int b);
+extern "C" void fn_80381E9C(Unk80271DBC_Link* l, int v, int a, int b);
 
 #endif /* GAME_GOALS_TU_80296C78_H */

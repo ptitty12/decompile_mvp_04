@@ -9,8 +9,8 @@ extern const float lbl_805D6ED4;
 extern const float lbl_805D6ED8;
 extern "C" float fn_8023A888(Unk8022FE34_Ent* e);
 void fn_80230B50(Unk8022FE34_Sub* s);
-void fn_8022F4D4(Unk8022FE34_Sub* s);
-void fn_8022F328(Unk8022FE34_Sub* s, int i);
+extern "C" void fn_8022F4D4(Unk8022FE34_Sub* s);
+extern "C" void fn_8022F328(Unk8022FE34_Sub* s, int i);
 
 /* near-miss: right length and structure; retail hoists all the table addresses and keeps
    the 1.0 load after the -1.0 stores (7 saved regs r25-r31 vs our 5). Tried 40+ store orders. */
@@ -366,25 +366,25 @@ void Unk8022FE34_Sub::fn_80230EB4()
 
 struct Unk8017A930_T;
 extern const Unk8022FE34_V3 lbl_8068C8D4;
-Unk8022FE34_Pl* fn_801A497C(Unk8022FE34_Ctx* c, int i, int j);
+extern "C" Unk8022FE34_Pl* fn_801A497C(Unk8022FE34_Ctx* c, int i, int j);
 int fn_801A2034(Unk8022FE34_Ctx* c, int i);
 int fn_802530E8(Unk8022FE34_Obj480* p);
-void fn_8023135C(Unk8022FE34_Owner* t, Unk8022FE34_Pl* p);
-void fn_80231520(Unk8022FE34_Owner* t, Unk8022FE34_Pl* p);
-void fn_802F9410(void* obj, int idx, Unk8022FE34_V2* p, Unk8022FE34_V2 v);
+extern "C" void fn_8023135C(Unk8022FE34_Owner* t, Unk8022FE34_Pl* p);
+extern "C" void fn_80231520(Unk8022FE34_Owner* t, Unk8022FE34_Pl* p);
+extern "C" void fn_802F9410(void* obj, int idx, Unk8022FE34_V2* p, Unk8022FE34_V2 v);
 void fn_802FAD5C(void* obj, int idx, void* p);
 void fn_80238ECC(Unk8022FE34_W* w, Unk8022FE34_V2* a, int* b);
-void fn_80239AE0(Unk8022FE34_W* w, int* b);
-void fn_80239040(Unk8022FE34_W* w, Unk8022FE34_V2* a);
+extern "C" void fn_80239AE0(Unk8022FE34_W* w, int* b);
+extern "C" void fn_80239040(Unk8022FE34_W* w, Unk8022FE34_V2* a);
 void fn_8023A6C8(Unk8022FE34_W* w, int b);
-void fn_8022F2B8(Unk8022FE34_Owner* u, int v);
-int fn_80097148(Unk8022FE34_Row* r, int b);
+extern "C" void fn_8022F2B8(Unk8022FE34_Owner* u, int v);
+extern "C" int fn_80097148(Unk8022FE34_Row* r, int b);
 void fn_802531FC(Unk8022FE34_Obj480* p);
 void fn_80252A94(Unk8022FE34_Obj480* p, int v);
-int fn_80099B50(Unk8022FE34_Row* r, int i);
-void fn_801A6C1C(Unk8022FE34_Ctx* c, Unk8022FE34_Row* r, int i, int a, int b, int d);
+extern "C" int fn_80099B50(Unk8022FE34_Row* r, int i);
+extern "C" void fn_801A6C1C(Unk8022FE34_Ctx* c, Unk8022FE34_Row* r, int i, int a, int b, int d);
 void fn_8040A208(void* arr, int n, int sz, void (*f)(void*));
-void fn_8022F2C0(void* p);
+extern "C" void fn_8022F2C0(void* p);
 
 void Unk8022FE34_Sub::fn_80231018()
 {

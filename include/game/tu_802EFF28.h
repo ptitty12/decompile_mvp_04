@@ -6,9 +6,9 @@
  * collision tests behind argument-swapping wrappers that pass r5 through.
  */
 
-void fn_802EFF54(void* a, void* b, void* c);
-void fn_802F1EAC(void* a, void* b, void* c);
-void fn_802F335C(void* a, void* b);
+extern "C" void fn_802EFF54(void* a, void* b, void* c);
+extern "C" void fn_802F1EAC(void* a, void* b, void* c);
+extern "C" void fn_802F335C(void* a, void* b);
 
 #include "game/tu_802E6464.h"
 

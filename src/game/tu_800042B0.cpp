@@ -116,21 +116,21 @@ extern int lbl_8061A330;
 extern int lbl_80624260;
 
 int fn_801747A0();
-int fn_804367C8();
-void fn_8042C1E8();
-void fn_8042C464();
+extern "C" int fn_804367C8();
+extern "C" void fn_8042C1E8();
+extern "C" void fn_8042C464();
 void fn_8043D3EC(int);
 void fn_8043D250();
 void fn_8043C580();
-void fn_80436204(int, int, int);
-void fn_80439918(int, int);
-int fn_804250B0();
-void fn_800B81BC(int);
-void fn_800B8194();
-int fn_803D9E3C();
+extern "C" void fn_80436204(int, int, int);
+extern "C" void fn_80439918(int, int);
+extern "C" int fn_804250B0();
+extern "C" void fn_800B81BC(int);
+extern "C" void fn_800B8194();
+extern "C" int fn_803D9E3C();
 void fn_803157B4(Unk8061FEDC*);
 void fn_80315B34(Unk8061FEDC*, unsigned short*, int);
-void fn_803158DC(Unk8061FEDC*);
+extern "C" void fn_803158DC(Unk8061FEDC*);
 void fn_80315AD8(Unk8061FEDC*);
 Unk806869AC* fn_80020BCC(unsigned int id);
 void fn_8002114C(Unk806869AC*, int);
@@ -359,7 +359,7 @@ struct Vec3 {
     float z;
 };
 
-float fn_804028E4(float x);               /* square root */
+extern "C" float fn_804028E4(float x);               /* square root */
 extern const Vec3 lbl_806055AC;           /* shared 0xC-byte constant: the fallback for a zero-length vector */
 
 inline Vec3 VSub(const Vec3& a, const Vec3& b)

@@ -161,7 +161,7 @@ inline Unk8024EF40_Ent* EntOf(Unk8024EF40_P* p)
 /* Random percentage roll used by the injury checks (fn_80252460 family); the file
    string and line are parameters of the inline (a hard-coded string changes the argument
    setup order). */
-unsigned fn_8014D8AC(int seed, int max, const char* file, int line);
+extern "C" unsigned fn_8014D8AC(int seed, int max, const char* file, int line);
 inline float RandPct(Unk8024EF40_P* x, const char* f, int line)
 {
     float k = 100.0f;

@@ -145,8 +145,8 @@ struct Unk805B17A0_Ent {
 extern Unk805B17A0_Ent lbl_805B17A0[];
 void* fn_8004072C();
 int fn_800412AC(void* o, int id, int a, int b, int c, int d);
-void fn_8004181C(void* o, int id, int h, int a, int b, int c, int d);
-void fn_80039A3C(int a, unsigned int b, unsigned int c);
+extern "C" void fn_8004181C(void* o, int id, int h, int a, int b, int c, int d);
+extern "C" void fn_80039A3C(int a, unsigned int b, unsigned int c);
 }
 
 #endif /* GAME_TU_80037250_H */

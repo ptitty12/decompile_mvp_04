@@ -12,7 +12,7 @@
 
 Unk80273498_Vec3 fn_8027AF54(Unk8028B194* g, int a);
 Unk80270BA0_X* fn_8027A90C(Unk8028B194* g);
-Unk80273498_Vec3 fn_801837F4(int obj, int a);
+extern "C" Unk80273498_Vec3 fn_801837F4(int obj, int a);
 void fn_8028F5CC(void* p, float f);
 void fn_8027AD3C(Unk8028B194* g, Unk80270BA0_X* x, int a, Unk80273498_Vec3* out6, float* out7,
                  int b, int c, unsigned int* out10, int s8);
@@ -21,7 +21,7 @@ int fn_8026D940(Unk80270BA0_X* x, int a);
 int fn_8026D9D0(Unk80270BA0_X* x, int a);
 double __builtin_fabs(double x);
 int fn_8026D704(Unk80270BA0_X* x, int a);
-int fn_803164C4(const Unk80273498_Vec3& v);
+extern "C" int fn_803164C4(const Unk80273498_Vec3& v);
 void fn_8024937C(Unk80270BA0_X* x, float a, float b, Unk80273498_Vec3 v);
 
 inline float AngleDiff(float a, float b)

@@ -13,11 +13,11 @@ extern char lbl_805BF470[];
 extern char lbl_805BF478[];
 extern char lbl_805BF480[];
 extern char lbl_805BF488[];
-void fn_8011A2F4(int a, Ui8011AA24* g, UiObj* c, char* s, int f);
-void fn_8011A2AC(int a, UiObj* c, char* s);
-void fn_8011A3CC(int a, UiObj* c, char* s);
-void fn_8011A414(int a, UiObj* c, char* s);
-void fn_8011A468(int a, UiObj* c, char* s);
+extern "C" void fn_8011A2F4(int a, Ui8011AA24* g, UiObj* c, char* s, int f);
+extern "C" void fn_8011A2AC(int a, UiObj* c, char* s);
+extern "C" void fn_8011A3CC(int a, UiObj* c, char* s);
+extern "C" void fn_8011A414(int a, UiObj* c, char* s);
+extern "C" void fn_8011A468(int a, UiObj* c, char* s);
 extern char lbl_805BF3C4[];
 extern char lbl_805BE5B8[];
 extern char lbl_805BE3BC[];
@@ -37,7 +37,7 @@ struct UiEnt {
     char mC9C[1];
 };
 extern "C" int fn_80099570(void* o, int a, unsigned char b, int c);
-int fn_8008CFD8(char* p, int a, unsigned char b);
+extern "C" int fn_8008CFD8(char* p, int a, unsigned char b);
 extern char lbl_805BF3A8[];
 extern char lbl_805BEAB8[];
 extern char lbl_805BEAC0[];
@@ -59,13 +59,13 @@ struct UiP54 {
     char pad18[0x54 - 0x18];
     int m54;
 };
-void fn_80118770(UiObj* a);
-void fn_8011A0A4(int a, UiObj* b, char* c);
+extern "C" void fn_80118770(UiObj* a);
+extern "C" void fn_8011A0A4(int a, UiObj* b, char* c);
 extern char lbl_805BF240[];
 extern char lbl_805BE5A4[];
 Unk8001BC8C* fn_8001BC4C();
 void fn_801006D4(UiV_20i_24i_28i_2Ci* self, int idx);
-void fn_801015EC(void* self, UiObj* obj, int idx);
+extern "C" void fn_801015EC(void* self, UiObj* obj, int idx);
 
 inline int UiIntAt(char* b, int i)
 {

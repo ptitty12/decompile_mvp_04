@@ -333,7 +333,7 @@ public:
     virtual void s29();
     virtual void s30(const char* s);
 };
-UiS* fn_800C8054(UiS* p);
+extern "C" UiS* fn_800C8054(UiS* p);
 extern char lbl_805BDC84[];
 extern char lbl_805BDD84[];
 extern char lbl_805BA714[];
@@ -603,7 +603,7 @@ extern char lbl_805BC180[];
 extern "C" int sprintf(char*, const char*, ...);
 
 extern "C" int fn_800C33D0();
-int fn_800DE440(char* out, int a, int b);
+extern "C" int fn_800DE440(char* out, int a, int b);
 extern "C" void fn_800C3ED4(int h, int a, int b);
 extern "C" int fn_80097318(int a, int b);
 extern "C" int fn_80097380(int a, int b);

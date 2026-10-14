@@ -19,7 +19,7 @@ void fn_80378E48(char** cursor, int* remaining, char delim, char** token, int* t
 unsigned int fn_80378568(const char* token, int len);
 int fn_80409DAC(const char* token);
 double fn_80409D88(const char* token);    /* string to double */
-double fn_80410634(double x);             /* rounds down (callers add 0.5 to round) */
+extern "C" double fn_80410634(double x);             /* rounds down (callers add 0.5 to round) */
 int fn_80383334(unsigned int hash);
 /* Random number generator (multi-word add-with-carry state at +0x4..+0x18). */
 class Unk8014D8AC {

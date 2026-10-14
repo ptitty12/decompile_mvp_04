@@ -31,7 +31,7 @@ struct Unk801757D4_T {
     int mC0;
 };
 
-void fn_80402CAC(int a, int b);
+extern "C" void fn_80402CAC(int a, int b);
 
 /* 0x48-byte entry; five of them at container+0xC */
 struct Unk80176C0C_Entry {
@@ -83,15 +83,15 @@ struct Unk80176ADC_Obj {
     char pad268[0x618 - 0x268];
     Unk80176ADC_Sub* m618;
 };
-void fn_801A656C(void* ctx, void* a, int b);
+extern "C" void fn_801A656C(void* ctx, void* a, int b);
 void fn_80177A90(void* p);
 void fn_8017739C(Unk80176C0C_Entry* p, int a);
-void fn_8017772C(void* p);
+extern "C" void fn_8017772C(void* p);
 void fn_801769A8(void* p, int a);
-void fn_80178720(void* p);
+extern "C" void fn_80178720(void* p);
 void fn_80178944(void* p);
-void fn_8017493C(int a, int b);
-void fn_80175810(int a, int b);
+extern "C" void fn_8017493C(int a, int b);
+extern "C" void fn_80175810(int a, int b);
 void fn_80176C0C(void* self);
 void fn_8017696C(void* self);
 void fn_80177B40(void* self);
@@ -164,8 +164,8 @@ public:
 };
 struct Unk80173274_T;
 int fn_80173274(Unk80173274_T* p);
-int fn_8000587C(int p);
-void fn_803EDA0C(int a);
+extern "C" int fn_8000587C(int p);
+extern "C" void fn_803EDA0C(int a);
 
 /* Player object (vptr at +0x98): only slot 8 is used here. */
 class Unk80177974_Obj {
@@ -203,11 +203,11 @@ struct Unk8017706C_T {
     char padAC[0xF0 - 0xAC];
     int mF0;
 };
-void fn_80244A64(void* p, int a, int b);
-void fn_8037EBE8(void* p);
+extern "C" void fn_80244A64(void* p, int a, int b);
+extern "C" void fn_8037EBE8(void* p);
 void fn_803814A4(void* p, int a, int b, float f);
 void fn_8024D178(void* p, int a);
-void fn_80189300(void* p, int a);
+extern "C" void fn_80189300(void* p, int a);
 extern const float lbl_805CBD24;
 void fn_80177C74(void* self, int a);
 void fn_80177BF4(Unk80177B74_T* p, void* a);
@@ -227,15 +227,15 @@ struct Unk80177A90_T {
 extern const Unk80177A90_V3 lbl_806055AC;
 extern const char lbl_805CB1DC[];
 extern const char lbl_805CB208[];
-int fn_802B9300(int n, int a, int b, int c);
-int fn_80402DE4(int a, int b);
-void fn_80402BEC(int a, int b, int c);
+extern "C" int fn_802B9300(int n, int a, int b, int c);
+extern "C" int fn_80402DE4(int a, int b);
+extern "C" void fn_80402BEC(int a, int b, int c);
 int fn_804089B4(char* dst, const char* fmt, ...);
-void fn_8040074C(void* p, unsigned int n);
-int fn_80359BAC();
-int fn_80359C58();
-int fn_80359E94();
-void fn_803EE8F8(void* cfg);
+extern "C" void fn_8040074C(void* p, unsigned int n);
+extern "C" int fn_80359BAC();
+extern "C" int fn_80359C58();
+extern "C" int fn_80359E94();
+extern "C" void fn_803EE8F8(void* cfg);
 void fn_80174824(int a);
 int fn_801747AC(const char* name);
 

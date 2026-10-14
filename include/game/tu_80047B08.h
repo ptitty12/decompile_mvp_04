@@ -8,11 +8,11 @@ Types for game/tu_80047B08.cpp (see tu_80044C10.h for the shared game object and
 the Unk8004763C manager).
 */
 
-void fn_80392708();
-void fn_80392DF4();
-void fn_803EDA0C(void* p);
-void fn_80377488(void* p); /* __builtin_vec_delete */
-void fn_803917D0(int a);
+extern "C" void fn_80392708();
+extern "C" void fn_80392DF4();
+extern "C" void fn_803EDA0C(void* p);
+extern "C" void fn_80377488(void* p); /* __builtin_vec_delete */
+extern "C" void fn_803917D0(int a);
 void fn_80057778(void* p);
 void fn_80057950(void* p);
 void* fn_8005BA9C(void* p);
@@ -57,8 +57,8 @@ struct Unk8005BA1C_Obj;
 Unk8005BA1C_Obj* fn_8005BA9C();
 void fn_8005C384(Unk8005BA1C_Obj* o, int i);
 int fn_802B96C4(const char* name, int a);
-int fn_802B9300(const char* name, int a, int b, int* out);
-int fn_80395250(int buf, int x);
+extern "C" int fn_802B9300(const char* name, int a, int b, int* out);
+extern "C" int fn_80395250(int buf, int x);
 extern char lbl_805B0A09[];
 /* Callback record returned by fn_80395864 (three function pointers; fn_80047B08 fills them). */
 struct Unk80047B08_Cb {

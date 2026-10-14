@@ -116,10 +116,10 @@ struct Unk802E0914_Out {
     int m4;
     int m8;
 };
-void fn_802DD224(int a, int b);
-void fn_802DF870(void* a, void* b, void* c);
-void fn_802DFD04(void* a, void* b, void* c);
-void fn_802E0E50(void* a, void* b, void* c);
+extern "C" void fn_802DD224(int a, int b);
+extern "C" void fn_802DF870(void* a, void* b, void* c);
+extern "C" void fn_802DFD04(void* a, void* b, void* c);
+extern "C" void fn_802E0E50(void* a, void* b, void* c);
 
 typedef int (*Unk802DE2C8_Fn)();
 extern Unk802DE2C8_Fn lbl_806E0B98[12][12];

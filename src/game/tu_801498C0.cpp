@@ -25,8 +25,8 @@ extern const char lbl_805C5030[];
 extern const char lbl_805C5044[];
 extern const char lbl_805C5054[];
 extern const char lbl_805C506C[];
-int fn_803FEE14(char*, int);
-int fn_803FECF8(int, int);
+extern "C" int fn_803FEE14(char*, int);
+extern "C" int fn_803FECF8(int, int);
 char* fn_8040B448(char*, const char*);
 struct Unk8014AD2C_V2 {
     float x;

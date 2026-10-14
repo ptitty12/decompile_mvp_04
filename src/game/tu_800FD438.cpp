@@ -125,7 +125,7 @@ public:
 };
 struct Unk8017DD64_T;
 void fn_8017DD80(Unk8017DD64_T* a, int b, int* c, int* d);
-void fn_800FED08(int a, UiObj* b);
+extern "C" void fn_800FED08(int a, UiObj* b);
 void fn_800FF26C(UiWM* self, int k);
 extern char lbl_805BEF5C[];
 extern char lbl_805BEF68[];
@@ -142,8 +142,8 @@ struct UiColor {
     float m8;
     float mC;
 };
-void fn_8014D9C4(UiColor* c);
-void fn_8014D9EC(UiColor* c, float a, float b, float d, float e, float f);
+extern "C" void fn_8014D9C4(UiColor* c);
+extern "C" void fn_8014D9EC(UiColor* c, float a, float b, float d, float e, float f);
 UiColor fn_800FD4FC(int idx)
 {
     UiColor c;
@@ -216,8 +216,8 @@ struct UiTbl5b {
 extern UiTbl5b lbl_805BED90;
 extern char lbl_805BEB70[];
 extern char lbl_805B6F58[];
-int fn_801C4128(int a);
-void fn_801195C8(int a, UiObj* b);
+extern "C" int fn_801C4128(int a);
+extern "C" void fn_801195C8(int a, UiObj* b);
 void fn_800FD64C(UiS64C* self, UiG64C* g)
 {
     if (g->m6F8->m10->m184 == 0 || fn_801C4128(g->m700->m3A4) != 0) {
@@ -399,7 +399,7 @@ public:
     int a10[7];
     int m2C;
 };
-int fn_800C8048(int a);
+extern "C" int fn_800C8048(int a);
 int fn_801A7130(Unk8019F8C0_Owner* a, int b);
 extern char lbl_805BEF38[];
 void fn_800FF26C(UiWM* self, int idx)
@@ -598,7 +598,7 @@ struct UiGauge {
     char pad20[0x30 - 0x20];
     UiObj* m30;
 };
-float fn_804028E4(float x);
+extern "C" float fn_804028E4(float x);
 extern char lbl_805BEFE4[];
 extern int lbl_8061B3C0[];
 extern char lbl_805C2CCC[];

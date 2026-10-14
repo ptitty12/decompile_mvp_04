@@ -117,7 +117,7 @@ struct UnkFEObj8 {         /* vptr at +8 (lbl_8065B228 / lbl_8065B1E8), 0x28 byt
 };
 void fn_800AB0C4(UnkFEArr* a, int v);
 void* operator new[](unsigned int size, int heap);
-void fn_800ADAD8(void* p);
+extern "C" void fn_800ADAD8(void* p);
 Unk80040640* fn_8004072C();
 void fn_800412AC(Unk80040640* o, int a, int b, int c, int d, int e);
 extern const float lbl_805B9590;

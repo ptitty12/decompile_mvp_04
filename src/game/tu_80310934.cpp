@@ -442,8 +442,8 @@ struct Unk80311508_Ob {
     char pad0[0xC];
     Unk80311508_V* mC;
 };
-void fn_803E4450(Unk80310934_Big* a, Unk80310934_Big* b, int* c, float f);
-void fn_803E456C(Unk80310934_Big* a, Unk80311508_M* m);
+extern "C" void fn_803E4450(Unk80310934_Big* a, Unk80310934_Big* b, int* c, float f);
+extern "C" void fn_803E456C(Unk80310934_Big* a, Unk80311508_M* m);
 
 Unk80310934_Big* fn_80311508(void* p, int a, int b, int c, int d)
 {

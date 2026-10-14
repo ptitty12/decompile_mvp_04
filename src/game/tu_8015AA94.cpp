@@ -13,9 +13,9 @@ extern float lbl_805C8E68;
 extern float lbl_805C8E6C;
 extern Unk8015ABB8_Rec lbl_8068B7DC;
 
-void fn_80326ED4(Unk801527C8_Sub* s, float* a, float* b);
-int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
-int fn_801D0294(void* p);
+extern "C" void fn_80326ED4(Unk801527C8_Sub* s, float* a, float* b);
+extern "C" int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
+extern "C" int fn_801D0294(void* p);
 
 void Unk80159F28::fn_8015AA94() /* 8015AA94 */
 {

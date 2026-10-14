@@ -122,7 +122,7 @@ extern char lbl_805BD4C8[];
 extern const float lbl_805BD4E8;
 void fn_80303BC4(const char* fmt, float a, float b, ...);
 void fn_800D92D8(void* t);
-void fn_800D8B24(void* t);
+extern "C" void fn_800D8B24(void* t);
 
 extern "C" int fn_800D8938(Unk800D876C_A* t)
 {
@@ -480,16 +480,16 @@ void fn_800DB5F4()
 }
 
 extern const char lbl_805BD828[];
-char* fn_804031BC(char* dst, const char* src);
+extern "C" char* fn_804031BC(char* dst, const char* src);
 int fn_8007F828(int s, char* name);
 void fn_8007F7FC(int s, int h, int v);
 int fn_8007F910(int s, int idx, int a, int b, int c, int d, int e);
 int fn_80075808(int a);
 int fn_80075948(int s, int a);
-void fn_80086EC0(Unk800D878C_C* p, int a, int b);
-void fn_800A3490(int g, int a, int b, int c);
-int fn_800A2AE8(int g);
-void fn_800C2034(void* o, int v);
+extern "C" void fn_80086EC0(Unk800D878C_C* p, int a, int b);
+extern "C" void fn_800A3490(int g, int a, int b, int c);
+extern "C" int fn_800A2AE8(int g);
+extern "C" void fn_800C2034(void* o, int v);
 
 extern "C" void fn_800DB66C(int a, int b, int c, int d)
 {

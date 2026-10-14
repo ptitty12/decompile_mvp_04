@@ -27,6 +27,6 @@ extern "C" int fn_803BA7C4(Unk803BA7C4_Obj* obj, int* value);
 
 /* The game TU's __static_initialization_and_destruction_0(int initialize, int priority),
  * at 0x80065968 in tu_80064D48; its caller below passes (1, 0xFFFF). */
-void fn_80065968(int initialize, int priority);
+extern "C" void fn_80065968(int initialize, int priority);
 
 #endif

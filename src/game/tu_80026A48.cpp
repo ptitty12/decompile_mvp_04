@@ -144,7 +144,7 @@ extern "C" void fn_80027CCC(Unk80023AC4_Obj* x)
 }
 
 extern "C" int fn_8002BD04(Unk80023AC4_Obj* x, Unk801A4B34_Pos* p);
-void fn_800357F4(int a, int b, int c, int d, int e, int f, int g);
+extern "C" void fn_800357F4(int a, int b, int c, int d, int e, int f, int g);
 void fn_8003D33C(int a, int b, int c);
 void fn_8003CB00(int a);
 int fn_8002A2D4(Unk80023AC4_Obj* x);

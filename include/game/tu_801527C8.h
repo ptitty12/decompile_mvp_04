@@ -218,10 +218,10 @@ struct Unk8016C788_Obj {
     Unk8016C788_Sub m360;
 };
 void fn_8027C728(Unk8027C728_Goal* g);
-void fn_80189300(Unk80189300* p, Unk8016C788_Obj* o);
+extern "C" void fn_80189300(Unk80189300* p, Unk8016C788_Obj* o);
 Unk8016C788_Obj* fn_8016C788(Unk801527C8_Ctx* ctx, int a);
-Unk8027C728_Goal* fn_802448F4(Unk8016C788_Obj* o, int a);
-void fn_8015152C(Unk8016C788_Obj* o, Unk8027C728_Goal* g);
+extern "C" Unk8027C728_Goal* fn_802448F4(Unk8016C788_Obj* o, int a);
+extern "C" void fn_8015152C(Unk8016C788_Obj* o, Unk8027C728_Goal* g);
 
 /* Global object lbl_8061FEDC: a state block whose substructure at +0x40 holds
  * a handle at +4 and a float at +0xC (written by cBlendDepthOfField, cSetDepthOfField). */

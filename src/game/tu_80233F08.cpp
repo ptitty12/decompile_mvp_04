@@ -15,12 +15,12 @@ extern int lbl_80620750;
 extern int lbl_80620748;
 extern int lbl_8061EDCC;
 
-void fn_8022F2B8(Unk8022FE34_Owner* t, int v);
-void fn_8022F174(Unk8022FE34_U* u, int v);
+extern "C" void fn_8022F2B8(Unk8022FE34_Owner* t, int v);
+extern "C" void fn_8022F174(Unk8022FE34_U* u, int v);
 void fn_8023A7F4(Unk8022FE34_W* w);
 void fn_802361F8(void* p, float f);
 void fn_802361F4();
-Unk8022FE34_V3 fn_80233F08(Unk8022FE34_Ent* e, int a, ...);
+extern "C" Unk8022FE34_V3 fn_80233F08(Unk8022FE34_Ent* e, int a, ...);
 extern "C" int fn_801C3E68(void* p);
 struct Unk8026C414_O;
 struct Unk8026C414_X;
@@ -51,12 +51,12 @@ inline V3f FlatPos(const V3f& p)
     return r;
 }
 
-void fn_8025191C(Unk8022FE34_Pl* pl, int a, float f);
-float fn_8025356C(Unk8022FE34_Obj480* o);
+extern "C" void fn_8025191C(Unk8022FE34_Pl* pl, int a, float f);
+extern "C" float fn_8025356C(Unk8022FE34_Obj480* o);
 void fn_802516CC(Unk8022FE34_Pl* pl);
 void fn_802517F4(Unk8022FE34_Pl* pl);
-Unk8022FE34_Pl* fn_801A497C(Unk8022FE34_Ctx* c, int i, int j);
-int fn_8033E420(void* p);
+extern "C" Unk8022FE34_Pl* fn_801A497C(Unk8022FE34_Ctx* c, int i, int j);
+extern "C" int fn_8033E420(void* p);
 int fn_801A2034(Unk8022FE34_Ctx* c, int i);
 struct Unk8024EF40_P;
 int fn_802536D0(Unk8024EF40_P* p);
@@ -75,15 +75,15 @@ inline float Lerp(float a, float t, float b)
 
 extern "C" void fn_80189300(int a, void* b);
 void fn_80234B18(Unk8022FE34_U* u);
-void fn_80234E4C(Unk8022FE34_U* u);
+extern "C" void fn_80234E4C(Unk8022FE34_U* u);
 
 void fn_802349E8(Unk8022FE34_Owner* t);
-void fn_80233444(Unk8022FE34_Owner* t);
+extern "C" void fn_80233444(Unk8022FE34_Owner* t);
 float fn_802398C8(Unk8022FE34_W* w);
-Unk8022FE34_X6D* fn_801A6DB8(Unk8022FE34_Ctx* c);
-void fn_80188698(int a, float f);
+extern "C" Unk8022FE34_X6D* fn_801A6DB8(Unk8022FE34_Ctx* c);
+extern "C" void fn_80188698(int a, float f);
 int fn_801A48F8(Unk8022FE34_Ctx* c, int i);
-Unk8022FE34_Pl* fn_801A4910(Unk8022FE34_Ctx* c, int i, int k);
+extern "C" Unk8022FE34_Pl* fn_801A4910(Unk8022FE34_Ctx* c, int i, int k);
 void fn_80253244(Unk8022FE34_Obj480* o, int a, int b);
 extern const float lbl_805D730C;
 extern float lbl_805D7328[1];
@@ -152,8 +152,8 @@ public:
     void fn_802F44D0();
 };
 void fn_80232500(Unk8022FE34_Owner* t);
-void fn_8022F204(Unk8022FE34_Owner* t);
-int fn_801DBF3C(void* p);
+extern "C" void fn_8022F204(Unk8022FE34_Owner* t);
+extern "C" int fn_801DBF3C(void* p);
 extern "C" void* fn_800AB5C8(void* self);
 extern "C" char* fn_800AEC78(void* self, void* ctx);
 extern void* lbl_80619D10;

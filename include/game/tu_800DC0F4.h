@@ -33,8 +33,8 @@ struct Unk800DEDC0_Row {
 extern Unk800DEDC0_Row lbl_805BD894[];
 
 void* fn_80090880(int obj, int id);
-int fn_8032A130(int a, int b, int c);
-int fn_803EB434(int h, void* s, float* a, float* b, float* c, float* d);
+extern "C" int fn_8032A130(int a, int b, int c);
+extern "C" int fn_803EB434(int h, void* s, float* a, float* b, float* c, float* d);
 void fn_800DC3D8(int* a, int* b, int c);
 int fn_800DB9A8(int a, int b, int c, int d);
 
@@ -42,12 +42,12 @@ struct Unk800DB840_Slot {
     char m0[0xE64];
 };
 float fn_800DBA74(Unk800DB840_Slot* s, int a, int b, int c);
-int fn_8007824C(int a, UiW* b);
-UiS* fn_800DF254(UiS* self, int a, int b, float f);
-int fn_8008CFD8(char* p, int a, int b);
-char* fn_804031BC(char* dst, const char* src);
-int fn_800968C0(void* p, int b, int c);
-int fn_8040321C(char* dst, char* fmt, char* a, const char* b);
+extern "C" int fn_8007824C(int a, UiW* b);
+extern "C" UiS* fn_800DF254(UiS* self, int a, int b, float f);
+extern "C" int fn_8008CFD8(char* p, int a, int b);
+extern "C" char* fn_804031BC(char* dst, const char* src);
+extern "C" int fn_800968C0(void* p, int b, int c);
+extern "C" int fn_8040321C(char* dst, char* fmt, char* a, const char* b);
 extern char lbl_805BC188[];
 extern char lbl_805BD8C0[];
 extern float lbl_805BD8BC;
@@ -61,11 +61,11 @@ struct Udd344_T {
     unsigned char m0;
     unsigned char m1;
 };
-int fn_80403144(void* dst, const char* src);
+extern "C" int fn_80403144(void* dst, const char* src);
 int fn_800DBC50(Unk800DB840_Slot* o, int a, int idx, int b, int c);
-int fn_800DBAE0(Unk800DB840_Slot* o, int a, int idx, int b);
+extern "C" int fn_800DBAE0(Unk800DB840_Slot* o, int a, int idx, int b);
 const char* fn_800E5F38(int x);
-void fn_800DE6A8(int a0, char* a, char* b, int fl, int v, char* c);
+extern "C" void fn_800DE6A8(int a0, char* a, char* b, int fl, int v, char* c);
 struct Unk8024EF40_W;
 char* fn_802542E8(Unk8024EF40_W* sub, int a, int out);
 int fn_8040B320(char* dst, int a, int n, ...);
@@ -90,7 +90,7 @@ extern char lbl_805BD920[];
 extern char lbl_805BD924[];
 extern char lbl_806E02B8[];
 extern float lbl_805BD900;
-void fn_800D4254(int a, int e, float* x, float* y);
+extern "C" void fn_800D4254(int a, int e, float* x, float* y);
 int fn_800DD5E8(int i);
 int fn_800DD5FC(int i);
 int fn_800DD610(Unk800DD610_P* p);

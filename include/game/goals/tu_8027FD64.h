@@ -26,7 +26,7 @@ inline float Unk8027FD64_Abs(float v)
     return fabsf(v);
 }
 
-float fn_804028E4(float x);               /* square root */
+extern "C" float fn_804028E4(float x);               /* square root */
 float fn_80410ABC(float x);
 
 inline float Length(Unk80273498_Vec3 v)

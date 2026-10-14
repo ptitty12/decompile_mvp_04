@@ -316,30 +316,30 @@ extern int lbl_806EF9AC;
 extern int lbl_806EF9B0;
 
 int fn_80247858(int a, float* out);
-Unk80044C10_A* fn_801A4B34(Unk80044C10_B* b);
+extern "C" Unk80044C10_A* fn_801A4B34(Unk80044C10_B* b);
 int fn_80043B78(int a);
 int fn_80043650(int a);
 Unk8004763C* fn_800475EC();
-void fn_80057C30(void* a, unsigned short b);
+extern "C" void fn_80057C30(void* a, unsigned short b);
 void fn_8018CA5C(void* a, float* b, float* c, float* d);
 void* operator new(unsigned int size, int heap); /* 0x80377428 */
-Unk8004763C* fn_8004763C(Unk8004763C* t);
+extern "C" Unk8004763C* fn_8004763C(Unk8004763C* t);
 void fn_8004778C(Unk8004763C* t, int flags);
 int fn_80047B08(Unk8004763C* t);
 void fn_80047CA4(Unk8004763C* t);
 void fn_80047D40(Unk8004763C* t, int i);
 int fn_80048294(Unk8004763C* t, int i);
 int fn_8004838C(Unk8004763C* t, int i);
-int fn_800484A8(Unk8004763C* t, int i);
+extern "C" int fn_800484A8(Unk8004763C* t, int i);
 void fn_80048818(Unk8004763C* t, int i);
 Unk80048A10_Sub* fn_80048A10(Unk80048A10_Sub* p);
 void fn_80048B2C(Unk80048A10_Sub* p, int flags);
 void fn_80048BC0(Unk80048A10_Sub* p);
 void fn_80048BE4(Unk80048A10_Sub* p);
 void fn_800490F4(Unk80048A10_Sub* p);
-void fn_80377408(void* p); /* __builtin_delete */
-void fn_80391348(unsigned a);
-void fn_803EE7BC();
+extern "C" void fn_80377408(void* p); /* __builtin_delete */
+extern "C" void fn_80391348(unsigned a);
+extern "C" void fn_803EE7BC();
 extern Unk8004763C* lbl_80617800;
 
 #endif

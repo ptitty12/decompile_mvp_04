@@ -7,9 +7,9 @@ extern char lbl_80665E78[];
 extern char lbl_80665EC8[];
 extern char lbl_80666138[];
 extern char lbl_80665F58[];
-void fn_80328374(void* p, int chrg);
-void fn_80332614(void* p, int chrg);
-void fn_80332428(void* p, int chrg);
+extern "C" void fn_80328374(void* p, int chrg);
+extern "C" void fn_80332614(void* p, int chrg);
+extern "C" void fn_80332428(void* p, int chrg);
 extern char lbl_80665FA8[];
 extern char lbl_806660E8[];
 extern char lbl_80666188[];
@@ -22,10 +22,10 @@ extern char lbl_806662C8[];
 extern char lbl_80666548[];
 extern char lbl_80666368[];
 extern char lbl_80666318[];
-void fn_80377408(void* p);
-void fn_80330778(void* p, int chrg);
-void fn_80330870(void* p, int chrg);
-void fn_80330BC8(void* p, int chrg);
+extern "C" void fn_80377408(void* p);
+extern "C" void fn_80330778(void* p, int chrg);
+extern "C" void fn_80330870(void* p, int chrg);
+extern "C" void fn_80330BC8(void* p, int chrg);
 
 #define PUT(o, v) (*(const void**)((char*)self + (o)) = (v))
 
@@ -241,9 +241,9 @@ void fn_80341090(Unk803401A8* self, int chrg)
 extern char lbl_806661D8[];
 extern char lbl_80665E78[];
 extern char lbl_80665EC8[];
-void fn_80328374(void* p, int chrg);
-void fn_80332614(void* p, int chrg);
-void fn_80332428(void* p, int chrg);
+extern "C" void fn_80328374(void* p, int chrg);
+extern "C" void fn_80332614(void* p, int chrg);
+extern "C" void fn_80332428(void* p, int chrg);
 
 void fn_803410DC(Unk803401A8* self, int chrg)
 {
@@ -361,8 +361,8 @@ struct Unk803413B0 {
 extern Unk803401A8_VT* lbl_80620410;
 extern int lbl_80620414;
 extern int lbl_806204E4;
-int fn_803308E4();
-void fn_8033EA44(int a, int b);
+extern "C" int fn_803308E4();
+extern "C" void fn_8033EA44(int a, int b);
 
 void fn_80341364()
 {

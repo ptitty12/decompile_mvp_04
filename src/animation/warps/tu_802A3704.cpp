@@ -319,18 +319,18 @@ public:
 };
 
 float fn_80382BD8(Unk80271DBC_Link* p, int a);
-int fn_80380964(Unk80271DBC_Link* p);
-int fn_80189698(Unk80189698_Ctx* c, float t);
+extern "C" int fn_80380964(Unk80271DBC_Link* p);
+extern "C" int fn_80189698(Unk80189698_Ctx* c, float t);
 Unk80273498_Vec3 fn_8018959C(Unk80189698_Ctx* c, float t);      /* hidden result pointer in r3 */
-void fn_8018C4D0(Unk80189698_Ctx* c, Unk80273498_Vec3* v, int a, float b, float c2, float d);
+extern "C" void fn_8018C4D0(Unk80189698_Ctx* c, Unk80273498_Vec3* v, int a, float b, float c2, float d);
 
 /* 4x4 matrix built by fn_803DF824 on the stack. */
 struct Unk803DF824_Mtx {
     float m[16];
 };
-void fn_803DF824(Unk803DF824_Mtx* m, float a, float b, float c, float d, float e, float f, float g, float h, float i);
-void fn_803DFAB4(Unk803DF824_Mtx* m);
-void fn_803DED40(Unk803DF824_Mtx* m, const Unk80273498_Vec3* in, Unk80273498_Vec3* out);
+extern "C" void fn_803DF824(Unk803DF824_Mtx* m, float a, float b, float c, float d, float e, float f, float g, float h, float i);
+extern "C" void fn_803DFAB4(Unk803DF824_Mtx* m);
+extern "C" void fn_803DED40(Unk803DF824_Mtx* m, const Unk80273498_Vec3* in, Unk80273498_Vec3* out);
 
 /* Local transform object of fn_802A3D8C (size 0x9C, vptr at +0x98 with the
  * vtable at 0x806604F8; ctor inlined, member +0x7C built by fn_80379324). */
