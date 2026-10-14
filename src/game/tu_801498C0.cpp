@@ -220,8 +220,6 @@ void fn_8014B464();
 void fn_8014B490();
 void fn_8014B4BC();
 void fn_8014B4E8();
-/* near-miss (aligned diff 3): retail stores lbl_8061E978 through 'mr r0,r3'; the address-caching
-   pointer locals below reproduce the callee-saved lis registers, which plain globals do not */
 void fn_8014BB70();
 void fn_8014BE28();
 extern int lbl_8061B938;
@@ -330,7 +328,7 @@ void fn_80070E38();
 void fn_800A152C();
 void* fn_80148280(void*);
 void* fn_802AD720(void*);
-void fn_802B85D8();
+void fn_802B85D8(Unk802ACD88_Mgr*);
 void fn_80313BCC(int);
 void* fn_802BB4FC(void*);
 void fn_800B8108();
@@ -801,6 +799,8 @@ void fn_8014B4E8() { fn_80311D08(lbl_8068A380, 0x2); }
 
 /* near-miss (aligned diff 3): retail stores lbl_8061E978 through 'mr r0,r3'; the address-caching
    pointer locals below reproduce the callee-saved lis registers, which plain globals do not */
+/* Constructs the global managers. fn_802B85D8 takes the new manager (r3 stays live across the store); the
+   address-caching pointer locals below reproduce the callee-saved lis registers, which plain globals do not */
 void fn_8014BB70()
 {
     void** a = &lbl_8068B618;
@@ -816,8 +816,9 @@ void fn_8014BB70()
     fn_80070E38();
     fn_800A152C();
     *a = fn_80148280(operator new(0x38, 0));
-    *b = fn_802AD720(operator new(0x18720, 0));
-    fn_802B85D8();
+    void* m = fn_802AD720(operator new(0x18720, 0));
+    *b = m;
+    fn_802B85D8((Unk802ACD88_Mgr*)m);
     fn_80313BCC(lbl_8061FEDC);
     *c = fn_802BB4FC(operator new(8, 0));
     fn_800B8108();
