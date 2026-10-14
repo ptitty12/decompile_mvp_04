@@ -1,0 +1,33 @@
+name: decomp.dev report
+
+# Hands decomp.dev (https://decomp.dev) the progress report built on the
+# owner's PC. GitHub-hosted runners have no game files, so they cannot build
+# report.json themselves. tools/progress_bot.py builds and verifies main, uploads
+# build/GV4E69/report.json to the `progress-report` release, then pushes its
+# "docs: update progress card" commit. This job runs for that commit only and
+# re-publishes the file as the GV4E69_report artifact decomp.dev reads.
+# Added with the owner's approval (docs/DECISIONS.md, 2026-10-13). It verifies
+# nothing and is separate from build.yml, which stays as protected.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    if: startsWith(github.event.head_commit.message, 'docs: update progress card')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the bot's report
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download progress-report --repo "$GITHUB_REPOSITORY" --pattern report.json --dir report
+
+      - name: Upload for decomp.dev
+        uses: actions/upload-artifact@v4
+        with:
+          name: GV4E69_report
+          path: report/report.json

@@ -17,7 +17,11 @@ minutes while the owner is logged in (pythonw, no window). Each run:
      --baseline-ref <that origin/main>` on the commit (the project's rule
      before every push) and pushes it to main. Never forced: if
      main moved meanwhile the push is rejected and the next run starts over
-     from the new main.
+     from the new main;
+  5. just before that push, uploads the verified build's report.json to the
+     `progress-report` GitHub release. GitHub's runners have no game files and
+     cannot build it; .github/workflows/decomp-dev.yml picks it up when the
+     card commit lands and hands it to decomp.dev as the GV4E69_report artifact.
 
 A failed build or verify is logged and retried after 10 minutes, or sooner if main changes.
 Log: build/_progress/bot.log.
@@ -52,6 +56,7 @@ LOG = BOT_DIR / "bot.log"
 LOCK = BOT_DIR / "lock"
 DISC_IMAGES = {".iso", ".ciso", ".rvz", ".gcm", ".wbfs", ".wia", ".gcz", ".nfs", ".tgc"}
 COMMIT_SUBJECT = "docs: update progress card"
+REPORT_RELEASE = "progress-report"  # read by .github/workflows/decomp-dev.yml
 RETRY_FAILED_AFTER = 10 * 60  # seconds before a failed build of the same commit is tried again
 
 # Sign git in with the gh CLI's token for fetch/push, without changing any config.
@@ -130,6 +135,23 @@ def prepare_worktree(target: str) -> None:
         shutil.copyfile(elf, dst / "mvp.elf")
 
 
+def publish_report(built: str) -> None:
+    """Upload WT's verified report.json for decomp.dev (see step 5 above)."""
+    report = WT / "build" / VERSION / "report.json"
+    if not report.is_file():
+        raise BotError(f"{report} is missing")
+    url = git(ROOT, "remote", "get-url", "origin")
+    repo = url.removesuffix(".git").split("github.com")[-1].lstrip("/:")
+    if run(["gh", "release", "view", REPORT_RELEASE, "--repo", repo], WT, check=False).returncode:
+        run(["gh", "release", "create", REPORT_RELEASE, "--repo", repo, "--prerelease", "--latest=false",
+             "--title", "Progress report (automated)",
+             "--notes", "report.json from the latest verified build, uploaded by tools/progress_bot.py "
+                        "for decomp.dev. Names and match percentages only; no game data."], WT)
+    run(["gh", "release", "upload", REPORT_RELEASE, str(report), "--repo", repo, "--clobber"], WT)
+    run(["gh", "release", "edit", REPORT_RELEASE, "--repo", repo,
+         "--title", f"Progress report (automated, build of {built[:10]})"], WT)
+
+
 def bot(force: bool, push: bool, ref: str) -> None:
     git(ROOT, *GIT_AUTH, "fetch", "--quiet", "origin", "main")
     target = git(ROOT, "rev-parse", ref)
@@ -177,6 +199,11 @@ def bot(force: bool, push: bool, ref: str) -> None:
     if not push:
         log(f"--no-push: verified commit {head[:10]} left in {WT}")
         return
+    try:
+        publish_report(target)
+    except BotError as e:
+        # The card is still worth pushing; decomp.dev catches up on the next one.
+        log(f"report upload FAILED: {e}")
     # main moves every few minutes while agents merge, and a build takes longer than that.
     # The verified commit only touches docs/progress/, so when the push is rejected, replay it
     # onto the new main and push again instead of waiting a whole build for the next try.
