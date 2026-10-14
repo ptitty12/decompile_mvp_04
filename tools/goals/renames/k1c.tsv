@@ -1,0 +1,11 @@
+# K1c (docs/ROADMAP.md K1): the two SDK boot functions K1b held back. old<TAB>new<TAB>evidence
+# mitsevox: mitsevox/mvp2005 (CC0, f1e1763b), a matching decomp of this DOL, names this address.
+# dtk-signature: dtk has a built-in signature for the name (its split then names callees and data).
+# re4: the name is in the RE4 decomp's dolsdk2004 symbols, with the same size. comment: our source named it in a comment.
+# refnames: EA GameCube builds whose symbols name the same code (config/GV4E69/refnames, unique masked fingerprint).
+#   OSInit: ge, hp, moh4, nfsmw, sims2. DVDInit: hp, moh4, nfsmw, sims2.
+# Apply: python tools/goals/rename_symbols.py --from-dtk tools/goals/renames/k1c.tsv
+# Held (docs/DECISIONS.md, 2026-10-14 K1c entry): the dtk cascade needs .sbss data splits that make
+# dtk's link order cyclic, four linker-defined symbols, and dvd.c's .data for stateBusy's jump table.
+fn_8043188C	OSInit	mitsevox+dtk-signature+re4+refnames+comment
+fn_80422FD8	DVDInit	mitsevox+dtk-signature+re4+refnames+comment
