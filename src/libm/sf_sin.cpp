@@ -3,5 +3,5 @@
  * and keeps tables in small data, which is what SN's libm has. */
 /* Game code still refers to this function by its placeholder name; the rename to sinf waits for
  * a project-wide pass over those sources. */
-#define sinf fn_8041171C
+#define sinf sinf
 #include "fdlibm/sf_sin.c"

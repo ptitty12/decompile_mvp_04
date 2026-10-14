@@ -62,7 +62,7 @@ extern "C" void fn_80377488(void* p);
 int fn_8000446C(int a, int b);
 extern "C" int fn_804017B0(int a, int b);
 extern "C" int fn_80401904(int a);
-extern "C" void fn_80433004(void* p, int n);
+extern "C" void DCStoreRange(void* p, int n);
 extern "C" int fn_803EBFF8(void* p);
 extern "C" int fn_803EC3D4(void* p);
 void fn_8040B61C(void* dst, int src);
@@ -533,7 +533,7 @@ void fn_802BA110(void* a, Unk802BA110_Src* b)
     fn_804017B0(b->m0, (int)buf);
     fn_802B9FF0(a, (Unk802B9FF0_Hdr*)buf);
     delete[] (char*)buf;
-    fn_80433004(a, 0x19260);
+    DCStoreRange(a, 0x19260);
 }
 
 void fn_802BA194(Unk802B9F40* p, Unk802B9FF0_Hdr* h)

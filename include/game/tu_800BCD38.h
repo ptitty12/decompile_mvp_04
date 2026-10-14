@@ -549,7 +549,7 @@ void* fn_802B0850(void* obj, const char* name, void* out);
 Unk800D244C_Vec4 fn_802B0ACC(void* obj, const char* name);
 }
 int fn_800E1990(int id);
-extern "C" double fn_80410634(double x);
+extern "C" double floor(double x);
 
 /* Two-button list selector: count m40, selected index m44, step widgets m48/m4C (fn_800D0F18 family). */
 struct Unk800D0F18_Obj : Unk800C7B40_Widget {

@@ -24,7 +24,7 @@
  * fn_804269A8 DVDLowAudioStream, fn_80426A40 DVDLowRequestAudioStatus, fn_80426ACC DVDLowAudioBufferConfig,
  * fn_80426B68 DVDLowReset, fn_80426C24 DVDLowBreak, fn_80426C38 DVDLowClearCallback,
  * fn_80426C54 __DVDLowSetWAType, fn_80426C98 __DVDLowTestAlarm.
- * Other placeholder callees: fn_80432224 OSCreateAlarm, fn_80432484 OSSetAlarm, fn_80432568 OSCancelAlarm,
+ * Other placeholder callees: fn_80432224 OSCreateAlarm, fn_80432484 OSSetAlarm, OSCancelAlarm OSCancelAlarm,
  * fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext, fn_80435350 __OSMaskInterrupts,
  * fn_80425508 (DVD drive-status flag accessor), fn_804321CC OSInitAlarm. */
 
@@ -73,7 +73,7 @@ extern volatile s32 lbl_806EF71C;               /* NextCommandNumber */
 
 void fn_80432224(OSAlarm* alarm);
 void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
-void fn_80432568(OSAlarm* alarm);
+void OSCancelAlarm(OSAlarm* alarm);
 void fn_80433814(OSContext* context);
 void fn_8043364C(OSContext* context);
 void fn_80435350(u32 mask);
@@ -144,7 +144,7 @@ void fn_80425E94(__OSInterrupt interrupt, OSContext* context) {
     }
     if (cause != 0) {
         lbl_806EF6F0 = 0;
-        fn_80432568(&bss->alarmForTimeout);
+        OSCancelAlarm(&bss->alarmForTimeout);
     }
     __DIRegs[0] = intr | mask;
     if (lbl_806EF6F0 != 0 && (__OSGetSystemTime() - lbl_806EF6E8) < OSMillisecondsToTicks(200)) {

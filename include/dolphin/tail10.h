@@ -21,7 +21,7 @@ void fn_8041A5BC(u32 hid0);       /* PPCMthid0 */
 u32 fn_8041A5C4(void);            /* PPCMfl2cr */
 void fn_8041A5CC(u32 l2cr);       /* PPCMtl2cr */
 void fn_8041A5D4(u32 dec);        /* PPCMtdec */
-void fn_8041A5DC(void);           /* PPCSync */
+void PPCSync(void);
 void fn_8041A5E4(void);           /* PPCHalt */
 void fn_8041A5F8(u32 v);          /* PPCMtmmcr0 */
 void fn_8041A600(u32 v);          /* PPCMtmmcr1 */

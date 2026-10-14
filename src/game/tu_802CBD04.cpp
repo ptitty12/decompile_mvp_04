@@ -403,16 +403,16 @@ void fn_802CF4B4(Unk802CF4B4_Self* self, Unk8037B3E8* reg)
 }
 
 extern "C" float fn_80323848(int p);
-extern "C" double fn_80410634(double x);
-extern "C" float fn_8041171C(float x);
+extern "C" double floor(double x);
+extern "C" float sinf(float x);
 extern "C" int rand();
 
 float fn_802CF5CC(int a, int b, float x, float y, float z)
 {
     Unk802CC580_T* t = fn_801A04A8(((Unk802CBD04*)a)->mD8, b);
     float ph = (t->m44 != 0 || t->m48 == 0) ? t->m4C : fn_80323848(t->m48);
-    float w = ph - (float)fn_80410634(ph * 0.15915494f) * 6.2831855f;
-    float s = x * fn_8041171C(y * w);
+    float w = ph - (float)floor(ph * 0.15915494f) * 6.2831855f;
+    float s = x * sinf(y * w);
     float lo = -1.0f;
     float r = (float)(rand() % 10000) * 0.0001f;
     float hi = 1.0f;

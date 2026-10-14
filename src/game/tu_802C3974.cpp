@@ -46,7 +46,7 @@ int fn_802B9954(int a, int b, int c);
 int fn_802B98AC(int a, int b);
 extern "C" int fn_803EE310(int a);
 extern "C" void fn_803FFA60(int dst, int src, int n);
-extern "C" void fn_80433004(int p, int n);
+extern "C" void DCStoreRange(int p, int n);
 extern "C" void fn_803EDA0C(int p);
 extern const char lbl_805DFC34[];
 extern const char lbl_805E144C[];
@@ -1024,7 +1024,7 @@ void fn_802C5A08(int, Unk802C58E0_Slot* o, Unk802C59D0_Req* req)
     fn_802C59D0(buf, req);
     int h = fn_802B98AC((int)buf, 0x500);
     fn_803FFA60(o->m4, h, fn_803EE310(h));
-    fn_80433004(o->m4, 0x4070);
+    DCStoreRange(o->m4, 0x4070);
     fn_803EDA0C(h);
     o->m0 = fn_803EBD14(o->m4, lbl_805E15E0);
 }
@@ -1208,7 +1208,7 @@ void fn_802C6BA4(Unk802C6BA4_Tex* tex, int fmt)
                 *fn_803EC1C0(tex, x, y, 0) = v;
             }
         }
-        fn_80433004((int)tex, fn_803EC6F8(tex));
+        DCStoreRange((int)tex, fn_803EC6F8(tex));
         break;
     }
     case 0xF:
@@ -1278,7 +1278,7 @@ void fn_802C7138(unsigned a, unsigned b, unsigned c, int h, int x0, int y0, int 
             for (int x = 0; x < w; x++)
                 *(int*)fn_803EC1C0((void*)h, x + x0, y + y0, 0) = v;
         }
-        fn_80433004(h, fn_803EC6F8((void*)h));
+        DCStoreRange(h, fn_803EC6F8((void*)h));
         break;
     }
 }

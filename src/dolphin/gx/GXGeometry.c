@@ -1,7 +1,7 @@
 /* Imported from emoose/re4 @ feb6805b (src/lib/GXGeometry.c), based on doldecomp/dolsdk2004. Nintendo Dolphin SDK 2004 Patch 1, gx library; names are Nintendo's. */
 /* The game code still calls this by its placeholder name; the placeholder keeps symbols.txt and the
  * callers consistent until a project-wide rename. */
-#define GXBegin fn_8042C8B0
+#define GXBegin GXBegin
 #include <stddef.h>
 #include <dolphin/gx.h>
 #include <dolphin/os.h>

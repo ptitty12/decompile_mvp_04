@@ -324,15 +324,15 @@ struct Unk8023F29C_O {
 };
 
 extern "C" float fn_80382BB8(void* p);
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 
 inline Unk8023ECD4_V Direction(float angle)
 {
     Unk8023ECD4_V r;
-    r.m0 = fn_8041171C(angle);
+    r.m0 = sinf(angle);
     r.m4 = 0.0f;
-    r.m8 = fn_80411554(angle);
+    r.m8 = cosf(angle);
     return r;
 }
 

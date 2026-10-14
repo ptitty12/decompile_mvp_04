@@ -11,15 +11,15 @@ void GXInvalidateTexAll(void);
 void VISetPostRetraceCallback(int cb);
 void fn_803DB4CC(void);
 void fn_8043000C(int a);
-void fn_8042C464(void);
+void GXDrawDone(void);
 void fn_80432FA8(void);
-void fn_8042A8A0(int a);
-void fn_8042A9A8(void);
-void fn_8042A588(int a);
-void fn_8042A614(void);
-void fn_8042C020(void);
-int fn_8042A890(void);
-void fn_8042A4AC(int h, int* a, int* b);
+void GXRedirectWriteGatherPipe(int a);
+void GXRestoreWriteGatherPipe(void);
+void GXEnableBreakPt(int a);
+void GXDisableBreakPt(void);
+void GXFlush(void);
+int GXGetCPUFifo(void);
+void GXGetFifoPtrs(int h, int* a, int* b);
 int OSDisableInterrupts(void);
 void OSRestoreInterrupts(int level);
 }
@@ -118,7 +118,7 @@ void fn_803DD73C(void* o, int c);
 void* fn_803DD7C0(void* o);
 void fn_803EDA0C(void* o);
 void* fn_803D9A24(struct Unk803D8234Sub* sub, void* owner);
-void fn_804310E0(int* a, int* b, int* c, int* d, int* e, int* f);
+void GXReadPixMetric(int* a, int* b, int* c, int* d, int* e, int* f);
 void fn_803D9664(void);
 int fn_803D96FC(Unk803D8234Rec* a, Unk803D8234Rec* b);
 void fn_803D9774(Unk803D8234Rec* r, int a, int b);
@@ -133,7 +133,7 @@ void fn_803D9ECC(void* o, int a, int b, int c, int d);
 void fn_803D8828(void);
 void fn_8042FED0(int a, int b, int c);
 void fn_8042FE78(int a);
-void fn_8042C3B0(int a);
+void GXSetDrawSync(int a);
 int OSReceiveMessage(void* q, void* msg, int flags);
 void GXCopyDisp(int dest, int clear);
 }
@@ -265,14 +265,14 @@ void GXSetNumTevStages(int n);
 void fn_803DB9C0(int a, int b);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void GXSetCullMode(int m);
-void fn_80431564(float* m, float t, float b, float l, float r, float n, float f);
-void fn_80430194(float* m, int type);
+void C_MTXOrtho(float* m, float t, float b, float l, float r, float n, float f);
+void GXSetProjection(float* m, int type);
 void fn_80430364(int idx);
 void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
 void fn_8042FE24(int a, int b, int c, int d);
 void GXSetAlphaCompare(int a, int b, int c, int d, int e);
 void fn_8042FF04(int a);
-void fn_8042C8B0(int a, int b, int c);
+void GXBegin(int a, int b, int c);
 }
 
 /* near-miss (96.9%): fullscreen alpha quad (unsigned conversion of the fade value, ortho setup, four GX vertices).
@@ -303,15 +303,15 @@ extern "C" void fn_803D83BC(Unk803D83BCObj* self)
         fn_803DBF78(5, 0xB, 1, 5, 0);
         fn_803DBF78(5, 0xD, 1, 4, 0);
         GXSetCullMode(0);
-        fn_80431564(m2, 0.0f, self->m20, 0.0f, self->m1C, 0.0f, -1.0f);
-        fn_80430194(m2, 1);
+        C_MTXOrtho(m2, 0.0f, self->m20, 0.0f, self->m1C, 0.0f, -1.0f);
+        GXSetProjection(m2, 1);
         fn_80430364(0x3C);
         fn_8042DC80(4, 0, 0, 1, 0, 2, 2);
         fn_8042FE24(1, 4, 5, 3);
         GXSetAlphaCompare(7, 0, 1, 7, 0);
         fn_8042FF04(0);
         fn_8042FED0(0, 7, 0);
-        fn_8042C8B0(0x80, 5, 4);
+        GXBegin(0x80, 5, 4);
         GXWGFifo.f32 = 0.0f;
         GXWGFifo.f32 = 0.0f;
         GXWGFifo.f32 = 0.0f;
@@ -403,10 +403,10 @@ extern "C" void fn_803D8640(Unk803D8640Dev* self)
     OSReceiveMessage(lbl_80627390, &msg, 1);
     lbl_806272D4 = 0;
     lbl_80627304 = 1;
-    fn_8042C3B0(0x8000);
+    GXSetDrawSync(0x8000);
     fn_803D95FC(0, (int)fn_803D8828);
     GXCopyDisp(self->mB8, lbl_80627308);
-    fn_8042C020();
+    GXFlush();
     lbl_8062731C ^= 1;
     Unk803D8640Ring* r = (Unk803D8640Ring*)fn_803D98AC();
     int used = r->m4 - r->m0;
@@ -507,7 +507,7 @@ extern "C" void fn_803D9454(unsigned short x)
             int e;
             int f;
             int idx = x & 0xFFF;
-            fn_804310E0(&a, &b, &c, &d, &e, &f);
+            GXReadPixMetric(&a, &b, &c, &d, &e, &f);
             lbl_806E9938[idx] = (unsigned short)d + (unsigned short)b;
             lbl_806EB938[idx] = (unsigned short)c + (unsigned short)a;
             lbl_806ED938[idx] = 1;
@@ -549,10 +549,10 @@ extern "C" int fn_803D96FC(Unk803D8234Rec* a, Unk803D8234Rec* b)
         return 0;
     int v = b->m0;
     if (v != 0) {
-        fn_8042A588(v);
+        GXEnableBreakPt(v);
         lbl_80627350 = 1;
     } else {
-        fn_8042A614();
+        GXDisableBreakPt();
         lbl_80627350 = v;
     }
     a->m0 = 0;
@@ -563,8 +563,8 @@ extern "C" void fn_803D9774(Unk803D8234Rec* r, int a, int b)
 {
     int x;
     int y;
-    fn_8042C020();
-    fn_8042A4AC(fn_8042A890(), &x, &y);
+    GXFlush();
+    GXGetFifoPtrs(GXGetCPUFifo(), &x, &y);
     while (r->m0 != 0)
         ;
     r->m4 = a;
@@ -573,7 +573,7 @@ extern "C" void fn_803D9774(Unk803D8234Rec* r, int a, int b)
     r->m0 = y;
     if (lbl_80627350 == 0) {
         lbl_80627350 = 1;
-        fn_8042A588(y);
+        GXEnableBreakPt(y);
     }
     OSRestoreInterrupts(ints);
 }
@@ -617,7 +617,7 @@ extern "C" int fn_803D986C(Unk803D8234Dev* self, int* out)
 
 extern "C" void fn_803D987C()
 {
-    fn_8042C464();
+    GXDrawDone();
     lbl_806279B8 += 5;
 }
 
@@ -632,7 +632,7 @@ extern "C" void fn_803D98C8(int x)
     if (lbl_80627320)
         fn_803D999C();
     lbl_80627320 = 1;
-    fn_8042A8A0(x);
+    GXRedirectWriteGatherPipe(x);
 }
 
 extern "C" void fn_803D9918(const double* p, unsigned n)
@@ -668,7 +668,7 @@ extern "C" void fn_803D9918(const double* p, unsigned n)
 
 extern "C" void fn_803D999C()
 {
-    fn_8042A9A8();
+    GXRestoreWriteGatherPipe();
     lbl_80627320 = 0;
 }
 

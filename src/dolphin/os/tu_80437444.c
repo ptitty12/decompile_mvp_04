@@ -2,7 +2,7 @@
  * Dolphin SDK OS (OSThread, MWCC GC/1.2.5n, cflags_dolphin_sdk),
  * .text 0x80437444-0x80438628 (code-only unit). OSTime.c (0x80438628-0x80438778) is its own unit, dolphin/os/OSTime.c.
  * Every data object is extern by its lbl_ name.
- * OSThread.c is done (fn_80437444..fn_8043857C).
+ * OSThread.c is done (OSGetCurrentThread..fn_8043857C).
  *
  * Statics: RunQueue/IdleThread/DefaultThread/IdleContext are real .bss statics here (the compiler addresses
  * them off one shared base, which an extern cannot reproduce); RunQueueBits/RunQueueHint/Reschedule are volatile.
@@ -88,8 +88,8 @@ extern void* lbl_806DF090[17];         /* __OSErrorTable */
         lbl_806EF864 = TRUE;                                            \
     } while (0)
 
-OSThread* fn_80437444(void);
-BOOL fn_80437450(OSThread* thread);
+OSThread* OSGetCurrentThread(void);
+BOOL OSIsThreadTerminated(OSThread* thread);
 s32 fn_80437484(void);
 s32 fn_804374C4(void);
 static void fn_80437504(OSThread* thread);
@@ -98,25 +98,25 @@ OSThread* fn_804375A8(OSThread* thread, OSPriority priority);
 void fn_80437768(OSThread* thread, OSPriority priority);
 OSThread* fn_804377B8(BOOL yield);
 void fn_804379E0(void);
-void fn_80437A10(void);
-int fn_80437A4C(OSThread* thread, void* (*func)(void*), void* param, void* stack, u32 stackSize, OSPriority priority, u16 attr);
+void OSYieldThread(void);
+int OSCreateThread(OSThread* thread, void* (*func)(void*), void* param, void* stack, u32 stackSize, OSPriority priority, u16 attr);
 void fn_80437C34(void* val);
 void fn_80437D18(OSThread* thread);
-s32 fn_80437ED4(OSThread* thread);
+s32 OSResumeThread(OSThread* thread);
 s32 fn_8043815C(OSThread* thread);
 void fn_804382CC(OSThreadQueue* queue);
-void fn_804383B8(OSThreadQueue* queue);
-int fn_804384BC(OSThread* thread, OSPriority priority);
+void OSWakeupThread(OSThreadQueue* queue);
+int OSSetThreadPriority(OSThread* thread, OSPriority priority);
 void fn_8043857C(u8 val);
 
 /* OSGetCurrentThread */
-OSThread* fn_80437444(void)
+OSThread* OSGetCurrentThread(void)
 {
     return *(OSThread**)0x800000E4;
 }
 
 /* OSIsThreadTerminated */
-BOOL fn_80437450(OSThread* thread)
+BOOL OSIsThreadTerminated(OSThread* thread)
 {
     return (thread->state == OS_THREAD_STATE_MORIBUND || thread->state == 0) ? TRUE : FALSE;
 }
@@ -244,7 +244,7 @@ OSThread* fn_804377B8(BOOL yield)
         return NULL;
     }
     currentContext = fn_804336A8();
-    currentThread = fn_80437444();
+    currentThread = OSGetCurrentThread();
     if (currentContext != &currentThread->context) {
         return NULL;
     }
@@ -264,7 +264,7 @@ OSThread* fn_804377B8(BOOL yield)
         }
     }
     if (lbl_806EF860 == 0) {
-        lbl_806EF2F8(fn_80437444(), NULL);
+        lbl_806EF2F8(OSGetCurrentThread(), NULL);
         __OSCurrentThread = NULL;
         fn_8043364C(&IdleContext);
         do {
@@ -284,7 +284,7 @@ OSThread* fn_804377B8(BOOL yield)
     }
     nextThread->queue = NULL;
     nextThread->state = OS_THREAD_STATE_RUNNING;
-    lbl_806EF2F8(fn_80437444(), nextThread);
+    lbl_806EF2F8(OSGetCurrentThread(), nextThread);
     __OSCurrentThread = nextThread;
     fn_8043364C(&nextThread->context);
     fn_80433734(&nextThread->context);
@@ -300,7 +300,7 @@ void fn_804379E0(void)
 }
 
 /* OSYieldThread */
-void fn_80437A10(void)
+void OSYieldThread(void)
 {
     BOOL enabled;
 
@@ -310,7 +310,7 @@ void fn_80437A10(void)
 }
 
 /* OSCreateThread */
-int fn_80437A4C(OSThread* thread, void* (*func)(void*), void* param, void* stack, u32 stackSize, OSPriority priority, u16 attr)
+int OSCreateThread(OSThread* thread, void* (*func)(void*), void* param, void* stack, u32 stackSize, OSPriority priority, u16 attr)
 {
     BOOL enabled;
     u32 sp;
@@ -362,7 +362,7 @@ void fn_80437C34(void* val)
     OSThread* currentThread;
 
     enabled = OSDisableInterrupts();
-    currentThread = fn_80437444();
+    currentThread = OSGetCurrentThread();
     fn_80433814(&currentThread->context);
     if (currentThread->attr & OS_THREAD_ATTR_DETACH) {
         RemoveItem(&__OSActiveThreadQueue, currentThread, linkActive);
@@ -372,7 +372,7 @@ void fn_80437C34(void* val)
         currentThread->val = val;
     }
     fn_80435EC4(currentThread);
-    fn_804383B8(&currentThread->queueJoin);
+    OSWakeupThread(&currentThread->queueJoin);
     lbl_806EF864 = TRUE;
     fn_804379E0();
     OSRestoreInterrupts(enabled);
@@ -412,13 +412,13 @@ void fn_80437D18(OSThread* thread)
         thread->state = OS_THREAD_STATE_MORIBUND;
     }
     fn_80435EC4(thread);
-    fn_804383B8(&thread->queueJoin);
+    OSWakeupThread(&thread->queueJoin);
     fn_804379E0();
     OSRestoreInterrupts(enabled);
 }
 
 /* OSResumeThread */
-s32 fn_80437ED4(OSThread* thread)
+s32 OSResumeThread(OSThread* thread)
 {
     BOOL enabled;
     s32 suspendCount;
@@ -487,7 +487,7 @@ void fn_804382CC(OSThreadQueue* queue)
     OSThread* currentThread;
 
     enabled = OSDisableInterrupts();
-    currentThread = fn_80437444();
+    currentThread = OSGetCurrentThread();
     currentThread->state = OS_THREAD_STATE_WAITING;
     currentThread->queue = queue;
     AddPrio(queue, currentThread, link);
@@ -497,7 +497,7 @@ void fn_804382CC(OSThreadQueue* queue)
 }
 
 /* OSWakeupThread */
-void fn_804383B8(OSThreadQueue* queue)
+void OSWakeupThread(OSThreadQueue* queue)
 {
     BOOL enabled;
     OSThread* thread;
@@ -515,7 +515,7 @@ void fn_804383B8(OSThreadQueue* queue)
 }
 
 /* OSSetThreadPriority */
-int fn_804384BC(OSThread* thread, OSPriority priority)
+int OSSetThreadPriority(OSThread* thread, OSPriority priority)
 {
     BOOL enabled;
 
@@ -541,7 +541,7 @@ void fn_8043857C(u8 val)
 
     pattern = (val << 24) | (val << 16) | (val << 8) | val;
     sp = fn_8043380C();
-    for (p = fn_80437444()->stackEnd + 1; p < (u32*)sp; p++) {
+    for (p = OSGetCurrentThread()->stackEnd + 1; p < (u32*)sp; p++) {
         *p = pattern;
     }
 }

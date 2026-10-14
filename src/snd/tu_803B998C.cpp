@@ -17,9 +17,9 @@ extern int lbl_80626DC0;
 extern unsigned short lbl_80626DC4;
 
 extern "C" {
-void fn_80435CE8(void*);
-void fn_80435D20(void*);
-void fn_80435DFC(void*);
+void OSInitMutex(void*);
+void OSLockMutex(void*);
+void OSUnlockMutex(void*);
 int fn_803B998C(FunctionHandle* h);
 int fn_803B9B1C(ClassHandle* h);
 int fn_803B9CAC(GlobalVariableHandle* h);
@@ -185,7 +185,7 @@ extern "C" int fn_803B9D60(EA::Allocator::IAllocator** pa)
 
 extern "C" int fn_803B9D84()
 {
-    fn_80435CE8(&lbl_806AA8A4);
+    OSInitMutex(&lbl_806AA8A4);
     lbl_806AA89C.head = 0;
     lbl_80626DC0 = 1;
     return 0;
@@ -199,13 +199,13 @@ extern "C" int fn_803B9DC8()
 
 extern "C" int fn_803B9DDC()
 {
-    fn_80435D20(&lbl_806AA8A4);
+    OSLockMutex(&lbl_806AA8A4);
     return 0;
 }
 
 extern "C" int fn_803B9E08()
 {
-    fn_80435DFC(&lbl_806AA8A4);
+    OSUnlockMutex(&lbl_806AA8A4);
     return 0;
 }
 

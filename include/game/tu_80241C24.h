@@ -38,7 +38,7 @@ void fn_80244A60(Player* player, Goal* g);
 extern "C" void fn_80244A64(Player* player, Goal* g, int flag);
 extern "C" void fn_80382BC0(Unk80271DBC_Link* l, float f);
 extern "C" int fn_8037EDFC(Unk80271DBC_Link* l, int a, int b, int c, int d, float f1, float f2);
-extern "C" double fn_80410634(double x);
+extern "C" double floor(double x);
 Goal* fn_8027D2FC(Goal* g, int);
 Goal* fn_8027D31C(Goal* g);
 void fn_8027D150(Goal* g, int a, Unk80279BB8* out, float f, Vec3* b, Unk8027D150_Pair* c, int d);
@@ -57,7 +57,7 @@ inline void SetYaw(Unk80270BA0_X* x, float v)
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 

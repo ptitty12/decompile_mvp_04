@@ -155,7 +155,7 @@ extern "C" void fn_800D24A4(Unk800D2338_Obj* o)
 
 inline float WrapAngle(float t)
 {
-    return t - (float)fn_80410634(t * lbl_805BC96C + lbl_805BC970) * lbl_805BC968;
+    return t - (float)floor(t * lbl_805BC96C + lbl_805BC970) * lbl_805BC968;
 }
 
 /* near-miss: retail recomputes src+0x40 for each string call and keeps only this+0x40 in a saved register */

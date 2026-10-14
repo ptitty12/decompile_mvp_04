@@ -28,15 +28,15 @@ extern u32 lbl_806EF4E4;           /* __AR_ExpansionSize */
 void fn_80433814(OSContext* context);  /* OSClearContext */
 void fn_8043364C(OSContext* context);  /* OSSetCurrentContext */
 void __ARChecksize(void);
-void fn_8041A5DC(void);                /* PPCSync */
+void PPCSync(void);
 void fn_80432FA8(void* addr, u32 len); /* DCInvalidateRange */
 void fn_80432FD4(void* addr, u32 len); /* DCFlushRange */
 
 ARCallback fn_8041583C(ARCallback callback);
 u32 fn_80415880(void);
 void fn_804158BC(u32 type, u32 mainmem_addr, u32 aram_addr, u32 length);
-u32 fn_804159AC(u32* stack_index_addr, u32 num_entries);
-u32 fn_80415A70(void);
+u32 ARInit(u32* stack_index_addr, u32 num_entries);
+u32 ARGetBaseAddress(void);
 void fn_80415A78(__OSInterrupt interrupt, OSContext* context);
 void fn_80415AF0(void);
 u16 fn_80415B10(void);
@@ -83,7 +83,7 @@ void fn_804158BC(u32 type, u32 mainmem_addr, u32 aram_addr, u32 length)
 }
 
 /* ARInit */
-u32 fn_804159AC(u32* stack_index_addr, u32 num_entries)
+u32 ARInit(u32* stack_index_addr, u32 num_entries)
 {
     BOOL old;
     u16 refresh;
@@ -108,7 +108,7 @@ u32 fn_804159AC(u32* stack_index_addr, u32 num_entries)
 }
 
 /* ARGetBaseAddress */
-u32 fn_80415A70(void)
+u32 ARGetBaseAddress(void)
 {
     return 0x4000;
 }
@@ -238,7 +238,7 @@ void __ARChecksize(void) {
 
     fn_80432FA8((void*)save1, 0x20);
     __ARReadDMA((u32)save1, ARAM_size + 0, 0x20);
-    fn_8041A5DC();
+    PPCSync();
 
     __ARWriteDMA((u32)test_data, ARAM_size + 0x0000000, 0x20);
 
@@ -246,24 +246,24 @@ void __ARChecksize(void) {
     fn_80432FD4((void*)buffer, 0x20);
 
     __ARReadDMA((u32)buffer, ARAM_size + 0x0000000, 0x20);
-    fn_8041A5DC();
+    PPCSync();
 
     if (buffer[0] == test_data[0]) {
         fn_80432FA8((void*)save2, 0x20);
         __ARReadDMA((u32)save2, ARAM_size + 0x0200000, 0x20);
-        fn_8041A5DC();
+        PPCSync();
 
         fn_80432FA8((void*)save3, 0x20);
         __ARReadDMA((u32)save3, ARAM_size + 0x1000000, 0x20);
-        fn_8041A5DC();
+        PPCSync();
 
         fn_80432FA8((void*)save4, 0x20);
         __ARReadDMA((u32)save4, ARAM_size + 0x0000200, 0x20);
-        fn_8041A5DC();
+        PPCSync();
 
         fn_80432FA8((void*)save5, 0x20);
         __ARReadDMA((u32)save5, ARAM_size + 0x0400000, 0x20);
-        fn_8041A5DC();
+        PPCSync();
 
         __ARWriteDMA((u32)dummy_data, ARAM_size + 0x0200000, 0x20);
         __ARWriteDMA((u32)test_data, ARAM_size + 0x0000000, 0x20);
@@ -272,7 +272,7 @@ void __ARChecksize(void) {
         fn_80432FD4((void*)buffer, 0x20);
 
         __ARReadDMA((u32)buffer, ARAM_size + 0x0200000, 0x20);
-        fn_8041A5DC();
+        PPCSync();
 
         if (buffer[0] == test_data[0]) {
             __ARWriteDMA((u32)save1, ARAM_size + 0x0000000, 0x20);
@@ -288,7 +288,7 @@ void __ARChecksize(void) {
             fn_80432FD4((void*)buffer, 0x20);
 
             __ARReadDMA((u32)buffer, ARAM_size + 0x1000000, 0x20);
-            fn_8041A5DC();
+            PPCSync();
 
             if (buffer[0] == test_data[0]) {
                 __ARWriteDMA((u32)save1, ARAM_size + 0x0000000, 0x20);
@@ -305,7 +305,7 @@ void __ARChecksize(void) {
                 fn_80432FD4((void*)buffer, 0x20);
 
                 __ARReadDMA((u32)buffer, ARAM_size + 0x0000200, 0x20);
-                fn_8041A5DC();
+                PPCSync();
 
                 if (buffer[0] == test_data[0]) {
                     __ARWriteDMA((u32)save1, ARAM_size + 0x0000000, 0x20);
@@ -324,7 +324,7 @@ void __ARChecksize(void) {
                     fn_80432FD4((void*)buffer, 0x20);
 
                     __ARReadDMA((u32)buffer, ARAM_size + 0x0400000, 0x20);
-                    fn_8041A5DC();
+                    PPCSync();
 
                     if (buffer[0] == test_data[0]) {
                         __ARWriteDMA((u32)save1, ARAM_size + 0x0000000, 0x20);

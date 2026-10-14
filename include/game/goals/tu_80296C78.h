@@ -13,10 +13,10 @@ typedef Unk80273498_Vec3 Vec3;
 extern "C" float fn_80382BB8(Unk80271DBC_Link* l);
 float fn_80382BD8(Unk80271DBC_Link* l, int a);
 extern "C" float fn_804028E4(float x);               /* square root */
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 float fn_80410CE8(float y, float x);
-extern "C" double fn_80410634(double x);                 /* rounds down */
+extern "C" double floor(double x);                 /* rounds down */
 
 struct Unk80296C78_Goal;
 
@@ -167,16 +167,16 @@ inline Vec3 operator*(Vec3 v, float s)
 inline Vec3 Direction(float angle)
 {
     Vec3 r;
-    r.x = fn_8041171C(angle);
+    r.x = sinf(angle);
     r.y = 0.0f;
-    r.z = fn_80411554(angle);
+    r.z = cosf(angle);
     return r;
 }
 
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 

@@ -76,8 +76,8 @@ inline int Unk8019CD04_Cell(Unk8019CD04_O* o, int k, float x)
 extern "C" float fn_8019C41C(float x)
 {
     if (x > 0.0f)
-        return (float)fn_80410634(x);
-    return -(float)fn_80410634(-x);
+        return (float)floor(x);
+    return -(float)floor(-x);
 }
 
 //@8019CCE4

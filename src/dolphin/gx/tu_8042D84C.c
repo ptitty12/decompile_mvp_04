@@ -22,10 +22,10 @@ typedef struct LightObjInt {
     f32 ldir[3];
 } LightObjInt;
 
-f32 fn_80411554(f32 x); /* cosf */
+f32 cosf(f32 x);
 
 void fn_8042D84C(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func);
-void fn_8042D9DC(GXLightObj* lt_obj, f32 x, f32 y, f32 z);
+void GXInitLightPos(GXLightObj* lt_obj, f32 x, f32 y, f32 z);
 void fn_8042D9EC(GXLightObj* lt_obj, GXColor* color);
 void fn_8042DA74(GXChannelID chan, GXColor amb_color);
 void fn_8042DB5C(GXChannelID chan, GXColor mat_color);
@@ -42,7 +42,7 @@ void fn_8042D84C(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
     if (cutoff <= 0.0f || cutoff > 90.0f) {
         spot_func = GX_SP_OFF;
     }
-    cr = fn_80411554((3.1415927f * cutoff) / 180.0f);
+    cr = cosf((3.1415927f * cutoff) / 180.0f);
     switch (spot_func) {
     case GX_SP_FLAT:
         a0 = -1000.0f * cr;
@@ -91,7 +91,7 @@ void fn_8042D84C(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
     obj->a[2] = a2;
 }
 
-void fn_8042D9DC(GXLightObj* lt_obj, f32 x, f32 y, f32 z) {
+void GXInitLightPos(GXLightObj* lt_obj, f32 x, f32 y, f32 z) {
     LightObjInt* obj = (LightObjInt*)lt_obj;
 
     obj->lpos[0] = x;

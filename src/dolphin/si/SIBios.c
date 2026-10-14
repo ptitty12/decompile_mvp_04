@@ -3,7 +3,7 @@
 #include <dolphin/vi.h>
 
 
-extern void fn_80432568(OSAlarm*);
+extern void OSCancelAlarm(OSAlarm*);
 extern void fn_80432484(OSAlarm*, OSTime, OSAlarmHandler);
 extern void fn_80437080(s32, u16);
 extern u16 fn_80436FFC(s32);
@@ -124,7 +124,7 @@ static inline void SITransferNext(s32 chan) {
         if (packet->chan != -1) {
             if (packet->fire <= __OSGetSystemTime()) {
                 if (__SITransfer(packet->chan, packet->output, packet->outputBytes, packet->input, packet->inputBytes, packet->callback) != 0) {
-                    fn_80432568(&Alarm[chan]);
+                    OSCancelAlarm(&Alarm[chan]);
                     packet->chan = -1;
                 }
                 return;

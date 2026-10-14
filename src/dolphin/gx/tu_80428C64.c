@@ -21,11 +21,11 @@ OSTime fn_80438628(void);
 /* GXInit.c part (0x80428C64..): fn_80428C64 __GXDefaultTexRegionCallback, fn_80428D60
  * __GXDefaultTlutRegionCallback, fn_80428D84 __GXShutdown. Placeholder callees: fn_8042A544
  * GXSetBreakPtCallback, fn_8042C62C GXSetDrawSyncCallback, fn_8042C6F8 GXSetDrawDoneCallback,
- * fn_8041A5DC PPCSync, fn_8042C07C __GXAbort. */
+ * PPCSync PPCSync, fn_8042C07C __GXAbort. */
 void fn_8042A544(void* cb);
 void fn_8042C62C(void* cb);
 void fn_8042C6F8(void* cb);
-void fn_8041A5DC(void);
+void PPCSync(void);
 void fn_8042C07C(void);
 
 GXTexRegion* fn_80428C64(const GXTexObj* t_obj, GXTexMapID id) {
@@ -101,7 +101,7 @@ int fn_80428D84(BOOL final) {
         GX_WRITE_U32(0);
         GX_WRITE_U32(0);
 
-        fn_8041A5DC();
+        PPCSync();
 
         reg = 0;
         GX_SET_CP_REG(1, reg);

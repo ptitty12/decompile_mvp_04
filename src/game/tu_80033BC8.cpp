@@ -174,7 +174,7 @@ extern "C" void fn_80034144(Unk80033BCC* self, int i, Unk8002D15C_Msg* msg)
         float len;
         Unk8002D15C_Vec3 v = fn_80196E3C(c->m448, d);
         len = fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8) * 0.05681818f;
-        int n = (int)(float)fn_80410634(len) + 0xC;
+        int n = (int)(float)floor(len) + 0xC;
         fn_80021EB4(self, self->m80[i], r, 2, n);
     }
 }
@@ -354,7 +354,7 @@ extern "C" void fn_80034854(Unk80034488* self, int i, Unk8002D15C_Msg* msg)
         float len;
         Unk8002D15C_Vec3 v = fn_80196E3C(c->m448, d);
         len = fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8) * 0.05681818f;
-        int n = (int)(float)fn_80410634(len) + 0xC;
+        int n = (int)(float)floor(len) + 0xC;
         fn_80021EB4(self, self->m80[i], r, 2, n);
     }
 }

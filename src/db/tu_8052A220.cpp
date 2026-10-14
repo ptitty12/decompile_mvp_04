@@ -32,7 +32,7 @@ extern "C" int fn_8052BE28(Unk8052B978_Tbl* self, int a, int b, int c, int d, in
 extern "C" void fn_8052BA70(Unk8052B978_Tbl* self);
 extern "C" void fn_8052B644(Unk8052B5C4_Ent* self, int a, Unk80070DDC_Stream* io);
 extern "C" void fn_803792AC(char** p, int* n);
-extern "C" double fn_80410634(double x);
+extern "C" double floor(double x);
 extern "C" int fn_8052A35C(Unk8052A220_PalData* self, float a, float b);
 extern "C" float fn_8052A3C0(Unk8052A220_PalData* self, float a, int b);
 extern "C" void fn_8052A220(Unk8052A220_PalData* p);
@@ -136,7 +136,7 @@ extern "C" DB_OVERLAY void fn_8052A220(Unk8052A220_PalData* p)
 extern "C" DB_OVERLAY int fn_8052A35C(Unk8052A220_PalData* self, float a, float b)
 {
     float t = (a - b) * lbl_805FDC44;
-    return (int)(float)fn_80410634(t + lbl_805FDC48);
+    return (int)(float)floor(t + lbl_805FDC48);
 }
 
 extern "C" DB_OVERLAY float fn_8052A3C0(Unk8052A220_PalData* self, float a, int b)

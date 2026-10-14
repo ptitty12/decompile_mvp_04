@@ -13,8 +13,8 @@ void GXSetVtxDescv(void* list);
 void GXGetCullMode(int* mode);
 void GXSetCullMode(int mode);
 void fn_8042B460(void);
-void fn_8042AB48(int attr, int type);
-void fn_8042C8B0(int a, int b, int c);
+void GXSetVtxDesc(int attr, int type);
+void GXBegin(int a, int b, int c);
 void fn_8042FED0(int a, int b, int c);
 void fn_8042FE78(int a);
 }
@@ -115,49 +115,49 @@ extern "C" void fn_803DB9C0(int flags, int mode)
     if (mode != -1) {
         fn_8042B460();
         if (flags & 0x1)
-            fn_8042AB48(0, 1);
+            GXSetVtxDesc(0, 1);
         if (flags & 0x2)
-            fn_8042AB48(1, 1);
+            GXSetVtxDesc(1, 1);
         if (flags & 0x4)
-            fn_8042AB48(2, 1);
+            GXSetVtxDesc(2, 1);
         if (flags & 0x8)
-            fn_8042AB48(3, 1);
+            GXSetVtxDesc(3, 1);
         if (flags & 0x10)
-            fn_8042AB48(4, 1);
+            GXSetVtxDesc(4, 1);
         if (flags & 0x20)
-            fn_8042AB48(5, 1);
+            GXSetVtxDesc(5, 1);
         if (flags & 0x40)
-            fn_8042AB48(6, 1);
+            GXSetVtxDesc(6, 1);
         if (flags & 0x80)
-            fn_8042AB48(7, 1);
+            GXSetVtxDesc(7, 1);
         if (flags & 0x100)
-            fn_8042AB48(8, 1);
+            GXSetVtxDesc(8, 1);
         if (flags & 0x200)
-            fn_8042AB48(9, mode);
+            GXSetVtxDesc(9, mode);
         if (flags & 0x400)
-            fn_8042AB48(10, mode);
+            GXSetVtxDesc(10, mode);
         if (flags & 0x800)
-            fn_8042AB48(25, mode);
+            GXSetVtxDesc(25, mode);
         if (flags & 0x1000)
-            fn_8042AB48(11, mode);
+            GXSetVtxDesc(11, mode);
         if (flags & 0x2000)
-            fn_8042AB48(12, mode);
+            GXSetVtxDesc(12, mode);
         if (flags & 0x4000)
-            fn_8042AB48(13, mode);
+            GXSetVtxDesc(13, mode);
         if (flags & 0x8000)
-            fn_8042AB48(14, mode);
+            GXSetVtxDesc(14, mode);
         if (flags & 0x10000)
-            fn_8042AB48(15, mode);
+            GXSetVtxDesc(15, mode);
         if (flags & 0x20000)
-            fn_8042AB48(16, mode);
+            GXSetVtxDesc(16, mode);
         if (flags & 0x40000)
-            fn_8042AB48(17, mode);
+            GXSetVtxDesc(17, mode);
         if (flags & 0x80000)
-            fn_8042AB48(18, mode);
+            GXSetVtxDesc(18, mode);
         if (flags & 0x100000)
-            fn_8042AB48(19, mode);
+            GXSetVtxDesc(19, mode);
         if (flags & 0x200000)
-            fn_8042AB48(20, mode);
+            GXSetVtxDesc(20, mode);
     }
     lbl_80627A8C = flags;
     lbl_80627A90 = mode;
@@ -177,7 +177,7 @@ extern "C" void fn_803DBBE0(float* m)
     int cull;
     GXGetCullMode(&cull);
     GXSetCullMode(3);
-    fn_8042C8B0(0x90, 5, 3);
+    GXBegin(0x90, 5, 3);
     WriteVec3I(m, 0);
     WriteVec3I(m, 3);
     WriteVec3I(m, 6);

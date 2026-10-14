@@ -232,9 +232,9 @@ int sprintf(char* buf, const char* fmt, ...);
 void fn_8014F4B4(int a, char* s);
 void fn_8014F738(int a);
 void OSReport(const char* msg, ...);
-void fn_80422EE4(void* blk, void* buf, int len, int off, void* cb, int prio);
+void DVDReadAsyncPrio(void* blk, void* buf, int len, int off, void* cb, int prio);
 int fn_80425064(void* blk);
-void fn_80437A10();
+void OSYieldThread();
 void* fn_803774A8(unsigned n, int heap);
 int fn_80072E90(void* g, void* a, int b, int c, int d, void* out);
 void fn_800A59F0(void* p);
@@ -247,8 +247,8 @@ void fn_80148438(void*);
 int fn_8014E6E0(void* self, char* buf, int n);
 void fn_8040B320(char*, int, int, ...);
 int fn_8040B574(const char* a, const char* b);
-void fn_80422C3C(void* p);
-int fn_80422B74(const char* a, void* p);
+void DVDClose(void* p);
+int DVDOpen(const char* a, void* p);
 int fn_803FEC74(int buf, int pos, const char* s, int len, int n);
 unsigned int strlen(const char* s);
 void fn_8014BEA4();
@@ -828,13 +828,13 @@ void fn_8014E588(void* sv, const char* a)
 {
     Self8014E588* s = (Self8014E588*)sv;
     if (s->m2014 != 0) {
-        fn_80422C3C(s->m2018);
+        DVDClose(s->m2018);
         s->m2014 = 0;
     }
     s->m2010 = 1;
     s->m2004 = 0;
     s->m200C = 0;
-    int ok = fn_80422B74(a, s->m2018);
+    int ok = DVDOpen(a, s->m2018);
     int t = 1;
     if (ok == 0) {
         t = 0;
@@ -854,10 +854,10 @@ char fn_8014E614(Self8014E588* s)
     if (s->m2010 != 0 || s->m2000 > 0x1FFF) {
         s->m2000 = 0;
         char* blk = s->m2018;
-        fn_80422EE4(blk, s, 0x2000, s->m2004, 0, 2);
+        DVDReadAsyncPrio(blk, s, 0x2000, s->m2004, 0, 2);
         int r;
         while ((r = fn_80425064(blk)) != 0) {
-            fn_80437A10();
+            OSYieldThread();
         }
         s->m2010 = r;
         s->m2004 += 0x2000;

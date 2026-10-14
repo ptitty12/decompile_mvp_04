@@ -83,8 +83,8 @@ struct Unk801CF054_Q4 {
 extern "C" int fn_801C5AE0(Z* z, void* b, int c, int d, int e, int f, int g, float t);
 extern "C" Unk801CF054_Q4 fn_80379C80(const Vec3* a, const Vec3* b, int c);
 extern "C" int fn_801C4128(Z* z);
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 extern "C" float fn_804028E4(float x);
 float fn_802D7E88(int a, int b);
 float fn_802D7E2C(int a, int b);
@@ -137,9 +137,9 @@ extern "C" void fn_801CF054(Z* z, float* a, float* b)
     float y = fn_802D7E2C(k, 0xB3);
     if (!(y <= 1.0f))
         y = 1.0f;
-    y = y * (AbsF(fn_8041171C(x + x)) * (fn_804028E4(2.0f) - 1.0f) + 1.0f);
-    *a = fn_80411554(x) * y;
-    *b = -fn_8041171C(x) * y;
+    y = y * (AbsF(sinf(x + x)) * (fn_804028E4(2.0f) - 1.0f) + 1.0f);
+    *a = cosf(x) * y;
+    *b = -sinf(x) * y;
     *a = !(*a > 1.0f) ? (*a >? -1.0f) : 1.0f;
     *b = !(*b > 1.0f) ? (*b >? -1.0f) : 1.0f;
 }

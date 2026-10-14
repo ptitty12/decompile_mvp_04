@@ -602,7 +602,7 @@ extern int lbl_8061EAB0;
 extern "C" {
 int rand();
 void fn_8014D9C4(void* p);
-float fn_8041171C(float x);
+float sinf(float x);
 void fn_803185A0(void* a, int b, float* c, void* d, int e, Unk802B5F9C_Col f, int g, int h);
 }
 void* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
@@ -635,7 +635,7 @@ void fn_802B5F9C(Unk802B5F9C_Obj* self)
         float cur = fn_801A0744(self->m30);
         self->mC = !(self->m8 < 0.0f) ? cur - self->m8 : 0.0f;
         self->m8 = cur;
-        float a = fn_8041171C(self->m0) * 0.07f + 0.7f;
+        float a = sinf(self->m0) * 0.07f + 0.7f;
         col.r = Unk802B5F9C_Cl(1.0f);
         col.g = Unk802B5F9C_Cl(1.0f);
         col.b = Unk802B5F9C_Cl(1.0f);

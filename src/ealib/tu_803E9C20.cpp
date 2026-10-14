@@ -263,7 +263,7 @@ union PPCWGPipe {
 
 #include "../../include/ealib/gx_fifo.h"
 
-extern "C" void fn_80430124(void* list, int nbytes);
+extern "C" void GXCallDisplayList(void* list, int nbytes);
 
 struct Unk803DBE08Out {
     int m0;
@@ -277,12 +277,12 @@ extern unsigned char* lbl_8062C660;
 
 extern int lbl_8062C664;
 
-extern "C" void fn_80433004(void* p, int n);
+extern "C" void DCStoreRange(void* p, int n);
 
 extern "C" void fn_803DA188(int n);
 
 extern "C" void fn_803DBE08(void* state, Unk803DBE08Out* out);
-extern "C" void fn_8042C8B0(int a,int b,int c);
+extern "C" void GXBegin(int a,int b,int c);
 inline Unk803DBE08Out::Unk803DBE08Out(void* state)
 {
     fn_803DBE08(state, this);
@@ -296,7 +296,7 @@ inline void Unk803DBE08Out::StoreHdr(int per)
 
 inline void Unk803DBE08Out::Begin(int n)
 {
-    fn_8042C8B0(0x90, 0, 0);
+    GXBegin(0x90, 0, 0);
     EALIB_GX_FIFO(PPCWGPipe).u8 = (unsigned char)m0;
     EALIB_GX_FIFO(PPCWGPipe).u16 = n;
 }
@@ -335,7 +335,7 @@ extern "C" void fn_803EA500(Unk803E3C08* a, Unk80623E94* b)
             EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)dl;
             EALIB_GX_FIFO(PPCWGPipe).u32 = dlsz;
         } else {
-            fn_80430124(dl, dlsz);
+            GXCallDisplayList(dl, dlsz);
         }
     } else {
         Unk803DBE08Out v(b->m4);
@@ -358,7 +358,7 @@ extern "C" void fn_803EA500(Unk803E3C08* a, Unk80623E94* b)
                 for (; p < lbl_8062C660 + lbl_8062C664; p++) {
                     *p = 0;
                 }
-                fn_80433004(lbl_8062C660, lbl_8062C664);
+                DCStoreRange(lbl_8062C660, lbl_8062C664);
             }
             int sz = (per * b->m0 + 0x22) / 32 * 32;
             int first = 0;
@@ -368,7 +368,7 @@ extern "C" void fn_803EA500(Unk803E3C08* a, Unk80623E94* b)
                     EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)lbl_8062C660;
                     EALIB_GX_FIFO(PPCWGPipe).u32 = sz;
                 } else {
-                    fn_80430124(lbl_8062C660, sz);
+                    GXCallDisplayList(lbl_8062C660, sz);
                     first = 1;
                 }
                 int chunk = per;

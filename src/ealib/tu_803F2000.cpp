@@ -763,7 +763,7 @@ struct RcIfB;
 struct DVDDiskID;
 extern "C" void fn_803F9234(char*);
 extern "C" void fn_803F92D8(char*);
-extern "C" void fn_8041B75C();
+extern "C" void CARDInit();
 extern "C" DVDDiskID* fn_80425508();
 extern "C" char* strncpy(char*, const char*, unsigned);
 extern char lbl_8060E664[], lbl_8060E678[], lbl_8060E6A8[], lbl_8060E6C8[];
@@ -811,7 +811,7 @@ extern "C" RcIfB* fn_803F713C(void* object, void* handle)
     RcReq* request;
     self->m2BC = (int)self->m2B8->v0(0xA000, (request = RcLink(RcReq(1, (int)lbl_8060E664), RcReq(2, 0x20)), lbl_806EEA88 = 0, request));
     self->m2C0 = (int)self->m2B8->v0(*(int*)((char*)self + 0x2B4), RcLink(RcReq(1, (int)lbl_8060E678), RcReq(2, 0x20)));
-    fn_8041B75C();
+    CARDInit();
     const char* id = (const char*)fn_80425508();
     strncpy((char*)self + 0x2C8, id, 4);
     strncpy((char*)self + 0x2CC, id + 4, 2);
@@ -827,7 +827,7 @@ struct RcEventBig61 : RcEv {
 struct RcBlock48_61 { int words[12]; };
 extern RcEventBig61 lbl_806AAEB0, lbl_806AB434;
 extern int lbl_806AB44C[];
-extern "C" int fn_8041BC20(int);
+extern "C" int CARDSetFastMode(int);
 extern "C" void fn_803F24E8()
 {
     int ready;
@@ -841,7 +841,7 @@ extern "C" void fn_803F24E8()
         int state = lbl_806AAEB0.m8;
         switch (state) {
         case 0:
-            fn_8041BC20(1);
+            CARDSetFastMode(1);
             lbl_806AAEB0.m24 = state;
             lbl_806AAEB0.m8 = 0x65;
             lbl_806AAEB0.mC = state;

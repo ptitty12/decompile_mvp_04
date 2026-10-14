@@ -324,8 +324,8 @@ inline void SetVec(Vec3* dst, Vec3 v)
 extern "C" float fn_80382BB8(Unk80271DBC_Link* p);
 extern "C" int fn_80188EF4(Unk80299920_Pos* p);
 void fn_8024D178(Unk80270BA0_X* x, int a);
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 extern "C" float fabsf(float x);          /* inlined as fabs */
 inline float Unk80299920_Abs(float v)
 {
@@ -334,15 +334,15 @@ inline float Unk80299920_Abs(float v)
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 inline Vec3 Direction(float angle)
 {
     Vec3 r;
-    r.x = fn_8041171C(angle);
+    r.x = sinf(angle);
     r.y = 0.0f;
-    r.z = fn_80411554(angle);
+    r.z = cosf(angle);
     return r;
 }
 inline Vec3 operator*(Vec3 v, float s)

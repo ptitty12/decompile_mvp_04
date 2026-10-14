@@ -222,7 +222,7 @@ int fn_8029D7C4(Unk8029B70C_Goal* g);
 
 extern "C" float fn_80382BB8(Unk80271DBC_Link* l);       /* current animation time/angle */
 float fn_80410CE8(float y, float x);          /* atan2 */
-extern "C" double fn_80410634(double x);                 /* floor */
+extern "C" double floor(double x);
 void fn_80244858(Unk80270BA0_X* x, float v);
 extern "C" int fn_8024D504(Unk80270BA0_X* x, int a, int b, int c, int d);
 extern "C" int fn_801DC658(int a, Unk80273498_Vec3* pos, float* out);
@@ -279,7 +279,7 @@ inline float Abs(float v)
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 

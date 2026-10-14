@@ -87,13 +87,13 @@ void fn_803DD794(void* tex);
 void fn_803DB5A0(void* state);
 void fn_803DB9C0(int a, int b);
 void fn_803DDCD4(void);
-void fn_80430124(void* list, int nbytes);
+void GXCallDisplayList(void* list, int nbytes);
 void fn_803DDBF0(void);
 void fn_803DDE7C(void);
 void fn_8042DA74(int chan, GXColor c);
 void fn_8042DB5C(int chan, GXColor c);
 void fn_8042B460(void);
-void fn_8042AB48(int attr, int type);
+void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB88(int a, int b, int c, int d, int e, int f);
 void fn_803DDB5C(int n);
@@ -114,8 +114,8 @@ extern int lbl_8062C664;
 
 extern "C" {
 void fn_803DBE08(void* state, Unk803DBE08Out* out);
-void fn_80433004(void* p, int n);
-void fn_8042C8B0(int a, int b, int c);
+void DCStoreRange(void* p, int n);
+void GXBegin(int a, int b, int c);
 void fn_803DA188(int n);
 }
 
@@ -132,7 +132,7 @@ inline void Unk803DBE08Out::StoreHdr(int per)
 
 inline void Unk803DBE08Out::Begin(int n)
 {
-    fn_8042C8B0(0x90, 0, 0);
+    GXBegin(0x90, 0, 0);
     EALIB_GX_FIFO(PPCWGPipe).u8 = (unsigned char)m0;
     EALIB_GX_FIFO(PPCWGPipe).u16 = n;
 }
@@ -151,7 +151,7 @@ void fn_803DE27C(void* o, int a, int b, int c, int d);
 void fn_803DE25C(void* o, int a, int b, int c, int d);
 void fn_803DE2D4(void* o, int a);
 void fn_80430398(Mtx34* m, int id, int type);
-void fn_80430124(void* list, int nbytes);
+void GXCallDisplayList(void* list, int nbytes);
 }
 
 struct Unk803DE29C {
@@ -190,7 +190,7 @@ extern int lbl_806EFA58;
  * index counter per branch (i1 / i2) shared by all five loops, float literals
  * (0.0f 0.5f -0.5f 1.0f = retail .rodata 0x806033BC..C8), a[0][8].m4[k]
  * re-read per element, Mtx34 locals, a local Unk8062BC30* for the +0x64
- * sub-object, "first = 1" after the fn_80430124 call.
+ * sub-object, "first = 1" after the GXCallDisplayList call.
  */
 extern "C" void fn_80367658(Unk803E3C08* a, Unk806230D4* b)
 {
@@ -270,7 +270,7 @@ extern "C" void fn_80367658(Unk803E3C08* a, Unk806230D4* b)
             EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)dl;
             EALIB_GX_FIFO(PPCWGPipe).u32 = dlsz;
         } else {
-            fn_80430124(dl, dlsz);
+            GXCallDisplayList(dl, dlsz);
         }
     } else {
         Unk803DBE08Out v(b->m4);
@@ -293,7 +293,7 @@ extern "C" void fn_80367658(Unk803E3C08* a, Unk806230D4* b)
                 for (; p < lbl_8062C660 + lbl_8062C664; p++) {
                     *p = 0;
                 }
-                fn_80433004(lbl_8062C660, lbl_8062C664);
+                DCStoreRange(lbl_8062C660, lbl_8062C664);
             }
             int sz = (per * b->m0 + 0x22) / 32 * 32;
             int first = 0;
@@ -303,7 +303,7 @@ extern "C" void fn_80367658(Unk803E3C08* a, Unk806230D4* b)
                     EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)lbl_8062C660;
                     EALIB_GX_FIFO(PPCWGPipe).u32 = sz;
                 } else {
-                    fn_80430124(lbl_8062C660, sz);
+                    GXCallDisplayList(lbl_8062C660, sz);
                     first = 1;
                 }
                 int chunk = per;
@@ -406,21 +406,21 @@ extern "C" void fn_80367F00(void* x)
         fn_8042B460();
         lbl_80623108 = a.m50[10];
         if (lbl_80623108) {
-            fn_8042AB48(9, 2);
+            GXSetVtxDesc(9, 2);
         } else {
-            fn_8042AB48(9, 3);
+            GXSetVtxDesc(9, 3);
         }
         lbl_8062310C = a.m50[11];
         if (lbl_8062310C) {
-            fn_8042AB48(0xa, 2);
+            GXSetVtxDesc(0xa, 2);
         } else {
-            fn_8042AB48(0xa, 3);
+            GXSetVtxDesc(0xa, 3);
         }
         lbl_80623120 = a.m50[16];
         if (lbl_80623120) {
-            fn_8042AB48(0xd, 2);
+            GXSetVtxDesc(0xd, 2);
         } else {
-            fn_8042AB48(0xd, 3);
+            GXSetVtxDesc(0xd, 3);
         }
     }
     if (a.mB4) {

@@ -516,7 +516,7 @@ extern "C" float fn_801C9EEC(Z* z, float f)
         r = t.v[9];
     } else {
         float x = f * 10.0f - 1.0f;
-        int i = (int)(float)fn_80410634(x);
+        int i = (int)(float)floor(x);
         int k;
         if (i <= 8) {
             k = i;
@@ -526,7 +526,7 @@ extern "C" float fn_801C9EEC(Z* z, float f)
             k = 8;
         }
         int k1 = k + 1;
-        float fr = x - (float)fn_80410634(x);
+        float fr = x - (float)floor(x);
         fr = !(fr > 1.0f) ? (fr >? 0.0f) : 1.0f;
         r = t.v[k] * (1.0f - fr) + t.v[k1] * fr;
     }

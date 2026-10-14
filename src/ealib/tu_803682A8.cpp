@@ -87,13 +87,13 @@ void fn_803DD794(void* tex);
 void fn_803DB5A0(void* state);
 void fn_803DB9C0(int a, int b);
 void fn_803DDCD4(void);
-void fn_80430124(void* list, int nbytes);
+void GXCallDisplayList(void* list, int nbytes);
 void fn_803DDBF0(void);
 void fn_803DDE7C(void);
 void fn_8042DA74(int chan, GXColor c);
 void fn_8042DB5C(int chan, GXColor c);
 void fn_8042B460(void);
-void fn_8042AB48(int attr, int type);
+void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB88(int a, int b, int c, int d, int e, int f);
 void fn_803DDB5C(int n);
@@ -114,8 +114,8 @@ extern int lbl_8062C664;
 
 extern "C" {
 void fn_803DBE08(void* state, Unk803DBE08Out* out);
-void fn_80433004(void* p, int n);
-void fn_8042C8B0(int a, int b, int c);
+void DCStoreRange(void* p, int n);
+void GXBegin(int a, int b, int c);
 void fn_803DA188(int n);
 }
 
@@ -132,7 +132,7 @@ inline void Unk803DBE08Out::StoreHdr(int per)
 
 inline void Unk803DBE08Out::Begin(int n)
 {
-    fn_8042C8B0(0x90, 0, 0);
+    GXBegin(0x90, 0, 0);
     EALIB_GX_FIFO(PPCWGPipe).u8 = (unsigned char)m0;
     EALIB_GX_FIFO(PPCWGPipe).u16 = n;
 }
@@ -148,11 +148,11 @@ void fn_803DE29C(void* o, int a, int b, int c, int d, int e);
 void fn_803DE27C(void* o, int a, int b, int c, int d);
 void fn_803DE25C(void* o, int a, int b, int c, int d);
 void fn_803DE2D4(void* o, int a);
-void fn_8043134C(Mtx34* m, float x, float y, float z);
-void fn_80431318(Mtx34* m, float x, float y, float z);
-void fn_8043124C(Mtx34* a, Mtx34* b, Mtx34* ab);
+void PSMTXScale(Mtx34* m, float x, float y, float z);
+void PSMTXTrans(Mtx34* m, float x, float y, float z);
+void PSMTXConcat(Mtx34* a, Mtx34* b, Mtx34* ab);
 void fn_80430398(Mtx34* m, int id, int type);
-void fn_80430124(void* list, int nbytes);
+void GXCallDisplayList(void* list, int nbytes);
 }
 
 struct Unk803DE29C {
@@ -197,7 +197,7 @@ extern int lbl_806EFA70;
  * - Mtx34 locals declared m1, m2, m3 (lowest address first);
  * - a local struct pointer for the lbl_8062BC30+0x64 sub-object gives retail's
  *   hoisted lis plus separate addi @l / addi 0x64.
- * "first = 1" after the fn_80430124 call, as in tu_80368E64.
+ * "first = 1" after the GXCallDisplayList call, as in tu_80368E64.
  */
 extern "C" void fn_803682A8(Unk803E3C08* a, Unk806231B8* b)
 {
@@ -232,10 +232,10 @@ extern "C" void fn_803682A8(Unk803E3C08* a, Unk806231B8* b)
         m3.f[9] = 0.0f;
         m3.f[10] = 1.0f;
         m3.f[11] = 0.0f;
-        fn_8043134C(&m1, 0.5f, -0.5f, 0.0f);
-        fn_80431318(&m2, 0.5f, 0.5f, 1.0f);
-        fn_8043124C(&m3, &m2, &m2);
-        fn_8043124C(&m2, &m1, &m2);
+        PSMTXScale(&m1, 0.5f, -0.5f, 0.0f);
+        PSMTXTrans(&m2, 0.5f, 0.5f, 1.0f);
+        PSMTXConcat(&m3, &m2, &m2);
+        PSMTXConcat(&m2, &m1, &m2);
         fn_80430398(&m2, 0x40, 0);
         if (b->m70) {
             fn_8042DC80(4, 0, 1, 1, 0, 2, 2);
@@ -266,7 +266,7 @@ extern "C" void fn_803682A8(Unk803E3C08* a, Unk806231B8* b)
             EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)dl;
             EALIB_GX_FIFO(PPCWGPipe).u32 = dlsz;
         } else {
-            fn_80430124(dl, dlsz);
+            GXCallDisplayList(dl, dlsz);
         }
     } else {
         Unk803DBE08Out v(b->m4);
@@ -289,7 +289,7 @@ extern "C" void fn_803682A8(Unk803E3C08* a, Unk806231B8* b)
                 for (; p < lbl_8062C660 + lbl_8062C664; p++) {
                     *p = 0;
                 }
-                fn_80433004(lbl_8062C660, lbl_8062C664);
+                DCStoreRange(lbl_8062C660, lbl_8062C664);
             }
             int sz = (per * b->m0 + 0x22) / 32 * 32;
             int first = 0;
@@ -299,7 +299,7 @@ extern "C" void fn_803682A8(Unk803E3C08* a, Unk806231B8* b)
                     EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)lbl_8062C660;
                     EALIB_GX_FIFO(PPCWGPipe).u32 = sz;
                 } else {
-                    fn_80430124(lbl_8062C660, sz);
+                    GXCallDisplayList(lbl_8062C660, sz);
                     first = 1;
                 }
                 int chunk = per;
@@ -400,25 +400,25 @@ extern "C" void fn_80368AA4(void* x)
         || a.m50[16] != lbl_806231B8.m4C) {
         a.mB8 = 0;
         fn_8042B460();
-        fn_8042AB48(0, 1);
-        fn_8042AB48(2, 1);
+        GXSetVtxDesc(0, 1);
+        GXSetVtxDesc(2, 1);
         lbl_806231EC = a.m50[10];
         if (lbl_806231EC) {
-            fn_8042AB48(9, 2);
+            GXSetVtxDesc(9, 2);
         } else {
-            fn_8042AB48(9, 3);
+            GXSetVtxDesc(9, 3);
         }
         lbl_806231F0 = a.m50[11];
         if (lbl_806231F0) {
-            fn_8042AB48(0xa, 2);
+            GXSetVtxDesc(0xa, 2);
         } else {
-            fn_8042AB48(0xa, 3);
+            GXSetVtxDesc(0xa, 3);
         }
         lbl_80623204 = a.m50[16];
         if (lbl_80623204) {
-            fn_8042AB48(0xd, 2);
+            GXSetVtxDesc(0xd, 2);
         } else {
-            fn_8042AB48(0xd, 3);
+            GXSetVtxDesc(0xd, 3);
         }
     }
     if (a.mB4) {

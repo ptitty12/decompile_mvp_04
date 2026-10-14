@@ -181,8 +181,8 @@ struct Unk802A1790_Pos {
     int m390;
 };
 
-extern "C" float fn_8041171C(float a);        /* sin */
-extern "C" float fn_80411554(float a);        /* cos */
+extern "C" float sinf(float a);        /* sin */
+extern "C" float cosf(float a);        /* cos */
 
 /* Unary minus on a vector: three negations (fn_802A1790). */
 inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a)
@@ -210,9 +210,9 @@ struct Unk802A1790_V3 : public Unk80273498_Vec3 {
 inline Unk802A1790_V3 Unk802A1790_Dir(float a)
 {
     Unk802A1790_V3 r;
-    r.x = fn_8041171C(a);
+    r.x = sinf(a);
     r.y = 0.0f;
-    r.z = fn_80411554(a);
+    r.z = cosf(a);
     return r;
 }
 

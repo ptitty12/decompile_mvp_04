@@ -13,7 +13,7 @@
 /* Target relocations bind these SDK calls to existing exports. */
 void fn_80433814(OSContext*);
 void fn_8043364C(OSContext*);
-void fn_804383B8(OSThreadQueue*);
+void OSWakeupThread(OSThreadQueue*);
 void fn_80437434(OSThreadQueue*);
 void fn_804382CC(OSThreadQueue*);
 OSSram* fn_80436A9C(void);
@@ -24,7 +24,7 @@ int __OSUnlockSram(BOOL);
 
 #define OSClearContext fn_80433814
 #define OSSetCurrentContext fn_8043364C
-#define OSWakeupThread fn_804383B8
+#define OSWakeupThread OSWakeupThread
 #define OSInitThreadQueue fn_80437434
 #define OSSleepThread fn_804382CC
 #define __OSLockSram fn_80436A9C

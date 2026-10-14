@@ -457,7 +457,7 @@ void fn_8031C328(void* h, int id);
 extern "C" {
 void fn_803E6B3C(void* p);
 void fn_803E6B74(void* p);
-void fn_80433060(void* p, int n);
+void DCStoreRangeNoSync(void* p, int n);
 }
 extern "C" {
 void fn_803E47E8(void* p);
@@ -1056,8 +1056,8 @@ extern "C" int fn_8030F598(Unk8030F598_Obj* p)
     }
     if (changed) {
         fn_803E6B74((char*)p + 0x114);
-        fn_80433060(p->mB8, p->m80 * 0x18);
-        fn_80433060(p->mBC, p->m80 * 8);
+        DCStoreRangeNoSync(p->mB8, p->m80 * 0x18);
+        DCStoreRangeNoSync(p->mBC, p->m80 * 8);
     }
     return p->m80 != 0 ? 1 : 0;
 }

@@ -249,8 +249,8 @@ public:
 };
 extern float lbl_805C841C;
 extern float lbl_805C8420;
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 inline void SetDir(Unk8027A84C* o, Unk80273498_Vec3 v)
 {
     o->fn_8027A898(&v);
@@ -258,9 +258,9 @@ inline void SetDir(Unk8027A84C* o, Unk80273498_Vec3 v)
 inline Unk80273498_Vec3 Direction(float angle)
 {
     Unk80273498_Vec3 r;
-    r.x = fn_8041171C(angle);
+    r.x = sinf(angle);
     r.y = lbl_805C8420;
-    r.z = fn_80411554(angle);
+    r.z = cosf(angle);
     return r;
 }
 

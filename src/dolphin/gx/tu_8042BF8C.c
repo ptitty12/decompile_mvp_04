@@ -10,13 +10,13 @@
 #include "__gx.h"
 
 /* GXMisc.c / GXCpu2Efb.c pieces. Callees that symbols.txt names only by address:
- * fn_8041A5DC PPCSync, fn_80438628 OSGetTime, fn_804382CC OSSleepThread, fn_804383B8 OSWakeupThread,
+ * PPCSync PPCSync, fn_80438628 OSGetTime, fn_804382CC OSSleepThread, OSWakeupThread OSWakeupThread,
  * fn_80437434 OSInitThreadQueue, fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext,
  * fn_8042A898 __GXIsGPFifoReady, fn_8042A790 __GXCleanGPFifo. */
-void fn_8041A5DC(void);
+void PPCSync(void);
 OSTime fn_80438628(void);
 void fn_804382CC(OSThreadQueue* queue);
-void fn_804383B8(OSThreadQueue* queue);
+void OSWakeupThread(OSThreadQueue* queue);
 void fn_80437434(OSThreadQueue* queue);
 void fn_80433814(OSContext* context);
 void fn_8043364C(OSContext* context);
@@ -28,12 +28,12 @@ extern GXDrawDoneCallback lbl_806EF784;
 extern u8 lbl_806EF788;
 extern OSThreadQueue lbl_806EF78C;
 
-void fn_8042C020(void);
+void GXFlush(void);
 void fn_8042C07C(void);
-void fn_8042C1E8(void);
-void fn_8042C3B0(u16 token);
-void fn_8042C464(void);
-void fn_8042C4E4(void);
+void GXAbortFrame(void);
+void GXSetDrawSync(u16 token);
+void GXDrawDone(void);
+void GXPixModeSync(void);
 void fn_8042C508(GXCompare func, u8 threshold);
 void fn_8042C51C(GXAlphaReadMode mode);
 void fn_8042C53C(GXBool dither);
@@ -69,7 +69,7 @@ void GXSetMisc(GXMiscToken token, u32 val) {
 }
 
 /* GXFlush */
-void fn_8042C020(void) {
+void GXFlush(void) {
     if (__GXData->dirtyState) {
         __GXSetDirtyState();
     }
@@ -81,7 +81,7 @@ void fn_8042C020(void) {
     GX_WRITE_U32(0);
     GX_WRITE_U32(0);
     GX_WRITE_U32(0);
-    fn_8041A5DC();
+    PPCSync();
 }
 
 static inline void __GXAbortWait(u32 clocks) {
@@ -121,19 +121,19 @@ void fn_8042C07C(void) {
 }
 
 /* GXAbortFrame */
-void fn_8042C1E8(void) {
+void GXAbortFrame(void) {
     fn_8042C07C();
 
     if (fn_8042A898()) {
         fn_8042A790();
         __GXInitRevisionBits();
         __GXData->dirtyState = 0;
-        fn_8042C020();
+        GXFlush();
     }
 }
 
 /* GXSetDrawSync */
-void fn_8042C3B0(u16 token) {
+void GXSetDrawSync(u16 token) {
     u32 reg;
     BOOL enabled;
 
@@ -143,7 +143,7 @@ void fn_8042C3B0(u16 token) {
     SET_REG_FIELD(0, reg, 16, 0, token);
     SET_REG_FIELD(0, reg, 8, 24, 0x47);
     GX_WRITE_RAS_REG(reg);
-    fn_8042C020();
+    GXFlush();
     OSRestoreInterrupts(enabled);
     __GXData->bpSentNot = 0;
 }
@@ -155,7 +155,7 @@ static inline void GXSetDrawDoneInt(void) {
     enabled = OSDisableInterrupts();
     reg = 0x45000002;
     GX_WRITE_RAS_REG(reg);
-    fn_8042C020();
+    GXFlush();
     lbl_806EF788 = 0;
     OSRestoreInterrupts(enabled);
 }
@@ -171,13 +171,13 @@ static inline void GXWaitDrawDoneInt(void) {
 }
 
 /* GXDrawDone */
-void fn_8042C464(void) {
+void GXDrawDone(void) {
     GXSetDrawDoneInt();
     GXWaitDrawDoneInt();
 }
 
 /* GXPixModeSync */
-void fn_8042C4E4(void) {
+void GXPixModeSync(void) {
     GX_WRITE_RAS_REG(__GXData->peCtrl);
     __GXData->bpSentNot = 0;
 }
@@ -312,7 +312,7 @@ void fn_8042C73C(__OSInterrupt interrupt, OSContext* context) {
         fn_80433814(&exceptContext);
         fn_8043364C(context);
     }
-    fn_804383B8(&lbl_806EF78C);
+    OSWakeupThread(&lbl_806EF78C);
 }
 
 void __GXPEInit(void) {

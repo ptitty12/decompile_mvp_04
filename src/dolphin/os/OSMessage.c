@@ -4,7 +4,7 @@
 
 extern void fn_80437434(OSThreadQueue* queue);
 extern void fn_804382CC(OSThreadQueue* queue);
-extern void fn_804383B8(OSThreadQueue* queue);
+extern void OSWakeupThread(OSThreadQueue* queue);
 
 void OSInitMessageQueue(OSMessageQueue* mq, void* msgArray, s32 msgCount) {
     fn_80437434(&mq->queueSend);
@@ -30,7 +30,7 @@ int OSSendMessage(OSMessageQueue* mq, void* msg, s32 flags) {
     lastIndex = (mq->firstIndex + mq->usedCount) % mq->msgCount;
     ((u32*)mq->msgArray)[lastIndex] = (u32)msg;
     mq->usedCount++;
-    fn_804383B8(&mq->queueReceive);
+    OSWakeupThread(&mq->queueReceive);
     OSRestoreInterrupts(enabled);
     return 1;
 }
@@ -51,7 +51,7 @@ int OSReceiveMessage(OSMessageQueue* mq, void* msg, s32 flags) {
     
     mq->firstIndex = (mq->firstIndex + 1) % mq->msgCount;
     mq->usedCount--;
-    fn_804383B8(&mq->queueSend);
+    OSWakeupThread(&mq->queueSend);
     OSRestoreInterrupts(enabled);
     return 1;
 }

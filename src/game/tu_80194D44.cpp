@@ -47,7 +47,7 @@ struct Unk80197A6C_O {
 inline float Unk80197A6C_AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 
@@ -356,7 +356,7 @@ extern "C" int fn_801964C8(Unk801964C8_O* o, float* out, float t)
             r = o->m40 - 1;
         return r;
     }
-    float fl = (float)fn_80410634(t * 60.0f);
+    float fl = (float)floor(t * 60.0f);
     if (out)
         *out = t * 60.0f - fl;
     return ((int)fl + o->m50) % o->m40;

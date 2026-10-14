@@ -61,8 +61,8 @@ extern char lbl_8060E700[];
 extern char lbl_8060E748[];
 
 extern "C" int fn_804002BC(const char*, ...);
-extern "C" void fn_80435D20(void*);
-extern "C" void fn_80435DFC(void*);
+extern "C" void OSLockMutex(void*);
+extern "C" void OSUnlockMutex(void*);
 extern "C" void fn_803FFC58(void*, int, int);
 extern "C" int fn_803F9A80(int);
 extern "C" void fn_803FA410(int);
@@ -100,7 +100,7 @@ extern "C" int fn_803F9464();
 
 extern "C" int fn_803F963C(int a, int b, int c);
 
-extern "C" void fn_80435CE8(void*);
+extern "C" void OSInitMutex(void*);
 extern "C" void fn_803FEE70(void);
 
 extern "C" int strncmp(const char*, const char*, unsigned);
@@ -168,7 +168,7 @@ extern "C" int fn_803F9544(int a, int b, int c, void* mem)
         lbl_806ADE4C.m8 = 0xff;
         lbl_806ADE4C.m0 = c;
         lbl_806ADE4C.m4 = a;
-        fn_80435CE8(lbl_806ADE74);
+        OSInitMutex(lbl_806ADE74);
         fn_803FFC58(lbl_806ADE4C.m18, 0, fn_803F963C(a, b, c));
         lbl_806ADE4C.m1C = (char*)lbl_806ADE4C.m18 + lbl_806ADE4C.m0 * 0x30;
         fn_803FEE70();
@@ -212,7 +212,7 @@ extern "C" void fn_803F972C(int h, int prio)
 {
     RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
     if (fn_803F93F4(h) != 0) {
-        fn_80435D20(lbl_806ADE74);
+        OSLockMutex(lbl_806ADE74);
         int old = j->m10;
         j->m10 = prio;
         if (lbl_806ADE4C.mC > 1 && (int)j != lbl_806ADE4C.m14 && j->m8 == 0 && old != prio) {
@@ -223,7 +223,7 @@ extern "C" void fn_803F972C(int h, int prio)
                 p = (RcJob*)p->m2C;
             }
             if (p == 0) {
-                fn_80435DFC(lbl_806ADE74);
+                OSUnlockMutex(lbl_806ADE74);
                 return;
             }
             if (t != 0)
@@ -248,14 +248,14 @@ extern "C" void fn_803F972C(int h, int prio)
             else
                 lbl_806ADE6C[0] = j;
         }
-        fn_80435DFC(lbl_806ADE74);
+        OSUnlockMutex(lbl_806ADE74);
     }
 }
 
 extern "C" void fn_803F9884(int h)
 {
     int state = 0;
-    fn_80435D20(lbl_806ADE74);
+    OSLockMutex(lbl_806ADE74);
     if (fn_803F93F4(h) != 0 && ((unsigned char*)&h)[2] != 3 && ((unsigned char*)&h)[2] != 10) {
         RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
         if (lbl_806ADE4C.m14 == (int)j) {
@@ -270,7 +270,7 @@ extern "C" void fn_803F9884(int h)
                     p = (RcJob*)p->m2C;
                 }
                 if (p == 0) {
-                    fn_80435DFC(lbl_806ADE74);
+                    OSUnlockMutex(lbl_806ADE74);
                     return;
                 }
                 if (t != 0)
@@ -287,7 +287,7 @@ extern "C" void fn_803F9884(int h)
                 ((void (*)(int, int, int))j->m28)(j->m0, -1, j->m14);
         }
     }
-    fn_80435DFC(lbl_806ADE74);
+    OSUnlockMutex(lbl_806ADE74);
 }
 
 extern "C" int fn_803F99E8(int h)
@@ -568,7 +568,7 @@ extern "C" void fn_803FA948()
 extern "C" RcJob* fn_803FA94C()
 {
     int i = 0;
-    fn_80435D20(lbl_806ADE74);
+    OSLockMutex(lbl_806ADE74);
     for (; i < lbl_806ADE4C.m0; i++) {
         if (*((unsigned char*)(lbl_806ADE4C.m18 + i) + 2) == 0) {
             *((unsigned char*)(lbl_806ADE4C.m18 + i) + 2) = 1;
@@ -580,7 +580,7 @@ extern "C" RcJob* fn_803FA94C()
             break;
         }
     }
-    fn_80435DFC(lbl_806ADE74);
+    OSUnlockMutex(lbl_806ADE74);
     if (i == lbl_806ADE4C.m0)
         for (;;)
             ;
@@ -589,22 +589,22 @@ extern "C" RcJob* fn_803FA94C()
 
 extern "C" void fn_803FAA38(void* p)
 {
-    fn_80435D20(lbl_806ADE74);
+    OSLockMutex(lbl_806ADE74);
     fn_803FFC58(p, 0, 0x30);
-    fn_80435DFC(lbl_806ADE74);
+    OSUnlockMutex(lbl_806ADE74);
 }
 
 extern "C" int fn_803FAA84(RcJob*)
 {
     int i = 0;
-    fn_80435D20(lbl_806ADE74);
+    OSLockMutex(lbl_806ADE74);
     for (; i < lbl_806ADE4C.m4; i++) {
         if (*((unsigned char*)lbl_806ADE4C.m1C + i * 0x144 + 4) == 0) {
             *((unsigned char*)lbl_806ADE4C.m1C + i * 0x144 + 4) = 1;
             break;
         }
     }
-    fn_80435DFC(lbl_806ADE74);
+    OSUnlockMutex(lbl_806ADE74);
     if (i == lbl_806ADE4C.m4)
         for (;;)
             ;
@@ -613,9 +613,9 @@ extern "C" int fn_803FAA84(RcJob*)
 
 extern "C" void fn_803FAB1C(void* p)
 {
-    fn_80435D20(lbl_806ADE74);
+    OSLockMutex(lbl_806ADE74);
     fn_803FFC58(p, 0, 0x144);
-    fn_80435DFC(lbl_806ADE74);
+    OSUnlockMutex(lbl_806ADE74);
 }
 
 extern "C" char* strchr(const char*, int);

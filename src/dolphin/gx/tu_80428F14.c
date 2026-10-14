@@ -23,22 +23,22 @@
 
 /* GXFifo.c part of this unit. Placeholder names (symbols.txt) with the likely SDK names:
  * fn_80429FF0 GXCPInterruptHandler, fn_8042A190 GXInitFifoPtrs, fn_8042A200 GXInitFifoLimits,
- * fn_8042A4AC GXGetFifoPtrs, fn_8042A544 GXSetBreakPtCallback, fn_8042A588 GXEnableBreakPt,
- * fn_8042A614 GXDisableBreakPt, fn_8042A6B4 __GXFifoReadEnable, fn_8042A6D8 __GXFifoReadDisable,
+ * GXGetFifoPtrs GXGetFifoPtrs, fn_8042A544 GXSetBreakPtCallback, GXEnableBreakPt GXEnableBreakPt,
+ * GXDisableBreakPt GXDisableBreakPt, fn_8042A6B4 __GXFifoReadEnable, fn_8042A6D8 __GXFifoReadDisable,
  * fn_8042A6FC __GXFifoLink, fn_8042A730 __GXWriteFifoIntEnable, fn_8042A760 __GXWriteFifoIntReset,
- * fn_8042A790 __GXCleanGPFifo, fn_8042A890 GXGetCPUFifo, fn_8042A898 GXGetGPFifo,
- * fn_8042A8A0 GXRedirectWriteGatherPipe, fn_8042A9A8 GXRestoreWriteGatherPipe.
- * Other placeholder callees: fn_80437ED4 OSResumeThread, fn_8043815C OSSuspendThread,
- * fn_80437444 OSGetCurrentThread, fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext,
- * fn_8041A5DC PPCSync, fn_8041A680 PPCMfwpar, fn_8042C020 GXFlush. */
-s32 fn_80437ED4(OSThread* thread);
+ * fn_8042A790 __GXCleanGPFifo, GXGetCPUFifo GXGetCPUFifo, fn_8042A898 GXGetGPFifo,
+ * GXRedirectWriteGatherPipe GXRedirectWriteGatherPipe, GXRestoreWriteGatherPipe GXRestoreWriteGatherPipe.
+ * Other placeholder callees: OSResumeThread OSResumeThread, fn_8043815C OSSuspendThread,
+ * OSGetCurrentThread OSGetCurrentThread, fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext,
+ * PPCSync PPCSync, fn_8041A680 PPCMfwpar, GXFlush GXFlush. */
+s32 OSResumeThread(OSThread* thread);
 s32 fn_8043815C(OSThread* thread);
-OSThread* fn_80437444(void);
+OSThread* OSGetCurrentThread(void);
 void fn_80433814(OSContext* context);
 void fn_8043364C(OSContext* context);
-void fn_8041A5DC(void);
+void PPCSync(void);
 u32 fn_8041A680(void);
-void fn_8042C020(void);
+void GXFlush(void);
 
 extern __GXFifoObj* lbl_806EF760; /* CPUFifo */
 extern __GXFifoObj* lbl_806EF764; /* GPFifo */
@@ -52,20 +52,20 @@ extern u32 lbl_806EF77C;          /* BreakPoint address */
 void fn_80429FF0(__OSInterrupt interrupt, OSContext* context);
 void fn_8042A190(GXFifoObj* fifo, void* rd, void* wr);
 void fn_8042A200(GXFifoObj* fifo, u32 hi, u32 lo);
-void fn_8042A4AC(GXFifoObj* fifo, void** readPtr, void** writePtr);
+void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr);
 GXBreakPtCallback fn_8042A544(GXBreakPtCallback cb);
-void fn_8042A588(void* break_pt);
-void fn_8042A614(void);
+void GXEnableBreakPt(void* break_pt);
+void GXDisableBreakPt(void);
 void fn_8042A6B4(void);
 void fn_8042A6D8(void);
 void fn_8042A6FC(u8 enable);
 void fn_8042A730(u8 hi, u8 lo);
 void fn_8042A760(u8 hi, u8 lo);
 void fn_8042A790(void);
-GXFifoObj* fn_8042A890(void);
+GXFifoObj* GXGetCPUFifo(void);
 GXFifoObj* fn_8042A898(void);
-volatile void* fn_8042A8A0(void* ptr);
-void fn_8042A9A8(void);
+volatile void* GXRedirectWriteGatherPipe(void* ptr);
+void GXRestoreWriteGatherPipe(void);
 
 void __GXInitRevisionBits(void);
 

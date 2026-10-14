@@ -40,8 +40,8 @@ extern "C" void fn_803EDC74();
 extern "C" int fn_803EE3D4(int a);
 extern "C" int fn_80436404();
 int fn_8043D6A8();
-extern "C" void fn_80436F58(int a);
-extern "C" int fn_80436EE8();
+extern "C" void OSSetProgressiveMode(int a);
+extern "C" int OSGetProgressiveMode();
 void fn_80439618(Unk8000D6D4_Pad* pad);
 extern "C" float fn_804028E4(float x); /* square root */
 extern const Vec3 lbl_806055AC;
@@ -82,11 +82,11 @@ void fn_8000D6D4()
 {
     if (fn_80436404() >= 0) {
         if (fn_8043D6A8() != 1) {
-            fn_80436F58(0);
+            OSSetProgressiveMode(0);
         }
         int mode = fn_8043D6A8();
         if (mode == 1) {
-            if (fn_80436EE8() != 0) {
+            if (OSGetProgressiveMode() != 0) {
                 lbl_806164B8[0] = mode;
             } else {
                 Unk8000D6D4_Pad pad[4];

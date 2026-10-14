@@ -3,7 +3,7 @@
 
 #include "__card.h"
 
-extern void fn_80433004(void* addr, u32 nBytes); /* DCStoreRange */
+extern void DCStoreRange(void* addr, u32 nBytes);
 extern void fn_8041C2D8(void* ptr, int length, u16* checksum, u16* checksumInv); /* __CARDCheckSum */
 extern s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback); /* __CARDEraseSector */
 extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
@@ -89,7 +89,7 @@ s32 __CARDUpdateDir(s32 chan, CARDCallback callback) {
     check = CARDGetDirCheck(dir);
     ++check->checkCode;
     fn_8041C2D8(dir, 0x2000 - sizeof(u32), &check->checkSum, &check->checkSumInv);
-    fn_80433004(dir, 0x2000);
+    DCStoreRange(dir, 0x2000);
 
     card->eraseCallback = callback;
     addr = ((u32)dir - (u32)card->workArea) / 0x2000 * card->sectorSize;

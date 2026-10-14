@@ -7,7 +7,7 @@
 extern "C" void fn_80377408(void* p); /* __builtin_delete */
 extern "C" void fn_803D9110(int a, int b);
 extern "C" void fn_803E1A38(void* p);
-extern "C" void fn_8042C4E4();
+extern "C" void GXPixModeSync();
 extern "C" {
 void GXSetTexCopySrc(unsigned short left, unsigned short top, unsigned short wd, unsigned short ht);
 void GXSetTexCopyDst(unsigned short wd, unsigned short ht, int fmt, unsigned char mipmap);
@@ -229,7 +229,7 @@ extern "C" void fn_803D9ECC(Unk803D9E00* self, Unk803D9ECCHolder* holder, int cl
     GXCopyTex(dest, clear);
     GXSetCopyFilter(m->m19, m->m1A, 1, m->m32);
     if (flag)
-        fn_8042C4E4();
+        GXPixModeSync();
 }
 
 extern "C" void fn_803D9FBC()

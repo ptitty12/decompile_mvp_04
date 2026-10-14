@@ -301,8 +301,8 @@ extern const float lbl_805D422C;
 float fn_802D7F40(int k);
 float fn_802D7E88(int k, int h);
 float fn_802D7E2C(int k, int h);
-extern "C" float fn_80411554(float x);
-extern "C" float fn_8041171C(float x);
+extern "C" float cosf(float x);
+extern "C" float sinf(float x);
 extern const float lbl_805D4208;
 extern const float lbl_805D420C;
 extern const Vec3 lbl_806055AC;
@@ -318,9 +318,9 @@ extern "C" int fn_801E8328(I* s, Vec3* out, float f)
         r = 1;
         a = -a;
         b = b - lbl_805D4208;
-        out->x = fn_80411554(a + b);
+        out->x = cosf(a + b);
         out->y = lbl_805D420C;
-        out->z = fn_8041171C(a + b);
+        out->z = sinf(a + b);
     } else {
         *out = lbl_806055AC;
     }
@@ -345,9 +345,9 @@ extern "C" int fn_801E8428(I* s, int a, Vec3* out, float* outf)
         a1 = -a1;
         *outf = c;
         b1 = b1 - 3.1415927f;
-        out->x = fn_80411554(a1 + b1) * 240.0f;
+        out->x = cosf(a1 + b1) * 240.0f;
         out->y = 0.0f;
-        out->z = fn_8041171C(a1 + b1) * 240.0f;
+        out->z = sinf(a1 + b1) * 240.0f;
         const Vec3* pv = &p->m60;
         out->x = out->x + pv->x;
         out->y = out->y + pv->y;

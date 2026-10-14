@@ -56,7 +56,7 @@ struct Unk800C49C4_Letters {
 extern const Unk800C493C_Letters lbl_805BBE98 __attribute__((aligned(4)));
 extern const Unk800C49C4_Letters lbl_805BBEAC __attribute__((aligned(4)));
 extern "C" int strcmp(const char* a, const char* b);
-extern "C" void fn_80433004(void* a, int b);
+extern "C" void DCStoreRange(void* a, int b);
 extern "C" int fn_800C5CF8(Unk800C341C_Mgr* m, const char* name);
 extern "C" void* fn_803774A8(unsigned n, int heap);
 extern "C" void fn_80377488(void* p);
@@ -188,7 +188,7 @@ extern "C" void fn_800C3054(Unk800C2250_File* f, const char* name, Unk800C1BE4_W
 extern "C" void fn_800C313C(Unk800C2250_File* f)
 {
     int i = 0;
-    fn_80433004(f->m45C, f->m460);
+    DCStoreRange(f->m45C, f->m460);
     for (; i < fn_800C2F88(f); i++) {
         if (fn_800C2F90(f, i)) {
             Unk800C1BE4_Widget* w = fn_800C2FB0(f, i);

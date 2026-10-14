@@ -3,10 +3,10 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 /* chooser.h declares these two with C++ linkage; here they are plain C symbols. */
-#define fn_80410634 fn_80410634_cxx
+#define floor fn_80410634_cxx
 #define fn_8037C7FC fn_8037C7FC_cxx
 #include "game/tu_802A6334.h"
-#undef fn_80410634
+#undef floor
 #undef fn_8037C7FC
 #include "game/tu_80317B88.h"
 
@@ -97,8 +97,8 @@ int fn_803E9B98(const void* a, void* b);
 void* fn_8037C7FC();
 void* fn_8037CF5C(void* c, unsigned hash, void* obj);
 void fn_80377488(void* p);
-float fn_8041171C(float x);
-float fn_80411554(float x);
+float sinf(float x);
+float cosf(float x);
 int fn_8014DDAC(void* p);
 void fn_803181E4(int a, int b, int c, float x1, float x2, float x3, float x4, int d, int e, int f, float x5, int g, int h, int s0, int s1);
 void fn_80377408(void* p);
@@ -257,8 +257,8 @@ void fn_80317F38(void* self, FxV2f* origin, FxV2f* p, float a) {
     if (!(ang >= lbl_805E9C90)) ang = lbl_805E9C90;
     if (!(ang <= lbl_805E9C94)) ang = lbl_805E9C94;
     if (!(ang <= lbl_805E9C98)) ang = ang - lbl_805E9C94;
-    float s = fn_8041171C(ang);
-    float c = fn_80411554(ang);
+    float s = sinf(ang);
+    float c = cosf(ang);
     FxV2f r;
     r.x = d2.x * c - d2.y * s;
     r.y = d2.x * s + d2.y * c;

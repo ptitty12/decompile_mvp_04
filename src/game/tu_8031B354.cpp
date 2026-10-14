@@ -48,7 +48,7 @@ extern int lbl_8061E9F4;
 
 inline float FxDSecs(unsigned n) { return (float)n * 0.016666668f; }
 extern "C" {
-double fn_80410634(double x);
+double floor(double x);
 void fn_8031259C(FxCtx* c);
 void fn_803125D0(FxCtx* c);
 void fn_8014D9EC(void* p, float a, float b, float c, float d, float e);
@@ -335,7 +335,7 @@ float fn_8031C100(FxRec2* rec, float t) {
         return lbl_805EA5E4;
     case 1: {
         x = t * rec->m24;
-        int n = (int)((float)fn_80410634(x) + (!((float)fn_80410634(x) < lbl_805EA5E8) ? lbl_805EA5EC : lbl_805EA5F0));
+        int n = (int)((float)floor(x) + (!((float)floor(x) < lbl_805EA5E8) ? lbl_805EA5EC : lbl_805EA5F0));
         r = (n & 1) ? lbl_805EA5F4 : lbl_805EA5E4;
         return r;
     }

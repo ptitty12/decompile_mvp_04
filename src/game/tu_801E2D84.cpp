@@ -1337,8 +1337,8 @@ struct Unk801E6B9C_Obj {
 extern "C" {
 void fn_8019BA30(int h, Unk801E61C0_Vec3* a, Unk801E61C0_Vec3* b, float* c, Unk801E61C0_Vec3* d, Unk801E61C0_Vec3* e, float* f, float* g, float z);
 }
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 
 /* near-miss (95.7%): store/addi scheduling around the fn_8019BA30 argument setup; the lwz of arg 1 lands last instead of first */
 extern "C" Unk801E61C0_Vec3 fn_801E6B9C(Unk801E6AA0_O* o, int a, Unk801E6AA0_Vec2 v, int mode)
@@ -1362,8 +1362,8 @@ extern "C" Unk801E61C0_Vec3 fn_801E6B9C(Unk801E6AA0_O* o, int a, Unk801E6AA0_Vec
     va.x = 6000.0f;
     va.y = 1800.0f;
     va.z = 144.0f;
-    sn = fn_8041171C(s.y * 0.017453294f);
-    cs = fn_80411554(s.y * 0.017453294f);
+    sn = sinf(s.y * 0.017453294f);
+    cs = cosf(s.y * 0.017453294f);
     vb.x = cs * 6000.0f;
     vc.y = 6.0f;
     vb.y = 6.0f;

@@ -8,13 +8,13 @@
 /* RealCore threading / diagnostics helpers (EA). */
 extern "C" {
 int fn_803FF850(void);
-int fn_80437444(void);
-int fn_80437A4C(int, int, int, int, int, int, int);
-void fn_80437ED4(int);
-void fn_80435CE8(int);
-int fn_80437450(int);
+int OSGetCurrentThread(void);
+int OSCreateThread(int, int, int, int, int, int, int);
+void OSResumeThread(int);
+void OSInitMutex(int);
+int OSIsThreadTerminated(int);
 void fn_80437D18(void);
-void fn_804384BC(int, int);
+void OSSetThreadPriority(int, int);
 int fn_804000C8(int);
 void fn_803FFFA8(int);
 int OSSendMessage(void*, int, int);
@@ -49,12 +49,12 @@ void fn_803FFA60(void* d, const void* s, int n);
 void fn_80400870(int idx, int v);
 void fn_80400890(int a, int b);
 void fn_80400948(void);
-void fn_80437A10(void);
+void OSYieldThread(void);
 void fn_80400F80(void* p);
 void fn_80400FE4(void* p);
 void fn_80432224(void* alarm);
 void fn_80432484(void* alarm, long long tick, void (*cb)(void*));
-void fn_80432568(void* alarm);
+void OSCancelAlarm(void* alarm);
 void fn_803FFF0C(char* p);
 void fn_80433CE8(const char* file, int line, const char* msg, ...);
 }
@@ -147,15 +147,15 @@ extern "C" int fn_803FFD9C(int k)
 extern "C" void fn_803FFE14()
 {
     fn_803FF850();
-    lbl_806EF47C = fn_80437444();
+    lbl_806EF47C = OSGetCurrentThread();
 }
 
 extern "C" int fn_803FFE3C(int a, int b, int c, int d, int e, int f)
 {
     int ok = 1;
-    if (fn_80437A4C(a, b, c, d + e, e, fn_803FFD9C(f), 1) == 0)
+    if (OSCreateThread(a, b, c, d + e, e, fn_803FFD9C(f), 1) == 0)
         ok = 0;
-    fn_80437ED4(a);
+    OSResumeThread(a);
     return ok;
 }
 
@@ -165,7 +165,7 @@ extern "C" void fn_803FFEB8(int h)
     int t;
     if (fn_804000C8(h) == 0) {
         if (h == -1)
-            t = fn_80437444();
+            t = OSGetCurrentThread();
         else
             t = h;
         if (t != 0)
@@ -185,14 +185,14 @@ extern "C" void fn_803FFF30(long long ticks)
     char alarm[0x28];
     char ev[0x28];
     if (ticks == 0) {
-        fn_80437A10();
+        OSYieldThread();
         return;
     }
     fn_80400F80(ev);
     fn_80432224(alarm);
     fn_80432484(alarm, ticks, (void (*)(void*))fn_803FFF0C);
     fn_80400FE4(ev);
-    fn_80432568(alarm);
+    OSCancelAlarm(alarm);
 }
 
 extern "C" void fn_803FFFA8(int ms)
@@ -202,12 +202,12 @@ extern "C" void fn_803FFFA8(int ms)
 
 extern "C" int fn_80400008(int h)
 {
-    int cur = fn_80437444();
+    int cur = OSGetCurrentThread();
     int t;
     if (h == 0)
         t = lbl_806EF47C;
     else if (h == -1)
-        t = fn_80437444();
+        t = OSGetCurrentThread();
     else
         t = h;
     return cur == t;
@@ -220,10 +220,10 @@ extern "C" int fn_80400068(int h, int prio)
         t = lbl_806EF47C;
     } else {
         if (h == -1)
-            h = fn_80437444();
+            h = OSGetCurrentThread();
         t = h;
     }
-    fn_804384BC(t, fn_803FFD9C(prio));
+    OSSetThreadPriority(t, fn_803FFD9C(prio));
     return 1;
 }
 
@@ -232,8 +232,8 @@ extern "C" int fn_804000C8(int h)
     if (h == 0)
         h = lbl_806EF47C;
     else if (h == -1)
-        h = fn_80437444();
-    return fn_80437450(h) != 0;
+        h = OSGetCurrentThread();
+    return OSIsThreadTerminated(h) != 0;
 }
 
 extern "C" int fn_80400114(int h)
@@ -246,9 +246,9 @@ extern "C" int fn_80400114(int h)
 extern "C" void fn_8040015C()
 {
     if (lbl_806EEAB8 == 0) {
-        fn_80437A4C((int)lbl_806B83A8, (int)fn_8040024C, 0, (int)lbl_806B96C0, 0x1000, 4, 1);
+        OSCreateThread((int)lbl_806B83A8, (int)fn_8040024C, 0, (int)lbl_806B96C0, 0x1000, 4, 1);
         OSInitMessageQueue(lbl_806B8308, lbl_806B8328, 0x20);
-        fn_80437ED4((int)lbl_806B83A8);
+        OSResumeThread((int)lbl_806B83A8);
     }
     lbl_806EEAB8++;
 }
@@ -418,7 +418,7 @@ extern "C" void fn_80400774(unsigned char* d, unsigned char* s, unsigned n)
 
 extern "C" int fn_804007D4(int p)
 {
-    fn_80435CE8(p + 4);
+    OSInitMutex(p + 4);
     return 1;
 }
 
@@ -433,18 +433,18 @@ struct Unk8037E6F4 {
     int m8;
 };
 
-extern "C" void fn_80435D20(Unk8037E6F4* o);
+extern "C" void OSLockMutex(Unk8037E6F4* o);
 
 extern "C" void fn_80400828(char* self)
 {
-    fn_80435D20((Unk8037E6F4*)(self + 4));
+    OSLockMutex((Unk8037E6F4*)(self + 4));
 }
 
-extern "C" void fn_80435DFC(Unk8037E6F4* o);
+extern "C" void OSUnlockMutex(Unk8037E6F4* o);
 
 extern "C" void fn_8040084C(char* self)
 {
-    fn_80435DFC((Unk8037E6F4*)(self + 4));
+    OSUnlockMutex((Unk8037E6F4*)(self + 4));
 }
 
 extern "C" void fn_80400870(int idx, int v)

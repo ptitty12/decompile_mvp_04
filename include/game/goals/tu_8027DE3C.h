@@ -104,7 +104,7 @@ extern float lbl_8061E6CC;                                     /* .data 0x8061E6
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 

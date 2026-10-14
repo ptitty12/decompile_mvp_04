@@ -21,9 +21,9 @@ extern "C" void fn_803E0F9C(Unk803E1F98_Node* n);
 extern "C" void fn_803E1F0C(Unk803E198C_View* v);
 
 /* Orthographic projection setup: the matrix helper at 0x80431564 takes (mtx, t, b, l, r, n, f); the
- * result is mirrored into the node's 4x4 block at Node+0x18 and loaded by fn_80430194(mtx, 1). */
-extern "C" void fn_80431564(float* m, float t, float b, float l, float r, float n, float f);
-extern "C" void fn_80430194(float* m, int type);
+ * result is mirrored into the node's 4x4 block at Node+0x18 and loaded by GXSetProjection(mtx, 1). */
+extern "C" void C_MTXOrtho(float* m, float t, float b, float l, float r, float n, float f);
+extern "C" void GXSetProjection(float* m, int type);
 /* Fog parameter block (pointed to by the first word of the owner at View+0). */
 struct Unk803E1A38Fog {
     int m0;
@@ -40,7 +40,7 @@ struct Unk803E1A38Mid {
     Unk803E1A38Fog* m0;
 };
 extern "C" void fn_8042F93C(int type, Unk803E1A38Col color, float startz, float endz, float nearz, float farz);
-extern "C" void fn_8042FB50(unsigned short* table, unsigned short width, float* projmtx);
+extern "C" void GXInitFogAdjTable(unsigned short* table, unsigned short width, float* projmtx);
 extern "C" void fn_8042FD00(int enable, unsigned short center, unsigned short* table);
 
 /* Node viewed with absolute offsets (View sits at Node+0xC, so Node+0x158 is View.m14C). */
@@ -84,12 +84,12 @@ struct Unk803E0DD0Obj {
 extern "C" {
 float tanf(float x);
 float atanf(float x);
-float fn_8041171C(float x);
-void fn_80431494(float* m, float fovy, float aspect, float n, float f);
-void fn_80430194(float* m, int type);
+float sinf(float x);
+void C_MTXPerspective(float* m, float fovy, float aspect, float n, float f);
+void GXSetProjection(float* m, int type);
 }
 
-/* near-miss (96.3%): perspective setup (fn_80431494 takes fov, aspect 1.0, near, far). Retail emits the
+/* near-miss (96.3%): perspective setup (C_MTXPerspective takes fov, aspect 1.0, near, far). Retail emits the
    n->m10 = 0 store before the two pool loads for the tanf argument; ours interleaves them. Store orders
    permuted, constant folding forms tried. */
 extern "C" void fn_803E0DD0(Unk803E0DD0Obj* n, float fov, float aspect, float zn, float zf)
@@ -98,7 +98,7 @@ extern "C" void fn_803E0DD0(Unk803E0DD0Obj* n, float fov, float aspect, float zn
     n->mF4 = aspect;
     n->mF8 = zn;
     n->mFC = zf;
-    fn_80431494(n->m158, fov, 1.0f, zn, zf);
+    C_MTXPerspective(n->m158, fov, 1.0f, zn, zf);
     float m5 = n->m158[5] * aspect;
     n->m18 = n->m158[0];
     n->m38 = n->m158[2];
@@ -111,7 +111,7 @@ extern "C" void fn_803E0DD0(Unk803E0DD0Obj* n, float fov, float aspect, float zn
     n->m54 = 0.0f;
     n->m158[5] = m5;
     n->m2C = m5;
-    fn_80430194(n->m158, 0);
+    GXSetProjection(n->m158, 0);
     n->m10 = 0;
     float t = tanf(fov * 0.5f * 0.017453292f);
     float nt = -t;
@@ -120,13 +120,13 @@ extern "C" void fn_803E0DD0(Unk803E0DD0Obj* n, float fov, float aspect, float zn
     float a2 = atanf((t * n->m140) / aspect);
     float a3 = atanf((nt * n->m144) / aspect);
     n->m118 = tanf(a0);
-    n->m11C = fn_8041171C(1.5707964f - a0);
+    n->m11C = sinf(1.5707964f - a0);
     n->m120 = tanf(a1);
-    n->m124 = fn_8041171C(1.5707964f - a1);
+    n->m124 = sinf(1.5707964f - a1);
     n->m128 = tanf(a2);
-    n->m12C = fn_8041171C(1.5707964f - a2);
+    n->m12C = sinf(1.5707964f - a2);
     n->m130 = tanf(a3);
-    n->m134 = fn_8041171C(1.5707964f - a3);
+    n->m134 = sinf(1.5707964f - a3);
 }
 
 union PPCWGPipe {
@@ -154,7 +154,7 @@ void GXSetAlphaCompare(int a, int b, int c, int d, int e);
 void fn_8042FF04(int a);
 void fn_8042FE78(int a);
 void fn_8042FED0(int a, int b, int c);
-void fn_8042C8B0(int prim, int fmt, unsigned short n);
+void GXBegin(int prim, int fmt, unsigned short n);
 }
 extern Unk803E1F98_Node* lbl_8062C2B4;
 extern int lbl_8062C2BC;
@@ -181,8 +181,8 @@ extern "C" void fn_803E1578(Unk803E1F98_Node* n, int flags)
     GXSetCullMode(0);
     float y = n->mC.mD0;
     float x = n->mC.mCC;
-    fn_80431564(m, y, y + n->mC.mD8, x, x + n->mC.mD4, 0.0f, -1.0f);
-    fn_80430194(m, 1);
+    C_MTXOrtho(m, y, y + n->mC.mD8, x, x + n->mC.mD4, 0.0f, -1.0f);
+    GXSetProjection(m, 1);
     fn_80430364(0x3C);
     GXSetNumTexGens(0);
     GXSetNumTevStages(1);
@@ -197,7 +197,7 @@ extern "C" void fn_803E1578(Unk803E1F98_Node* n, int flags)
         fn_8042FED0(1, 7, 1);
     else
         fn_8042FED0(0, 7, 0);
-    fn_8042C8B0(0x80, 5, 4);
+    GXBegin(0x80, 5, 4);
     {
         float x = n->mC.mCC;
         float y = n->mC.mD0;
@@ -232,9 +232,9 @@ extern "C" void fn_803E1578(Unk803E1F98_Node* n, int flags)
     }
     fn_8042FE78(1);
     if (n->mC.m4 == 0)
-        fn_80430194(n->mC.m14C, 0);
+        GXSetProjection(n->mC.m14C, 0);
     else
-        fn_80430194(n->mC.m14C, 1);
+        GXSetProjection(n->mC.m14C, 1);
     lbl_80627A78 = 0;
 }
 
@@ -286,7 +286,7 @@ extern "C" void fn_803E1A38(Unk803E198C_View* v)
             if (((Unk803E1A38Mid*)v->m0)->m0->m14) {
                 unsigned short tbl[10];
                 unsigned short* t = tbl;
-                fn_8042FB50(t, (unsigned short)(int)v->mD4, v->m14C);
+                GXInitFogAdjTable(t, (unsigned short)(int)v->mD4, v->m14C);
                 int w = (int)(v->mD4 * 0.5f + v->mCC);
                 if (w < 0)
                     w = 0;
@@ -336,7 +336,7 @@ extern "C" void fn_803E1CDC(Unk803E1F98_Node* n, float a, float b, float c)
     n->mC.mE8 = a;
     n->mC.mEC = b;
     n->mC.mF0 = c;
-    fn_80431564(n->mC.m14C, a, -a, -1.0f, 1.0f, b, c);
+    C_MTXOrtho(n->mC.m14C, a, -a, -1.0f, 1.0f, b, c);
     n->mC.mC.w[8] = zero;
     n->mC.mC.w[9] = zero;
     n->mC.mC.w[0] = n->mC.m14C[0];
@@ -348,7 +348,7 @@ extern "C" void fn_803E1CDC(Unk803E1F98_Node* n, float a, float b, float c)
     n->mC.mC.w[14] = n->mC.m14C[11];
     n->mC.mC.w[15] = 1.0f;
     n->mC.m4 = 1;
-    fn_80430194(n->mC.m14C, 1);
+    GXSetProjection(n->mC.m14C, 1);
 }
 
 extern "C" void fn_803E1DB0(Unk803E1F98_Node* n, float a, float b)
@@ -358,7 +358,7 @@ extern "C" void fn_803E1DB0(Unk803E1F98_Node* n, float a, float b)
     n->mC.mE8 = 0.75f;
     n->mC.mEC = a;
     n->mC.mF0 = b;
-    fn_80431564(n->mC.m14C, zero, n->mC.mD8, zero, n->mC.mD4, a, b);
+    C_MTXOrtho(n->mC.m14C, zero, n->mC.mD8, zero, n->mC.mD4, a, b);
     n->mC.m4 = 1;
     n->mC.mC.w[0] = n->mC.m14C[0];
     n->mC.mC.w[5] = n->mC.m14C[5];
@@ -370,7 +370,7 @@ extern "C" void fn_803E1DB0(Unk803E1F98_Node* n, float a, float b)
     n->mC.mC.w[14] = n->mC.m14C[11];
     n->mC.mC.w[15] = 1.0f;
     n->mC.mC.w[11] = zero;
-    fn_80430194(n->mC.m14C, 1);
+    GXSetProjection(n->mC.m14C, 1);
 }
 
 extern "C" void fn_803E1E88(Unk803E1F98_Node* n)

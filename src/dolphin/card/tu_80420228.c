@@ -12,7 +12,7 @@
 extern u8 lbl_806EF17A;
 
 s32 fn_80420228(s32 chan, s32 fileNo, u8 attr, CARDCallback callback);
-s32 fn_8042030C(s32 chan, s32 fileNo, u8 attr);
+s32 CARDSetAttributes(s32 chan, s32 fileNo, u8 attr);
 void fn_8041A6C8(s32 chan, s32 result);
 s32 fn_8041BB38(s32 chan);
 
@@ -40,7 +40,7 @@ s32 fn_80420228(s32 chan, s32 fileNo, u8 attr, CARDCallback callback) {
     return __CARDSetStatusExAsync(chan, fileNo, &dirent, callback);
 }
 
-s32 fn_8042030C(s32 chan, s32 fileNo, u8 attr) {
+s32 CARDSetAttributes(s32 chan, s32 fileNo, u8 attr) {
     s32 result = fn_80420228(chan, fileNo, attr, fn_8041A6C8);
     if (result < 0) {
         return result;

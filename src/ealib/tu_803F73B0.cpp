@@ -30,9 +30,9 @@ extern char lbl_8060E6E8[];
 extern "C" int fn_803F73B0(void*, int);
 extern "C" int CARDRename(int, const char*, const char*);
 extern "C" int CARDClose(void*);
-extern "C" int fn_8041E4E0(int);
-extern "C" int fn_8041B964(int, int*, int*);
-extern "C" int fn_8042030C(int, int, int);
+extern "C" int CARDFormat(int);
+extern "C" int CARDFreeBlocks(int, int*, int*);
+extern "C" int CARDSetAttributes(int, int, int);
 extern "C" int fn_803F8CB4(void*, const char*, int*);
 extern "C" int fn_803F8A2C(void*);
 extern "C" void* memset(void*, int, unsigned);
@@ -58,8 +58,8 @@ extern "C" int CARDRead(void*, void*, int, int);
 extern "C" int CARDWrite(void*, void*, int, int);
 extern "C" int strcmp(const char*, const char*);
 
-extern "C" int fn_8041DC98(int);
-extern "C" int fn_8041D30C(int, int*, int*);
+extern "C" int CARDUnmount(int);
+extern "C" int CARDProbeEx(int, int*, int*);
 extern "C" int fn_803F8434(void*, void*, void*, int, int*);
 extern int lbl_806EEA84;
 extern int lbl_806EEA80;
@@ -88,13 +88,13 @@ extern "C" int CARDCreate(int, const char*, int, void*);
 extern "C" int fn_803F80EC(void*, void*);
 extern "C" int fn_803F8F80(void*, char*);
 
-extern "C" int fn_8041BAB4(int, int*);
+extern "C" int CARDGetSectorSize(int, int*);
 extern "C" int fn_803F78CC(void*, unsigned short*);
 
 extern "C" int fn_803F8D8C(int unused, void* f, int off, int whence);
 
-extern "C" int fn_8041DBB4(int, int, void (*)());
-extern "C" int fn_8041D1EC(int);
+extern "C" int CARDMount(int, int, void (*)());
+extern "C" int CARDCheck(int);
 extern "C" void fn_803F773C(void);
 
 extern "C" int fn_803F73B0(void* o, int k)
@@ -158,7 +158,7 @@ extern "C" int fn_803F74E0(void* o, unsigned short* h)
     int b = 0;
     int r;
     do {
-        r = fn_8041D30C(*h, &a, &b);
+        r = CARDProbeEx(*h, &a, &b);
         lbl_806EEA34->v6(1);
     } while (r == -1);
     int rc = fn_803F73B0(o, r);
@@ -202,7 +202,7 @@ extern "C" int fn_803F7604(char* o, unsigned short* p)
     int r = 0;
     int out = 0;
     do {
-        r = fn_8041BAB4(*p, &out);
+        r = CARDGetSectorSize(*p, &out);
         lbl_806EEA34->v6(1);
     } while (r == -1);
     int rc = fn_803F73B0(o, r);
@@ -234,19 +234,19 @@ extern "C" int fn_803F7748(void* o, unsigned short* h)
     a = 0;
     b = 0;
     do {
-        r = fn_8041D30C(*h, &a, &b);
+        r = CARDProbeEx(*h, &a, &b);
         lbl_806EEA34->v6(1);
     } while (r == -1);
     rc = fn_803F73B0(o, r);
     if (rc == 0) {
         do {
-            r = fn_8041DBB4(*h, RCI(o, 0x2bc), (void (*)())fn_803F773C);
+            r = CARDMount(*h, RCI(o, 0x2bc), (void (*)())fn_803F773C);
             lbl_806EEA34->v6(1);
         } while (r == -1);
         rc = fn_803F73B0(o, r);
         if (rc == 0 || rc == 0xd || rc == 6) {
             do {
-                r = fn_8041D1EC(*h);
+                r = CARDCheck(*h);
                 lbl_806EEA34->v6(1);
             } while (r == -1);
             rc = fn_803F73B0(o, r);
@@ -272,7 +272,7 @@ extern "C" int fn_803F78CC(void* o, unsigned short* h)
         lbl_806EEA84 = 0;
         lbl_806EEA88 = 0;
         do {
-            r = fn_8041DC98(*h);
+            r = CARDUnmount(*h);
             lbl_806EEA34->v6(1);
         } while (r == -1);
         return fn_803F73B0(o, r);
@@ -715,7 +715,7 @@ extern "C" int fn_803F8730(void* o, unsigned short* h, int* out1, int* out2)
     int s0 = 0;
     int s1 = 0;
     int r = 0xf;
-    if (fn_8041B964(*h, &s1, &s0) == 0)
+    if (CARDFreeBlocks(*h, &s1, &s0) == 0)
         r = 0;
     *out1 = s1 / RCI(o, 0x2b4);
     *out2 = s0;
@@ -756,7 +756,7 @@ extern "C" int fn_803F88D8(void* o, unsigned short* h)
 {
     int r;
     do {
-        r = fn_8041E4E0(*h);
+        r = CARDFormat(*h);
         lbl_806EEA34->v6(1);
     } while (r == -1);
     return fn_803F73B0(o, r);
@@ -844,7 +844,7 @@ extern "C" int fn_803F8C44(void* o, int* a, void* b, int c)
     if (r == 0) {
         int q;
         do {
-            q = fn_8042030C(cur >> 16, s8, (unsigned char)c);
+            q = CARDSetAttributes(cur >> 16, s8, (unsigned char)c);
         } while (q == -1);
         r = fn_803F73B0(o, q);
     }

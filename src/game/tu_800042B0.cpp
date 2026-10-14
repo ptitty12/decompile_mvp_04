@@ -116,14 +116,14 @@ extern int lbl_8061A330;
 extern int lbl_80624260;
 
 int fn_801747A0();
-extern "C" int fn_804367C8();
-extern "C" void fn_8042C1E8();
-extern "C" void fn_8042C464();
+extern "C" int OSGetResetSwitchState();
+extern "C" void GXAbortFrame();
+extern "C" void GXDrawDone();
 void fn_8043D3EC(int);
 void fn_8043D250();
 void fn_8043C580();
 extern "C" void fn_80436204(int, int, int);
-extern "C" void fn_80439918(int, int);
+extern "C" void PADControlMotor(int, int);
 extern "C" int fn_804250B0();
 extern "C" void fn_800B81BC(int);
 extern "C" void fn_800B8194();
@@ -183,8 +183,8 @@ void fn_800043AC()
 {
     if (lbl_8060F704 != 0) {
         if (fn_801747A0() != 0) {
-            fn_8042C1E8();
-            fn_8042C464();
+            GXAbortFrame();
+            GXDrawDone();
             fn_8043D3EC(1);
             fn_8043D250();
             fn_8043C580();
@@ -213,7 +213,7 @@ int fn_8000446C()
     int t;
     do {
         fn_800043AC();
-        if (fn_804367C8()) {
+        if (OSGetResetSwitchState()) {
             lbl_8060F708 = 1;
         } else if (lbl_8060F708 != 0 && lbl_8060F704 == 0 && s != 4) {
             lbl_8060F704 = (s != 5) ? 2 : 1;
@@ -224,11 +224,11 @@ int fn_8000446C()
         t = fn_804250B0();
         s = fn_800042B0(t);
         if (flag == 0 && s != 5) {
-            fn_80439918(0, 0);
+            PADControlMotor(0, 0);
             flag = 1;
-            fn_80439918(1, 0);
-            fn_80439918(2, 0);
-            fn_80439918(3, 0);
+            PADControlMotor(1, 0);
+            PADControlMotor(2, 0);
+            PADControlMotor(3, 0);
         }
     } while (s != 5 || t == -1);
     return 0;

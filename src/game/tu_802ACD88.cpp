@@ -870,7 +870,7 @@ extern "C" int fn_803FED48(const char* fmt, int a, int b, int* out);
 extern "C" void fn_803FEDB8(int h, int n);
 int fn_802B98AC(int a, int b);
 void fn_802B9FF0(void* p, Unk802B9FF0_Hdr* h);
-extern "C" void fn_80433004(void* p, int n);
+extern "C" void DCStoreRange(void* p, int n);
 extern "C" void fn_80377488(void* p);
 
 extern "C" void fn_802B0224(Mgr* m, const char* name, int n)
@@ -895,7 +895,7 @@ extern "C" void fn_802B0224(Mgr* m, const char* name, int n)
         fn_802B9FF0(*e, x);
         if (x != 0)
             delete[] (char*)x;
-        fn_80433004(*e, (lbl_805E0F88 + 0x1F) & ~0x1F);
+        DCStoreRange(*e, (lbl_805E0F88 + 0x1F) & ~0x1F);
         fn_80377CD8((char*)m + 0xFA98, k, 0, h);
         char* o = (char*)*e;
         fn_802AFC7C(m, o + *(int*)(o + 0x14), k, a, 0);
@@ -1063,7 +1063,7 @@ extern "C" void fn_803ECA70(void* a, int x, int y, int z, int v);
 extern "C" int fn_8014DD30(void* p);
 extern "C" void fn_803DDA68(void* a, void* b);
 extern "C" int fn_803EC6F8(void* p);
-extern "C" void fn_80433004(void* a, int b);
+extern "C" void DCStoreRange(void* a, int b);
 
 struct Unk802B9F40;
 void fn_802BA750(Unk802B9F40* t);
@@ -1182,7 +1182,7 @@ extern "C" void fn_802B09CC(void* mem, const char* name, int base, int n, int pp
             Unk802B09CC_Ent* e1 = (Unk802B09CC_Ent*)((char*)m + 0x4030);
             void** tb = (void**)(t - 0x1C28);
             fn_803DDA68(tb[e1[a].m0], o);
-            fn_80433004(o, fn_803EC6F8(o));
+            DCStoreRange(o, fn_803EC6F8(o));
         }
     }
 }

@@ -9,7 +9,7 @@
 #include "snd/cmn/sndcmn.h"
 #include <string.h>
 
-extern "C" void fn_80435CE8(void* p);
+extern "C" void OSInitMutex(void* p);
 
 extern char lbl_806AA030[];
 
@@ -61,9 +61,9 @@ struct Unk8069E200 {
 };
 extern Unk8069E200 lbl_8069E200;
 
-extern "C" void fn_80435D20(void* p);
+extern "C" void OSLockMutex(void* p);
 
-extern "C" void fn_80435DFC(void* p);
+extern "C" void OSUnlockMutex(void* p);
 
 extern "C" void fn_803B1B30();
 extern "C" void fn_803B1DF0();
@@ -277,7 +277,7 @@ void Snd::Hal::SetDry(int voice)
 
 extern "C" void fn_803AE0FC(void* h, int v);
 extern "C" void fn_803AE964(int v, int k);
-extern "C" void fn_8041A248(int h, int v);
+extern "C" void AXSetVoiceState(int h, int v);
 
 
 extern "C" int fn_803B0F24(int voice)
@@ -294,7 +294,7 @@ extern "C" int fn_803B0F24(int voice)
             void* h = lbl_8069E200.rec[c->voices[i]].m3C;
             if (h == 0)
                 return -8;
-            fn_8041A248((int)h, 0);
+            AXSetVoiceState((int)h, 0);
             if (lbl_8069E200.rec[c->voices[i]].m24 != 0) {
                 fn_803AE964(c->voices[i], 0);
                 lbl_8069E200.rec[c->voices[i]].m24 = 0;
@@ -369,7 +369,7 @@ extern "C" int fn_803B11FC(int id)
 
 extern "C" void fn_803B12A4()
 {
-    fn_80435CE8(lbl_806AA030);
+    OSInitMutex(lbl_806AA030);
 }
 
 extern "C" void fn_803B12CC()
@@ -378,12 +378,12 @@ extern "C" void fn_803B12CC()
 
 extern "C" void fn_803B12D0()
 {
-    fn_80435D20(lbl_806AA030);
+    OSLockMutex(lbl_806AA030);
 }
 
 extern "C" void fn_803B12F8()
 {
-    fn_80435DFC(lbl_806AA030);
+    OSUnlockMutex(lbl_806AA030);
 }
 
 extern "C" int fn_803B1320(SNDSYSOPTS* p, int kind)
@@ -707,7 +707,7 @@ int SNDPLATFORM_getcurframe(int voice)
     return fn_803B2794(voice - sndgs.sso.set.voicesdsp);
 }
 
-extern "C" void fn_8041A458(int h, float pitch);
+extern "C" void AXSetVoiceSrcRatio(int h, float pitch);
 extern char lbl_8069E23C[];
 
 int SNDPLATFORM_setpitch(int voice)
@@ -723,7 +723,7 @@ int SNDPLATFORM_setpitch(int voice)
             int h = *(int*)(lbl_8069E23C + (c->voices[i] << 6));
             if (h == 0)
                 return -8;
-            fn_8041A458(h, f);
+            AXSetVoiceSrcRatio(h, f);
         }
         return 0;
     } else {

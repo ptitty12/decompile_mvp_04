@@ -22,8 +22,8 @@ extern u32 lbl_806EF978;
 extern void (*lbl_806EF97C)(u32);
 extern s32 lbl_806EF980;
 
-extern void fn_80433004(void* addr, u32 len);
-extern void fn_80433060(void* addr, u32 len);
+extern void DCStoreRange(void* addr, u32 len);
+extern void DCStoreRangeNoSync(void* addr, u32 len);
 extern void fn_8043F34C(u32 va);
 extern void fn_8043F808(void);
 extern void fn_8043F860(void);
@@ -94,7 +94,7 @@ void fn_8043F124(u32 va, u32 pa, u32 idx)
     BOOL en = OSDisableInterrupts();
     pte[0] = 0x80000000 | ((va >> 22) & 0x3F);
     pte[1] = pa & 0x0FFFF000;
-    fn_80433004(pte, 8);
+    DCStoreRange(pte, 8);
     fn_8043F34C(va);
     fn_8043F398(idx, va);
     OSRestoreInterrupts(en);
@@ -106,7 +106,7 @@ void fn_8043F1B8(u32 va, u32 idx)
     u32* pte = fn_8043F7D4(va);
     pte[0] = 0;
     pte[1] = 0;
-    fn_80433004(pte, 8);
+    DCStoreRange(pte, 8);
     fn_8043F34C(va);
     fn_8043F398(idx, 0);
     fn_8043F3B4(idx, 0);
@@ -137,7 +137,7 @@ void fn_8043F2BC(u32 va, s32 flag)
     } else {
         pte[1] &= ~0x100;
     }
-    fn_80433004(&pte[1], 4);
+    DCStoreRange(&pte[1], 4);
     fn_8043F34C(va);
     OSRestoreInterrupts(en);
 }
@@ -206,7 +206,7 @@ void fn_8043F480(void)
         *(u32*)(lbl_806EF970 + i) = 0;
         *(u32*)(lbl_806EF970 + i + 4) = 0;
     }
-    fn_80433004((void*)lbl_806EF970, 0x10000);
+    DCStoreRange((void*)lbl_806EF970, 0x10000);
     fn_8043F808();
     OSRestoreInterrupts(en);
 }
@@ -236,10 +236,10 @@ void fn_8043F728(void (*cb)(u32))
         if ((pte[0] & 0x80000000) && (pte[1] & 0x80)) {
             cb(fn_8043F7EC(pte));
             pte[1] &= ~0x80;
-            fn_80433060(&pte[1], 4);
+            DCStoreRangeNoSync(&pte[1], 4);
         }
     }
-    fn_8041A5DC();
+    PPCSync();
     fn_8043F808();
     OSRestoreInterrupts(en);
 }

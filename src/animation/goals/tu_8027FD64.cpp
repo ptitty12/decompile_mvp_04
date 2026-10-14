@@ -12,8 +12,8 @@ extern "C" float atan2f(float y, float x);
 
 float lbl_8061E6D0 = 45.0f;
 extern Unk80273498_Vec3 lbl_805DED28;
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 
 extern "C" void fn_80280418(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int d);
 extern "C" int fn_802834E8(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c);
@@ -170,9 +170,9 @@ inline Unk80273498_Vec3 operator*(Unk80273498_Vec3 v, float s)
 inline Unk80273498_Vec3 Direction(float angle)
 {
     Unk80273498_Vec3 r;
-    r.x = fn_8041171C(angle);
+    r.x = sinf(angle);
     r.y = 0.0f;
-    r.z = fn_80411554(angle);
+    r.z = cosf(angle);
     return r;
 }
 

@@ -3,5 +3,5 @@
  * and keeps tables in small data, which is what SN's libm has. */
 /* Game code still refers to this function by its placeholder name; the rename to floor waits for
  * a project-wide pass over those sources. */
-#define floor fn_80410634
+#define floor floor
 #include "fdlibm/s_floor.c"

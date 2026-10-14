@@ -321,7 +321,7 @@ extern "C" int fn_800CFC28(Unk800CFB38_Timer* o, float t)
 {
     t = t - o->m18;
     if (o->m14 != 0)
-        t = t - (float)fn_80410634(t / o->m1C) * o->m1C;
+        t = t - (float)floor(t / o->m1C) * o->m1C;
     o->m28 = o->m28 ? o->m28->m18 : o->m20;
     while (o->m28 != 0) {
         if (fn_800CFAE4((Unk800CFAE4_Range*)o->m28, t)) {
@@ -355,7 +355,7 @@ extern "C" void fn_800CFD1C(Unk800CFB38_Timer* o, float t, int* a, int* b, float
 {
     t = t - o->m18;
     if (o->m14 != 0)
-        t = t - (float)fn_80410634(t / o->m1C) * o->m1C;
+        t = t - (float)floor(t / o->m1C) * o->m1C;
     *a = o->m28->m4;
     *b = o->m28->m8;
     if (t == 0.0f) {

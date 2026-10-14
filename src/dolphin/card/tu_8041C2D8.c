@@ -22,9 +22,9 @@ extern u32 fn_804282BC(s32 chan);                            /* EXIGetState */
 extern s32 fn_804282FC(s32 chan, u32 dev, u32* id);          /* EXIGetID */
 extern EXICallback fn_80427440(s32 chan, EXICallback cb);    /* EXISetExiCallback */
 extern BOOL fn_80427630(s32 chan);                           /* EXIProbe */
-extern void fn_80432568(OSAlarm* alarm);                     /* OSCancelAlarm */
+extern void OSCancelAlarm(OSAlarm* alarm);
 extern void fn_80432FA8(void* addr, u32 nBytes);             /* DCInvalidateRange */
-extern void fn_80433004(void* addr, u32 nBytes);             /* DCStoreRange */
+extern void DCStoreRange(void* addr, u32 nBytes);
 extern void* fn_80436A9C(void);                              /* __OSLockSram */
 extern void* fn_80436AF8(void);                              /* __OSLockSramEx */
 extern void fn_80436E90(BOOL commit);                        /* __OSUnlockSram */
@@ -392,7 +392,7 @@ static s32 fn_CheckEx(s32 chan, s32* xferBytes)
 }
 
 /* CARDCheck */
-s32 fn_8041D1EC(s32 chan)
+s32 CARDCheck(s32 chan)
 {
     s32 xferBytes;
 
@@ -438,7 +438,7 @@ static BOOL fn_8041D240(u32 id)
 }
 
 /* CARDProbeEx */
-s32 fn_8041D30C(s32 chan, s32* memSize, s32* sectorSize)
+s32 CARDProbeEx(s32 chan, s32* memSize, s32* sectorSize)
 {
     CARDControl* card;
     u32 id;
@@ -707,7 +707,7 @@ static s32 fn_8041DA14(s32 chan, void* workArea, CARDCallback detachCallback, CA
     card->attached = TRUE;
 
     fn_80427440(chan, 0);
-    fn_80432568(&card->alarm);
+    OSCancelAlarm(&card->alarm);
 
     card->currentDir = 0;
     card->currentFat = 0;
@@ -724,7 +724,7 @@ static s32 fn_8041DA14(s32 chan, void* workArea, CARDCallback detachCallback, CA
 }
 
 /* CARDMount */
-s32 fn_8041DBB4(s32 chan, void* workArea, CARDCallback detachCallback)
+s32 CARDMount(s32 chan, void* workArea, CARDCallback detachCallback)
 {
     s32 result;
 
@@ -746,7 +746,7 @@ static void fn_8041DBFC(s32 chan, s32 result)
     if (card->attached) {
         fn_80427440(chan, 0);
         fn_80427870(chan);
-        fn_80432568(&card->alarm);
+        OSCancelAlarm(&card->alarm);
         card->attached = FALSE;
         card->result = result;
         card->mountStep = 0;
@@ -755,7 +755,7 @@ static void fn_8041DBFC(s32 chan, s32 result)
 }
 
 /* CARDUnmount */
-s32 fn_8041DC98(s32 chan)
+s32 CARDUnmount(s32 chan)
 {
     CARDControl* card;
     s32 result;
@@ -870,7 +870,7 @@ static s32 fn_8041DE88(s32 chan, u16 encode, CARDCallback callback)
 
     card->apiCallback = callback ? callback : fn_8041A6C4;
 
-    fn_80433004(card->workArea, CARD_WORKAREA_SIZE);
+    DCStoreRange(card->workArea, CARD_WORKAREA_SIZE);
 
     card->formatStep = 0;
     result = fn_8041B64C(chan, card->sectorSize * card->formatStep, fn_8041DD44);
@@ -881,7 +881,7 @@ static s32 fn_8041DE88(s32 chan, u16 encode, CARDCallback callback)
 }
 
 /* CARDFormat */
-s32 fn_8041E4E0(s32 chan)
+s32 CARDFormat(s32 chan)
 {
     s32 result;
 

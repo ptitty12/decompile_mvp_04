@@ -111,7 +111,7 @@ inline Unk80273498_Vec3 ToVec3(const Unk80379324_Vec4& v)
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 
@@ -390,8 +390,8 @@ Unk8037B3E8* cGenericTimeWarp::fn_vslot5()
 }
 
 extern "C" float fn_804028E4(float x);               /* square root */
-extern "C" float fn_8041171C(float x);               /* sine */
-extern "C" float fn_80411554(float x);               /* cosine */
+extern "C" float sinf(float x);               /* sine */
+extern "C" float cosf(float x);               /* cosine */
 extern float lbl_8061E88C;
 extern float lbl_8061E890;
 
@@ -517,8 +517,8 @@ void cCycleTimeSpaceWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, U
             Unk802726BC_Angles* p = &x->m734;
             float* q = &p->m110[p->m190];
             float a = *q;
-            float sa = fn_8041171C(a);
-            float ca = fn_80411554(a);
+            float sa = sinf(a);
+            float ca = cosf(a);
             Unk80273498_Vec3 pos = x->m60;
             float len = Length(pos - m14);
             float* r = &p->m50[p->m190];

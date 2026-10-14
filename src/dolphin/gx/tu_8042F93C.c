@@ -12,11 +12,11 @@
 #include "__gx.h"
 
 /* GXPixel.c / GXTransform.c / GXPerf.c part. Placeholder names kept (symbols.txt); likely SDK names:
- * fn_8042F93C GXSetFog, fn_8042FB50 GXInitFogAdjTable, fn_8042FD00 GXSetFogRangeAdj,
+ * fn_8042F93C GXSetFog, GXInitFogAdjTable GXInitFogAdjTable, fn_8042FD00 GXSetFogRangeAdj,
  * fn_8042FE24 GXSetBlendMode, fn_8042FE78 GXSetColorUpdate, fn_8042FEA4 GXSetAlphaUpdate,
  * fn_8042FED0 GXSetZMode, fn_8042FF04 GXSetZCompLoc, fn_8042FF38 GXSetPixelFmt,
  * fn_8043000C GXSetDither, fn_80430038 GXSetDstAlpha, fn_80430074 GXSetFieldMask,
- * fn_804300AC GXSetFieldMode, fn_80430124 GXCallDisplayList, fn_80430194 GXSetProjection (psq),
+ * fn_804300AC GXSetFieldMode, GXCallDisplayList GXCallDisplayList, GXSetProjection GXSetProjection (psq),
  * fn_80430238 GXSetProjectionv (psq), fn_804302C4 GXLoadPosMtxImm (psq), fn_80430314
  * GXLoadNrmMtxImm (psq), fn_80430364 GXSetCurrentMtx, fn_80430398 GXLoadTexMtxImm (psq),
  * fn_8043044C __GXSetProjection helper (viewport), fn_804304DC GXSetViewportJitter,
@@ -27,7 +27,7 @@
 u32 fn_80406C74(double x);
 
 void fn_8042F93C(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color);
-void fn_8042FB50(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4]);
+void GXInitFogAdjTable(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4]);
 void fn_8042FD00(GXBool enable, u16 center, GXFogAdjTable* table);
 void fn_8042FE24(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op);
 void fn_8042FE78(GXBool update_enable);
@@ -39,7 +39,7 @@ void fn_8043000C(GXBool dither);
 void fn_80430038(GXBool enable, u8 alpha);
 void fn_80430074(GXBool update_odd, GXBool update_even);
 void fn_804300AC(GXBool field_mode, GXBool half_aspect_ratio);
-void fn_80430124(void* list, u32 nbytes);
+void GXCallDisplayList(void* list, u32 nbytes);
 void fn_80430364(u32 id);
 void fn_8043044C(void);
 void fn_804304DC(u32 field, f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
@@ -122,7 +122,7 @@ void fn_8042F93C(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXCo
     __GXData->bpSentNot = 0;
 }
 
-void fn_8042FB50(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4]) {
+void GXInitFogAdjTable(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4]) {
     f32 xi, rangeScale, sqrtTerm, ratio;
     f32 sc;
     f32 iw;
@@ -278,7 +278,7 @@ void fn_804300AC(GXBool field_mode, GXBool half_aspect_ratio) {
     __GXFlushTextureState();
 }
 
-void fn_80430124(void* list, u32 nbytes) {
+void GXCallDisplayList(void* list, u32 nbytes) {
     if (__GXData->dirtyState != 0) {
         __GXSetDirtyState();
     }

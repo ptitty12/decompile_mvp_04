@@ -27,7 +27,7 @@ extern "C" void fn_80377488(void* p);
 extern "C" void* fn_803774A8(unsigned n, int heap);
 extern "C" int fn_80401904(int h);
 extern "C" void fn_804017B0(int h, int p);
-extern "C" void fn_80433004(int p, int n);
+extern "C" void DCStoreRange(int p, int n);
 void* fn_8040B190(void* dst, const void* src, ...);
 extern "C" int fn_802B9300(const char* name, int a, int b, unsigned int* outn);
 extern "C" void fn_802CA5AC(int a, int b);
@@ -205,7 +205,7 @@ void fn_802C8424(Unk802C83C0* o, int dst, int* out)
     int h = o->m0;
     int n = fn_80401904(h);
     fn_804017B0(h, dst);
-    fn_80433004(dst, n);
+    DCStoreRange(dst, n);
     if (out != 0) {
         *out = n;
     }

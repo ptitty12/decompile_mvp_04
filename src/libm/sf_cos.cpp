@@ -3,5 +3,5 @@
  * and keeps tables in small data, which is what SN's libm has. */
 /* Game code still refers to this function by its placeholder name; the rename to cosf waits for
  * a project-wide pass over those sources. */
-#define cosf fn_80411554
+#define cosf cosf
 #include "fdlibm/sf_cos.c"

@@ -66,8 +66,8 @@ extern int lbl_8069E1C4;
 
 extern "C" unsigned int OSDisableInterrupts();
 extern "C" void OSRestoreInterrupts(unsigned int);
-extern "C" void fn_80417B10(void* p);
-extern "C" void fn_804176B0(void* p);
+extern "C" void AXFreeVoice(void* p);
+extern "C" void ARQRemoveRequest(void* p);
 extern "C" int fn_803AEB50(int a, int b, int c, int d, int e);
 
 struct Unk8069E200_RecA {
@@ -119,7 +119,7 @@ extern Unk8069E200 lbl_8069E200;
 
 extern "C" void fn_803B14D0();
 extern "C" void fn_803B5ACC();
-extern "C" int fn_8041818C(int a, int b);
+extern "C" int AXRegisterAuxACallback(int a, int b);
 extern "C" void fn_80437D18(void* p);
 extern "C" void fn_80417808();
 extern "C" void fn_803A979C();
@@ -137,7 +137,7 @@ struct Unk803AEE98 {
 extern void (*lbl_806AA4C8)(Unk803AEE98*);
 extern void (*lbl_806AA4CC)();
 
-extern "C" int fn_80415A70();
+extern "C" int ARGetBaseAddress();
 
 extern "C" void fn_803AE964(int v, int k);
 extern unsigned short lbl_80625468[][4];
@@ -149,7 +149,7 @@ struct Unk803AE618 {
 
 extern "C" void fn_803AE0E0(Unk803AE0E0* p);
 
-extern "C" void fn_80417554(void* p, int t, int z, int a, int b, int c, int aligned, void (*cb)(Unk8069E200_RecB*));
+extern "C" void ARQPostRequest(void* p, int t, int z, int a, int b, int c, int aligned, void (*cb)(Unk8069E200_RecB*));
 
 extern "C" void fn_803AC88C()
 {
@@ -453,7 +453,7 @@ extern "C" void fn_803AE550()
     if (lbl_8069E200.mC049 != 0) {
         for (i = 0; i <= 0x2f; i++) {
             if (lbl_8069E200.recA[i].m1F != 0) {
-                fn_80417B10(lbl_8069E200.recA[i].m3C);
+                AXFreeVoice(lbl_8069E200.recA[i].m3C);
                 lbl_8069E200.recA[i].m1F = 0;
                 lbl_8069E200.mC049--;
                 lbl_8069E200.recA[i].m3C = 0;
@@ -504,7 +504,7 @@ extern "C" void fn_803AE964(int v, int mode)
         SNDVOICEI_free(v);
     if (mode == 0) {
         if (p != 0) {
-            fn_80417B10(p);
+            AXFreeVoice(p);
             r->m3C = 0;
         }
     } else if (mode == 2) {
@@ -568,7 +568,7 @@ extern "C" int fn_803AEB50(int a, int b, int c, int d, int idx)
         aligned = d + 0x1f;
         t = lbl_8069E200.recB[slot].m0;
     }
-    fn_80417554(&lbl_8069E200.recB[slot].m4, t, 0, a, b, c, aligned & ~0x1f, fn_803AEB04);
+    ARQPostRequest(&lbl_8069E200.recB[slot].m4, t, 0, a, b, c, aligned & ~0x1f, fn_803AEB04);
     OSRestoreInterrupts(en);
     return lbl_8069E200.m9DEC++;
 }
@@ -579,7 +579,7 @@ extern "C" void fn_803AEC70(int id)
     unsigned int en = OSDisableInterrupts();
     for (i = 0; i <= 63; i++) {
         if (lbl_8069E200.recB[i].m0 == id) {
-            fn_804176B0(&lbl_8069E200.recB[i].m4);
+            ARQRemoveRequest(&lbl_8069E200.recB[i].m4);
             fn_803AEB50(lbl_8069E200.recB[i].m24, lbl_8069E200.recB[i].m28, lbl_8069E200.recB[i].m2C, lbl_8069E200.recB[i].m30, i);
         }
     }
@@ -596,7 +596,7 @@ extern unsigned char lbl_8069C8BB;
 extern int lbl_80625C68;
 extern char lbl_8069FFE0[];
 extern "C" unsigned int fn_80434F9C();
-extern "C" void fn_804383B8(void* p);
+extern "C" void OSWakeupThread(void* p);
 extern "C" int fn_803B1364(int i);
 
 extern "C" void fn_803AED08(int** outs)
@@ -624,7 +624,7 @@ extern "C" void fn_803AED08(int** outs)
             Snd::Util::MemCpy(outs[3], (void*)lbl_8069E200.mAligned[1], 0x280);
         }
     }
-    fn_804383B8(lbl_8069FFE0);
+    OSWakeupThread(lbl_8069FFE0);
     lbl_80625C68++;
     OSRestoreInterrupts(en);
 }
@@ -793,7 +793,7 @@ extern "C" int fn_803AF374()
     sndgs.sso.set.outputrate = 0x7d00;
     sndgs.sso.set.outputchannels = 2;
     sndgs.sso.set.initaram = 1;
-    int a = fn_80415A70() + 0x100;
+    int a = ARGetBaseAddress() + 0x100;
     sndgs.sso.set.arampooladdr = a;
     sndgs.sso.set.arampoolsize = 0x800000 - a;
     return 0;
@@ -824,7 +824,7 @@ extern "C" int fn_803AF42C()
 
 extern "C" int fn_803AF934()
 {
-    fn_8041818C(0, 0);
+    AXRegisterAuxACallback(0, 0);
     if (lbl_8069E200.mC048 != 0)
         fn_803AEF88();
     fn_803B5ACC();

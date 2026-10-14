@@ -107,20 +107,20 @@ void fn_80435BD0(void)
 
 /* ==== OSMutex ==== */
 
-extern OSThread* fn_80437444(void);        /* OSGetCurrentThread */
+extern OSThread* OSGetCurrentThread(void);
 extern void fn_80437768(OSThread* thread, s32 priority);   /* __OSPromoteThread */
 extern void fn_804382CC(OSThreadQueue* queue);             /* OSSleepThread */
-extern void fn_804383B8(OSThreadQueue* queue);             /* OSWakeupThread */
+extern void OSWakeupThread(OSThreadQueue* queue);
 extern s32 fn_8043756C(OSThread* thread);                  /* __OSGetEffectivePriority */
 extern void fn_80437434(OSThreadQueue* queue);             /* OSInitThreadQueue */
 
-void fn_80435CE8(OSMutex* mutex);
-void fn_80435D20(OSMutex* mutex);
-void fn_80435DFC(OSMutex* mutex);
+void OSInitMutex(OSMutex* mutex);
+void OSLockMutex(OSMutex* mutex);
+void OSUnlockMutex(OSMutex* mutex);
 void fn_80435EC4(OSThread* thread);
 
 /* OSInitMutex */
-void fn_80435CE8(OSMutex* mutex)
+void OSInitMutex(OSMutex* mutex)
 {
     fn_80437434(&mutex->queue);
     mutex->thread = NULL;
@@ -128,10 +128,10 @@ void fn_80435CE8(OSMutex* mutex)
 }
 
 /* OSLockMutex */
-void fn_80435D20(OSMutex* mutex)
+void OSLockMutex(OSMutex* mutex)
 {
     BOOL enabled = OSDisableInterrupts();
-    OSThread* currentThread = fn_80437444();
+    OSThread* currentThread = OSGetCurrentThread();
     OSThread* ownerThread;
 
     while (TRUE) {
@@ -166,10 +166,10 @@ void fn_80435D20(OSMutex* mutex)
 }
 
 /* OSUnlockMutex */
-void fn_80435DFC(OSMutex* mutex)
+void OSUnlockMutex(OSMutex* mutex)
 {
     BOOL enabled = OSDisableInterrupts();
-    OSThread* currentThread = fn_80437444();
+    OSThread* currentThread = OSGetCurrentThread();
 
     if (mutex->thread == currentThread && --mutex->count == 0) {
         OSMutex* next = mutex->link.next;
@@ -189,7 +189,7 @@ void fn_80435DFC(OSMutex* mutex)
         if (currentThread->priority < currentThread->base) {
             currentThread->priority = fn_8043756C(currentThread);
         }
-        fn_804383B8(&mutex->queue);
+        OSWakeupThread(&mutex->queue);
     }
     OSRestoreInterrupts(enabled);
 }
@@ -212,7 +212,7 @@ void fn_80435EC4(OSThread* thread)
         thread->queueMutex.head = next;
         mutex->count = 0;
         mutex->thread = NULL;
-        fn_804383B8(&mutex->queue);
+        OSWakeupThread(&mutex->queue);
     }
 }
 
@@ -437,7 +437,7 @@ extern void (*lbl_806EF840)(void);    /* ResetCallback */
 extern BOOL fn_80436530(void);
 
 void fn_8043643C(s16 interrupt, OSContext* context);
-BOOL fn_804367C8(void);
+BOOL OSGetResetSwitchState(void);
 
 /* __OSResetSWInterruptHandler */
 void fn_8043643C(s16 interrupt, OSContext* context)
@@ -513,7 +513,7 @@ BOOL fn_80436530(void)
 }
 
 /* OSGetResetSwitchState */
-BOOL fn_804367C8(void)
+BOOL OSGetResetSwitchState(void)
 {
     return fn_80436530();
 }
@@ -541,8 +541,8 @@ BOOL fn_80436B54(BOOL commit, u32 offset);
 BOOL fn_80436E90(BOOL commit);
 BOOL fn_80436EB4(BOOL commit);
 BOOL fn_80436ED8(void);
-u32 fn_80436EE8(void);
-void fn_80436F58(u32 mode);
+u32 OSGetProgressiveMode(void);
+void OSSetProgressiveMode(u32 mode);
 u16 fn_80436FFC(s32 chan);
 void fn_80437080(s32 chan, u16 id);
 u16 fn_8043712C(void);
@@ -711,7 +711,7 @@ BOOL fn_80436ED8(void)
 
 /* flags: not matched (near-miss) */
 /* OSGetSoundMode */
-u32 fn_80436EE8(void)
+u32 OSGetProgressiveMode(void)
 {
     OSSram* sram = fn_80436A9C();
     u32 mode = (sram->flags >> 7) & 1;
@@ -722,7 +722,7 @@ u32 fn_80436EE8(void)
 
 /* flags: not matched (near-miss) */
 /* OSSetSoundMode */
-void fn_80436F58(u32 mode)
+void OSSetProgressiveMode(u32 mode)
 {
     OSSram* sram;
     BOOL r;

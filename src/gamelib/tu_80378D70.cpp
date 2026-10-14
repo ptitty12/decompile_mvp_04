@@ -37,8 +37,8 @@ struct Unk8037B16C_Mat {
     float m20, m24, m28;
 };
 
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 
 extern "C" int printf(const char* fmt, ...);
 extern "C" int strncmp(const char* a, const char* b, unsigned n);
@@ -639,7 +639,7 @@ inline Unk80379324_Vec3 fn_80379DA0_Scale(const Unk80379324_Vec3& v, float s)
 /* near-miss (97.9%): same instructions except the order of `fmr f1,f31` and `mr r3,r30` before the fn_803793D4 call (retail loads the return-slot pointer last, as in fn_8037B310). */
 extern "C" Unk80379DA0_Quat fn_80379DA0(const Unk80379324_Vec3* axis, float angle)
 {
-    Unk803793D4_Vec4 t = fn_803793D4(fn_80411554(angle * 0.5f), &(const Unk80379324_Vec3&)fn_80379DA0_Scale(fn_80379B34_NormD(*axis), fn_8041171C(angle * 0.5f)));
+    Unk803793D4_Vec4 t = fn_803793D4(cosf(angle * 0.5f), &(const Unk80379324_Vec3&)fn_80379DA0_Scale(fn_80379B34_NormD(*axis), sinf(angle * 0.5f)));
     return *(Unk80379DA0_Quat*)&t;
 }
 
@@ -819,8 +819,8 @@ extern "C" Unk80379324_Vec3 fn_8037B128(const Unk8037B10C_Obj* m)
 
 extern "C" void fn_8037B16C(Unk8037B16C_Mat* m, float a)
 {
-    float s = fn_8041171C(a);
-    float c = fn_80411554(a);
+    float s = sinf(a);
+    float c = cosf(a);
     m->m0 = c;
     m->m4 = 0.0f;
     m->m8 = -s;

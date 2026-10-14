@@ -483,7 +483,7 @@ int fn_8026D184(int a, int flag)
         float p = t;
         float q = w;
         float d = p - q;
-        d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+        d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
         u = d;
     } else {
         u = t + 1.5707964f;
@@ -525,7 +525,7 @@ int fn_8026D344(int a, int flag)
         float p = t;
         float q = w;
         float d = p - q;
-        d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+        d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
         u = d;
     } else {
         u = t + 1.5707964f;

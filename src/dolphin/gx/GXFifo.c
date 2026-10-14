@@ -12,22 +12,22 @@
 
 /* GXFifo.c part of this unit. Placeholder names (symbols.txt) with the likely SDK names:
  * fn_80429FF0 GXCPInterruptHandler, fn_8042A190 GXInitFifoPtrs, fn_8042A200 GXInitFifoLimits,
- * fn_8042A4AC GXGetFifoPtrs, fn_8042A544 GXSetBreakPtCallback, fn_8042A588 GXEnableBreakPt,
- * fn_8042A614 GXDisableBreakPt, fn_8042A6B4 __GXFifoReadEnable, fn_8042A6D8 __GXFifoReadDisable,
+ * GXGetFifoPtrs GXGetFifoPtrs, fn_8042A544 GXSetBreakPtCallback, GXEnableBreakPt GXEnableBreakPt,
+ * GXDisableBreakPt GXDisableBreakPt, fn_8042A6B4 __GXFifoReadEnable, fn_8042A6D8 __GXFifoReadDisable,
  * fn_8042A6FC __GXFifoLink, fn_8042A730 __GXWriteFifoIntEnable, fn_8042A760 __GXWriteFifoIntReset,
- * fn_8042A790 __GXCleanGPFifo, fn_8042A890 GXGetCPUFifo, fn_8042A898 GXGetGPFifo,
- * fn_8042A8A0 GXRedirectWriteGatherPipe, fn_8042A9A8 GXRestoreWriteGatherPipe.
- * Other placeholder callees: fn_80437ED4 OSResumeThread, fn_8043815C OSSuspendThread,
- * fn_80437444 OSGetCurrentThread, fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext,
- * fn_8041A5DC PPCSync, fn_8041A680 PPCMfwpar, fn_8042C020 GXFlush. */
-s32 fn_80437ED4(OSThread* thread);
+ * fn_8042A790 __GXCleanGPFifo, GXGetCPUFifo GXGetCPUFifo, fn_8042A898 GXGetGPFifo,
+ * GXRedirectWriteGatherPipe GXRedirectWriteGatherPipe, GXRestoreWriteGatherPipe GXRestoreWriteGatherPipe.
+ * Other placeholder callees: OSResumeThread OSResumeThread, fn_8043815C OSSuspendThread,
+ * OSGetCurrentThread OSGetCurrentThread, fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext,
+ * PPCSync PPCSync, fn_8041A680 PPCMfwpar, GXFlush GXFlush. */
+s32 OSResumeThread(OSThread* thread);
 s32 fn_8043815C(OSThread* thread);
-OSThread* fn_80437444(void);
+OSThread* OSGetCurrentThread(void);
 void fn_80433814(OSContext* context);
 void fn_8043364C(OSContext* context);
-void fn_8041A5DC(void);
+void PPCSync(void);
 u32 fn_8041A680(void);
-void fn_8042C020(void);
+void GXFlush(void);
 
 extern __GXFifoObj* lbl_806EF760; /* CPUFifo */
 extern __GXFifoObj* lbl_806EF764; /* GPFifo */
@@ -41,23 +41,23 @@ extern u32 lbl_806EF77C;          /* BreakPoint address */
 void fn_80429FF0(__OSInterrupt interrupt, OSContext* context);
 void fn_8042A190(GXFifoObj* fifo, void* rd, void* wr);
 void fn_8042A200(GXFifoObj* fifo, u32 hi, u32 lo);
-void fn_8042A4AC(GXFifoObj* fifo, void** readPtr, void** writePtr);
+void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr);
 GXBreakPtCallback fn_8042A544(GXBreakPtCallback cb);
-void fn_8042A588(void* break_pt);
-void fn_8042A614(void);
+void GXEnableBreakPt(void* break_pt);
+void GXDisableBreakPt(void);
 void fn_8042A6B4(void);
 void fn_8042A6D8(void);
 void fn_8042A6FC(u8 enable);
 void fn_8042A730(u8 hi, u8 lo);
 void fn_8042A760(u8 hi, u8 lo);
 void fn_8042A790(void);
-GXFifoObj* fn_8042A890(void);
+GXFifoObj* GXGetCPUFifo(void);
 GXFifoObj* fn_8042A898(void);
-volatile void* fn_8042A8A0(void* ptr);
-void fn_8042A9A8(void);
+volatile void* GXRedirectWriteGatherPipe(void* ptr);
+void GXRestoreWriteGatherPipe(void);
 
 static inline void GXUnderflowHandler(void) {
-    fn_80437ED4(lbl_806EF768);
+    OSResumeThread(lbl_806EF768);
     lbl_806EF770 = 0;
     fn_8042A760(1, 1);
     fn_8042A730(1, 0);
@@ -162,7 +162,7 @@ void GXSetCPUFifo(GXFifoObj* fifo) {
         GX_SET_PI_REG(5, reg);
         }
     }
-    fn_8041A5DC();
+    PPCSync();
     OSRestoreInterrupts(enabled);
 }
 
@@ -188,7 +188,7 @@ void GXSetGPFifo(GXFifoObj* fifo) {
     GX_SET_CP_REG(29, ((u32)realFifo->rdPtr >> 16) & 0x3FFF);
     GX_SET_CP_REG(21, realFifo->hiWatermark >> 16);
     GX_SET_CP_REG(23, realFifo->loWatermark >> 16);
-    fn_8041A5DC();
+    PPCSync();
     if (lbl_806EF760 == lbl_806EF764) {
         lbl_806EF76C = 1;
         fn_8042A730(1, 0);
@@ -203,7 +203,7 @@ void GXSetGPFifo(GXFifoObj* fifo) {
     OSRestoreInterrupts(enabled);
 }
 
-void fn_8042A4AC(GXFifoObj* fifo, void** readPtr, void** writePtr) {
+void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 
     if (realFifo == lbl_806EF760) {
@@ -234,7 +234,7 @@ GXBreakPtCallback fn_8042A544(GXBreakPtCallback cb) {
     return oldCB;
 }
 
-void fn_8042A588(void* break_pt) {
+void GXEnableBreakPt(void* break_pt) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
@@ -249,7 +249,7 @@ void fn_8042A588(void* break_pt) {
     OSRestoreInterrupts(enabled);
 }
 
-void fn_8042A614(void) {
+void GXDisableBreakPt(void) {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
@@ -263,7 +263,7 @@ void fn_8042A614(void) {
 void __GXFifoInit(void) {
     __OSSetInterruptHandler(17, fn_80429FF0);
     __OSUnmaskInterrupts(0x4000);
-    lbl_806EF768 = fn_80437444();
+    lbl_806EF768 = OSGetCurrentThread();
     lbl_806EF770 = 0;
     lbl_806EF760 = NULL;
     lbl_806EF764 = NULL;
@@ -307,7 +307,7 @@ void fn_8042A790(void) {
     if (gpFifo == NULL) {
         return;
     }
-    cpuFifo = fn_8042A890();
+    cpuFifo = GXGetCPUFifo();
     tempBase = ((__GXFifoObj*)gpFifo)->base;
     tempFifo = *gpFifo;
     fn_8042A190(&tempFifo, tempBase, tempBase);
@@ -322,7 +322,7 @@ void fn_8042A790(void) {
     }
 }
 
-GXFifoObj* fn_8042A890(void) {
+GXFifoObj* GXGetCPUFifo(void) {
     return (GXFifoObj*)lbl_806EF760;
 }
 
@@ -331,12 +331,12 @@ GXFifoObj* fn_8042A898(void) {
 }
 
 /* near-miss: only the scheduling of the final rlwimi/li differs */
-volatile void* fn_8042A8A0(void* ptr) {
+volatile void* GXRedirectWriteGatherPipe(void* ptr) {
     u32 reg = 0;
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    fn_8042C020();
+    GXFlush();
     while (fn_8041A680() & 1) {
     }
     PPCMtwpar(OSUncachedToPhysical((void*)0xCC008000));
@@ -350,12 +350,12 @@ volatile void* fn_8042A8A0(void* ptr) {
     GX_SET_PI_REG(3, 0);
     GX_SET_PI_REG(4, 0x04000000);
     GX_SET_PI_REG(5, reg);
-    fn_8041A5DC();
+    PPCSync();
     OSRestoreInterrupts(enabled);
     return &GXWGFifo;
 }
 
-void fn_8042A9A8(void) {
+void GXRestoreWriteGatherPipe(void) {
     u32 reg = 0;
     BOOL enabled;
     u32 i;
@@ -364,7 +364,7 @@ void fn_8042A9A8(void) {
     for (i = 0; i < 31; i++) {
         GX_WRITE_U8(0);
     }
-    fn_8041A5DC();
+    PPCSync();
     while (fn_8041A680() & 1) {
     }
     PPCMtwpar(OSUncachedToPhysical((void*)0xCC008000));
@@ -378,6 +378,6 @@ void fn_8042A9A8(void) {
         fn_8042A730(1, 0);
         fn_8042A6FC(1);
     }
-    fn_8041A5DC();
+    PPCSync();
     OSRestoreInterrupts(enabled);
 }

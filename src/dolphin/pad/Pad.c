@@ -1,8 +1,8 @@
 /* Imported from emoose/re4 @ feb6805b (src/lib/Pad.c), based on doldecomp/dolsdk2004. Nintendo Dolphin SDK 2004 Patch 1, pad library; names are Nintendo's. */
 /* The game code still calls this by its placeholder name; the placeholder keeps symbols.txt and the
  * callers consistent until a project-wide rename. */
-#define PADRecalibrate fn_804393B4
-#define PADControlMotor fn_80439918
+#define PADRecalibrate PADRecalibrate
+#define PADControlMotor PADControlMotor
 #include <dolphin.h>
 #include <dolphin/pad.h>
 #include <dolphin/si.h>

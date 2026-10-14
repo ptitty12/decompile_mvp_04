@@ -3,7 +3,7 @@
 
 #include "__card.h"
 
-extern void fn_80433004(void* addr, u32 nBytes); /* DCStoreRange */
+extern void DCStoreRange(void* addr, u32 nBytes);
 extern OSTime fn_80438628(void); /* OSGetTime */
 extern void fn_8041A6C4(s32 chan, s32 result); /* __CARDDefaultApiCallback */
 extern void fn_8041A6C8(s32 chan, s32 result); /* __CARDSyncCallback */
@@ -114,7 +114,7 @@ s32 CARDWriteAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CA
     if (result < 0)
         return fn_8041B900(card, result);
 
-    fn_80433004((void*)buf, (u32)length);
+    DCStoreRange((void*)buf, (u32)length);
     card->apiCallback = callback ? callback : fn_8041A6C4;
     card->buffer = (void*)buf;
 

@@ -8,7 +8,7 @@
  * "page is in ARAM", low 31 bits the ARAM address), lbl_806EF948 the table of resident main memory frames
  * (virtual page address per frame). The format string passed to sprintf in fn_8043E198 says
  * "Virtual address (%x) has not been allocated. Call VMAlloc ..." (strings: lbl_80649228),
- * so fn_8043E038 is VMAlloc. Names stay fn_ until symbols.txt is updated.
+ * so VMAlloc is VMAlloc. Names stay fn_ until symbols.txt is updated.
  *
  * The three small accessors (fn_8043DA04/DA0C/DA14) carry padding statements: in retail they are in another
  * source file than their callers (calls stay bl); in this one unit the auto-inliner would expand them.
@@ -61,20 +61,20 @@ extern u32 fn_8043F388(u32 frame);
 extern int fn_8043F3A8(u32 frame);
 extern void fn_8043F728(void (*cb)(u32));
 
-void fn_8043D960(u32 memSize, u32 aramBase, u32 aramSize);
-void fn_8043D9FC(void (*cb)(u32, u32, u32, u32, u32));
+void VMInit(u32 memSize, u32 aramBase, u32 aramSize);
+void VMSetLogStatsCallback(void (*cb)(u32, u32, u32, u32, u32));
 u32 fn_8043DA04(void);
 u32 fn_8043DA0C(void);
 u32 fn_8043DA14(void);
 void fn_8043DA1C(void);
 void fn_8043DA4C(u32 addr);
 void fn_8043DC48(u32 page);
-void fn_8043DCFC(void);
+void VMStoreAllPages(void);
 u32 fn_8043DD24(void);
 u32 fn_8043DD68(void);
 u32 fn_8043DF38(void);
 u32 fn_8043DFCC(void);
-int fn_8043E038(u32 vaddr, u32 size);
+int VMAlloc(u32 vaddr, u32 size);
 u32 fn_8043E138(u32 page);
 int fn_8043E178(u32 page);
 void fn_8043E198(u32 page);
@@ -86,7 +86,7 @@ void fn_8043E2A4(void);
 #define TICKS_TO_US(t) __div2i((s64)(t) * 8, (s64)(OS_TIMER_CLOCK / 125000))
 
 /* VMInit */
-void fn_8043D960(u32 memSize, u32 aramBase, u32 aramSize)
+void VMInit(u32 memSize, u32 aramBase, u32 aramSize)
 {
     BOOL enabled;
 
@@ -105,7 +105,7 @@ void fn_8043D960(u32 memSize, u32 aramBase, u32 aramSize)
     }
 }
 
-void fn_8043D9FC(void (*cb)(u32, u32, u32, u32, u32))
+void VMSetLogStatsCallback(void (*cb)(u32, u32, u32, u32, u32))
 {
     lbl_806EF930 = cb;
 }
@@ -208,7 +208,7 @@ void fn_8043DC48(u32 page)
     fn_8043E1D0(page);
 }
 
-void fn_8043DCFC(void)
+void VMStoreAllPages(void)
 {
     fn_8043F728(fn_8043DC48);
 }
@@ -325,7 +325,7 @@ u32 fn_8043DFCC(void)
 }
 
 /* VMAlloc */
-int fn_8043E038(u32 vaddr, u32 size)
+int VMAlloc(u32 vaddr, u32 size)
 {
     u32 base;
     u32 end;

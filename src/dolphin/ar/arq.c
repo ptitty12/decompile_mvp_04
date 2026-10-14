@@ -33,10 +33,10 @@ ARCallback fn_8041583C(ARCallback callback);                             /* ARRe
 static void fn_80417314(void);
 void fn_80417414(u32 unused);
 static void fn_80417418(void);
-void fn_804174E4(void);
-void fn_80417554(ARQRequest* request, u32 owner, u32 type, u32 priority, u32 source, u32 dest, u32 length,
+void ARQInit(void);
+void ARQPostRequest(ARQRequest* request, u32 owner, u32 type, u32 priority, u32 source, u32 dest, u32 length,
                  ARQCallback callback);
-void fn_804176B0(ARQRequest* request);
+void ARQRemoveRequest(ARQRequest* request);
 
 /* __ARQPopTaskQueueHi */
 static inline void __ARQPopTaskQueueHi(void)
@@ -105,7 +105,7 @@ static void fn_80417418(void)
 }
 
 /* ARQInit */
-void fn_804174E4(void)
+void ARQInit(void)
 {
     if (lbl_806EF524 == TRUE) {
         return;
@@ -123,7 +123,7 @@ void fn_804174E4(void)
 }
 
 /* ARQPostRequest */
-void fn_80417554(ARQRequest* request, u32 owner, u32 type, u32 priority, u32 source, u32 dest, u32 length,
+void ARQPostRequest(ARQRequest* request, u32 owner, u32 type, u32 priority, u32 source, u32 dest, u32 length,
                  ARQCallback callback)
 {
     BOOL level;
@@ -168,7 +168,7 @@ void fn_80417554(ARQRequest* request, u32 owner, u32 type, u32 priority, u32 sou
 }
 
 /* ARQRemoveRequest */
-void fn_804176B0(ARQRequest* request)
+void ARQRemoveRequest(ARQRequest* request)
 {
     BOOL level;
     ARQRequest* req;

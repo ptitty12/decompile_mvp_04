@@ -83,13 +83,13 @@ void fn_803DD794(void* tex);
 void fn_803DB5A0(void* state);
 void fn_803DB9C0(int a, int b);
 void fn_803DDCD4(void);
-void fn_80430124(void* list, int nbytes);
+void GXCallDisplayList(void* list, int nbytes);
 void fn_803DDBF0(void);
 void fn_803DDE7C(void);
 void fn_8042DA74(int chan, GXColor c);
 void fn_8042DB5C(int chan, GXColor c);
 void fn_8042B460(void);
-void fn_8042AB48(int attr, int type);
+void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB88(int a, int b, int c, int d, int e, int f);
 void fn_803DDB5C(int n);
@@ -109,8 +109,8 @@ extern int lbl_8062C664;
 
 extern "C" {
 void fn_803DBE08(void* state, Unk803DBE08Out* out);
-void fn_80433004(void* p, int n);
-void fn_8042C8B0(int a, int b, int c);
+void DCStoreRange(void* p, int n);
+void GXBegin(int a, int b, int c);
 void fn_803DA188(int n);
 }
 
@@ -127,7 +127,7 @@ inline void Unk803DBE08Out::StoreHdr(int per)
 
 inline void Unk803DBE08Out::Begin(int n)
 {
-    fn_8042C8B0(0x90, 0, 0);
+    GXBegin(0x90, 0, 0);
     EALIB_GX_FIFO(PPCWGPipe).u8 = (unsigned char)m0;
     EALIB_GX_FIFO(PPCWGPipe).u16 = n;
 }
@@ -150,12 +150,12 @@ void fn_803DE2E8(Unk803DE1BC* o, int a, int b);
 void fn_803DE27C(Unk803DE1BC* o, int a, int b, int c, int d);
 void fn_803DE25C(Unk803DE1BC* o, int a, int b, int c, int d);
 void fn_803DE300(Unk803DE1BC* o, int a);
-void fn_80431218(void* a, Mtx34* m);
-void fn_80431440(Mtx34* m, void* in, float* out);
+void PSMTXCopy(void* a, Mtx34* m);
+void PSMTXMultVec(Mtx34* m, void* in, float* out);
 void fn_803D98C8(int a, int n);
 void fn_803D9918(void* p, int n);
 void fn_803D999C(void);
-void fn_80430124(void* list, int nbytes);
+void GXCallDisplayList(void* list, int nbytes);
 }
 
 extern const char lbl_806232E0[];
@@ -180,7 +180,7 @@ extern int lbl_806EFAA0;
  * (c0 + c1*xx + c2*yy + c3*zz + c4*xy + c5*xz + c6*yz + c7*x + c8*y + c9*z,
  * one chain per channel, clamped to [0, 1], packed RGBA). Levers, as in
  * tu_80368E64 / tu_803682A8: one index counter per branch, "first = 1" after
- * the fn_80430124 call, float literals, the table pointer a[0][2].m4 re-read per
+ * the GXCallDisplayList call, float literals, the table pointer a[0][2].m4 re-read per
  * iteration. Unk803DBE08Out is a single int here (v at sp+0xb4 next to the
  * 8-aligned fctiwz temp); an 8-byte struct pushes the frame out by 8.
  */
@@ -217,13 +217,13 @@ extern "C" void fn_80369878(Unk803E3C08* a, Unk80623320* b)
     }
     int j = 0;
     int count = ((int*)a->m0[0].m4)[1];
-    fn_80431218(a->m0[1].m4, &mtx);
+    PSMTXCopy(a->m0[1].m4, &mtx);
     mtx.f[3] = 0.0f;
     mtx.f[7] = 0.0f;
     mtx.f[11] = 0.0f;
     fn_803D98C8(lbl_806EFA90, ((int*)a->m0[0].m4)[1] * 4);
     for (; j < count; j++) {
-        fn_80431440(&mtx, (char*)a->m0[4].m4 + j * 16, vec);
+        PSMTXMultVec(&mtx, (char*)a->m0[4].m4 + j * 16, vec);
         SHCoef* c = (SHCoef*)a->m0[2].m4;
         float x = vec[0];
         float y = vec[1];
@@ -268,7 +268,7 @@ extern "C" void fn_80369878(Unk803E3C08* a, Unk80623320* b)
             EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)dl;
             EALIB_GX_FIFO(PPCWGPipe).u32 = dlsz;
         } else {
-            fn_80430124(dl, dlsz);
+            GXCallDisplayList(dl, dlsz);
         }
     } else {
         Unk803DBE08Out v(b->m4);
@@ -291,7 +291,7 @@ extern "C" void fn_80369878(Unk803E3C08* a, Unk80623320* b)
                 for (; p < lbl_8062C660 + lbl_8062C664; p++) {
                     *p = 0;
                 }
-                fn_80433004(lbl_8062C660, lbl_8062C664);
+                DCStoreRange(lbl_8062C660, lbl_8062C664);
             }
             int sz = (per * b->m0 + 0x22) / 32 * 32;
             int first = 0;
@@ -301,7 +301,7 @@ extern "C" void fn_80369878(Unk803E3C08* a, Unk80623320* b)
                     EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)lbl_8062C660;
                     EALIB_GX_FIFO(PPCWGPipe).u32 = sz;
                 } else {
-                    fn_80430124(lbl_8062C660, sz);
+                    GXCallDisplayList(lbl_8062C660, sz);
                     first = 1;
                 }
                 int chunk = per;
@@ -403,15 +403,15 @@ extern "C" void fn_8036A16C(void* x)
         fn_8042B460();
         lbl_80623354 = a.m50[10];
         if (lbl_80623354) {
-            fn_8042AB48(9, 2);
+            GXSetVtxDesc(9, 2);
         } else {
-            fn_8042AB48(9, 3);
+            GXSetVtxDesc(9, 3);
         }
         lbl_80623364 = a.m50[14];
         if (lbl_80623364) {
-            fn_8042AB48(0xb, 2);
+            GXSetVtxDesc(0xb, 2);
         } else {
-            fn_8042AB48(0xb, 3);
+            GXSetVtxDesc(0xb, 3);
         }
     }
     if (a.mB4) {

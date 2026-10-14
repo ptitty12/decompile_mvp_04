@@ -133,7 +133,7 @@ void fn_8028F588(float v);
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 
@@ -144,16 +144,16 @@ void fn_80244858(Unk80270BA0_X* x, float v);
 extern "C" float fn_804028E4(float x);               /* square root */
 float fn_802958F4(Unk80283934_Ent* e, Unk80270BA0_X* x, int a, float b);
 
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 
 /* Unit vector for an angle (as in animation/choosers/tu_80272B20.cpp). */
 inline Vec3 Direction(float angle)
 {
     Vec3 r;
-    r.x = fn_8041171C(angle);
+    r.x = sinf(angle);
     r.y = 0.0f;
-    r.z = fn_80411554(angle);
+    r.z = cosf(angle);
     return r;
 }
 

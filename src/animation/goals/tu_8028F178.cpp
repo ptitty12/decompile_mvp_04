@@ -17,8 +17,8 @@ template <class T> inline float Unk8028F178_Secs(T n)
 }
 
 extern "C" float fn_804028E4(float x);               /* square root */
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 float fn_80410CE8(float y, float x);
 
 inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
@@ -42,16 +42,16 @@ inline Unk80273498_Vec3 operator*(Unk80273498_Vec3 v, float s)
 inline Unk80273498_Vec3 Direction(float angle)
 {
     Unk80273498_Vec3 r;
-    r.x = fn_8041171C(angle);
+    r.x = sinf(angle);
     r.y = 0.0f;
-    r.z = fn_80411554(angle);
+    r.z = cosf(angle);
     return r;
 }
 
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 

@@ -3,8 +3,8 @@
  * .text 0x804321CC-0x804330D0 (code-only unit, 33 functions; TU boundaries approximate, placeholder).
  * Every data object is extern by its lbl_ name.
  * Not reproduced (original code, no C equivalent): fn_804328B4 (DecrementerExceptionHandler),
- * fn_80432F94 (DCEnable), fn_80432FA8 (DCInvalidateRange), fn_80432FD4 (DCFlushRange), fn_80433004 (DCStoreRange),
- * fn_80433034 (DCFlushRangeNoSync), fn_80433060 (DCStoreRangeNoSync), ICInvalidateRange, fn_804330C0 (ICFlashInvalidate).
+ * fn_80432F94 (DCEnable), fn_80432FA8 (DCInvalidateRange), fn_80432FD4 (DCFlushRange), DCStoreRange (DCStoreRange),
+ * fn_80433034 (DCFlushRangeNoSync), DCStoreRangeNoSync (DCStoreRangeNoSync), ICInvalidateRange, fn_804330C0 (ICFlashInvalidate).
  */
 #include <dolphin.h>
 #include <dolphin/os.h>
@@ -26,7 +26,7 @@ void fn_80432224(OSAlarm* alarm);
 void fn_80432234(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler);
 void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
 void fn_804324EC(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler handler);
-void fn_80432568(OSAlarm* alarm);
+void OSCancelAlarm(OSAlarm* alarm);
 void fn_80432684(u8 exception, OSContext* context);
 void fn_804328B4(u8 exception, OSContext* context);
 BOOL fn_80432904(BOOL final);
@@ -132,7 +132,7 @@ void fn_804324EC(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler han
 }
 
 /* OSCancelAlarm */
-void fn_80432568(OSAlarm* alarm)
+void OSCancelAlarm(OSAlarm* alarm)
 {
     OSAlarm* next;
     BOOL enabled;
@@ -222,7 +222,7 @@ BOOL fn_80432904(BOOL final)
 
         while (alarm != 0) {
             if (fn_80425724(alarm) == FALSE) {
-                fn_80432568(alarm);
+                OSCancelAlarm(alarm);
             }
 
             alarm = next;
@@ -280,7 +280,7 @@ Cell* fn_804329A4(Cell* list, Cell* cell);
 void* fn_80432A50(long heap, u32 size);
 void fn_80432B4C(long heap, void* ptr);
 long fn_80432BC8(long heap);
-void* fn_80432BD8(void* arenaStart, void* arenaEnd, int maxHeaps);
+void* OSInitAlloc(void* arenaStart, void* arenaEnd, int maxHeaps);
 long fn_80432C48(void* start, void* end);
 
 /* DLInsert */
@@ -385,7 +385,7 @@ long fn_80432BC8(long heap)
 /* OSInitAlloc */
 /* near-miss 98.9%: arraySize hoisted before the loop and the last stores in retail order fix the structure; 5 slots differ only in the
  * volatile register numbers of the final base load (r5 here, r3 in retail) */
-void* fn_80432BD8(void* arenaStart, void* arenaEnd, int maxHeaps)
+void* OSInitAlloc(void* arenaStart, void* arenaEnd, int maxHeaps)
 {
     u32 arraySize;
     long i;

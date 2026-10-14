@@ -16,8 +16,8 @@ extern "C" {
 void SISetSamplingRate(int);                      /* called once before the pads are created */
 void* fn_8040B320(void* dst, int val, unsigned int n);   /* memset */
 void* fn_803FFC58(void* dst, int val, unsigned int n);   /* memset */
-void fn_804393B4(unsigned int mask);
-void fn_80439918(int chan, int cmd);   /* motor control */
+void PADRecalibrate(unsigned int mask);
+void PADControlMotor(int chan, int cmd);   /* motor control */
 }
 extern char lbl_806E0210[0x30];             /* two 0x30-byte buffers (common symbols) */
 extern char lbl_806E0240[0x30];
@@ -57,7 +57,7 @@ Unk800085B0::Unk800085B0(int idx)
     m15FC = 0;
     fn_803FFC58(lbl_806E0210, 0, 0x30);
     fn_803FFC58(lbl_806E0240, 0, 0x30);
-    fn_804393B4(lbl_805A3B18[m15DC]);
+    PADRecalibrate(lbl_805A3B18[m15DC]);
 }
 
 /* not attempted: fn_80008664 (0x1DE8 bytes, large frame). */
@@ -97,7 +97,7 @@ void Unk800085B0::fn_8000AEB4()
     if (vslot6()) {
         if ((m15F8 > 0x78 && m15FC) || (m15F8 > 0 && m15E8 <= 0 && m15F0 <= 0)) {
             m15F8 = 0;
-            fn_80439918(lbl_805A3B28[m15DC], 0);
+            PADControlMotor(lbl_805A3B28[m15DC], 0);
             m1600 = 5;
             m15FC = 0;
             m15E0 = 0;
@@ -120,10 +120,10 @@ void Unk800085B0::fn_8000AEB4()
             else if (m15F8 > 0x78)
                 v = 0;
             if (v == 0) {
-                fn_80439918(lbl_805A3B28[m15DC], 0);
+                PADControlMotor(lbl_805A3B28[m15DC], 0);
                 m1600 = 5;
             } else if (m15FC == 0) {
-                fn_80439918(lbl_805A3B28[m15DC], 1);
+                PADControlMotor(lbl_805A3B28[m15DC], 1);
             }
             m15FC = v;
             m15E0 = 0;

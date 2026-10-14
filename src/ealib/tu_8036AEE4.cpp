@@ -66,7 +66,7 @@ void fn_8042DB5C(int chan, GXColor c);
 void fn_803DDE7C(void);
 void fn_803DDBF0(void);
 void fn_8042B460(void);
-void fn_8042AB48(int attr, int type);
+void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB88(int a, int b, int c, int d, int e, int f);
 void fn_803DDB5C(int n);
@@ -113,21 +113,21 @@ extern "C" void fn_8036BB24(void* x)
         fn_8042B460();
         lbl_806234E8 = a.m50[10];
         if (lbl_806234E8) {
-            fn_8042AB48(9, 2);
+            GXSetVtxDesc(9, 2);
         } else {
-            fn_8042AB48(9, 3);
+            GXSetVtxDesc(9, 3);
         }
         lbl_806234EC = a.m50[11];
         if (lbl_806234EC) {
-            fn_8042AB48(0xa, 2);
+            GXSetVtxDesc(0xa, 2);
         } else {
-            fn_8042AB48(0xa, 3);
+            GXSetVtxDesc(0xa, 3);
         }
         lbl_80623500 = a.m50[16];
         if (lbl_80623500) {
-            fn_8042AB48(0xd, 2);
+            GXSetVtxDesc(0xd, 2);
         } else {
-            fn_8042AB48(0xd, 3);
+            GXSetVtxDesc(0xd, 3);
         }
     }
     if (a.mB4) {

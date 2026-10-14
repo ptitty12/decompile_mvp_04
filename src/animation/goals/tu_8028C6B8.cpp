@@ -32,8 +32,8 @@ inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_V
 }
 
 extern Unk80273498_Vec3 lbl_806055AC;       /* 0xc bytes in another unit's .rodata (default direction) */
-extern "C" float fn_8041171C(float x);
-extern "C" float fn_80411554(float x);
+extern "C" float sinf(float x);
+extern "C" float cosf(float x);
 
 inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
 {
@@ -56,9 +56,9 @@ inline Unk80273498_Vec3 operator*(Unk80273498_Vec3 v, float s)
 inline Unk80273498_Vec3 Direction(float angle)
 {
     Unk80273498_Vec3 r;
-    r.x = fn_8041171C(angle);
+    r.x = sinf(angle);
     r.y = 0.0f;
-    r.z = fn_80411554(angle);
+    r.z = cosf(angle);
     return r;
 }
 

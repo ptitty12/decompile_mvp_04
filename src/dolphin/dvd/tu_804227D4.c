@@ -13,12 +13,12 @@
 #include <string.h>
 
 /* dvdfs.c / dvd.c small functions of this unit. Placeholder names kept (symbols.txt); likely SDK names:
- * fn_804227D4 __DVDFSInit, fn_80422B00 DVDFastOpen, fn_80422C3C DVDClose, fn_80422FA4 cbForReadAsync,
+ * fn_804227D4 __DVDFSInit, DVDFastOpen DVDFastOpen, DVDClose DVDClose, fn_80422FA4 cbForReadAsync,
  * fn_80422FD4 cbForReadSync (empty), fn_80423E80 / fn_804232A4 / fn_804236C0 / fn_80423DEC / fn_804239D8
  * (state machine starters: DVDLow* with the next state as callback), fn_80423908 / fn_8042393C
  * (DVDLowAudioBufferConfig starters), fn_80425064 DVDGetCommandBlockStatus, fn_8042515C
  * __DVDSetAutoInvalidation-style exchange, fn_80425508 DVDGetCurrentDiskID, fn_804254E4 (wakes the DVD
- * thread queue), fn_80425724 __DVDTestAlarm. Callees: fn_80425438 DVDCancel, fn_804383B8 OSWakeupThread,
+ * thread queue), fn_80425724 __DVDTestAlarm. Callees: fn_80425438 DVDCancel, OSWakeupThread OSWakeupThread,
  * fn_80426C98 __DVDLowTestAlarm, fn_804263F8 DVDLowRead, fn_80426724 DVDLowWaitCoverClose,
  * fn_80426750 DVDLowReadDiskID, fn_804267F4 DVDLowStopMotor, fn_80426880 DVDLowRequestError,
  * fn_80426ACC DVDLowAudioBufferConfig. */
@@ -49,7 +49,7 @@ extern DVDDiskID lbl_806DE180;
 extern OSAlarm lbl_806DE1D0;
 
 int fn_80425438(DVDCommandBlock* block);
-void fn_804383B8(OSThreadQueue* queue);
+void OSWakeupThread(OSThreadQueue* queue);
 BOOL fn_80426C98(const OSAlarm* alarm);
 BOOL fn_804263F8(void* addr, u32 length, u32 offset, DVDLowCallback callback);
 BOOL fn_80426724(DVDLowCallback callback);
@@ -131,9 +131,9 @@ void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
 BOOL fn_80426690(u32 offset, DVDLowCallback callback);
 void fn_80423828(void);
 void fn_804230B0(void);
-s32 fn_8042280C(const char* path);
+s32 DVDConvertPathToEntrynum(const char* path);
 void fn_80423CD4(OSAlarm* alarm, OSContext* context);
-BOOL fn_80422E84(const char* path);
+BOOL DVDChangeDir(const char* path);
 void fn_804235E4(u32 intType);
 void fn_8042516C(void);
 
@@ -142,10 +142,10 @@ extern u32 lbl_806EF6A8;
 extern s32 lbl_806EF6A4;
 extern const char* lbl_806EF1A0;
 
-BOOL fn_80422B74(const char* fileName, DVDFileInfo* fileInfo);
+BOOL DVDOpen(const char* fileName, DVDFileInfo* fileInfo);
 BOOL fn_80422DC0(char* path, u32 maxlen);
 u32 fn_80422C60(u32 entry, char* path, u32 maxlen);
-BOOL fn_80422EE4(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio);
+BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio);
 int fn_80424C14(DVDCommandBlock* block, void* addr, s32 length, s32 offset, DVDCBCallback callback, s32 prio);
 void fn_80422FD8(void);
 void fn_80425E54(void);
@@ -155,8 +155,8 @@ void fn_80425CEC(void);
 void __DVDClearWaitingQueue(void);
 
 void fn_804227D4(void);
-BOOL fn_80422B00(s32 entrynum, DVDFileInfo* fileInfo);
-BOOL fn_80422C3C(DVDFileInfo* fileInfo);
+BOOL DVDFastOpen(s32 entrynum, DVDFileInfo* fileInfo);
+BOOL DVDClose(DVDFileInfo* fileInfo);
 void fn_80422FA4(s32 result, DVDCommandBlock* block);
 void fn_80422FD4(s32 result, DVDCommandBlock* block);
 void fn_804232A4(void);
@@ -185,7 +185,7 @@ static BOOL isSame(const char* path, const char* string) {
     return FALSE;
 }
 
-s32 fn_8042280C(const char* pathPtr) {
+s32 DVDConvertPathToEntrynum(const char* pathPtr) {
     const char* ptr;
     const char* stringPtr;
     BOOL isDir;
@@ -270,7 +270,7 @@ s32 fn_8042280C(const char* pathPtr) {
     }
 }
 
-BOOL fn_80422B00(s32 entrynum, DVDFileInfo* fileInfo) {
+BOOL DVDFastOpen(s32 entrynum, DVDFileInfo* fileInfo) {
     if (entrynum < 0 || entrynum >= lbl_806EF64C || FST_IS_DIR(&lbl_806EF644[entrynum])) {
         return FALSE;
     }
@@ -281,11 +281,11 @@ BOOL fn_80422B00(s32 entrynum, DVDFileInfo* fileInfo) {
     return TRUE;
 }
 
-BOOL fn_80422B74(const char* fileName, DVDFileInfo* fileInfo) {
+BOOL DVDOpen(const char* fileName, DVDFileInfo* fileInfo) {
     s32 entry;
     char currentDir[128];
 
-    entry = fn_8042280C(fileName);
+    entry = DVDConvertPathToEntrynum(fileName);
     if (entry < 0) {
         fn_80422DC0(currentDir, 128);
         OSReport("Warning: DVDOpen(): file '%s' was not found under %s.\n", fileName, currentDir);
@@ -301,7 +301,7 @@ BOOL fn_80422B74(const char* fileName, DVDFileInfo* fileInfo) {
     return TRUE;
 }
 
-BOOL fn_80422C3C(DVDFileInfo* fileInfo) {
+BOOL DVDClose(DVDFileInfo* fileInfo) {
     fn_80425438(&fileInfo->cb);
     return TRUE;
 }
@@ -357,8 +357,8 @@ BOOL fn_80422DC0(char* path, u32 maxlen) {
     return DVDConvertEntrynumToPath((s32)lbl_806EF650, path, maxlen);
 }
 
-BOOL fn_80422E84(const char* path) {
-    s32 entry = fn_8042280C(path);
+BOOL DVDChangeDir(const char* path) {
+    s32 entry = DVDConvertPathToEntrynum(path);
 
     if (entry < 0 || !FST_IS_DIR(&lbl_806EF644[entry])) {
         return FALSE;
@@ -367,7 +367,7 @@ BOOL fn_80422E84(const char* path) {
     return TRUE;
 }
 
-BOOL fn_80422EE4(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio) {
+BOOL DVDReadAsyncPrio(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio) {
     if (!((0 <= offset) && (offset <= fileInfo->length))) {
         fn_80433CE8("dvdfs.c", 0x2EE, "DVDReadAsync(): specified area is out of the file  ");
     }
@@ -1461,7 +1461,7 @@ int fn_80425438(DVDCommandBlock* block) {
 }
 
 void fn_804254E4(s32 result, DVDCommandBlock* block) {
-    fn_804383B8(&lbl_806EF658);
+    OSWakeupThread(&lbl_806EF658);
 }
 
 DVDDiskID* fn_80425508(void) {

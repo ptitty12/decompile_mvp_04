@@ -83,7 +83,7 @@ void fn_803DDE7C(void);
 void fn_8042DA74(int chan, GXColor c);
 void fn_8042DB5C(int chan, GXColor c);
 void fn_8042B460(void);
-void fn_8042AB48(int attr, int type);
+void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB5C(int n);
 void fn_803DA468(int attr, void* base, int stride);
@@ -94,7 +94,7 @@ void fn_80430364(int id);
 void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
 void fn_803DB5A0(void* state);
 void fn_803DDCD4(void);
-void fn_80430124(void* list, int nbytes);
+void GXCallDisplayList(void* list, int nbytes);
 void fn_803EA338(void* a, void* b, void* c, void* d);
 void fn_803DBBE0(void* tex);
 void fn_803DE1BC(Unk803DE1BC* o);
@@ -171,7 +171,7 @@ extern "C" void fn_803728E8(Unk803E3C08* a, Unk80623D04* b)
         EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)dl;
         EALIB_GX_FIFO(PPCWGPipe).u32 = dlsz;
     } else {
-        fn_80430124(dl, dlsz);
+        GXCallDisplayList(dl, dlsz);
     }
 }
 
@@ -196,18 +196,18 @@ extern "C" void fn_80372C30(void* x)
     if (a.mB4 != 0 || a.m50[10] != lbl_80623D04.m34 || a.m50[14] != lbl_80623D04.m44) {
         a.mB8 = 0;
         fn_8042B460();
-        fn_8042AB48(0, 1);
+        GXSetVtxDesc(0, 1);
         lbl_80623D38 = a.m50[10];
         if (lbl_80623D38) {
-            fn_8042AB48(9, 2);
+            GXSetVtxDesc(9, 2);
         } else {
-            fn_8042AB48(9, 3);
+            GXSetVtxDesc(9, 3);
         }
         lbl_80623D48 = a.m50[14];
         if (lbl_80623D48) {
-            fn_8042AB48(0xb, 2);
+            GXSetVtxDesc(0xb, 2);
         } else {
-            fn_8042AB48(0xb, 3);
+            GXSetVtxDesc(0xb, 3);
         }
     }
     if (a.mB4) {

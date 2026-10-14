@@ -64,9 +64,9 @@ extern int lbl_8062C664;
 extern "C" void* fn_803D700C(void* mem);
 extern "C" void fn_803D7600(void* p, int chrg);
 extern "C" int fn_803D76F4(int a, int b, int c);
-extern "C" void fn_80433060(void* p, int n);
+extern "C" void DCStoreRangeNoSync(void* p, int n);
 extern "C" void GXInvalidateVtxCache();
-extern "C" void fn_8041A5DC();
+extern "C" void PPCSync();
 extern "C" int strcmp(const char* a, const char* b);
 extern "C" void fn_803D987C(void* p);
 struct Unk803E68B0_Key {
@@ -308,10 +308,10 @@ inline int FlushInl(Unk803E6660* o)
             int off = i * 12;
             Unk803E6660_Rec* r = (Unk803E6660_Rec*)(off + (int)o->mC);
             if (r->m4 && r->m8 > 0)
-                fn_80433060(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
+                DCStoreRangeNoSync(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
         }
         GXInvalidateVtxCache();
-        fn_8041A5DC();
+        PPCSync();
     }
     o->m18 = 0;
     return 1;

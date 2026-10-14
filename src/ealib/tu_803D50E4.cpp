@@ -464,7 +464,7 @@ extern int lbl_806279C0;
 extern int lbl_806279C4;
 extern void (*lbl_806279C8)();
 extern "C" {
-void fn_804315FC(Mtx4* a, Mtx4* b, Mtx4* c);
+void PSMTX44Concat(Mtx4* a, Mtx4* b, Mtx4* c);
 int fn_803D9DF4();
 void fn_803D9528();
 void fn_803E6D00(void* a, void* b);
@@ -475,8 +475,8 @@ extern "C" void fn_803D71F0(int p)
 {
     Unk803D71F0Obj* self = (Unk803D71F0Obj*)p;
     lbl_806AAA10 = self->m0;
-    fn_804315FC(&lbl_806AAA10, &lbl_806AAA90, &lbl_806AAAD0);
-    fn_804315FC(&lbl_806AAA10, &lbl_806AA9D0, &lbl_806AAA50);
+    PSMTX44Concat(&lbl_806AAA10, &lbl_806AAA90, &lbl_806AAAD0);
+    PSMTX44Concat(&lbl_806AAA10, &lbl_806AA9D0, &lbl_806AAA50);
     lbl_80627290 = 0;
     if (fn_803D9DF4() != 0)
         fn_803D9528();

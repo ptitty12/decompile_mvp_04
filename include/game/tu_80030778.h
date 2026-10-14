@@ -82,7 +82,7 @@ extern Unk80030884* lbl_80616B68;
 extern "C" {
 void fn_80030C90(Unk80030884* self, int i);
 Unk8002D15C_Vec3 fn_80196E3C(int a, float f);
-double fn_80410634(double x);
+double floor(double x);
 void fn_80021EB4(void* self, void* o, int a, int b, int c);
 int fn_80031110(Unk80021A60* self, int a, int b);
 Unk80021A60* fn_80021A60(Unk80021A60* self);

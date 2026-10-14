@@ -24,11 +24,11 @@ extern BOOL fn_804281E0(s32 chan);                                              
 extern void fn_804321CC(void);                                                /* OSInitAlarm */
 extern void fn_80432224(OSAlarm* alarm);                                      /* OSCreateAlarm */
 extern void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler); /* OSSetAlarm */
-extern void fn_80432568(OSAlarm* alarm);                                      /* OSCancelAlarm */
+extern void OSCancelAlarm(OSAlarm* alarm);
 extern u16 fn_80434DE8(void);                                                 /* OSGetFontEncode */
 extern void fn_80437434(OSThreadQueue* queue);                                /* OSInitThreadQueue */
 extern void fn_804382CC(OSThreadQueue* queue);                                /* OSSleepThread */
-extern void fn_804383B8(OSThreadQueue* queue);                                /* OSWakeupThread */
+extern void OSWakeupThread(OSThreadQueue* queue);
 
 /* __CARDBlock (2 control blocks) followed by __CARDDiskNone: defined together in CARDBios.c, so MWCC forms
  * &__CARDDiskNone as base+0x220 */
@@ -64,7 +64,7 @@ void fn_8041A6C8(s32 chan, s32 result)
     CARDControl* card;
 
     card = &lbl_806DCF20.block[chan];
-    fn_804383B8(&card->threadQueue);
+    OSWakeupThread(&card->threadQueue);
 }
 
 /* __CARDExtHandler */
@@ -77,7 +77,7 @@ void fn_8041A6FC(s32 chan, OSContext* context)
     if (card->attached) {
         card->attached = FALSE;
         fn_80427440(chan, 0);
-        fn_80432568(&card->alarm);
+        OSCancelAlarm(&card->alarm);
 
         callback = card->exiCallback;
         if (callback) {
@@ -107,7 +107,7 @@ void fn_8041A7D4(s32 chan, OSContext* context)
 
     card = &lbl_806DCF20.block[chan];
 
-    fn_80432568(&card->alarm);
+    OSCancelAlarm(&card->alarm);
 
     if (!card->attached) {
         return;
@@ -284,7 +284,7 @@ static s32 fn_8041AE08(s32 chan)
         return CARD_RESULT_NOCARD;
     }
 
-    fn_80432568(&card->alarm);
+    OSCancelAlarm(&card->alarm);
 
     switch (card->cmd[0]) {
     case 0xF3:
@@ -399,7 +399,7 @@ s32 fn_8041B1B8(s32 chan, CARDCallback txCallback, CARDCallback exiCallback)
                 fn_804281E0(chan);
                 result = CARD_RESULT_NOCARD;
             } else {
-                fn_80432568(&card->alarm);
+                OSCancelAlarm(&card->alarm);
 
                 switch (card->cmd[0]) {
                 case 0xF3:
@@ -544,7 +544,7 @@ s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback)
  * (lwz r0,268(r30)); ours reads it through the full address in r3 and copies it into r30 afterwards. The pointer is now the
  * loop variable from the start, which fixes the register assignment (early-return, local-pointer, cast and pointer-arithmetic
  * spellings of the test all give the same copy). */
-void fn_8041B75C(void)
+void CARDInit(void)
 {
     CARDControl* card = &lbl_806DCF20.block[0];
     s32 chan;
@@ -625,7 +625,7 @@ s32 fn_8041B900(CARDControl* card, s32 result)
 }
 
 /* CARDFreeBlocks */
-s32 fn_8041B964(s32 chan, s32* byteNotUsed, s32* filesNotUsed)
+s32 CARDFreeBlocks(s32 chan, s32* byteNotUsed, s32* filesNotUsed)
 {
     CARDControl* card;
     u16* fat;
@@ -663,7 +663,7 @@ s32 fn_8041B964(s32 chan, s32* byteNotUsed, s32* filesNotUsed)
 }
 
 /* CARDGetSectorSize */
-s32 fn_8041BAB4(s32 chan, u32* size)
+s32 CARDGetSectorSize(s32 chan, u32* size)
 {
     CARDControl* card;
     s32 result;
@@ -701,17 +701,17 @@ s32 fn_8041BB38(s32 chan)
     return result;
 }
 
-extern s32 fn_8041DC98(s32 chan);
+extern s32 CARDUnmount(s32 chan);
 
 s32 fn_8041BBD0(s32 mode)
 {
-    if (mode == 0 && (fn_8041DC98(0) == -1 || fn_8041DC98(1) == -1)) {
+    if (mode == 0 && (CARDUnmount(0) == -1 || CARDUnmount(1) == -1)) {
         return 0;
     }
     return 1;
 }
 
-BOOL fn_8041BC20(BOOL enable)
+BOOL CARDSetFastMode(BOOL enable)
 {
     u16 prev = lbl_806EF602;
     lbl_806EF602 = enable ? 1 : 0;

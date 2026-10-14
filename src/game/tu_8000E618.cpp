@@ -26,14 +26,14 @@
 
 typedef Unk8000E618_Vec3 Vec3;
 
-/* EA core-library memory manager entry points (fn_8043D960 and fn_8043D9FC
+/* EA core-library memory manager entry points (VMInit and VMSetLogStatsCallback
  * set up the virtual-memory pool and a callback; fn_803ED720 creates a heap). */
-extern "C" void fn_8043D960(int a, int b, int c);
-extern "C" void fn_8043D9FC(void (*cb)(int, int, int, int));
-extern "C" void fn_8043E038(int a, int b);
+extern "C" void VMInit(int a, int b, int c);
+extern "C" void VMSetLogStatsCallback(void (*cb)(int, int, int, int));
+extern "C" void VMAlloc(int a, int b);
 extern "C" int fn_803ED9D4();
 extern "C" void fn_803ED720(int h, const char* name, int a, int b, int c, int d, int e, int f, int g, int h2);
-extern "C" void fn_8043DCFC();
+extern "C" void VMStoreAllPages();
 void* operator new(unsigned int, int);
 
 extern "C" float fn_804028E4(float x); /* square root */
@@ -57,15 +57,15 @@ void fn_8000E718(int a, int b, int c, int size);
 
 void fn_8000E624()
 {
-    fn_8043D960(0x100000, 0x800000, 0x800000);
-    fn_8043D9FC(fn_8000E718);
+    VMInit(0x100000, 0x800000, 0x800000);
+    VMSetLogStatsCallback(fn_8000E718);
 }
 
 Unk8000E618* fn_8000E65C()
 {
     if (lbl_806164C0 == 0) {
         lbl_806164C0 = new (0) Unk8000E618;
-        fn_8043E038(0x7e000000, 0x800000);
+        VMAlloc(0x7e000000, 0x800000);
         lbl_806164C0->m0 = fn_803ED9D4();
         fn_803ED720(lbl_806164C0->m0, "virtual memory", 0x7e000000, 0x800000, 0x20, 0x20, 0, 0, 0, 1);
     }
@@ -79,7 +79,7 @@ int Unk8000E618::fn_8000E6F0()
 
 void Unk8000E618::fn_8000E6F8()
 {
-    fn_8043DCFC();
+    VMStoreAllPages();
 }
 
 void fn_8000E718(int a, int b, int c, int size)

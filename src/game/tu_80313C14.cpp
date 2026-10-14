@@ -236,7 +236,7 @@ void fn_80314368(void* c, unsigned short* s, int a, int b, float x, float y);
 void fn_80317624(int* a, int* b, int c);
 Unk80313C14_TxO* fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
 int fn_803EB864(int a, int b, int c, int d, int e, int f, int g);
-void fn_80433004(void* a, int n);
+void DCStoreRange(void* a, int n);
 void* fn_803DD628(void* a, void* b);
 void fn_803D9E70(void* o, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_803D9ECC(void* o, void* img, int a, int b, int c);
@@ -251,7 +251,7 @@ int fn_803FC480(int h, char* s);
 int fn_804017D0();
 void* fn_803ED604(const char* name, int sz, int k);
 void fn_80401710(int h, void* b);
-void fn_80433004(void* a, int n);
+void DCStoreRange(void* a, int n);
 int fn_80400DA4();
 void* fn_803DD628(void* a, void* b);
 void fn_803155B4(void* self, int tex, int a, int b, float f1, float f2, float f3, float f4);
@@ -569,7 +569,7 @@ void fn_803157B4(Unk80313C14_Tx* self)
     self->m4 = fn_803EBBA4(w, h, 0x20, 0, 0, 0x100, 0, 0);
     int sz = fn_803EB864(w, h, 0x20, 0xF, 0, 0, 0);
     if (self->m4 != 0) {
-        fn_80433004(self->m4, sz);
+        DCStoreRange(self->m4, sz);
         self->m4->m0 = 0x16;
         self->m4->mC |= 0x20000000;
         void* o = lbl_8062C668(0x58, 0);
@@ -637,7 +637,7 @@ void fn_80315FFC(char* self)
     char* buf = (char*)fn_803ED604(lbl_805E9AFC, sz, 0x500);
     fn_80401710(h2, buf);
     fn_802B961C(h1, 0xE);
-    fn_80433004(buf, sz);
+    DCStoreRange(buf, sz);
     fn_803D9E1C(0);
     lbl_8061FF38 = fn_80400DA4();
     int tex = (int)fn_803DD628(lbl_8062C668(0x58, 0), buf + *(int*)(buf + 0x14));
@@ -663,7 +663,7 @@ extern "C" void fn_8031618C(char* self)
     char* buf = (char*)fn_803ED604(lbl_805E9AFC, sz, 0x500);
     fn_80401710(h2, buf);
     fn_802B961C(h1, 0xE);
-    fn_80433004(buf, sz);
+    DCStoreRange(buf, sz);
     fn_803D9E1C(0);
     int tex = (int)fn_803DD628(lbl_8062C668(0x58, 0), buf + *(int*)(buf + 0x14));
     fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
@@ -688,7 +688,7 @@ void fn_80316310(char* self)
     char* buf = (char*)fn_803ED604(lbl_805E9B24, sz, 0x500);
     fn_80401710(h2, buf);
     fn_802B961C(h1, 0xE);
-    fn_80433004(buf, sz);
+    DCStoreRange(buf, sz);
     fn_803D9E1C(0);
     int tex = (int)fn_803DD628(lbl_8062C668(0x58, 0), buf + *(int*)(buf + 0x14));
     fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);

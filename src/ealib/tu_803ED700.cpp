@@ -107,7 +107,7 @@ extern "C" int fn_80400690(void (*)(void));
 extern "C" void* fn_80432A50(void*, int);
 extern "C" int fn_80432CBC();
 extern "C" int fn_80432CB4();
-extern "C" int fn_80432BD8(int, int, int);
+extern "C" int OSInitAlloc(int, int, int);
 extern "C" int fn_80432CCC(int);
 extern "C" int fn_80432C48(int, int);
 extern "C" int fn_80432BC8();
@@ -728,7 +728,7 @@ extern "C" void fn_803EE878()
         lbl_806EEA0C = 1;
         int a = fn_80432CBC();
         int b = fn_80432CB4();
-        a = fn_80432BD8(a, b, 1);
+        a = OSInitAlloc(a, b, 1);
         b &= ~0x1f;
         fn_80432CCC(a);
         fn_80432C48((a + 0x1f) & ~0x1f, b);

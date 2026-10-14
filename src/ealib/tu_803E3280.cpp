@@ -60,10 +60,10 @@ extern int lbl_80627A78;
 extern "C" void fn_803DB5A0(void* p);
 extern "C" void fn_803DBD54(void* p);
 extern "C" void fn_803DBD84(void* p, int chrg);
-extern "C" void fn_8042C8B0(int prim, int fmt, unsigned short n);
+extern "C" void GXBegin(int prim, int fmt, unsigned short n);
 extern "C" void fn_803E3280(Unk803E3AFC_Obj* o, Unk803E3280_Item* items, int count);
 extern "C" void fn_803EDA0C(void* p);
-extern "C" void fn_80430194(void* m, int type);
+extern "C" void GXSetProjection(void* m, int type);
 
 /* near-miss: dataflow matches the original code but the float register allocation/schedule differs
  * (retail keeps 0.5f, 1.0f and both conversion constants in f28-f31; 137 slots differ). */
@@ -71,7 +71,7 @@ extern "C" void fn_80430194(void* m, int type);
 extern "C" void fn_803E3280(Unk803E3AFC_Obj* o, Unk803E3280_Item* items, int count)
 {
     Unk803E3AFC_Gfx* g = &o->m20;
-    fn_8042C8B0(0x80, 7, count * 4);
+    GXBegin(0x80, 7, count * 4);
     for (int i = 0; i < count; i++) {
         Unk803E3280_Sprite* sp = items->m0;
         float f9 = (float)sp->m9;
@@ -243,9 +243,9 @@ extern "C" void fn_803E3B3C()
     Unk803E3B3C_Cam* c = lbl_806EFC28;
     if (c->m1A0 == 0) {
         if (lbl_806EFC2C == 0)
-            fn_80430194(c->m158, 0);
+            GXSetProjection(c->m158, 0);
         else
-            fn_80430194(c->m158, 1);
+            GXSetProjection(c->m158, 1);
     }
     lbl_80627A78 = 0;
     fn_803DB5A0(lbl_806AAB20);

@@ -13,7 +13,7 @@ void* operator new(unsigned int size, int heap); /* 0x80377428 */
 void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
 extern "C" void fn_80377408(void* p);                       /* __builtin_delete */
 extern "C" void fn_80377488(void* p);                       /* __builtin_vec_delete */
-extern "C" double fn_80410634(double x);                    /* floor */
+extern "C" double floor(double x);
 float fn_80410CE8(float a, float b);             /* atan2 */
 float __builtin_fabsf(float x);
 double __builtin_fabs(double x);

@@ -18,12 +18,12 @@
 Unk80273498_Vec3 fn_8014E388(unsigned int idx);
 extern "C" float fn_804028E4(float x);
 extern "C" float fn_80382BB8(Unk80271DBC_Link* p);
-extern "C" float fn_8041171C(float x);
-extern "C" double fn_80410634(double x);
+extern "C" float sinf(float x);
+extern "C" double floor(double x);
 extern float lbl_8061E6A0;
 extern float lbl_8061E6A4;
 extern float lbl_8061E6A8;
-extern "C" float fn_80411554(float x);
+extern "C" float cosf(float x);
 float fn_80410CE8(float y, float x);
 
 inline Unk80273498_Vec3 GetPos(const Unk8037B128_Mtx* m)
@@ -62,16 +62,16 @@ inline Unk80273498_Vec3 operator*(Unk80273498_Vec3 v, float s)
 inline Unk80273498_Vec3 Direction(float angle)
 {
     Unk80273498_Vec3 r;
-    r.x = fn_8041171C(angle);
+    r.x = sinf(angle);
     r.y = 0.0f;
-    r.z = fn_80411554(angle);
+    r.z = cosf(angle);
     return r;
 }
 
 inline float AngleDiff(float a, float b)
 {
     float d = a - b;
-    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    d -= (float)floor(d * 0.15915494f + 0.5f) * 6.2831855f;
     return d;
 }
 
@@ -158,8 +158,8 @@ int Unk8027A84C::fn_8027AAB0(Unk80270BA0_X* x, int a, int b, float* c, Unk802734
 {
     Unk8027A9AC_Req req;
     float angle = fn_80382BB8(x->m618);
-    float s = fn_8041171C(angle);
-    float cs = fn_80411554(angle);
+    float s = sinf(angle);
+    float cs = cosf(angle);
     int r;
 
     if (x->m0 == 0) {

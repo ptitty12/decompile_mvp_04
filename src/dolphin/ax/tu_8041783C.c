@@ -129,7 +129,7 @@ static void fn_80417A7C(AXVPB* p)
 }
 
 /* AXFreeVoice */
-void fn_80417B10(AXVPB* p)
+void AXFreeVoice(AXVPB* p)
 {
     BOOL old;
 
@@ -195,7 +195,7 @@ static void __AXPushStackHead(AXVPB* p, u32 priority)
 /* AXAcquireVoice
  * near-miss: 96 vs 93 instructions; retail keeps the head and tail walk pointers as two separate loop induction
  * pointers, ours folds the tail into a displacement off one. */
-AXVPB* fn_80417B90(u32 priority, void (*callback)(void*), u32 userContext)
+AXVPB* AXAcquireVoice(u32 priority, void (*callback)(void*), u32 userContext)
 {
     BOOL old;
     AXVPB* p;
@@ -402,7 +402,7 @@ void fn_80417F50(void)
 }
 
 /* AXRegisterAuxACallback */
-void fn_8041818C(void (*callback)(void*, void*), void* context)
+void AXRegisterAuxACallback(void (*callback)(void*, void*), void* context)
 {
     lbl_806EF530 = callback;
     lbl_806EF538 = context;
@@ -448,14 +448,14 @@ void fn_804188B0(void)
 }
 
 /* AXSetMode */
-void fn_804188B4(u32 mode)
+void AXSetMode(u32 mode)
 {
     if (lbl_806EF578 != mode) {
         lbl_806EF578 = mode;
     }
 }
 
-void fn_804188C8(u32 v)
+void AXSetCompressor(u32 v)
 {
     lbl_806EF574 = v;
 }
@@ -486,7 +486,7 @@ extern u16 lbl_806EF168;   /* axDspSlaveLength */
 extern OSTime fn_80438628(void);               /* OSGetTime */
 extern void fn_80437434(OSThreadQueue* queue); /* OSInitThreadQueue */
 extern void fn_804382CC(OSThreadQueue* queue); /* OSSleepThread */
-extern void fn_804383B8(OSThreadQueue* queue); /* OSWakeupThread */
+extern void OSWakeupThread(OSThreadQueue* queue);
 extern void fn_80432FD4(void* addr, u32 nBytes); /* DCFlushRange */
 extern void fn_80419CB4(u32 lessDspCycles);    /* __AXSyncPBs */
 extern void fn_804190A4(void);
@@ -581,7 +581,7 @@ void fn_80418B50(void)
 void fn_80418BA8(void)
 {
     lbl_806EF5A0 = 1;
-    fn_804383B8(&lbl_806EF5A8);
+    OSWakeupThread(&lbl_806EF5A8);
 }
 
 /* __AXOutInitDSP */
@@ -802,7 +802,7 @@ void fn_8041A180(void)
 }
 
 /* AXSetVoiceSrcType */
-void fn_8041A184(AXVPB* p, u32 type)
+void AXSetVoiceSrcType(AXVPB* p, u32 type)
 {
     BOOL old;
     AXPB* pb;
@@ -834,7 +834,7 @@ void fn_8041A184(AXVPB* p, u32 type)
 }
 
 /* AXSetVoiceState */
-void fn_8041A248(AXVPB* p, u16 state)
+void AXSetVoiceState(AXVPB* p, u16 state)
 {
     BOOL old;
 
@@ -848,7 +848,7 @@ void fn_8041A248(AXVPB* p, u16 state)
 }
 
 /* AXSetVoiceAddr */
-void fn_8041A2A4(AXVPB* p, AXPBADDR* addr)
+void AXSetVoiceAddr(AXVPB* p, AXPBADDR* addr)
 {
     BOOL old;
     u32* pDst;
@@ -895,7 +895,7 @@ void fn_8041A2A4(AXVPB* p, AXPBADDR* addr)
 }
 
 /* AXSetVoiceAdpcm */
-void fn_8041A3B4(AXVPB* p, AXPBADPCM* adpcm)
+void AXSetVoiceAdpcm(AXVPB* p, AXPBADPCM* adpcm)
 {
     BOOL old;
     u32* pDst;
@@ -921,7 +921,7 @@ void fn_8041A3B4(AXVPB* p, AXPBADPCM* adpcm)
 u32 __cvt_fp2unsigned(double x); /* __cvt_fp2unsigned */
 
 /* AXSetVoiceSrcRatio */
-void fn_8041A458(AXVPB* p, f32 ratio)
+void AXSetVoiceSrcRatio(AXVPB* p, f32 ratio)
 {
     u32 r;
     BOOL old;
@@ -940,7 +940,7 @@ void fn_8041A458(AXVPB* p, f32 ratio)
 }
 
 /* AXSetVoiceAdpcmLoop */
-void fn_8041A4F0(AXVPB* p, AXPBADPCMLOOP* adpcmloop)
+void AXSetVoiceAdpcmLoop(AXVPB* p, AXPBADPCMLOOP* adpcmloop)
 {
     BOOL old;
     u16* pDst;

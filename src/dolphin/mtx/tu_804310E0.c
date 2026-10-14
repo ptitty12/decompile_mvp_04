@@ -9,10 +9,10 @@
 
 #include "__gx.h"
 
-void fn_804310E0(u32* topIn, u32* topOut, u32* botIn, u32* botOut, u32* clrIn, u32* copyClks);
-void fn_80431374(Mtx44 m, f32 fovY, f32 aspect, f32 scaleS, f32 scaleT, f32 transS, f32 transT);
-void fn_80431494(Mtx44 m, f32 fovY, f32 aspect, f32 n, f32 f);
-void fn_80431564(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
+void GXReadPixMetric(u32* topIn, u32* topOut, u32* botIn, u32* botOut, u32* clrIn, u32* copyClks);
+void C_MTXLightPerspective(Mtx44 m, f32 fovY, f32 aspect, f32 scaleS, f32 scaleT, f32 transS, f32 transT);
+void C_MTXPerspective(Mtx44 m, f32 fovY, f32 aspect, f32 n, f32 f);
+void C_MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f);
 
 /* near-miss: matches only with the extra flag -schedule off (default flags emit the hi/lo loads in the other order). Likely GXReadPixMetric. */
 static inline u32 ReadPE(u32 lo, u32 hi) {
@@ -26,7 +26,7 @@ static inline u32 ReadPE(u32 lo, u32 hi) {
     return (ctrH << 16) | ctrL;
 }
 
-void fn_804310E0(u32* topIn, u32* topOut, u32* botIn, u32* botOut, u32* clrIn, u32* copyClks) {
+void GXReadPixMetric(u32* topIn, u32* topOut, u32* botIn, u32* botOut, u32* clrIn, u32* copyClks) {
     *topIn = ReadPE(12, 13) * 4;
     *topOut = ReadPE(14, 15) * 4;
     *botIn = ReadPE(16, 17) * 4;
@@ -35,8 +35,8 @@ void fn_804310E0(u32* topIn, u32* topOut, u32* botIn, u32* botOut, u32* clrIn, u
     *copyClks = ReadPE(22, 23);
 }
 
-/* near-miss: matches only with the extra flag -opt nopeephole (C_MTXLightPerspective in mtx.c; fn_80431494/fn_80431564 are mtx44.c and match at default flags) */
-void fn_80431374(Mtx44 m, f32 fovY, f32 aspect, f32 scaleS, f32 scaleT, f32 transS, f32 transT) {
+/* near-miss: matches only with the extra flag -opt nopeephole (C_MTXLightPerspective in mtx.c; C_MTXPerspective/C_MTXOrtho are mtx44.c and match at default flags) */
+void C_MTXLightPerspective(Mtx44 m, f32 fovY, f32 aspect, f32 scaleS, f32 scaleT, f32 transS, f32 transT) {
     f32 angle;
     f32 cot;
 
@@ -60,7 +60,7 @@ void fn_80431374(Mtx44 m, f32 fovY, f32 aspect, f32 scaleS, f32 scaleT, f32 tran
     m[2][3] = 0.0f;
 }
 
-void fn_80431494(Mtx44 m, f32 fovY, f32 aspect, f32 n, f32 f) {
+void C_MTXPerspective(Mtx44 m, f32 fovY, f32 aspect, f32 n, f32 f) {
     f32 angle;
     f32 cot;
     f32 tmp;
@@ -92,7 +92,7 @@ void fn_80431494(Mtx44 m, f32 fovY, f32 aspect, f32 n, f32 f) {
     m[3][3] = 0.0f;
 }
 
-void fn_80431564(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f) {
+void C_MTXOrtho(Mtx44 m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f) {
     f32 tmp;
 
     tmp = 1.0f / (r - l);
