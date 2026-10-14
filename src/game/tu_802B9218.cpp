@@ -851,8 +851,8 @@ void fn_80314D60(int a);
 extern "C" void* fn_803773D8(unsigned int n);
 void fn_802BB4BC(Unk802BB1E4_Obj* o);
 void fn_802BB4B8(Unk802BB1E4_Obj*, Unk802BB1E4_Obj*);
-void fn_802BB334(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
-void fn_802BB29C(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
+void RestoreOverlay(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
+void PrepareForDataUsage(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
 struct Unk802BB0E4_O;
 Unk802BB0E4_O* fn_802BB0E4(Unk802BB0E4_O* p);
 
@@ -1159,15 +1159,15 @@ void fn_802BB1E4(Unk802BB1E4_Obj* o, int k)
     fn_802BB4BC(o);
     switch (k) {
     case 0:
-        fn_802BB334(o, o);
-        fn_802BB334(o, o + 1);
+        RestoreOverlay(o, o);
+        RestoreOverlay(o, o + 1);
         break;
     case 1:
-        fn_802BB29C(o, o);
-        fn_802BB29C(o, o + 1);
+        PrepareForDataUsage(o, o);
+        PrepareForDataUsage(o, o + 1);
         break;
     case 2:
-        fn_802BB29C(o, o);
+        PrepareForDataUsage(o, o);
         break;
     }
 }
@@ -1179,7 +1179,7 @@ int fn_802BB27C(char* o, int idx)
     return *(int*)(b + t * 0x1C);
 }
 
-void fn_802BB29C(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
+void PrepareForDataUsage(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
 {
     void* r = fn_8014EB44();
     int cs = fn_80400560(o->m0, o->m4);
@@ -1191,7 +1191,7 @@ void fn_802BB29C(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
     fn_802BB4BC(self);
 }
 
-void fn_802BB334(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
+void RestoreOverlay(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
 {
     int z = 0;
     int sp8;

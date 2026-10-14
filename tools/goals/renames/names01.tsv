@@ -188,3 +188,5 @@ fn_803AF9C0	iSNDserve	E	EA iSNDserve__Fv [ge,hp,moh4,nascar,nfsmw]
 fn_803AFD88	SNDPLATFORM_asyncresolvetimbre	E	EA SNDPLATFORM_asyncresolvetimbre(SNDIPATCHHEADER *, char *, int *)/SNDPLATFORM_asyncresolvetimbre__FP15SNDIPATCHHEADERPcPi [fifa05,ge,hp,moh3,moh4,nascar,nfsmw,nfsu,uefa]
 fn_801498C0	LoadGameAssets	S	string "end of LoadGameAssets" (lbl_805C4F8C, referenced at 80149DA8 inside the function)
 fn_80316614	DrawLoadingProgress	S	format string "DrawLoadingProgress: %d, %.3f @ %.3f seconds" printed by the function
+fn_802BB29C__FP15Unk802BB1E4_ObjT0	PrepareForDataUsage__FP15Unk802BB1E4_ObjT0	S	assert text "PrepareForDataUsage(): Code section corrupted." (lbl_805E105C) checked by the function after the overlay code CRC; C++ mangled suffix kept
+fn_802BB334__FP15Unk802BB1E4_ObjT0	RestoreOverlay__FP15Unk802BB1E4_ObjT0	S	assert text "RestoreOverlay(): Code section corrupted." (lbl_805E108C) checked by the function after the overlay is read back; C++ mangled suffix kept
