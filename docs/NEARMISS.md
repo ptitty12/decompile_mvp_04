@@ -365,3 +365,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - db/tu_805721F8::fn_805744D4: 99.966446%, 149/149 instructions; eight source forms leave one local edge at slot 55 (retail +0xE4, candidate +0xEC), skipping the pointer-bound compare. Candidate reverted.
 - 2026-10-13 | db/tu_80565FD4 fn_8056693C | 99.71654%, 127/127 words, five differences after eight ordinary forms: initial day-store address and table-address temporary registers. |
 - 2026-10-13 | db/tu_80565FD4 fn_80568940 | 98.234375%, 128/128 words after eight forms: saved-register and counter lifetimes, reversed-pair score-load order. |
+
+- `db/tu_8056A248` `fn_8056A838`: 98.21429%; eight ordinary table-pointer/offset/load-order forms retain table/index and compare-operand register colors; source preserved, scratch build/root54/A838.
