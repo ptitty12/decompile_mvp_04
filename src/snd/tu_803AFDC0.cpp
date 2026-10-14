@@ -416,7 +416,7 @@ extern "C" void fn_803B1378()
     float* p = (float*)SNDMEMI_allocz(size);
     lbl_806AA2C4 = (int*)p;
     lbl_806AA2D4.m14 = p + lbl_80625448;
-    lbl_806AA2D4.m100 = p + lbl_80625448 * 2;
+    lbl_806AA2D4.m100 = lbl_806AA2D4.m14 + lbl_80625448;
     memset(p, 0, size);
     lbl_806AA2C0 = (Unk803B1378_Node**)SNDMEMI_allocz(lbl_80625448 * 4);
     memset(lbl_806AA2C0, 0, lbl_80625448 * 4);
