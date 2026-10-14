@@ -546,6 +546,15 @@ def ref_line(name: str, idx: Index) -> str | None:
         return None
 
 
+def datafile_lines(name: str) -> list[str]:
+    """EA datafile classes (field names) the function builds the hash of (tools/match/datafile.py)."""
+    try:
+        import datafile  # same directory
+        return datafile.summary_for(name)
+    except Exception:
+        return []
+
+
 def near_miss_comment(src_where: str, cache: dict) -> bool:
     """True if the comment just above a matched twin's definition still says near-miss."""
     path, _, line = src_where.rpartition(":")
@@ -570,6 +579,8 @@ def cmd_show(args) -> None:
         ref = ref_line(name, idx)
         if ref:
             print(f"   EA name (reference build, same code): {ref}")
+        for line in datafile_lines(name):
+            print(f"   reads datafile class {line}")
         if not res[t]:
             print("   no twin within 2x length")
         for rank, (_, c, p) in enumerate(res[t], 1):

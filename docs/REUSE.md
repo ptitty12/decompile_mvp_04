@@ -1,5 +1,7 @@
 # Reuse map: public code we can port instead of writing
 
+> Every reference source checked since, with its verdict: `docs/REFERENCE_SOURCES.md` (2026-10-13).
+
 Researched 2026-10-10 for `docs/SPEEDUPS.md` item 6. **Verified** facts were
 checked directly (gh api, the repo's README). Everything else was **reported**
 by a research agent and must be checked before anyone relies on it. CLAUDE.md

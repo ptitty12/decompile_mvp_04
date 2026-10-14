@@ -199,6 +199,8 @@ Roughly ordered by expected payoff for the effort.
 
 - 2026-10-13 | REA session | More owner-supplied discs, all without symbols: MVP 07 NCAA Baseball PS2 (SLUS_215.82, empty .mdebug; EA_DASH.ELF stripped) and an MVP 2003 Xbox preview build (Dec 2002, a prototype rather than an owner disc; release and debug PE executables, no COFF symbols or PDB; the debug build names 651 source files, 56 of which also appear in MVP 2005 GC's asserts). Best remaining candidate: MVP Baseball 2004 for GameCube, same platform and compiler; its executable might still have symbols | 7 | none yet; the 2003 file list could later name TUs
 
+- 2026-10-13 | REA session | Owner's mods folder: the MVP 2004 GameCube datafile (EA tuning records, text) has 131 class schemas. 110 are built as hashes (lis+ori/addi) by 261 MVP 2005 functions, only 14 of them unmatched (15.7 KB), so the value is names and meaning, not matches. Now `config/GV4E69/datafile_schemas.tsv` + `tools/match/datafile.py`. Also gathered: database tables, player-record fields, enums, schedule and standings formats, archive formats (docs/GAME_DATA.md). All sources checked tonight: docs/REFERENCE_SOURCES.md | 7, 14 | readability and a future port; little for matching
+
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
