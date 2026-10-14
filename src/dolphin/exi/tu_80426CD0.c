@@ -47,7 +47,7 @@ extern const char* lbl_806EF218;  /* __EXIVersion */
 
 #define Ecb lbl_806DE358
 
-void fn_80435350(u32 mask);
+u32 fn_80435350(u32 mask);
 u32 fn_80434FF0(s32 interrupt);
 void OSClearContext(OSContext* context);
 void OSSetCurrentContext(OSContext* context);

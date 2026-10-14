@@ -16,7 +16,7 @@ extern u32 lbl_806EF968;                      /* address of the input-pending fl
 extern u8 lbl_806EF96C;                       /* input pending */
 extern u8 lbl_806EF358;                       /* buffer toggle */
 
-extern void fn_80435350(u32 mask);            /* __OSMaskInterrupts */
+extern u32 fn_80435350(u32 mask);            /* __OSMaskInterrupts */
 
 #define EXI2_CSR (__EXIRegs[10])
 #define EXI2_CR (__EXIRegs[13])
