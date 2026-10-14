@@ -496,7 +496,7 @@ void fn_80434550(OSExecParams* params)
     }
 }
 
-extern void fn_80434F9C(void);                         /* OSEnableInterrupts */
+extern BOOL fn_80434F9C(void);                         /* OSEnableInterrupts */
 extern u32 fn_80435350(u32 global);                    /* __OSMaskInterrupts */
 extern u32 __OSUnmaskInterrupts(u32 global);
 extern void fn_80422FD8(void);                         /* DVDInit */

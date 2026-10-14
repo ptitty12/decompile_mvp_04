@@ -23,7 +23,7 @@ static OSContext IdleContext;
 
 extern OSContext* fn_804336A8(void);   /* OSGetCurrentContext */
 extern u32 fn_804336B4(OSContext* context);   /* OSSaveContext */
-extern void fn_80434F9C(void);         /* OSEnableInterrupts */
+extern BOOL fn_80434F9C(void);         /* OSEnableInterrupts */
 extern void fn_80433734(OSContext* context);  /* OSLoadContext */
 extern void fn_80433838(OSContext* context, u32 pc, u32 newsp);   /* OSInitContext */
 extern u32 fn_8043380C(void);          /* OSGetStackPointer */

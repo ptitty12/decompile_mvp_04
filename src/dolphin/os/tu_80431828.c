@@ -45,7 +45,7 @@ extern void fn_80431D6C(void);              /* OSExceptionInit */
 extern void fn_80433C20(void);              /* __OSContextInit */
 extern void fn_80433304(void);              /* __OSCacheInit */
 extern void fn_80434550(OSExecParams* params);   /* __OSGetExecParams */
-extern void fn_80434F9C(void);              /* OSEnableInterrupts */
+extern BOOL fn_80434F9C(void);              /* OSEnableInterrupts */
 extern void fn_80435004(void);              /* __OSInterruptInit */
 extern void fn_804357F4(void);              /* __OSModuleInit */
 extern void fn_8043643C(void);              /* __OSResetSWInterruptHandler */
