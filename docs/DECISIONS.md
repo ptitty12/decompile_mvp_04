@@ -196,6 +196,18 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | Every mature GameCube recompiler is GPL, and none emits WebAssembly or translates in a browser (our D2). symbols.txt already gives all 24,158 functions and the 22 SDK jump tables. D4 is the only model that keeps save states and rollback possible without SharedArrayBuffer or JSPI. | docs/engine/E0_SURVEY.md §1-§6 (commit 868ef949)
 
+- 2026-10-14 | **Roster/team pack format v1 (engine API 1.0) settled** (lead, under the owner's 2026-10-14 delegation). The spec is `docs/MODDING.md`; the reference implementation is `tools/rosters/pack.py`, with 36 tests.
+  - JSON manifest and patches.
+  - Players keyed by "Last,First" text, never by row id; renames are explicit ops.
+  - Teams keyed by `unique_team`, with the 126 slots fixed.
+  - Field names are the on-disc column names, grouped by table.
+  - Roster rules come from the decompiled roster loader.
+  - A later pack may override another's cells only if it declares a dependency on it; there is no silent last-wins.
+  - SHA-256 hashes for the pack (canonical JSON), the ordered set (used by the netplay handshake) and the result (decompressed table and LOC text).
+  - v1 is deliberately strict, so later minor versions only relax rules.
+
+  Home park, the team list and the LOC-id tables are fixed in code (ROSTERS.md §12), so v1 team packs can't change them. | Packs never contain retail data and depend only on the game's own data formats (contract 2). Strict-first keeps every later change backward compatible. | docs/MODDING.md; end-to-end check on the owner's disc (empty pack gives 0 errors; the example applies byte-deterministically)
+
 ## Open questions for owner
 
 - 2026-10-13 | **Claude-owned roster wrapper ABI blocks two matching consumers.** Retail `fn_8007F198` forwards incoming r4 unchanged into `fn_805A19C8` at 8007F1B0; 805A19DC consumes that ID via `mr r6,r4`. The reconstructed game provider and canonical C++ declaration currently take only the object pointer. FE fn_80442AA0 and DB fn_80560010 need the real second argument and unsigned-byte result. Following the coherent-contract decision above, incompatible function-pointer casts and invented mangled imports are not accepted. Claude owns game/ under the current split: repair its provider/header/canonical names and affected typed callers coherently in that ownership window, with full regression/literal gates; these consumers remain parked while workers match elsewhere. The same ownership boundary holds BB28 float-return consumers: retail passes the result in f1, while the game provider/member header still declares int; legacy DB float views are not a new coherent provider repair. Fresh consumers remain parked pending the game-side declaration/definition migration. No game source or verification tool is changed by this coordinator.

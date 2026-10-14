@@ -131,7 +131,8 @@ Each milestone has a hard exit you can check. Don't advance on vibes.
    `python tools/goals/targets.py --units K3` (and K2, K4). In these batches, names
    and types are the deliverable. Match a function whenever the type knowledge
    depends on it.
-5. **K2 tools** (side session). A BIG archive reader, a database table
+5. ~~**K2 tools**~~ Done 2026-10-14: `tools/rosters/`, `docs/ROSTERS.md` (§12 team slot assets), and pack format v1 (`docs/MODDING.md`, `tools/rosters/pack.py`). The engine implements the same spec at E6.
+6. **K2 tools (original wording)** (side session). A BIG archive reader, a database table
    reader/writer under `tools/rosters/`, and `docs/ROSTERS.md`.
 6. **Show the new progress** (enabler). Add K-target and E-milestone progress to the
    progress card and the dashboard.
