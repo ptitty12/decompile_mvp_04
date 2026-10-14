@@ -319,6 +319,34 @@ Unk8019E6A4::Unk8019E6A4(Unk8019E3C0_Own* owner)
 {
 }
 
+struct Unk8019E790_Tgt {
+    char pad0[0x458];
+    int m458;
+};
+/* Current object at owner + 0x6CC: target pointer at +0x36C (its +0x458 is compared with 1), state at +0x38C,
+ * a float threshold at +0x3F4. Evidence: Unk8019E6A4::v5. */
+struct Unk8019E790_Cur {
+    char pad0[0x36C];
+    Unk8019E790_Tgt* m36C;
+    char pad370[0x38C - 0x370];
+    int m38C;
+    char pad390[0x3F4 - 0x390];
+    float m3F4;
+};
+struct Unk8017A930_T;
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+int fn_8017C8C0(Unk8017A930_T* t);
+int fn_8026D5D0(Unk8026C414_O* o, Unk8026C414_X* x);
+int fn_8026D5A4(Unk8026C414_O* o, Unk8026C414_X* x);
+extern "C" float fn_8018CAF0(void* p);
+extern "C" float fn_8018CB2C(void* p);
+extern "C" float fn_8018CA78(void* p);
+extern "C" void* fn_801A497C(void* w, int a, int b);
+extern "C" int rand();
+extern int lbl_8068BD78;
+extern int lbl_8061CA18;
+extern float lbl_805CE5E8;
 //@8019E6FC
 void Unk8019E6A4::v4()
 {
@@ -334,6 +362,87 @@ void Unk8019E6A4::v4()
             m24 = 0x3C;
     }
     ((Unk8019E6FC_Mid*)m18->m700)->m3B0->m7C = 0;
+}
+
+//@8019E790
+/* The case labels 4/2 jump to the body of 5/7/9 (goto L87) so that 4 and 5 stay separate switch nodes while the store
+ * is emitted once; the if/else with identical stores in case 3 keeps retail's dead cmpwi r3,-1. The two case 6/8 arms
+ * load lbl_8068BD78's high half without a relocation in the split output (objdiff still reports 100%). */
+void Unk8019E6A4::v5()
+{
+    if (lbl_80619D10->v25() != 0)
+        fn_8033E3FC(this, 0x11);
+    if (fn_8017C8C0((Unk8017A930_T*)m18->m700) != 0)
+        fn_8033E3FC(this, 0xF);
+    if (m24 <= 0 || (m24 -= lbl_8061B9C8) <= 0)
+        ((Unk8019E6FC_Mid*)m18->m700)->m3B0->m7C = 1;
+    Unk8019E790_Cur* cur = (Unk8019E790_Cur*)m18->m6CC;
+    switch (m18->m6F4) {
+    case 3: {
+        int f = m18->m6F8->m14->m1CD0 == 0;
+        if (fn_801A2034(m18, f) == -1)
+            lbl_8068BD78 = 0x87;
+        else
+            lbl_8068BD78 = 0x87;
+        break;
+    }
+    case 8:
+        lbl_8068BD78 = 10;
+        break;
+    case 6:
+        lbl_8068BD78 = 10;
+        break;
+    case 4:
+    case 2:
+        goto L87;
+    case 5:
+    case 7:
+    case 9:
+  L87:
+        lbl_8068BD78 = 0x87;
+        break;
+    }
+    int st = m18->m6F4;
+    if (st == 6) {
+        if (m1C == 0) {
+            if (cur->m38C == 2)
+                m1C = 1;
+        } else if (m28 != 0) {
+            if (--m20 <= 0)
+                fn_8033E3FC(this, 0x10);
+        } else {
+            int flag = 0;
+            float v = 0.0f;
+            v = fn_8018CAF0(cur);
+            if (!(v <= 0.0f))
+                flag = v < cur->m3F4;
+            v = fn_8018CB2C(cur);
+            if (!(v <= 0.0f) && !(v >= cur->m3F4))
+                flag = 1;
+            v = fn_8018CA78(cur);
+            if (!(v <= 0.0f) && !(v >= cur->m3F4))
+                flag = 1;
+            if (cur->m38C != 2 || flag != 0) {
+                m28 = 1;
+                m20 = lbl_8068BD78;
+            }
+        }
+    } else if (st == 8) {
+        Unk8019E790_Tgt* t = cur->m36C;
+        void* w;
+        if (((t != 0 && t->m458 == 1) || !(cur->m3F4 <= lbl_805CE5E8)) &&
+            (lbl_8061CA18 != 0 ||
+             (fn_8026D5D0((Unk8026C414_O*)(w = fn_801A497C(m18, 4, 0)), 0) == 0 &&
+              fn_8026D5A4((Unk8026C414_O*)w, 0) == 0)))
+            fn_8033E3FC(this, 0x10);
+    } else if (m1C == 0) {
+        if (cur->m38C == 2) {
+            m1C = 1;
+            m20 = lbl_8068BD78 + rand() % 20;
+        }
+    } else if (--m20 <= 0) {
+        fn_8033E3FC(this, 0x10);
+    }
 }
 
 //@8019EB0C

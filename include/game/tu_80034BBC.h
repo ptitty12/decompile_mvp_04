@@ -44,6 +44,7 @@ void fn_80030F18(void* mgr, int i, float f);
 void fn_80030F94(void* mgr, int i);
 int fn_800309AC(void* mgr, Unk80034B94* o, int a);
 int fn_8040ABA0();
+int rand(void);
 void fn_80039A3C(int a, int b, int c);
 void fn_80035E94(int a);
 void* fn_8004072C();
