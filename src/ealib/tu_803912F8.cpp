@@ -6,13 +6,13 @@
  */
 
 /* FLAGS EVIDENCE (for the lead): this unit has no r13 use and its loops are not strength-reduced or turned into
- * counted (bdnz) loops. fn_803913FC and fn_80391784 match exactly with `-O2 -G0 -fno-strength-reduce`
- * (cflags_ealib plus that flag), and fn_80391E2C and fn_80391C04 as well; under the unit's current lib flags
+ * counted (bdnz) loops. SPCH_InitBankMem and iSPCH_FindBankIndexFromHandle match exactly with `-O2 -G0 -fno-strength-reduce`
+ * (cflags_ealib plus that flag), and iSPCH_InitEventDat and fn_80391C04 as well; under the unit's current lib flags
  * (-O2 default -G8) only the loop-free functions match. The data below is declared as arrays of unknown size
  * so that -G8 does not put it in small data.
  *
  * Resource table of the MAD/VP6 file layer: lbl_806243F8[0] = entries (8 bytes each), lbl_80624400[0] = capacity,
- * lbl_80624404[0] = used count. Evidence: fn_803913FC clears n entries, fn_80391784 searches them. */
+ * lbl_80624404[0] = used count. Evidence: SPCH_InitBankMem clears n entries, iSPCH_FindBankIndexFromHandle searches them. */
 #include "../../include/prodg/stdarg.h"
 
 struct McEntry {
@@ -25,9 +25,9 @@ struct McEntryHdr {
     unsigned short mA;
 };
 
-/* Record behind McEntry::m4 (and McSlot::m0). Evidence: fn_803915D0 searches the table on the u16 at +0,
- * fn_80391734 reads +0xA, fn_80391C68 compares the bytes at +8/+9 with a tag, fn_803919B0/fn_8039188C/
- * fn_80391914 walk a byte ring buffer after the header (m4 low 7 bits and m5 size it, m6 = depth). */
+/* Record behind McEntry::m4 (and McSlot::m0). Evidence: iSPCH_FindBank searches the table on the u16 at +0,
+ * iSPCH_TestSubBankBounds reads +0xA, iSPCH_FindEventDatInfo compares the bytes at +8/+9 with a tag, fn_803919B0/iSPCHBank_AddToQueue/
+ * iSPCHBank_GetSampleTimeInQueue walk a byte ring buffer after the header (m4 low 7 bits and m5 size it, m6 = depth). */
 struct McRec {
     unsigned short m0;
     unsigned short m2;
@@ -46,7 +46,7 @@ struct McRec {
     unsigned short m18[1];
 };
 
-/* 8-entry table lbl_8069B7CC: pointer to the record, then an extra word (cleared by fn_80391E2C). */
+/* 8-entry table lbl_8069B7CC: pointer to the record, then an extra word (cleared by iSPCH_InitEventDat). */
 struct McSlot {
     McRec* m0;
     void* m4;
@@ -59,7 +59,7 @@ struct McTag {
     unsigned char a;
 };
 
-/* Channel table lbl_8069B80C (fn_80391EA4 resets it, fn_80392708 tears it down): eight counters, eight
+/* Channel table lbl_8069B80C (iSPCH_InitEventQueue resets it, SPCH_ClearEventQueue tears it down): eight counters, eight
  * positions (-1 = none), then 16 channel records of 16 bytes (flag at +6, slot index at +7, buffer at +0xC). */
 struct McChan {
     int m0;
@@ -90,8 +90,8 @@ extern McSlot lbl_8069B7CC[8];
 extern int lbl_806243F4[];
 extern int lbl_8069B98C[];
 extern "C" void fn_803919B0(McRec* r);
-extern "C" void fn_80391A3C(McRec* r);
-extern "C" int fn_80391C68(McTag* k, McSlot** out);
+extern "C" void iSPCH_SetCycleBits(McRec* r);
+extern "C" int iSPCH_FindEventDatInfo(McTag* k, McSlot** out);
 
 extern "C" void fn_803912F8()
 {
@@ -118,7 +118,7 @@ extern "C" void fn_80391348(int x)
                 McRec* r = (McRec*)lbl_806243F8[0][i].m4;
                 if (r != 0 && (r->m4 & 0x80)) {
                     fn_803919B0(r);
-                    fn_80391A3C(r);
+                    iSPCH_SetCycleBits(r);
                 }
             }
         }
@@ -130,7 +130,7 @@ extern "C" int fn_803913F4(int x)
     return x << 3;
 }
 
-extern "C" void fn_803913FC(int n, McEntry* tbl)
+extern "C" void SPCH_InitBankMem(int n, McEntry* tbl)
 {
     lbl_80624400[0] = n;
     lbl_806243F8[0] = tbl;
@@ -142,7 +142,7 @@ extern "C" void fn_803913FC(int n, McEntry* tbl)
     }
 }
 
-extern "C" short fn_803915D0(unsigned key, int* out)
+extern "C" short iSPCH_FindBank(unsigned key, int* out)
 {
     int lo = 0;
     int hi = lbl_80624404[0] - 1;
@@ -163,7 +163,7 @@ extern "C" short fn_803915D0(unsigned key, int* out)
     return -1;
 }
 
-extern "C" short fn_80391668(unsigned a, unsigned b, int* out)
+extern "C" short iSPCH_FindSubBank(unsigned a, unsigned b, int* out)
 {
     int lo = 0;
     int hi = lbl_80624404[0] - 1;
@@ -185,7 +185,7 @@ extern "C" short fn_80391668(unsigned a, unsigned b, int* out)
     return -1;
 }
 
-extern "C" int fn_80391734(int idx, unsigned x)
+extern "C" int iSPCH_TestSubBankBounds(int idx, unsigned x)
 {
     int r = 0;
     McEntry* tbl = lbl_806243F8[0];
@@ -198,7 +198,7 @@ extern "C" int fn_80391734(int idx, unsigned x)
     return r;
 }
 
-extern "C" int fn_80391784(int x)
+extern "C" int iSPCH_FindBankIndexFromHandle(int x)
 {
     for (int i = 0; i < lbl_80624404[0]; i++) {
         if (lbl_806243F8[0][i].m0 == x)
@@ -211,7 +211,7 @@ extern "C" int fn_80391784(int x)
 extern "C" void fn_803917D0(int key)
 {
     if (lbl_806243F8[0] != 0) {
-        int idx = fn_80391784(key);
+        int idx = iSPCH_FindBankIndexFromHandle(key);
         if (idx >= 0) {
             int n = lbl_80624404[0];
             if (idx < n) {
@@ -232,7 +232,7 @@ extern "C" void fn_803917D0(int key)
     }
 }
 
-extern "C" void fn_8039188C(McRec* r, char v)
+extern "C" void iSPCHBank_AddToQueue(McRec* r, char v)
 {
     if (r->m6 != 0) {
         int n = r->m4 & 0x7F;
@@ -253,7 +253,7 @@ extern "C" void fn_8039188C(McRec* r, char v)
     }
 }
 
-extern "C" int fn_80391914(McRec* r, int key)
+extern "C" int iSPCHBank_GetSampleTimeInQueue(McRec* r, int key)
 {
     int res = 0;
     int cnt = r->m6;
@@ -307,7 +307,7 @@ extern "C" int fn_80391A10(unsigned a, int b, int c)
     return a > r ? (int)(q * a + r) : (int)(q * a + a);
 }
 
-extern "C" void fn_80391A3C(McRec* r)
+extern "C" void iSPCH_SetCycleBits(McRec* r)
 {
     int n = r->m4 & 0x7F;
     int w = r->m5;
@@ -341,16 +341,16 @@ union McTagU {
     } f;
 };
 
-extern "C" int fn_80391444(McRec* r);
+extern "C" int iSPCH_FindInsertPosition(McRec* r);
 
-extern "C" int fn_80391B1C(McRec* r)
+extern "C" int SPCH_AddBank(McRec* r)
 {
     int ret = -1;
     if (lbl_806243F8[0] != 0) {
-        int idx = fn_80391444(r);
+        int idx = iSPCH_FindInsertPosition(r);
         if (idx < lbl_80624400[0] && idx >= 0) {
             if (r->m4 & 0x80)
-                fn_80391A3C(r);
+                iSPCH_SetCycleBits(r);
             int off = idx * 8;
             int i = lbl_80624404[0];
             if (i > idx) {
@@ -383,7 +383,7 @@ extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short
 }
 
 /* The id array's address is held as an int, which gives retail's index-first lhzx (i*2, base+0x18). */
-extern "C" unsigned short* fn_80391C20(McRec* r, int key)
+extern "C" unsigned short* iSPCH_SearchEventDat(McRec* r, int key)
 {
     int i = 0;
     int n = r->m10;
@@ -397,7 +397,7 @@ extern "C" unsigned short* fn_80391C20(McRec* r, int key)
     return 0;
 }
 
-extern "C" int fn_80391C68(McTag* k, McSlot** out)
+extern "C" int iSPCH_FindEventDatInfo(McTag* k, McSlot** out)
 {
     int r = 0;
     int i = 0;
@@ -413,31 +413,31 @@ extern "C" int fn_80391C68(McTag* k, McSlot** out)
     return r;
 }
 
-extern "C" unsigned short* fn_80391CCC(McTag* k)
+extern "C" unsigned short* iSPCH_FindEvent(McTag* k)
 {
     unsigned short* r = 0;
     McSlot* s;
-    if (fn_80391C68(k, &s))
-        r = fn_80391C20(s->m0, k->c);
+    if (iSPCH_FindEventDatInfo(k, &s))
+        r = iSPCH_SearchEventDat(s->m0, k->c);
     return r;
 }
 
-extern "C" int fn_80391D20(McTag* k, int* out)
+extern "C" int iSPCH_FindEventChannel(McTag* k, int* out)
 {
     int r = 0;
     McSlot* s;
-    if (fn_80391C68(k, &s)) {
+    if (iSPCH_FindEventDatInfo(k, &s)) {
         r = 1;
         *out = (int)s->m4;
     }
     return r;
 }
 
-extern "C" int fn_80391D70(McTag* k, int* out)
+extern "C" int iSPCH_GetDatID(McTag* k, int* out)
 {
     int r = 0;
     McSlot* s;
-    if (fn_80391C68(k, &s)) {
+    if (iSPCH_FindEventDatInfo(k, &s)) {
         r = 1;
         *out = s->m0->m9;
     }
@@ -445,11 +445,11 @@ extern "C" int fn_80391D70(McTag* k, int* out)
 }
 
 /* near-miss (98.7%): slot pointer in r10 and the halfword in r9, retail has r9 and r0; 11 spellings tried. */
-extern "C" int fn_80391DC4(McTag* k, void** out)
+extern "C" int iSPCH_GetGlobalMatchParmsArray(McTag* k, void** out)
 {
     int r = 0;
     McSlot* s;
-    if (fn_80391C68(k, &s)) {
+    if (iSPCH_FindEventDatInfo(k, &s)) {
         r = 1;
         McRec* n = s->m0;
         *out = (char*)n + (((n->m10 * 2 + 3) & ~3) + 0x18);
@@ -457,7 +457,7 @@ extern "C" int fn_80391DC4(McTag* k, void** out)
     return r;
 }
 
-extern "C" void fn_80391E2C()
+extern "C" void iSPCH_InitEventDat()
 {
     for (int i = 0; i < 8; i++) {
         lbl_8069B7CC[i].m0 = 0;
@@ -465,11 +465,11 @@ extern "C" void fn_80391E2C()
     }
 }
 
-extern "C" unsigned short fn_80391E5C(McTag* k)
+extern "C" unsigned short iSPCH_GetFilterLength(McTag* k)
 {
     unsigned short r = 0;
     McSlot* s;
-    if (fn_80391C68(k, &s))
+    if (iSPCH_FindEventDatInfo(k, &s))
         r = s->m0->m14;
     return r;
 }
@@ -481,7 +481,7 @@ struct McRaw {
     unsigned char m47;
 };
 
-extern "C" void fn_80391EA4()
+extern "C" void iSPCH_InitEventQueue()
 {
     int i;
     for (i = 0; i <= 7; i++) {
@@ -509,10 +509,10 @@ struct McRecW {
     unsigned short m4;
 };
 
-extern "C" int fn_8039582C();
+extern "C" int SPCHEXT_gettick();
 extern "C" void iSPCH_ClearEvent(int i);
 
-extern "C" int fn_80391F70(unsigned x, int y)
+extern "C" int iSPCH_FindEventSlot(unsigned x, int y)
 {
     int ret = -1;
     int skip = -1;
@@ -525,7 +525,7 @@ extern "C" int fn_80391F70(unsigned x, int y)
         i++;
     } while (i <= 15);
     {
-        unsigned now = fn_8039582C();
+        unsigned now = SPCHEXT_gettick();
         i = 0;
         do {
             McRecW* r = (McRecW*)lbl_8069B80C.ch[i].m8;
@@ -568,9 +568,9 @@ struct McRecV {
 };
 
 extern int lbl_80624410[];
-extern "C" int fn_80394FD4(int a, int b);
-extern "C" int fn_8039582C();
-extern "C" int fn_80391F70(unsigned x, int y);
+extern "C" int iSPCH_Rand(int a, int b);
+extern "C" int SPCHEXT_gettick();
+extern "C" int iSPCH_FindEventSlot(unsigned x, int y);
 extern "C" void SPCH_PlayLastEvent(int slot);
 
 inline unsigned char Lo8(int* p)
@@ -578,7 +578,7 @@ inline unsigned char Lo8(int* p)
     return *((unsigned char*)p + 3);
 }
 
-extern "C" int fn_803920BC(int* arg0)
+extern "C" int iSPCH_AddEvent(int* arg0)
 {
     int r = 0;
     int spC;
@@ -588,13 +588,13 @@ extern "C" int fn_803920BC(int* arg0)
         lbl_80624410[0] = 1;
         if (arg0 != 0) {
             *(int*)&tag = *arg0;
-            McRecV* o = (McRecV*)fn_80391CCC(&tag);
-            if (o != 0 && fn_80391D20(&tag, &spC) != 0) {
+            McRecV* o = (McRecV*)iSPCH_FindEvent(&tag);
+            if (o != 0 && iSPCH_FindEventChannel(&tag, &spC) != 0) {
                 int lim = o->m9;
-                if (fn_80394FD4(100, -1) <= lim) {
-                    int ch = fn_80391F70(o->m4, spC);
+                if (iSPCH_Rand(100, -1) <= lim) {
+                    int ch = iSPCH_FindEventSlot(o->m4, spC);
                     if (ch >= 0) {
-                        int now = fn_8039582C();
+                        int now = SPCHEXT_gettick();
                         if (now == lbl_8069B9B8[0])
                             lbl_8069B9BC[0] += 1;
                         else
@@ -625,7 +625,7 @@ extern "C" int fn_803920BC(int* arg0)
 
 extern "C" int fn_80392B80(int size);
 
-extern "C" int fn_8039223C(int first, int n, ...)
+extern "C" int SPCH_AddEventV(int first, int n, ...)
 {
     va_list ap;
     int r = 0;
@@ -636,7 +636,7 @@ extern "C" int fn_8039223C(int first, int n, ...)
         buf[0] = first;
         for (i = 1; i <= n; i++)
             buf[i] = va_arg(ap, int);
-        r = fn_803920BC(buf);
+        r = iSPCH_AddEvent(buf);
         if (r == 0)
             fn_80392BC0(buf);
     }
@@ -654,7 +654,7 @@ struct McShortList {
     unsigned short* m4;
 };
 
-extern "C" int fn_80392398(int x, McShortList* s)
+extern "C" int iSPCH_EventInFollowGroup(int x, McShortList* s)
 {
     int r = 0;
     for (int i = 0; i < s->m0; i++) {
@@ -666,7 +666,7 @@ extern "C" int fn_80392398(int x, McShortList* s)
     return r;
 }
 
-extern "C" void fn_80392708()
+extern "C" void SPCH_ClearEventQueue()
 {
     int i;
     for (i = 0; i <= 15; i++) {

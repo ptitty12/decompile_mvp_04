@@ -42,7 +42,7 @@ void fn_8040A208(void* base, int n, int size, int (*cmp)(int*, int*));
 int fn_802B96C4(Str* s, int a);
 int fn_802B9C1C(Str* s, int* sz, int a);
 int fn_802B9804(int a, int b);
-extern "C" int fn_80391B1C(int v);
+extern "C" int SPCH_AddBank(int v);
 extern "C" int fn_803FC438(int h, Str* s);
 Str* fn_8040B61C(Str* s, const char* name); /* strcpy: returns s */
 Str* fn_8040B448(Str* s, const char* t);    /* strcat: returns s */
@@ -501,7 +501,7 @@ int Unk800642F0::fn_8006473C(const char* name, int h, Rec* r)
         r->m8 = fn_802B9C1C(&s1, &sz, 0);
         m3C = m3C + sz;
         if (lbl_80617808 < lbl_80617804 - 1) {
-            r->m0 = fn_80391B1C(r->m8);
+            r->m0 = SPCH_AddBank(r->m8);
             lbl_80617808 += 1;
         }
         ok = 1;

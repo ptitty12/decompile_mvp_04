@@ -22,7 +22,7 @@ int fn_80047B08(Unk8004763C* t)
     SPCH_Init(fn_80044C98, t->mC04, h);
     fn_80392C94(fn_8004483C, fn_80044B94);
     fn_80392CE4(fn_80044C10);
-    fn_80392708();
+    SPCH_ClearEventQueue();
     *a = fn_800480FC(t);
     Unk800642F0* m = new Unk800642F0;
     *b = m;
@@ -36,7 +36,7 @@ int fn_80047B08(Unk8004763C* t)
         fn_803EE7BC();
         int p = t->mE4;
         if (p != 0) {
-            fn_803913FC(*a, p);
+            SPCH_InitBankMem(*a, p);
         } else {
             if (t->mF0 != 0)
                 fn_80377488((void*)t->mF0);
@@ -57,7 +57,7 @@ int fn_80047B08(Unk8004763C* t)
 void fn_80047CA4(Unk8004763C* t)
 {
     int i = 0;
-    fn_80392708();
+    SPCH_ClearEventQueue();
     fn_80392DF4();
     do {
         fn_80048464(t, i);
@@ -82,7 +82,7 @@ void fn_80047D40(Unk8004763C* t, int idx)
 {
     if (t->mF4 == 1) {
         if (t->mBE0[idx] >= 0) {
-            fn_80392708();
+            SPCH_ClearEventQueue();
             t->mBE0[idx] = -1;
             t->mC00 = -1;
             int k;
@@ -232,7 +232,7 @@ int fn_8004838C(Unk8004763C* t, int idx)
             t->mSlots[idx].mC = 0;
         } else {
             char* q = lbl_805B0A95 + 0x23;
-            if (fn_80395250(buf, *(int*)(q + off)) <= 0) {
+            if (SPCH_AddEventDB(buf, *(int*)(q + off)) <= 0) {
                 t->mSlots[idx].m0 = 0;
                 fn_803EDA0C((void*)t->mSlots[idx].mC);
                 t->mSlots[idx].mC = 0;
@@ -299,7 +299,7 @@ void fn_80048914(Unk8004763C* t, int a)
         if (flag == 1)
             fn_80049090(&t->mFC, a);
     }
-    fn_80392708();
+    SPCH_ClearEventQueue();
 }
 
 void fn_80048968(Unk8004763C* t)
@@ -311,7 +311,7 @@ void fn_80048968(Unk8004763C* t)
     }
     if (flag == 1) {
         fn_800490D0(&t->mFC);
-        fn_80392708();
+        SPCH_ClearEventQueue();
     }
 }
 
