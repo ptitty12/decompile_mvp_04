@@ -47,7 +47,7 @@ extern u32 fn_80415880(void);
 extern void fn_804158BC(u32 type, void* mram, u32 aram, u32 len);
 extern void fn_80415AF0(void);
 extern u16 fn_80415B10(void);
-extern OSTime fn_80438628(void);
+extern OSTime OSGetTime(void);
 extern u32 fn_80438640(void);
 extern void fn_8043F058(void (*handler)(u32));
 extern void fn_8043F124(u32 page, u32 frameAddr, u32 frame);
@@ -130,8 +130,8 @@ u32 fn_8043DA14(void)
 
 void fn_8043DA1C(void)
 {
-    lbl_806EF924 = (u32)fn_80432CBC();
-    fn_80432CCC((void*)(lbl_806EF924 + lbl_806EF920));
+    lbl_806EF924 = (u32)OSGetArenaLo();
+    OSSetArenaLo((void*)(lbl_806EF924 + lbl_806EF920));
 }
 
 /* page-fault handler */
@@ -146,7 +146,7 @@ void fn_8043DA4C(u32 addr)
     BOOL enabled;
     u32 old;
 
-    start = TICKS_TO_US(fn_80438628());
+    start = TICKS_TO_US(OSGetTime());
     page = addr & 0xFFFFF000;
     wrote = 0;
     frame = fn_8043DD24();
@@ -160,7 +160,7 @@ void fn_8043DA4C(u32 addr)
         if (fn_8043F294(old) != 0) {
             fn_8043E1D0(old);
             wrote = 1;
-            fn_80432FD4((void*)frameAddr, 0x1000);
+            DCFlushRange((void*)frameAddr, 0x1000);
             fn_804158BC(0, (void*)frameAddr, fn_8043E138(old), 0x1000);
             while (fn_80415880() != 0) {
             }
@@ -171,7 +171,7 @@ void fn_8043DA4C(u32 addr)
         fn_804158BC(1, (void*)frameAddr, fn_8043E138(page), 0x1000);
         while (fn_80415880() != 0) {
         }
-        fn_80432FA8((void*)frameAddr, 0x1000);
+        DCInvalidateRange((void*)frameAddr, 0x1000);
         ICInvalidateRange((void*)frameAddr, 0x1000);
     } else if (fn_8043E178(page) == 0) {
         fn_8043E198(page);
@@ -182,7 +182,7 @@ void fn_8043DA4C(u32 addr)
     fn_8043F124(page, frameAddr, frame);
     OSRestoreInterrupts(enabled);
     if (lbl_806EF930 != NULL) {
-        lbl_806EF930(addr, frameAddr, frame, (u32)TICKS_TO_US(fn_80438628()) - start, wrote);
+        lbl_806EF930(addr, frameAddr, frame, (u32)TICKS_TO_US(OSGetTime()) - start, wrote);
     }
 }
 
@@ -197,7 +197,7 @@ void fn_8043DC48(u32 page)
     while (fn_80415880() != 0) {
     }
     inter = fn_80415B10();
-    fn_80432FD4((void*)frameAddr, 0x1000);
+    DCFlushRange((void*)frameAddr, 0x1000);
     fn_804158BC(0, (void*)frameAddr, fn_8043E138(page), 0x1000);
     while (fn_80415880() != 0) {
     }
@@ -376,7 +376,7 @@ void fn_8043E198(u32 page)
     char buf[1024];
 
     sprintf(buf, "Virtual address (%x) has not been allocated. Call VMAlloc on virtual address ranges before using them.", page);
-    fn_8041A5E4();
+    PPCHalt();
 }
 
 void fn_8043E1D0(u32 page)
@@ -392,7 +392,7 @@ int fn_8043E1E8(u32 page)
 /* the arena-lo getter is a small inline here: its result copy is what makes retail keep the pointer in r4 */
 static inline void* GetLo(void)
 {
-    return fn_80432CBC();
+    return OSGetArenaLo();
 }
 
 void fn_8043E1FC(void)
@@ -402,7 +402,7 @@ void fn_8043E1FC(void)
 
     base = (u32*)GetLo();
     lbl_806EF94C = base;
-    fn_80432CCC(base + 0x2000);
+    OSSetArenaLo(base + 0x2000);
     for (i = 0; i < 0x8000; i += 4) {
         *(u32*)((char*)lbl_806EF94C + i) = 0;
     }
@@ -412,8 +412,8 @@ void fn_8043E2A4(void)
 {
     u32 i;
 
-    lbl_806EF948 = (u32*)fn_80432CBC();
-    fn_80432CCC((void*)((u32)lbl_806EF948 + 0x4000));
+    lbl_806EF948 = (u32*)OSGetArenaLo();
+    OSSetArenaLo((void*)((u32)lbl_806EF948 + 0x4000));
     for (i = 0; i < 0x4000; i += 4) {
         *(u32*)((char*)lbl_806EF948 + i) = 0;
     }

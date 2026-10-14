@@ -15,15 +15,15 @@
 extern u32 lbl_806EF748;  /* __GXShutdown peCount */
 extern OSTime lbl_806EF750;  /* __GXShutdown time */
 extern u32 lbl_806EF758;  /* __GXShutdown calledOnce */
-OSTime fn_80438628(void);
+OSTime OSGetTime(void);
 
 /* compile with: MWCC GC/1.2.5n, cflags_dolphin_sdk (-O4,p) + -opt nopeephole */
 /* GXInit.c part (0x80428C64..): fn_80428C64 __GXDefaultTexRegionCallback, fn_80428D60
- * __GXDefaultTlutRegionCallback, fn_80428D84 __GXShutdown. Placeholder callees: fn_8042A544
- * GXSetBreakPtCallback, fn_8042C62C GXSetDrawSyncCallback, fn_8042C6F8 GXSetDrawDoneCallback,
+ * __GXDefaultTlutRegionCallback, fn_80428D84 __GXShutdown. Placeholder callees: GXSetBreakPtCallback
+ * GXSetBreakPtCallback, GXSetDrawSyncCallback, fn_8042C6F8 GXSetDrawDoneCallback,
  * PPCSync PPCSync, fn_8042C07C __GXAbort. */
-GXBreakPtCallback fn_8042A544(GXBreakPtCallback cb);
-GXDrawSyncCallback fn_8042C62C(GXDrawSyncCallback cb);
+GXBreakPtCallback GXSetBreakPtCallback(GXBreakPtCallback cb);
+GXDrawSyncCallback GXSetDrawSyncCallback(GXDrawSyncCallback cb);
 void fn_8042C6F8(void* cb);
 void PPCSync(void);
 void fn_8042C07C(void);
@@ -69,12 +69,12 @@ int fn_80428D84(BOOL final) {
     if (!final) {
         if (!lbl_806EF758) {
             lbl_806EF748 = __GXReadMEMCounterU32(0x28, 0x27);
-            lbl_806EF750 = fn_80438628();
+            lbl_806EF750 = OSGetTime();
             lbl_806EF758 = 1;
             return 0;
         }
 
-        timeNew = fn_80438628();
+        timeNew = OSGetTime();
         peCountNew = __GXReadMEMCounterU32(0x28, 0x27);
 
         if (timeNew - lbl_806EF750 < 10) {
@@ -88,8 +88,8 @@ int fn_80428D84(BOOL final) {
         }
 
     } else {
-        fn_8042A544(NULL);
-        fn_8042C62C(NULL);
+        GXSetBreakPtCallback(NULL);
+        GXSetDrawSyncCallback(NULL);
         fn_8042C6F8(NULL);
 
         GX_WRITE_U32(0);

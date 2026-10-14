@@ -171,7 +171,7 @@ VdMain::~VdMain()
 }
 
 extern "C" void GXInitTlutObj(void* obj, void* data, int fmt, int n);
-extern "C" void fn_80432FD4(void* p, int n);
+extern "C" void DCFlushRange(void* p, int n);
 extern "C" int fn_8038D170(int x);
 /* near-miss (96.4%): retail loads the 0x4330 high word into r4 and the byte 255 into r5; ours has them swapped (4 slots). */
 extern "C" unsigned char* fn_8038C7D4(int a, int b)
@@ -189,9 +189,9 @@ extern "C" unsigned char* fn_8038C7D4(int a, int b)
         t[0x400 + i * 2] = (int)(((float)i - 128.0f) * -0.17205f + 42.666668f);
         t[0x401 + i * 2] = (int)(((float)i - 128.0f) * 0.886f + 128.0f);
     }
-    fn_80432FD4(t, 0x200);
-    fn_80432FD4(u, 0x200);
-    fn_80432FD4(v, 0x200);
+    DCFlushRange(t, 0x200);
+    DCFlushRange(u, 0x200);
+    DCFlushRange(v, 0x200);
     GXInitTlutObj(t + 0x608, t, 0, 0x100);
     GXInitTlutObj(t + 0x614, u, 0, 0x100);
     GXInitTlutObj(t + 0x620, v, 0, 0x100);
@@ -456,8 +456,8 @@ extern "C" int fn_8038D170(int tex)
     }
     GXInitTexObj((char*)p + 0x40, p->m3C, (unsigned short)p->m34, (unsigned short)p->m38, 3, 0, 1, 0);
     GXInitTexObjLOD((char*)p + 0x40, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
-    fn_80432FD4(p->m10, p->m8 * p->mC * 2);
-    fn_80432FD4(p->m3C, p->m34 * p->m38 * 2);
+    DCFlushRange(p->m10, p->m8 * p->mC * 2);
+    DCFlushRange(p->m3C, p->m34 * p->m38 * 2);
     return (int)p;
 }
 
@@ -602,7 +602,7 @@ extern "C" int fn_8038DF3C(I* s, unsigned rate)
     if (s->m0 != 0)
         fn_8038E694(s->m0, rate);
     VdClock* c = s->m60;
-    unsigned long long t = fn_80438628();
+    unsigned long long t = OSGetTime();
     if (c->m10 == 0x1000)
         c->m8 += t - c->m0;
     else
@@ -676,7 +676,7 @@ extern "C" int fn_8038E440(int a, int* b, int c)
 
 extern "C" int fn_8038E468(VdClock* c)
 {
-    unsigned long long t = fn_80438628();
+    unsigned long long t = OSGetTime();
     if (c->m10 == 0x1000)
         c->m8 += t - c->m0;
     else

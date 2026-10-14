@@ -100,7 +100,7 @@ struct VdClock {
     unsigned m10;
 };
 
-/* 64-bit clock (fn_80438628 returns the current time): m0 last time, m8 accumulated, m10 rate (0x1000 = 1.0).
+/* 64-bit clock (OSGetTime returns the current time): m0 last time, m8 accumulated, m10 rate (0x1000 = 1.0).
  * Stream state: m0 resource (VdRes), m60 clock. */
 struct VdStream {
     VdRes* m0;
@@ -111,7 +111,7 @@ struct VdStream {
 typedef VdStream I;
 
 extern "C" int fn_8038E694(VdRes* o, int a);
-extern "C" unsigned long long fn_80438628();
+extern "C" unsigned long long OSGetTime();
 
 
 struct VdRes {

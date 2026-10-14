@@ -21,13 +21,13 @@ extern BOOL fn_80427A58(s32 chan);                                              
 extern BOOL fn_804280EC(s32 chan, u32 dev, EXICallback cb);                      /* EXILock */
 extern BOOL fn_804281E0(s32 chan);                                               /* EXIUnlock */
 /* OS */
-extern void fn_804321CC(void);                                                /* OSInitAlarm */
-extern void fn_80432224(OSAlarm* alarm);                                      /* OSCreateAlarm */
-extern void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler); /* OSSetAlarm */
+extern void OSInitAlarm(void);
+extern void OSCreateAlarm(OSAlarm* alarm);
+extern void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
 extern void OSCancelAlarm(OSAlarm* alarm);
 extern u16 fn_80434DE8(void);                                                 /* OSGetFontEncode */
-extern void fn_80437434(OSThreadQueue* queue);                                /* OSInitThreadQueue */
-extern void fn_804382CC(OSThreadQueue* queue);                                /* OSSleepThread */
+extern void OSInitThreadQueue(OSThreadQueue* queue);
+extern void OSSleepThread(OSThreadQueue* queue);
 extern void OSWakeupThread(OSThreadQueue* queue);
 
 /* __CARDBlock (2 control blocks) followed by __CARDDiskNone: defined together in CARDBios.c, so MWCC forms
@@ -290,15 +290,15 @@ static s32 fn_8041AE08(s32 chan)
     case 0xF3:
         break;
     case 0xF2:
-        fn_80432484(&card->alarm, OSMillisecondsToTicks(100), fn_8041AD64);
+        OSSetAlarm(&card->alarm, OSMillisecondsToTicks(100), fn_8041AD64);
         break;
     case 0xF4:
         if (card->pageSize > 0x80) {
-            fn_80432484(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->cBlock / 0x40), fn_8041AD64);
+            OSSetAlarm(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->cBlock / 0x40), fn_8041AD64);
             break;
         }
     case 0xF1:
-        fn_80432484(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->sectorSize / 0x2000), fn_8041AD64);
+        OSSetAlarm(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->sectorSize / 0x2000), fn_8041AD64);
         break;
     }
 
@@ -405,15 +405,15 @@ s32 fn_8041B1B8(s32 chan, CARDCallback txCallback, CARDCallback exiCallback)
                 case 0xF3:
                     break;
                 case 0xF2:
-                    fn_80432484(&card->alarm, OSMillisecondsToTicks(100), fn_8041AD64);
+                    OSSetAlarm(&card->alarm, OSMillisecondsToTicks(100), fn_8041AD64);
                     break;
                 case 0xF4:
                     if (card->pageSize > 0x80) {
-                        fn_80432484(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->cBlock / 0x40), fn_8041AD64);
+                        OSSetAlarm(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->cBlock / 0x40), fn_8041AD64);
                         break;
                     }
                 case 0xF1:
-                    fn_80432484(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->sectorSize / 0x2000), fn_8041AD64);
+                    OSSetAlarm(&card->alarm, OSSecondsToTicks((OSTime)2) * (card->sectorSize / 0x2000), fn_8041AD64);
                     break;
                 }
 
@@ -556,11 +556,11 @@ void CARDInit(void)
     lbl_806EF600 = fn_80434DE8();
     OSRegisterVersion(lbl_806EF170);
     DSPInit();
-    fn_804321CC();
+    OSInitAlarm();
     for (chan = 0; chan < 2; ++chan, ++card) {
         card->result = CARD_RESULT_NOCARD;
-        fn_80437434(&card->threadQueue);
-        fn_80432224(&card->alarm);
+        OSInitThreadQueue(&card->threadQueue);
+        OSCreateAlarm(&card->alarm);
     }
     fn_8041B810((const DVDDiskID*)0x80000000);
     OSRegisterResetFunction(&lbl_806334A8);
@@ -695,7 +695,7 @@ s32 fn_8041BB38(s32 chan)
     card = &lbl_806DCF20.block[chan];
     enabled = OSDisableInterrupts();
     while ((result = CardGetResultCode(chan)) == CARD_RESULT_BUSY) {
-        fn_804382CC(&card->threadQueue);
+        OSSleepThread(&card->threadQueue);
     }
     OSRestoreInterrupts(enabled);
     return result;

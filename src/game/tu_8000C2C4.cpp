@@ -16,7 +16,7 @@ extern void* (*lbl_8062C668)(unsigned int size, int flags);
 extern unsigned char lbl_806158B8[];
 
 void fn_8000C704(short x, short y, unsigned short w, unsigned char* base, const char* s, unsigned short color);
-extern "C" void fn_80432FD4(void* p, unsigned int n);
+extern "C" void DCFlushRange(void* p, unsigned int n);
 int fn_804089B4(char* buf, const char* fmt, ...);
 extern "C" void fn_803E7320(int ch, const char* s, ...);
 void fn_8043D380(void* fb);
@@ -56,7 +56,7 @@ void Unk8000C2C4::fn_8000C354(const char* s)
     char buf[0x400];
     if (s) {
         fn_8000C704(mC, mE, m4->m4, m0, s, (unsigned short)m10.m0 * 256 + (unsigned short)m10.m4);
-        fn_80432FD4(m0, m8);
+        DCFlushRange(m0, m8);
         if (m1C) {
             fn_804089B4(buf, "%.*s\n", 0x3fe, s);
             buf[0x3fe] = '\n';

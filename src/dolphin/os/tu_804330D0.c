@@ -3,9 +3,9 @@
  * .text 0x804330D0-0x8043580C (code-only unit; TU boundaries approximate, placeholder).
  * Every data object is extern by its lbl_ name.
  *
- * Original-code functions in this range are not reproduced: fn_804330D0, fn_804330E4, fn_804333F8, fn_8043351C,
- * fn_80433644, fn_8043364C (mfmsr/mtmsr), fn_804336B4, fn_80433734, fn_8043380C, fn_80433838, fn_80433B9C,
- * fn_8043449C, fn_804344C4, OSDisableInterrupts, fn_80434F9C, OSRestoreInterrupts, fn_804357A4.
+ * Original-code functions in this range are not reproduced: ICEnable, LCDisable, fn_804333F8, fn_8043351C,
+ * fn_80433644, OSSetCurrentContext (mfmsr/mtmsr), fn_804336B4, OSLoadContext, fn_8043380C, fn_80433838, fn_80433B9C,
+ * fn_8043449C, fn_804344C4, OSDisableInterrupts, OSEnableInterrupts, OSRestoreInterrupts, fn_804357A4.
  *
  * The range is five source files (OSCache, OSContext, OSError, OSExec/OSFont, OSInterrupt); the "==== name ===="
  * markers below show the boundaries. String data is pooled per source file (offsets from the file's first string),
@@ -24,51 +24,51 @@
 #include <dolphin/hw_regs.h>
 #include <dolphin/tail10.h>
 
-extern void fn_80421C20(char* msg, ...);              /* DBPrintf */
-extern void fn_804330D0(void);                         /* ICEnable */
-extern void fn_80432F94(void);                         /* DCEnable */
-extern void fn_804338F4(OSContext* context);
+extern void DBPrintf(char* msg, ...);
+extern void ICEnable(void);
+extern void DCEnable(void);
+extern void OSDumpContext(OSContext* context);
 extern s16 lbl_806EF818;               /* __OSLastInterrupt */
 extern u32 lbl_806EF814;               /* __OSLastInterruptSrr0 */
 extern s64 lbl_806EF820;               /* __OSLastInterruptTime */
-extern OSTime fn_80438628(void);       /* OSGetTime */
+extern OSTime OSGetTime(void);
 extern u32 fn_8043380C(void);                          /* OSGetStackPointer (original code) */
 extern void fn_80433B9C(void);                         /* floating point unavailable handler (original code) */
-extern OSErrorHandler fn_80433E14(OSError error, OSErrorHandler handler);
+extern OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler);
 
 extern OSContext* __OSCurrentContextCached AT_ADDRESS(0x800000D4);
 extern OSContext* __OSFPUContextCached AT_ADDRESS(0x800000D8);
 
 /* ==== OSCache ==== */
 
-void fn_8043310C(void);
-void fn_804331A4(u16 error, OSContext* context, ...);
-void fn_80433304(void);
+void L2GlobalInvalidate(void);
+void DMAErrorHandler(u16 error, OSContext* context, ...);
+void __OSCacheInit(void);
 
 static void L2Disable(void)
 {
     __sync();
-    fn_8041A5CC(fn_8041A5C4() & 0x7FFFFFFF);
+    PPCMtl2cr(PPCMfl2cr() & 0x7FFFFFFF);
     __sync();
 }
 
 /* flags: matches only with -opt nopeephole */
 /* L2GlobalInvalidate */
-void fn_8043310C(void)
+void L2GlobalInvalidate(void)
 {
     L2Disable();
-    fn_8041A5CC(fn_8041A5C4() | 0x200000);
-    while (fn_8041A5C4() & 1) {
+    PPCMtl2cr(PPCMfl2cr() | 0x200000);
+    while (PPCMfl2cr() & 1) {
     }
-    fn_8041A5CC(fn_8041A5C4() & ~0x200000);
-    while (fn_8041A5C4() & 1) {
-        fn_80421C20(">>> L2 INVALIDATE : SHOULD NEVER HAPPEN\n");
+    PPCMtl2cr(PPCMfl2cr() & ~0x200000);
+    while (PPCMfl2cr() & 1) {
+        DBPrintf(">>> L2 INVALIDATE : SHOULD NEVER HAPPEN\n");
     }
 }
 
 /* flags: matches only with -opt nopeephole */
 /* DMAErrorHandler */
-void fn_804331A4(u16 error, OSContext* context, ...)
+void DMAErrorHandler(u16 error, OSContext* context, ...)
 {
     u32 hid2 = PPCMfhid2();
 
@@ -76,8 +76,8 @@ void fn_804331A4(u16 error, OSContext* context, ...)
     OSReport("HID2 = 0x%x   SRR1 = 0x%x\n", hid2, context->srr1);
     if (!(hid2 & 0x00F00000) || !(context->srr1 & 0x00200000)) {
         OSReport("Machine check was not DMA/locked cache related\n");
-        fn_804338F4(context);
-        fn_8041A5E4();
+        OSDumpContext(context);
+        PPCHalt();
     }
 
     OSReport("DMAErrorHandler(): An error occurred while processing DMA.\n");
@@ -101,47 +101,47 @@ void fn_804331A4(u16 error, OSContext* context, ...)
 
 static void L2Enable(void)
 {
-    fn_8041A5CC((fn_8041A5C4() | 0x80000000) & ~0x200000);
+    PPCMtl2cr((PPCMfl2cr() | 0x80000000) & ~0x200000);
 }
 
 static void L2Init(void)
 {
     u32 oldMSR;
 
-    oldMSR = fn_8041A5A4();
+    oldMSR = PPCMfmsr();
     __sync();
-    fn_8041A5AC(0x30);
+    PPCMtmsr(0x30);
     __sync();
     L2Disable();
-    fn_8043310C();
-    fn_8041A5AC(oldMSR);
+    L2GlobalInvalidate();
+    PPCMtmsr(oldMSR);
 }
 
 /* flags: matches only with -opt nopeephole */
 /* __OSCacheInit */
-void fn_80433304(void)
+void __OSCacheInit(void)
 {
-    if (!(fn_8041A5B4() & 0x8000)) {
-        fn_804330D0();
-        fn_80421C20("L1 i-caches initialized\n");
+    if (!(PPCMfhid0() & 0x8000)) {
+        ICEnable();
+        DBPrintf("L1 i-caches initialized\n");
     }
-    if (!(fn_8041A5B4() & 0x4000)) {
-        fn_80432F94();
-        fn_80421C20("L1 d-caches initialized\n");
+    if (!(PPCMfhid0() & 0x4000)) {
+        DCEnable();
+        DBPrintf("L1 d-caches initialized\n");
     }
-    if (!(fn_8041A5C4() & 0x80000000)) {
+    if (!(PPCMfl2cr() & 0x80000000)) {
         L2Init();
         L2Enable();
-        fn_80421C20("L2 cache initialized\n");
+        DBPrintf("L2 cache initialized\n");
     }
-    fn_80433E14(1, fn_804331A4);
-    fn_80421C20("Locked cache machine check handler installed\n");
+    OSSetErrorHandler(1, DMAErrorHandler);
+    DBPrintf("Locked cache machine check handler installed\n");
 }
 
 /* ==== OSContext ==== */
 
 
-void fn_804338F4(OSContext* context);
+void OSDumpContext(OSContext* context);
 void fn_80433C20(void);
 OSContext* fn_804336A8(void);
 
@@ -153,7 +153,7 @@ OSContext* fn_804336A8(void)
 
 /* flags: matches only with -opt nopeephole */
 /* OSClearContext */
-void fn_80433814(OSContext* context)
+void OSClearContext(OSContext* context)
 {
     context->mode = 0;
     context->state = 0;
@@ -164,7 +164,7 @@ void fn_80433814(OSContext* context)
 
 /* flags: matches only with -opt nopeephole */
 /* OSDumpContext */
-void fn_804338F4(OSContext* context)
+void OSDumpContext(OSContext* context)
 {
     u32 i;
     u32* p;
@@ -188,8 +188,8 @@ void fn_804338F4(OSContext* context)
 
         enabled = OSDisableInterrupts();
         currentContext = fn_804336A8();
-        fn_80433814(&fpuContext);
-        fn_8043364C(&fpuContext);
+        OSClearContext(&fpuContext);
+        OSSetCurrentContext(&fpuContext);
 
         OSReport("\n\nFPRs----------\n");
         for (i = 0; i < 32; i += 2) {
@@ -201,8 +201,8 @@ void fn_804338F4(OSContext* context)
             OSReport("ps%d \t= 0x%x \t ps%d \t= 0x%x\n", i, (u32)context->psf[i], i + 1, (u32)context->psf[i + 1]);
         }
 
-        fn_80433814(&fpuContext);
-        fn_8043364C(currentContext);
+        OSClearContext(&fpuContext);
+        OSSetCurrentContext(currentContext);
         OSRestoreInterrupts(enabled);
     }
 
@@ -216,15 +216,15 @@ void fn_804338F4(OSContext* context)
 /* __OSContextInit */
 void fn_80433C20(void)
 {
-    fn_80432014(7, (__OSExceptionHandler)fn_80433B9C);
+    __OSSetExceptionHandler(7, (__OSExceptionHandler)fn_80433B9C);
     __OSFPUContextCached = NULL;
-    fn_80421C20("FPU-unavailable handler installed\n");
+    DBPrintf("FPU-unavailable handler installed\n");
 }
 
 /* ==== OSError ==== */
 
 void OSReport(const char* msg, ...);
-void fn_80433CE8(const char* file, int line, const char* msg, ...);
+void OSPanic(const char* file, int line, const char* msg, ...);
 
 /* OSReport */
 void OSReport(const char* msg, ...)
@@ -237,7 +237,7 @@ void OSReport(const char* msg, ...)
 }
 
 /* OSPanic */
-void fn_80433CE8(const char* file, int line, const char* msg, ...)
+void OSPanic(const char* file, int line, const char* msg, ...)
 {
     va_list marker;
     u32 i;
@@ -252,7 +252,7 @@ void fn_80433CE8(const char* file, int line, const char* msg, ...)
     for (i = 0, p = (u32*)fn_8043380C(); p && (u32)p != 0xFFFFFFFF && i++ < 16; p = (u32*)*p) {
         OSReport("0x%08x:   0x%08x    0x%08x\n", p, p[0], p[1]);
     }
-    fn_8041A5E4();
+    PPCHalt();
 }
 
 extern u32 lbl_806EF2D8;               /* __OSFpscrEnableBits */
@@ -260,11 +260,11 @@ extern void* lbl_806DF090[17];         /* __OSErrorTable */
 
 extern void fn_80433644(OSContext* context);           /* OSSaveFPUContext wrapper (original code) */
 
-OSErrorHandler fn_80433E14(OSError error, OSErrorHandler handler);
+OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler);
 void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar);
 
 /* OSSetErrorHandler */
-OSErrorHandler fn_80433E14(OSError error, OSErrorHandler handler)
+OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler)
 {
     OSErrorHandler oldHandler;
     BOOL enabled;
@@ -278,8 +278,8 @@ OSErrorHandler fn_80433E14(OSError error, OSErrorHandler handler)
         u32 fpscr;
         OSThread* thread;
 
-        msr = fn_8041A5A4();
-        fn_8041A5AC(msr | 0x2000);
+        msr = PPCMfmsr();
+        PPCMtmsr(msr | 0x2000);
         fpscr = fn_8041A628();
         if (handler) {
             for (thread = __OSActiveThreadQueue.head; thread; thread = thread->linkActive.next) {
@@ -310,7 +310,7 @@ OSErrorHandler fn_80433E14(OSError error, OSErrorHandler handler)
         }
         fpscr &= 0x6005F8FF;
         fn_8041A648(fpscr);
-        fn_8041A5AC(msr);
+        PPCMtmsr(msr);
     }
 
     OSRestoreInterrupts(enabled);
@@ -327,7 +327,7 @@ typedef OSErrorHandler ErrHandler;
 void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
 {
     void** table = lbl_806DF090;
-    OSTime tb = fn_80438628();
+    OSTime tb = OSGetTime();
 
     if (!(context->srr1 & 2)) {
         OSReport("Non-recoverable Exception %d", exception);
@@ -337,46 +337,46 @@ void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
             u32 msr;
 
             exception = 16;
-            msr = fn_8041A5A4();
-            fn_8041A5AC(msr | 0x2000);
+            msr = PPCMfmsr();
+            PPCMtmsr(msr | 0x2000);
             if (__OSFPUContextCached) {
                 fn_80433644(__OSFPUContextCached);
             }
             fpscr = fn_8041A628();
             fn_8041A648(fpscr & 0x6005F8FF);
-            fn_8041A5AC(msr);
+            PPCMtmsr(msr);
 
             if (__OSFPUContextCached == context) {
-                fn_80437484();
+                OSDisableScheduler();
                 ((ErrHandler)table[16])(16, context, dsisr, dar);
                 context->srr1 &= ~0x2000;
                 __OSFPUContextCached = NULL;
                 context->fpscr &= 0x6005F8FF;
-                fn_804374C4();
-                fn_804379E0();
+                OSEnableScheduler();
+                __OSReschedule();
             } else {
                 context->srr1 &= ~0x2000;
                 __OSFPUContextCached = NULL;
             }
-            fn_80433734(context);
+            OSLoadContext(context);
         }
 
         if (table[exception]) {
-            fn_80437484();
+            OSDisableScheduler();
             ((ErrHandler)table[exception])(exception, context, dsisr, dar);
-            fn_804374C4();
-            fn_804379E0();
-            fn_80433734(context);
+            OSEnableScheduler();
+            __OSReschedule();
+            OSLoadContext(context);
         }
 
         if (exception == 8) {
-            fn_80433734(context);
+            OSLoadContext(context);
         }
         OSReport("Unhandled Exception %d", exception);
     }
 
     OSReport("\n");
-    fn_804338F4(context);
+    OSDumpContext(context);
     OSReport("\nDSISR = 0x%08x                   DAR  = 0x%08x\n", dsisr, dar);
     OSReport("TB = 0x%016llx\n", tb);
 
@@ -405,13 +405,13 @@ void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
     }
 
     OSReport("\nLast interrupt (%d): SRR0 = 0x%08x  TB = 0x%016llx\n", lbl_806EF818, lbl_806EF814, lbl_806EF820);
-    fn_8041A5E4();
+    PPCHalt();
 }
 
 /* ==== OSExec ==== */
 
 extern int fn_80424C14(DVDCommandBlock* block, void* addr, s32 length, s32 offset, void* callback, s32 prio);  /* DVDReadAbsAsyncPrio */
-extern s32 fn_80425064(const DVDCommandBlock* block);  /* DVDGetCommandBlockStatus */
+extern s32 DVDGetCommandBlockStatus(const DVDCommandBlock* block);
 extern BOOL fn_80425510(void);                         /* DVDCheckDisk */
 extern void fn_804361BC(int);                          /* __OSDoHotReset */
 extern s32 lbl_806EF7F8;                               /* Prepared */
@@ -472,7 +472,7 @@ void fn_804344D8(void* addr, s32 length, s32 offset)
     DVDCommandBlock block;
 
     fn_80424C14(&block, addr, length, offset, NULL, 0);
-    while (fn_80425064(&block)) {
+    while (DVDGetCommandBlockStatus(&block)) {
         if (!fn_80425510()) {
             fn_804361BC(0);
         }
@@ -496,17 +496,17 @@ void fn_80434550(OSExecParams* params)
     }
 }
 
-extern BOOL fn_80434F9C(void);                         /* OSEnableInterrupts */
+extern BOOL OSEnableInterrupts(void);
 extern u32 fn_80435350(u32 global);                    /* __OSMaskInterrupts */
 extern u32 __OSUnmaskInterrupts(u32 global);
 extern void fn_80422FD8(void);                         /* DVDInit */
 extern BOOL fn_8042515C(BOOL autoInvalidation);        /* DVDSetAutoInvalidation */
 extern void fn_8042516C(void);                         /* DVDResume */
 extern void fn_80425608(DVDCBCallback callback);       /* __DVDPrepareResetAsync */
-extern DVDDiskID* fn_80425508(void);                   /* DVDGetCurrentDiskID */
+extern DVDDiskID* DVDGetCurrentDiskID(void);
 extern int fn_80424E94(DVDCommandBlock* block, DVDCBCallback callback);  /* DVDCancelStreamAsync */
 extern void fn_8043449C(void* entry);                  /* Run (original code) */
-extern void fn_804330C0(void);                         /* ICFlashInvalidate */
+extern void ICFlashInvalidate(void);
 extern void fn_80435FA4(void** start, void** end);     /* OSGetSaveRegion */
 
 extern BOOL lbl_806EF7AC;                              /* __OSIsGcam */
@@ -560,7 +560,7 @@ static void StartDol(const OSExecParams* params, void* entry)
 /* IsStreamEnabled */
 static int IsStreamEnabled(void)
 {
-    if (fn_80425508()->streaming) {
+    if (DVDGetCurrentDiskID()->streaming) {
         return TRUE;
     }
 
@@ -577,7 +577,7 @@ static void StopStreaming(void)
         AISetStreamVolRight(0);
         fn_80424E94(&block, NULL);
 
-        while (fn_80425064(&block)) {
+        while (DVDGetCommandBlockStatus(&block)) {
             if (!fn_80425510()) {
                 fn_804361BC(0);
             }
@@ -616,7 +616,7 @@ static void* LoadDol(const OSExecParams* params, AppLoaderCallback getInterface)
     memcpy(paramsWork, params, sizeof(OSExecParams));
     __OSExecParams = paramsWork;
     appInit((void (*)(char*))OSReport);
-    fn_80432CCC(paramsWork);
+    OSSetArenaLo(paramsWork);
 
     while (appGetNext(&addr, &length, &offset) != 0) {
         fn_804344D8(addr, length, offset);
@@ -661,7 +661,7 @@ void fn_80434654(u32 doloffset, u32 restartCode, void* regionStart, void* region
     fn_80425608((DVDCBCallback)fn_80434544);
     fn_80435350(0xFFFFFFE0);
     __OSUnmaskInterrupts(0x400);
-    fn_80434F9C();
+    OSEnableInterrupts();
 
     while (lbl_806EF7F8 != TRUE) {
         if (!fn_80425510()) {
@@ -688,7 +688,7 @@ void fn_80434654(u32 doloffset, u32 restartCode, void* regionStart, void* region
         fn_804344D8((void*)0x81300000, OSRoundUp32B(header->rebootSize), (fn_80434590() + 0x20) + header->size);
         ICInvalidateRange((void*)0x81300000, OSRoundUp32B(header->rebootSize));
         OSDisableInterrupts();
-        fn_804330C0();
+        ICFlashInvalidate();
         fn_8043449C((void*)0x81300000);
     }
 }
@@ -890,7 +890,7 @@ void fn_80435004(void)
     *(u32*)0x800000C8 = 0;
     __PIRegs[1] = 0xF0;
     fn_80435350(0xFFFFFFE0);
-    fn_80432014(4, (__OSExceptionHandler)fn_804357A4);
+    __OSSetExceptionHandler(4, (__OSExceptionHandler)fn_804357A4);
 }
 
 /* flags: matches only with -opt nopeephole */
@@ -1112,7 +1112,7 @@ void fn_80435460(u16 exception, OSContext* context)
     intsr = __PIRegs[0];
     intsr &= ~0x10000;
     if (intsr == 0 || (intsr & __PIRegs[1]) == 0) {
-        fn_80433734(context);
+        OSLoadContext(context);
     }
 
     cause = 0;
@@ -1225,17 +1225,17 @@ void fn_80435460(u16 exception, OSContext* context)
         if (handler) {
             if (interrupt > 4) {
                 lbl_806EF818 = interrupt;
-                lbl_806EF820 = fn_80438628();
+                lbl_806EF820 = OSGetTime();
                 lbl_806EF814 = context->srr0;
             }
-            fn_80437484();
+            OSDisableScheduler();
             handler(interrupt, context);
-            fn_804374C4();
-            fn_804379E0();
-            fn_80433734(context);
+            OSEnableScheduler();
+            __OSReschedule();
+            OSLoadContext(context);
         }
     }
-    fn_80433734(context);
+    OSLoadContext(context);
 }
 
 extern void fn_804357A4(void);                         /* ExternalInterruptHandler wrapper (original code) */

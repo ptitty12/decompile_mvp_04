@@ -190,16 +190,16 @@ void fn_803164A0__Fv(void* x);
 extern "C" {
 void VISetBlack(int b);
 void VIFlush();
-void fn_80433814(OSCtx8014F05C* c);
-void fn_8043364C(OSCtx8014F05C* c);
-void fn_80434F9C();
-void* fn_80433CE8(const char* file, int line, const char* msg, ...);
+void OSClearContext(OSCtx8014F05C* c);
+void OSSetCurrentContext(OSCtx8014F05C* c);
+void OSEnableInterrupts();
+void* OSPanic(const char* file, int line, const char* msg, ...);
 void fn_8014F954(char* self);
 void VISetBlack(int b);
 void VIFlush();
-void fn_80433814(OSCtx8014F05C* c);
-void fn_8043364C(OSCtx8014F05C* c);
-void fn_80434F9C();
+void OSClearContext(OSCtx8014F05C* c);
+void OSSetCurrentContext(OSCtx8014F05C* c);
+void OSEnableInterrupts();
 
 void fn_8014F954(char* self);
 int fn_8031C6A8();
@@ -227,13 +227,13 @@ extern "C" {
 void fn_8014F3A8(const char* str);
 void fn_8014F47C(void* p);
 void fn_803D9E00(int a, unsigned char** b, Unk80634ADC** c);
-void* fn_80433E14(unsigned short sig, void* handler);
+void* OSSetErrorHandler(unsigned short sig, void* handler);
 int sprintf(char* buf, const char* fmt, ...);
 void fn_8014F4B4(int a, char* s);
 void fn_8014F738(int a);
 void OSReport(const char* msg, ...);
 void DVDReadAsyncPrio(void* blk, void* buf, int len, int off, void* cb, int prio);
-int fn_80425064(void* blk);
+int DVDGetCommandBlockStatus(void* blk);
 void OSYieldThread();
 void* fn_803774A8(unsigned n, int heap);
 int fn_80072E90(void* g, void* a, int b, int c, int d, void* out);
@@ -856,7 +856,7 @@ char fn_8014E614(Self8014E588* s)
         char* blk = s->m2018;
         DVDReadAsyncPrio(blk, s, 0x2000, s->m2004, 0, 2);
         int r;
-        while ((r = fn_80425064(blk)) != 0) {
+        while ((r = DVDGetCommandBlockStatus(blk)) != 0) {
             OSYieldThread();
         }
         s->m2010 = r;
@@ -969,18 +969,18 @@ void* fn_8014E9E0(void* sv)
         fn_803D9E00(fn_803D817C() + 0x10, &fb, &rm);
         fn_8000C4A8(fb, rm);
         void* h = (void*)fn_8014F008;
-        old[6] = fn_80433E14(6, h);
-        old[10] = fn_80433E14(10, h);
-        old[12] = fn_80433E14(12, h);
-        old[0] = fn_80433E14(0, h);
-        old[1] = fn_80433E14(1, h);
-        old[2] = fn_80433E14(2, h);
-        old[3] = fn_80433E14(3, h);
-        old[5] = fn_80433E14(5, h);
-        old[11] = fn_80433E14(11, h);
-        old[13] = fn_80433E14(13, h);
-        old[14] = fn_80433E14(14, h);
-        old[15] = fn_80433E14(15, h);
+        old[6] = OSSetErrorHandler(6, h);
+        old[10] = OSSetErrorHandler(10, h);
+        old[12] = OSSetErrorHandler(12, h);
+        old[0] = OSSetErrorHandler(0, h);
+        old[1] = OSSetErrorHandler(1, h);
+        old[2] = OSSetErrorHandler(2, h);
+        old[3] = OSSetErrorHandler(3, h);
+        old[5] = OSSetErrorHandler(5, h);
+        old[11] = OSSetErrorHandler(11, h);
+        old[13] = OSSetErrorHandler(13, h);
+        old[14] = OSSetErrorHandler(14, h);
+        old[15] = OSSetErrorHandler(15, h);
     }
     return s;
 }
@@ -1083,9 +1083,9 @@ void* fn_8014F05C(void* sv, int code0, int ctxp, int dsisr, int dar) /* 8014F05C
     unsigned code = code0;
     Ctx8014ECA8* ctx = (Ctx8014ECA8*)ctxp;
     OSCtx8014F05C c;
-    fn_80433814(&c);
-    fn_8043364C(&c);
-    fn_80434F9C();
+    OSClearContext(&c);
+    OSSetCurrentContext(&c);
+    OSEnableInterrupts();
     fn_8014F34C((int)"crash.txt");
     VISetBlack(0);
     VIFlush();
@@ -1135,9 +1135,9 @@ void* fn_8014F05C(void* sv, int code0, int ctxp, int dsisr, int dar) /* 8014F05C
     fn_8000C50C(0);
     fn_8000C5A8();
     fn_8014F42C();
-    fn_8043364C((OSCtx8014F05C*)ctx);
-    fn_80433814(&c);
-    return fn_80433CE8("C:/mvp2004/source/gc/exception/ddtrap.cpp", 0x2F8, "cExceptionHandler calling OSHalt()\n");
+    OSSetCurrentContext((OSCtx8014F05C*)ctx);
+    OSClearContext(&c);
+    return OSPanic("C:/mvp2004/source/gc/exception/ddtrap.cpp", 0x2F8, "cExceptionHandler calling OSHalt()\n");
 }
 
 void fn_8014F34C(int a)

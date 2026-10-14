@@ -25,7 +25,7 @@ void fn_803A979C(void);
 // so the two cache calls are declared directly until ProDG system headers exist.
 extern "C" {
 void ICInvalidateRange(void *addr, unsigned int nBytes);
-void fn_80432FD4(void *addr, unsigned int nBytes);
+void DCFlushRange(void *addr, unsigned int nBytes);
 }
 #endif
 
@@ -1367,7 +1367,7 @@ void SNDAEMSI_resolvemodulebank(
 
 #ifdef EA_PLATFORM_GAMECUBE
     ICInvalidateRange(pModuleBank, pModuleBank->totalsize);
-    fn_80432FD4(pModuleBank, pModuleBank->totalsize);
+    DCFlushRange(pModuleBank, pModuleBank->totalsize);
 #endif
     fn_803A979C();
 }

@@ -11,8 +11,8 @@ extern BOOL fn_80427A58(s32 chan); /* EXIDeselect */
 extern BOOL fn_804281E0(s32 chan); /* EXIUnlock */
 extern BOOL fn_80427630(s32 chan); /* EXIProbe */
 extern u32 fn_80438640(void); /* OSGetTick */
-extern void fn_80432FD4(void* addr, u32 length); /* DCFlushRange */
-extern void fn_80432FA8(void* addr, u32 length); /* DCInvalidateRange */
+extern void DCFlushRange(void* addr, u32 length);
+extern void DCInvalidateRange(void* addr, u32 length);
 extern s32 fn_8041AAD8(s32 chan, u8* status); /* __CARDReadStatus */
 extern void fn_8041D8DC(s32 chan, s32 result); /* __CARDMountCallback */
 extern CARDControl lbl_806DCF20[2]; /* __CARDBlock */
@@ -276,9 +276,9 @@ s32 __CARDUnlock(s32 chan, u8 flashID[12]) {
     param->outputAddr = output;
     param->aramAddr = 0;
 
-    fn_80432FD4(input, 8);
-    fn_80432FA8(output, 4);
-    fn_80432FD4(param, sizeof(CARDDecParam));
+    DCFlushRange(input, 8);
+    DCInvalidateRange(output, 4);
+    DCFlushRange(param, sizeof(CARDDecParam));
 
     task->priority = 255;
     task->iram_mmem_addr = (u16*)OSCachedToPhysical(lbl_80633500);

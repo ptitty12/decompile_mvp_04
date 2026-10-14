@@ -3,7 +3,7 @@
 
 #include "__card.h"
 
-extern OSTime fn_80438628(void); /* OSGetTime */
+extern OSTime OSGetTime(void);
 extern void fn_8041A6C8(s32 chan, s32 result); /* __CARDSyncCallback */
 extern s32 fn_8041B848(s32 chan, CARDControl** pcard); /* __CARDGetControlBlock */
 extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
@@ -147,7 +147,7 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat, CARDCallback callba
         CARDSetIconSpeed(ent, 0, CARD_STAT_SPEED_FAST);
     }
 
-    ent->time = (u32)OSTicksToSeconds(fn_80438628());
+    ent->time = (u32)OSTicksToSeconds(OSGetTime());
     result = __CARDUpdateDir(chan, callback);
     if (result < 0)
         fn_8041B900(card, result);

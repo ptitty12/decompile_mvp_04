@@ -24,9 +24,9 @@
  * fn_804269A8 DVDLowAudioStream, fn_80426A40 DVDLowRequestAudioStatus, fn_80426ACC DVDLowAudioBufferConfig,
  * fn_80426B68 DVDLowReset, fn_80426C24 DVDLowBreak, fn_80426C38 DVDLowClearCallback,
  * fn_80426C54 __DVDLowSetWAType, fn_80426C98 __DVDLowTestAlarm.
- * Other placeholder callees: fn_80432224 OSCreateAlarm, fn_80432484 OSSetAlarm, OSCancelAlarm OSCancelAlarm,
- * fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext, fn_80435350 __OSMaskInterrupts,
- * fn_80425508 (DVD drive-status flag accessor), fn_804321CC OSInitAlarm. */
+ * Other placeholder callees: OSCreateAlarm, OSSetAlarm, OSCancelAlarm OSCancelAlarm,
+ * OSClearContext, OSSetCurrentContext, fn_80435350 __OSMaskInterrupts,
+ * DVDGetCurrentDiskID (DVD drive-status flag accessor), OSInitAlarm. */
 
 typedef struct DvdLowCommand {
     s32 command;
@@ -71,14 +71,14 @@ extern OSTime lbl_806EF710;            /* LastReadIssued */
 extern volatile s32 lbl_806EF718;               /* LastCommandWasRead */
 extern volatile s32 lbl_806EF71C;               /* NextCommandNumber */
 
-void fn_80432224(OSAlarm* alarm);
-void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
+void OSCreateAlarm(OSAlarm* alarm);
+void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
 void OSCancelAlarm(OSAlarm* alarm);
-void fn_80433814(OSContext* context);
-void fn_8043364C(OSContext* context);
+void OSClearContext(OSContext* context);
+void OSSetCurrentContext(OSContext* context);
 void fn_80435350(u32 mask);
-void fn_804321CC(void);
-DVDDiskID* fn_80425508(void);
+void OSInitAlarm(void);
+DVDDiskID* DVDGetCurrentDiskID(void);
 void fn_80426C54(u32 type, u32 location);
 
 void fn_80425E54(void);
@@ -106,7 +106,7 @@ void fn_80425E54(void) {
     lbl_806EF71C = 0;
     lbl_806DE288.commandList[0].command = -1;
     fn_80426C54(0, 0);
-    fn_804321CC();
+    OSInitAlarm();
 }
 
 void fn_80425E94(__OSInterrupt interrupt, OSContext* context) {
@@ -195,8 +195,8 @@ void fn_80425E94(__OSInterrupt interrupt, OSContext* context) {
         bss->commandList[0].command = -1;
         lbl_806EF71C = 0;
     }
-    fn_80433814(&exceptionContext);
-    fn_8043364C(&exceptionContext);
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(&exceptionContext);
     if (cause != 0) {
         DVDLowCallback cb = lbl_806EF6E0;
 
@@ -206,8 +206,8 @@ void fn_80425E94(__OSInterrupt interrupt, OSContext* context) {
         }
         lbl_806EF6F8 = 0;
     }
-    fn_80433814(&exceptionContext);
-    fn_8043364C(context);
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(context);
 }
 
 /* near-miss: ProcessNextCommand; the original loads the command once and keeps the base in r4 */
@@ -228,15 +228,15 @@ void fn_804261F8(OSAlarm* alarm, OSContext* context) {
     DVDLowCallback cb;
 
     fn_80435350(0x400);
-    fn_80433814(&exceptionContext);
-    fn_8043364C(&exceptionContext);
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(&exceptionContext);
     cb = lbl_806EF6E0;
     lbl_806EF6E0 = NULL;
     if (cb) {
         cb(0x10);
     }
-    fn_80433814(&exceptionContext);
-    fn_8043364C(context);
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(context);
 }
 
 void fn_80426268(void* addr, u32 length, u32 offset, DVDLowCallback callback) {
@@ -255,12 +255,12 @@ void fn_80426268(void* addr, u32 length, u32 offset, DVDLowCallback callback) {
     __DIRegs[7] = 3;
     if (length > 0xA00000) {
         u32 ticks = OSSecondsToTicks(20);
-        fn_80432224(&bss->alarmForTimeout);
-        fn_80432484(&bss->alarmForTimeout, ticks, fn_804261F8);
+        OSCreateAlarm(&bss->alarmForTimeout);
+        OSSetAlarm(&bss->alarmForTimeout, ticks, fn_804261F8);
     } else {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&bss->alarmForTimeout);
-        fn_80432484(&bss->alarmForTimeout, ticks, fn_804261F8);
+        OSCreateAlarm(&bss->alarmForTimeout);
+        OSSetAlarm(&bss->alarmForTimeout, ticks, fn_804261F8);
     }
 }
 
@@ -315,7 +315,7 @@ BOOL fn_804263F8(void* addr, u32 length, u32 offset, DVDLowCallback callback) {
             prevOffset = &bss->prev.offset;
             start = *curOffset >> 15;
             prevEnd = (*prevLength - 1 + *prevOffset) >> 15;
-            streaming = fn_80425508()->streaming ? TRUE : FALSE;
+            streaming = DVDGetCurrentDiskID()->streaming ? TRUE : FALSE;
             gap = streaming ? 5 : 15;
             close = (start > prevEnd - 2) || (start < prevEnd + gap + 3);
             if (!close) {
@@ -342,8 +342,8 @@ BOOL fn_804263F8(void* addr, u32 length, u32 offset, DVDLowCallback callback) {
                         bss->commandList[0].callback = callback;
                         bss->commandList[1].command = -1;
                         lbl_806EF71C = 0;
-                        fn_80432224(&bss->alarmForWA);
-                        fn_80432484(&bss->alarmForWA, limit - elapsed + OSMicrosecondsToTicks(500), fn_80426174);
+                        OSCreateAlarm(&bss->alarmForWA);
+                        OSSetAlarm(&bss->alarmForWA, limit - elapsed + OSMicrosecondsToTicks(500), fn_80426174);
                     }
                 } else {
                     fn_80426378(addr, length, offset, callback);
@@ -362,8 +362,8 @@ BOOL fn_80426690(u32 offset, DVDLowCallback callback) {
     __DIRegs[7] = 1;
     {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&lbl_806DE2F0);
-        fn_80432484(&lbl_806DE2F0, ticks, fn_804261F8);
+        OSCreateAlarm(&lbl_806DE2F0);
+        OSSetAlarm(&lbl_806DE2F0, ticks, fn_804261F8);
     }
     return TRUE;
 }
@@ -387,8 +387,8 @@ BOOL fn_80426750(DVDDiskID* diskID, DVDLowCallback callback) {
     __DIRegs[7] = 3;
     {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&lbl_806DE2F0);
-        fn_80432484(&lbl_806DE2F0, ticks, fn_804261F8);
+        OSCreateAlarm(&lbl_806DE2F0);
+        OSSetAlarm(&lbl_806DE2F0, ticks, fn_804261F8);
     }
     return TRUE;
 }
@@ -400,8 +400,8 @@ BOOL fn_804267F4(DVDLowCallback callback) {
     __DIRegs[7] = 1;
     {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&lbl_806DE2F0);
-        fn_80432484(&lbl_806DE2F0, ticks, fn_804261F8);
+        OSCreateAlarm(&lbl_806DE2F0);
+        OSSetAlarm(&lbl_806DE2F0, ticks, fn_804261F8);
     }
     return TRUE;
 }
@@ -413,8 +413,8 @@ BOOL fn_80426880(DVDLowCallback callback) {
     __DIRegs[7] = 1;
     {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&lbl_806DE2F0);
-        fn_80432484(&lbl_806DE2F0, ticks, fn_804261F8);
+        OSCreateAlarm(&lbl_806DE2F0);
+        OSSetAlarm(&lbl_806DE2F0, ticks, fn_804261F8);
     }
     return TRUE;
 }
@@ -429,8 +429,8 @@ BOOL fn_8042690C(DVDDriveInfo* info, DVDLowCallback callback) {
     __DIRegs[7] = 3;
     {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&lbl_806DE2F0);
-        fn_80432484(&lbl_806DE2F0, ticks, fn_804261F8);
+        OSCreateAlarm(&lbl_806DE2F0);
+        OSSetAlarm(&lbl_806DE2F0, ticks, fn_804261F8);
     }
     return TRUE;
 }
@@ -444,8 +444,8 @@ BOOL fn_804269A8(u32 subcmd, u32 length, u32 offset, DVDLowCallback callback) {
     __DIRegs[7] = 1;
     {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&lbl_806DE2F0);
-        fn_80432484(&lbl_806DE2F0, ticks, fn_804261F8);
+        OSCreateAlarm(&lbl_806DE2F0);
+        OSSetAlarm(&lbl_806DE2F0, ticks, fn_804261F8);
     }
     return TRUE;
 }
@@ -457,8 +457,8 @@ BOOL fn_80426A40(u32 subcmd, DVDLowCallback callback) {
     __DIRegs[7] = 1;
     {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&lbl_806DE2F0);
-        fn_80432484(&lbl_806DE2F0, ticks, fn_804261F8);
+        OSCreateAlarm(&lbl_806DE2F0);
+        OSSetAlarm(&lbl_806DE2F0, ticks, fn_804261F8);
     }
     return TRUE;
 }
@@ -470,8 +470,8 @@ BOOL fn_80426ACC(BOOL eventMode, u32 bufferNum, DVDLowCallback callback) {
     __DIRegs[7] = 1;
     {
         u32 ticks = OSSecondsToTicks(10);
-        fn_80432224(&lbl_806DE2F0);
-        fn_80432484(&lbl_806DE2F0, ticks, fn_804261F8);
+        OSCreateAlarm(&lbl_806DE2F0);
+        OSSetAlarm(&lbl_806DE2F0, ticks, fn_804261F8);
     }
     return TRUE;
 }
