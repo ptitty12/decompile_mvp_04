@@ -60,7 +60,7 @@ included, can never break a mod. It only makes the game easier to understand.
   - The 18 database tables in `database.big` are **plain-text tables** (RefPack-compressed). The tools round-trip them byte for byte.
   - Rows are keyed by a djb2 hash of "Last,First" for players and of the 3-letter team code for teams.
   - The player arrays hold 3,250, with 2,921 used. Teams are fixed at 126 (30 MLB, 2 All-Star, 90 minor-league, 4 specials), so new teams replace slots until code hooks raise the limit.
-- **Engine:** E0a is done (`docs/engine/E0_SURVEY.md`; D1 and D4 decided). E0b, the native boot spike, is next.
+- **Engine:** E0a and **E0b are done.** The retail code, translated by our own translator, boots natively and deterministically to the frame loop (`docs/engine/E0B_LOG.md`). Next: E1 (renderer: GX command stream to WebGPU) and the E2 in-browser compile spike.
 - **Decomp** (main `d0a166c2`): 21,109 / 24,158 functions matched (87.4%);
   3,075,304 / 5,896,176 code bytes (52.2%); 234 of 847 units built from source. The
   live card is in `README.md`.
@@ -126,8 +126,8 @@ Updated at the end of 2026-10-14.
 1. ~~**K1 naming sweep**~~ 99% done (K1a: 94 names; K1b: 58 names plus dtk's cascade). Left: OSInit and
    DVDInit, which need data splits for fstload and EXIBios (see the K1b commit), and `__init_user`.
 2. ~~**E0a survey**~~ Done: we write our own translator (D1), with resumable guest threads (D4).
-3. **E0b boot spike**, in progress (one Opus side session, worktree `decompile_mvp_04-e0b`, branch
-   `engine/e0b`): the 10 items in `docs/engine/E0_SURVEY.md` §8, built natively with MSVC + CMake.
+3. ~~**E0b boot spike**~~ Done 2026-10-14: boots to the frame loop, deterministic. Follow-ups: fewer unwinds per thread switch,
+   controller input (R14), AX voice state (R8).
 4. **K2-K4 worker batches.** First round done: +32 matches (k_01..k_05) and 355 evidence-backed names
    (names-01). Next: a second names pass over the remaining EA reference names (`config/GV4E69/refnames/`),
    then batches from `python tools/goals/targets.py --units K3` (and K2, K4). K3 functions that read `mftb`

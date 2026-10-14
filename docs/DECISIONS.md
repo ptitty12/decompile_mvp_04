@@ -208,6 +208,14 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   Home park, the team list and the LOC-id tables are fixed in code (ROSTERS.md §12), so v1 team packs can't change them. | Packs never contain retail data and depend only on the game's own data formats (contract 2). Strict-first keeps every later change backward compatible. | docs/MODDING.md; end-to-end check on the owner's disc (empty pack gives 0 errors; the example applies byte-deterministically)
 
+- 2026-10-14 | **E0b closed: the retail code boots natively in our engine.** The translated DOL runs from `__start` through all four `OSCreateThread` sites into the frame loop. `VIWaitForRetrace` returns. Two runs give byte-identical SDK logs (178 SDK functions, all named). A long run reached 102.9 s of guest time. Engine-timing decisions (lead, under the owner's delegation; details in docs/engine/E0B_LOG.md):
+  - **CLK1:** the virtual time base advances 2 cycles per guest instruction. It is part of the netplay handshake.
+  - **GX1:** the GPU is treated as infinitely fast except at FIFO breakpoints, so GPU events land on 32-byte write-gather bursts.
+  - **DVD1:** a DVD command completes 1 ms after issue, plus its length at 3 MiB/s; inquiry data is fixed.
+  - **DSP1 (interim):** AX frames are acknowledged, but voices don't advance yet (R8 follow-up in E3).
+
+  D4 is confirmed: 10.7 thread switches per VI field, 11.75% of instructions interpreted early in boot and 1.13% over a long run. Reducing unwinds per switch is the next optimization. | These keep every source of time inside the guest (CLAUDE.md determinism invariant), so the same constants on every machine give identical runs. | commit f060c66c; local test local_boot_twice
+
 ## Open questions for owner
 
 - 2026-10-14 | **Add a CI workflow for the engine tests.** `.github/` is owner-only, so the E0b session added no workflow. `cmake --preset clang` (or `msvc`) then `ctest` in `engine/` runs every data-free engine test; tests that need the disc skip themselves (exit 77). Options: (a) the owner adds an engine-tests workflow; (b) the lead does, if the owner delegates it.
