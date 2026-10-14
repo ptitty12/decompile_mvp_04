@@ -3,6 +3,7 @@
 #include <cstdio>
 
 #include "synth.h"
+#include "runtime/hle.h"
 #include "translator/emit_cpp.h"
 
 using namespace mvp;
@@ -25,6 +26,7 @@ int main(int argc, char** argv) {
   for (const auto& e : cfg.error_list) std::fprintf(stderr, "mvp-synth-emit: %s\n", e.c_str());
   if (cfg.errors) return 1;
   EmitOptions opt;
+  for (std::size_t k = 0; k < rt::hle_table().size(); ++k) opt.hle[rt::hle_table()[k].name] = static_cast<int>(k);
   opt.shards = 2;
   std::string err;
   if (!emit_cpp(cfg, argv[1], opt, nullptr, &err)) {

@@ -79,6 +79,10 @@ class Hooks {
   virtual void msr_changed(Cpu& c, u32 old_msr) = 0;  // after mtmsr / rfi
   virtual void icbi(Cpu& c, u32 ea) = 0;              // instruction-cache block invalidate
   virtual void system_call(Cpu& c) = 0;               // sc (PC already points past it)
+  // Called at a safe point (a function entry or a loop back edge, before the
+  // instruction at c.pc runs) once c.ticks >= c.next_event: run due events,
+  // deliver interrupts, and set the next c.next_event.
+  virtual void safepoint(Cpu& c);
 };
 
 struct Cpu {
@@ -91,12 +95,17 @@ struct Cpu {
   u32 fpscr = 0;
   u32 msr = 0;
   u32 pc = 0;
+  // Virtual clock (E0b item 9): guest instructions started, and the count at
+  // which the runtime wants its next look (events, interrupts) at a safe point.
+  u64 ticks = 0;
+  u64 next_event = ~0ull;
   u32 reserve = 0, reserve_addr = 0;  // lwarx / stwcx.
   u32 sr[16] = {};
   u32 spr[1024] = {};  // every other SPR by number: GQRs (912-919), HID0-2, SRR0/1, SPRGs, BATs, ...
 
   Memory* mem = nullptr;
   Hooks* hooks = nullptr;
+  void* env = nullptr;  // the runtime's machine (runtime/machine.h), for HLE code
 
   u32 xer() const { return xer_so << 31 | xer_ov << 30 | xer_ca << 29 | (xer_low & 0x1FFFFFFF); }
   void set_xer(u32 v) {

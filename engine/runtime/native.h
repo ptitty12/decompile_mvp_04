@@ -41,6 +41,28 @@ inline void on_entry(Cpu& c, u32 address) {
   if (g_entry_hook) g_entry_hook(c, address);
 }
 
+// Safe points (D4): every translated entry point and every loop back edge. The
+// interpreter checks the same addresses, so interrupts land at the same guest
+// instruction whichever path runs the code.
+class SafeSet {
+ public:
+  void set(const u32* addrs, std::size_t count);
+  bool has(u32 a) const {
+    if (a < base_ || (a & 3)) return false;
+    std::size_t k = (a - base_) / 4;
+    return k < bits_.size() && bits_[k];
+  }
+
+ private:
+  u32 base_ = 0;
+  std::vector<bool> bits_;
+};
+extern SafeSet g_safe;
+
+inline void safepoint_check(Cpu& c) {
+  if (c.ticks >= c.next_event) c.hooks->safepoint(c);
+}
+
 [[noreturn]] void unwind(Cpu& c);
 [[noreturn]] void trap(Cpu& c, u32 address, const char* why);
 

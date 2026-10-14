@@ -15,7 +15,7 @@ A later session resumes from "Next step".
 | 5 | Functions and CFGs | Done | see git log |
 | 6 | IR and C++ emitter | Done | see git log |
 | 7 | Boot environment | Done | see git log |
-| 8 | HLE boundary and SDK log | | |
+| 8 | HLE boundary and SDK log | Done | see git log |
 | 9 | Virtual clock, interrupts, threads (D4) | | |
 | 10 | Devices to the first retrace | | |
 
@@ -312,6 +312,51 @@ A later session resumes from "Next step".
   SRAM write; absent devices; the DSP init handshake and ARAM DMA both ways; the
   write-gather capture and the poll limit).
 
+### 8. HLE boundary and SDK log (done)
+
+- **Replacement by name** (`runtime/hle.h`): a registry of symbols.txt names and
+  host functions, append-only because the translated code bakes in the indices.
+  For each listed function the emitter writes a stub `f_X` (entry hook, entry
+  safe point, `rt::hle_call`) and keeps the translation as `f_X_orig`, so direct
+  calls, indirect calls and the interpreter all get the replacement; the stub
+  returns as the guest `blr` would. The generated table also lists the replaced
+  addresses so the lockstep reference interpreter applies the same replacements.
+  Replacements today:
+  - `OSReport`: formats the guest's printf arguments (PowerPC EABI varargs:
+    r3-r10, f1-f8, then the parameter area) and prints to the developer log
+    (never guest state);
+  - `VMInit`, `VMAlloc`, `VMStoreAllPages`, `VMSetLogStatsCallback`
+    (DETERMINISM R10): 0x7E000000 becomes 8 MiB of plain RAM owned by the machine;
+    no DSI paging. Without this the VM library patches its exception stubs into
+    the DOL's code (fn_8043F8FC), which the icbi check rightly stops.
+- **SDK call log** (`mvp-boot run`): at every translated function entry, a call
+  whose call site (LR - 4) holds a call to this entry, from a unit outside the
+  runtime libraries (`translator/units.h`: splits.txt; dolphin/, sdk/, libc/, libm/,
+  libgcc/, libsn/, as K1 counts them), into one of them, is logged by name. A call
+  into an SDK function whose symbols.txt name is still `fn_` stops the run with its
+  address and unit. `runtime/sdk_names.h` names the three placeholders the K1b
+  session identified (OSInit 0x8043188C, DVDInit 0x80422FD8, __init_user
+  0x80438704); fn_8040405C (libsn, unknown) is only reached with a debugger.
+  - The first run stopped at fn_804061C4 (libsn) "called" from the EA file thread:
+    a false positive, since PCinit (named) is a single `b` into it, and the entry
+    hook attributed the tail call to PCinit's caller. Fixed by checking that the
+    word at LR - 4 is a call to this entry.
+- Exit evidence (2026-10-14): `mvp-boot run --until none --max-ticks 200000000`
+  reaches `VIWaitForRetrace` (through OSInit, DVDInit, VIInit, PADInit, VM, the
+  heap, the EA threads and periodic alarm, GXInit and the first `GXCopyDisp` and
+  `VIFlush`), then idles in SelectThread (no interrupts until item 9): **840
+  boundary calls into 66 SDK functions, all named**; 14 OSReport lines
+  (Dolphin OS banner, SDK build strings, "File server function not available in
+  non debug mode" from libsn); 1,027 MMIO accesses; 2,167 bytes written to the
+  write-gather pipe. Two runs give byte-identical logs (sha1 77bee50b...,
+  18,932 bytes; the log stays in build/).
+- **No unnamed SDK function is reached on this path**, so there is no new K1
+  input yet.
+- `local_disasm` now also reads the symbol names from dtk's listing itself (the
+  `# .sec:0xOFF | 0xADDR` header before each `.fn`/`.obj`/`.sym`): renames that
+  land on main between the listing build and this worktree no longer break the
+  check.
+
 ## Decisions to record (for the lead)
 
 - E0b-FP1: the FP model above (exact integer softfloat as the single source of
@@ -322,5 +367,6 @@ A later session resumes from "Next step".
 
 ## Next step
 
-Item 8: HLE boundary and SDK call log (route calls by symbols.txt name, log
-every call into SDK units, stop at unnamed SDK functions).
+Item 9: virtual clock (time base and decrementer from `c.ticks`), DEC and PI
+interrupts delivered at safe points, idle skip in SelectThread. The counters and
+safe points are already emitted (see item 9 notes when written).

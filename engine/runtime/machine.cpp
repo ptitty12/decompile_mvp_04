@@ -9,6 +9,19 @@ Machine::Machine() : mem1_(kMem1Size + kGuard, 0), mem_(std::make_unique<ppc::Me
   mem_->map(0x80000000u, mem1_.data(), kMem1Size);
   mem_->map(0xC0000000u, mem1_.data(), kMem1Size);
   cpu_.mem = mem_.get();
+  cpu_.env = this;
+}
+
+void Machine::map_ram(u32 base, u32 size) {
+  if (has_ram(base)) return;
+  extra_ram_.emplace_back(base, std::vector<u8>(size + kGuard, 0));
+  mem_->map(base, extra_ram_.back().second.data(), size);
+}
+
+bool Machine::has_ram(u32 base) const {
+  for (const auto& r : extra_ram_)
+    if (r.first == base) return true;
+  return false;
 }
 
 void Machine::set_real_mode(bool on) {

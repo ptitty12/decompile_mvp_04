@@ -2,6 +2,8 @@
 
 #include <cstdio>
 
+#include "runtime/hw.h"
+
 namespace mvp::rt {
 
 void SystemHooks::msr_changed(ppc::Cpu& c, u32 old) {
@@ -11,6 +13,11 @@ void SystemHooks::msr_changed(ppc::Cpu& c, u32 old) {
     m_->set_real_mode(is_real);
     ++real_mode_switches;
   }
+}
+
+void SystemHooks::safepoint(ppc::Cpu& c) {
+  if (c.ticks >= tick_limit) throw StopRun{"instruction budget used up (--max-ticks)"};
+  c.next_event = tick_limit;
 }
 
 void SystemHooks::icbi(ppc::Cpu& c, u32 ea) {

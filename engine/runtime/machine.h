@@ -38,6 +38,11 @@ class Machine {
   // windows at 0x80000000 and 0xC0000000 are), as on the console.
   void set_real_mode(bool on);
 
+  // Plain RAM at a guest address range (the VM region, DETERMINISM R10). Part of
+  // the machine state like MEM1. Idempotent for the same range.
+  void map_ram(u32 base, u32 size);
+  bool has_ram(u32 base) const;
+
   ppc::Cpu& cpu() { return cpu_; }
   ppc::Memory& memory() { return *mem_; }
   u8* mem1() { return mem1_.data(); }
@@ -46,6 +51,7 @@ class Machine {
  private:
   const vfs::Dol* dol_ = nullptr;
   std::vector<u8> mem1_;
+  std::vector<std::pair<u32, std::vector<u8>>> extra_ram_;
   std::unique_ptr<ppc::Memory> mem_;
   ppc::Cpu cpu_;
 };

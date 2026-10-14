@@ -11,6 +11,7 @@
 #include <cstring>
 #include <string>
 
+#include "runtime/hle.h"
 #include "translator/emit_cpp.h"
 #include "translator/program.h"
 
@@ -57,6 +58,7 @@ int main(int argc, char** argv) {
   if (cmd == "emit-cpp") {
     if (argc < 3) return 2;
     EmitOptions opt;
+    for (std::size_t k = 0; k < rt::hle_table().size(); ++k) opt.hle[rt::hle_table()[k].name] = static_cast<int>(k);
     for (int k = 3; k + 1 < argc; ++k)
       if (!std::strcmp(argv[k], "--shards")) opt.shards = std::atoi(argv[k + 1]);
     ProgramCfg p = build_cfg(in->disc.dol, in->symbols);

@@ -6,9 +6,15 @@
 
 #include "../../translator/tests/synth.h"
 #include "common/bytes.h"
+#include "runtime/hle.h"
 #include "runtime/lockstep.h"
 
 void mvp_register_game();
+
+namespace {
+std::string g_reported;
+void capture(const std::string& s) { g_reported += s; }
+}  // namespace
 
 using namespace mvp;
 using namespace mvp::rt;
@@ -39,6 +45,7 @@ TEST_CASE("translated synthetic program matches the interpreter in lockstep") {
   REQUIRE_FALSE(g_native.empty());
 
   std::uint64_t unwinds = g_unwinds;
+  g_report = &capture;
   LockstepResult r = run_lockstep(ref, nat, cfg, 1);
   INFO(r.message);
   REQUIRE(r.pass);
@@ -47,6 +54,8 @@ TEST_CASE("translated synthetic program matches the interpreter in lockstep") {
   CHECK(r.events > 20);
   CHECK(g_unwinds == unwinds + 1);  // jumper's early return unwound main once
 
+  // OSReport ran through the HLE (runtime/hle.h), formatted from guest varargs.
+  CHECK(g_reported.find("x=42") == 0);
   auto want = xlat::synth::expected_results();
   for (std::size_t k = 0; k < want.size(); ++k) {
     u32 got = be32(nat.mem1() + (prog.results & 0x01FFFFFF) + 4 * k);

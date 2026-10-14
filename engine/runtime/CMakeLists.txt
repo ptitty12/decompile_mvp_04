@@ -1,4 +1,4 @@
-add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp sys_hooks.cpp)
+add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp sys_hooks.cpp hle.cpp)
 target_link_libraries(engine_runtime PUBLIC engine_ppc engine_vfs)
 target_compile_options(engine_runtime PRIVATE ${ENGINE_WARN})
 

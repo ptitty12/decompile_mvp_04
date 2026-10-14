@@ -10,6 +10,20 @@ namespace mvp::rt {
 EntryHook g_entry_hook = nullptr;
 std::uint64_t g_unwinds = 0;
 NativeTable g_native;
+SafeSet g_safe;
+
+void SafeSet::set(const u32* addrs, std::size_t count) {
+  bits_.clear();
+  if (!count) return;
+  u32 lo = addrs[0], hi = addrs[0];
+  for (std::size_t k = 0; k < count; ++k) {
+    lo = std::min(lo, addrs[k]);
+    hi = std::max(hi, addrs[k]);
+  }
+  base_ = lo;
+  bits_.assign((hi - lo) / 4 + 1, false);
+  for (std::size_t k = 0; k < count; ++k) bits_[(addrs[k] - lo) / 4] = true;
+}
 
 void unwind(Cpu&) { throw Unwind{}; }
 
@@ -50,6 +64,7 @@ void dispatch(Cpu& c, bool has_stop, u32 stop) {
       fn(c);
       continue;
     }
+    if (c.ticks >= c.next_event && g_safe.has(c.pc)) c.hooks->safepoint(c);
     ppc::step(c);
   }
 }

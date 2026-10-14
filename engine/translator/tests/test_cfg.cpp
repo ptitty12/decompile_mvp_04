@@ -8,6 +8,7 @@
 #include "../../ppc/tests/encode.h"
 #include "common/bytes.h"
 #include "translator/cfg.h"
+#include "translator/units.h"
 
 using namespace mvp;
 using namespace mvp::xlat;
@@ -186,4 +187,24 @@ TEST_CASE("symbols.txt parsing") {
   CHECK(st.function_containing(0x80003200)->name == "fn_80003100");
   CHECK(st.function_containing(0x80003300) == nullptr);
   CHECK(st.find("lbl_80003328")->address == 0x80003328);
+}
+
+TEST_CASE("splits.txt units and the runtime-library test") {
+  UnitMap u = UnitMap::parse(
+      "Sections:\n\t.init       type:code align:4\n\t.text       type:code align:16\n\n"
+      "game/tu_80003100.cpp:\n\t.text       start:0x80003100 end:0x80003200\n\n"
+      "dolphin/os/OS.c:\n\t.text       start:0x80003200 end:0x80003300\n\t.data       start:0x80200000 end:0x80200010\n\n"
+      "libc/string.c:\n\t.text       start:0x80003300 end:0x80003400\n");
+  CHECK(u.size() == 4);
+  CHECK(u.unit_at(0x80003100) == "game/tu_80003100.cpp");
+  CHECK(u.unit_at(0x800031FC) == "game/tu_80003100.cpp");
+  CHECK(u.unit_at(0x80003200) == "dolphin/os/OS.c");
+  CHECK(u.unit_at(0x80200004) == "dolphin/os/OS.c");
+  CHECK(u.unit_at(0x80003400).empty());
+  CHECK_FALSE(u.is_runtime(0x80003150));
+  CHECK(u.is_runtime(0x80003250));
+  CHECK(u.is_runtime(0x80003350));
+  CHECK(UnitMap::is_runtime_unit("sdk/tu_8043E344.c"));
+  CHECK(UnitMap::is_runtime_unit("libsn/tu_80403E80.c"));
+  CHECK_FALSE(UnitMap::is_runtime_unit("ealib/tu_803FEB34.cpp"));
 }

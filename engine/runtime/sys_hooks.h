@@ -29,6 +29,10 @@ class SystemHooks : public ppc::Hooks {
   // The OS's system call only flushes write buffers (HID0[ABE] toggle, rfi):
   // nothing to do here.
   void system_call(ppc::Cpu&) override { ++syscalls; }
+  // Safe point: stops the run (StopRun, runtime/hw.h) once `tick_limit` guest
+  // instructions have run. Events and interrupts come with the scheduler (item 9).
+  void safepoint(ppc::Cpu& c) override;
+  std::uint64_t tick_limit = ~0ull;
 
   std::uint64_t syscalls = 0, icbi_blocks = 0, real_mode_switches = 0;
 

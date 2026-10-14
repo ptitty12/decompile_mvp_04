@@ -266,6 +266,10 @@ int main() {
   // Code sections of the listing; for an address listed twice (stale files from an
   // earlier split), the newest file wins.
   std::map<u32, Listed> listed;
+  // The listing's own symbol names (the "# .sec:0xOFF | 0xADDR | size" comment
+  // before each .fn/.obj/.sym), so the check does not depend on symbols.txt
+  // being from the same commit as the listing.
+  std::unordered_multimap<std::string, u32> listing_syms;
   std::size_t files = 0;
   for (auto& e : fs::recursive_directory_iterator(asm_dir)) {
     if (!e.is_regular_file() || e.path().extension() != ".s") continue;
@@ -273,7 +277,23 @@ int main() {
     auto mt = e.last_write_time();
     std::ifstream in(e.path());
     std::string l, sec;
+    u32 header_addr = 0;
+    bool have_header = false;
     while (std::getline(in, l)) {
+      if (l.rfind("# .", 0) == 0) {
+        auto bar = l.find("| 0x");
+        if (bar != std::string::npos) {
+          header_addr = static_cast<u32>(std::strtoul(l.c_str() + bar + 4, nullptr, 16));
+          have_header = true;
+        }
+        continue;
+      }
+      if (have_header && (l.rfind(".fn ", 0) == 0 || l.rfind(".obj ", 0) == 0 || l.rfind(".sym ", 0) == 0)) {
+        std::size_t s0 = l.find(' ') + 1, s1 = l.find(',', s0);
+        listing_syms.emplace(l.substr(s0, s1 == std::string::npos ? std::string::npos : s1 - s0), header_addr);
+        have_header = false;
+        continue;
+      }
       if (l.rfind(".section ", 0) == 0) {
         sec = l.substr(9, l.find(',') - 9);
         continue;
@@ -295,6 +315,7 @@ int main() {
   };
   u32 sda2 = lis_ori(0x80003108), sda = lis_ori(0x80003110);
   auto syms = load_symbols(symbols);
+  for (const auto& [n, a] : listing_syms) syms.emplace(n, a);
   syms.emplace("_SDA_BASE_", sda);  // linker-defined, not in symbols.txt
   syms.emplace("_SDA2_BASE_", sda2);
   Checker chk(std::move(syms), sda, sda2);

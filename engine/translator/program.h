@@ -23,5 +23,6 @@ std::optional<Inputs> load_inputs(const std::string& disc_path, const std::strin
 // Default locations for development tools, from the environment or the build.
 std::string default_disc_path();
 std::string default_symbols_path();
+std::string default_splits_path();
 
 }  // namespace mvp::xlat

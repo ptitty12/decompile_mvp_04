@@ -125,6 +125,11 @@ Program make() {
   a.w(D(14, 3, 0, 10));
   a.bl("fact");
   store_result(a, 13);
+  a.w(D(15, 3, 0, static_cast<s32>(kTable >> 16)));      // r3 = the format string (data + 0x10)
+  a.w(D(14, 3, 3, static_cast<s32>((kTable + 0x10) & 0xFFFF)));
+  a.w(D(14, 4, 0, 42));
+  a.w(X(19, 6, 6, 6, 193));            // crclr cr1eq: no FP arguments
+  a.bl("OSReport");                    // replaced by the HLE (runtime/hle.h)
   a.w(D(15, 4, 0, 0xCC00));            // lis r4, 0xCC00
   a.w(D(36, 3, 4, 0));                 // stw r3, 0(r4): MMIO, stops the run
   a.L("main_spin");
@@ -236,6 +241,9 @@ Program make() {
   a.w(SPR(467, 11, 8));                // mtlr r11
   a.w(D(14, 3, 0, 0x77));
   a.w(X(19, 20, 0, 0, 16));
+  // ---- OSReport: the original does nothing here; the HLE logs ----
+  a.fn("OSReport");
+  a.w(X(19, 20, 0, 0, 16));
   a.fn("end");  // marks the end of the text
 
   a.resolve();
@@ -243,6 +251,8 @@ Program make() {
   // DOL: text at kText, data (the jump table) at kTable.
   std::vector<u32> data;
   for (int k = 0; k < 4; ++k) data.push_back(a.labels.at("case" + std::to_string(k)));
+  data.push_back(0x783D2564);  // "x=%d", then a newline and NUL
+  data.push_back(0x0A000000);
   std::size_t text_bytes = 4 * a.words.size(), data_bytes = 4 * data.size();
   std::vector<std::uint8_t> d(0x100 + text_bytes + data_bytes, 0);
   auto set = [&](int slot, u32 off, u32 addr, u32 size) {

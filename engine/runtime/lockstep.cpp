@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "ppc/interp.h"
+#include "runtime/hle.h"
 
 namespace mvp::rt {
 
@@ -32,6 +33,7 @@ std::string cpu_diff(const ppc::Cpu& a, const ppc::Cpu& b) {
     one(n, a.fpr[k].ps1, b.fpr[k].ps1);
   }
   one("pc", a.pc, b.pc);
+  one("ticks", a.ticks, b.ticks);
   one("cr", a.cr, b.cr);
   one("xer", a.xer(), b.xer());
   one("lr", a.lr, b.lr);
@@ -95,17 +97,28 @@ struct State {
   bool first = true;
   LockstepResult r;
 
+  // One reference step, with the same safe points and replacements as the
+  // native side. Returns the flow of what ran.
+  xlat::Flow ref_step() {
+    ppc::Cpu& c = ref->cpu();
+    u32 pc = c.pc;
+    xlat::Flow fl = map.in(pc) ? map.flow[(pc - map.base) / 4] : xlat::Flow::Plain;
+    if (c.ticks >= c.next_event && g_safe.has(pc)) c.hooks->safepoint(c);
+    if (c.pc != pc) return xlat::Flow::Rfi;  // the safe point moved the PC (an interrupt)
+    if (hle_interpret(c)) return xlat::Flow::Return;  // a replacement returns like a blr
+    ppc::step(c);
+    ++r.ref_steps;
+    return fl;
+  }
+
   // Runs the reference machine to its next function-entry event: control
   // arriving at an entry point other than by a branch inside the same function.
   void advance() {
     ppc::Cpu& c = ref->cpu();
     for (;;) {
       u32 pc = c.pc;
-      bool inside = map.in(pc);
-      xlat::Flow fl = inside ? map.flow[(pc - map.base) / 4] : xlat::Flow::Plain;
-      int fn = inside ? map.func[(pc - map.base) / 4] : -1;
-      ppc::step(c);
-      ++r.ref_steps;
+      int fn = map.in(pc) ? map.func[(pc - map.base) / 4] : -1;
+      xlat::Flow fl = ref_step();
       if (!map.is_entry(c.pc)) continue;
       bool local = (fl == xlat::Flow::Plain || fl == xlat::Flow::Jump || fl == xlat::Flow::CondJump ||
                     fl == xlat::Flow::JumpTable) &&
@@ -180,10 +193,7 @@ LockstepResult run_lockstep(Machine& ref, Machine& nat, const xlat::ProgramCfg& 
   st.r.stop = nat_stop;
   // The reference machine catches up to its own first MMIO access.
   try {
-    for (;;) {
-      ppc::step(ref.cpu());
-      ++st.r.ref_steps;
-    }
+    for (;;) st.ref_step();
   } catch (const StopAtMmio& s) {
     ref_stop = s;
   } catch (const ppc::GuestFault& f) {

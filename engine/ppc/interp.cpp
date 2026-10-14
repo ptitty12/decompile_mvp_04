@@ -16,6 +16,8 @@ namespace {
 
 }  // namespace
 
+void Hooks::safepoint(Cpu& c) { c.next_event = ~0ull; }
+
 u32 slow_read(Cpu& c, u32 ea, int size) {
   // Entirely inside one unmapped page: an I/O access.
   u32 off = ea & (Memory::kPageSize - 1);
@@ -98,6 +100,7 @@ bool execute_plain(Cpu& c, Op op, Insn i) {
 }
 
 Op execute(Cpu& c, u32 w) {
+  ++c.ticks;  // counts instructions started, as translated code does
   Insn i{w};
   Op op = decode(w);
   if (execute_plain(c, op, i)) {
