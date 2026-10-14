@@ -360,3 +360,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | db/tu_80565FD4 fn_80567B58 | Seven ordinary C forms; best 114/114 words, first 36-byte copy destination/count r9/r11 and receiver vptr reload order remain. Scratch build/swarm39, source restored.
 
 - `gamelib/tu_80378D70` `fn_8037B310`: 99.2%, 25/25 instructions after eight ordinary temporary/reference/inline-builder forms; the input-vector and output-slot address instructions remain reversed. Scratch build/root-8037B310, source preserved.
+
+- `db/tu_80599594` `fn_80599D30`: 97.5%, 190/190 instructions after eight ordinary shared-zero initializer/type/order forms; four prologue zero/copy scheduling words remain. Scratch build/root-80599D30, source preserved.
