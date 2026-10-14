@@ -2502,6 +2502,7 @@ dolphin/exi/tu_80425E54.c:
 
 dolphin/exi/tu_80426CD0.c:
 	.text       start:0x80426CD0 end:0x804286AC
+	.bss        start:0x806DE358 end:0x806DE418
 
 dolphin/exi/tu_804286AC.c:
 	.text       start:0x804286AC end:0x80428C64
