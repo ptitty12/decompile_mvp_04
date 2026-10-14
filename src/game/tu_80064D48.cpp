@@ -70,7 +70,7 @@ extern "C" int fn_8001FA20(Ctx* c);
 extern "C" int fn_8001FA58(Ctx* c);
 float fn_80253F54(Unk8005DF2C_Stat* s, int a, int b, int c);
 void fn_8001475C(int, int, int, int, int);
-void fn_80016CD0(int, int, int, int);
+int fn_80016CD0(int, int, int, int);
 void fn_80016D44(int, int, int, int, int);
 void fn_800190A4(int, int);
 void fn_80019108(int, int);
@@ -227,9 +227,11 @@ void Unk800652F4::fn_800653A4()
     }
 }
 
-/* near-miss: four slots. Retail stores the constant 1 (m8) from the saved
- * `ok` register (r22) after the first call's argument moves; here CSE picks the
- * register that was just compared with 1 (p), and two argument moves swap. */
+/* near-miss: two stores. Retail stores the constant 1 (m8) from the saved
+ * `ok` register (r22); here CSE picks the register that was just compared with
+ * 1 (p, r25), and its death moves that store ahead of m4. The argument moves of
+ * fn_80016CD0 match once it is declared int. Tried: m8 = ok/p/1 in both orders,
+ * p == ok, ok = 1 inside the branch (becomes mr r22,r25), store after the call. */
 void Unk800652F4::fn_800653F8(Ctx* c)
 {
     int i = 0;
@@ -251,7 +253,7 @@ void Unk800652F4::fn_800653F8(Ctx* c)
         if (p == 1 && q > 1) {
             picked = 1;
             fn_80016CD0(fn_8001FA58(c), fn_8001FA20(c), fn_8001DB70(c), fn_8001F33C(c));
-            m8 = 1;
+            m8 = ok;
             m4 = i;
             p = fn_800656FC(i, c);
         } else if (p != -1 && lvl > 1 && fn_8040ABA0() % 100 > 0x3c) {
