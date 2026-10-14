@@ -980,7 +980,7 @@ int fn_8005A118(Unk8005BA1C_Voice* v, float f)
 {
     int r = 0;
     if (v->m1C == 0) {
-        r = fn_803AB858(v->m0, (int)(f * (float)v->m8)) >= 0;
+        r = SNDSTRM_setgreedylevel(v->m0, (int)(f * (float)v->m8)) >= 0;
     }
     return r;
 }
@@ -1050,7 +1050,7 @@ int fn_8005A010(Unk8005BA1C_Voice* v, int a, int ch)
                     sum += lbl_805AE420[ch].e[i].m20;
                 }
             }
-            if (fn_803A7924(v->m4, sum - (lbl_80620548 << 10), cnt) >= 0) {
+            if (SNDAEMS_streaminit(v->m4, sum - (lbl_80620548 << 10), cnt) >= 0) {
                 v->m0 = 0;
             }
         }
@@ -1065,19 +1065,19 @@ int fn_8005A010(Unk8005BA1C_Voice* v, int a, int ch)
 void fn_8005A240(Unk8005BA1C_Voice* v)
 {
     if (v->m1C == 0 && v->m0 > -1) {
-        fn_803A975C();
-        if (fn_803AB8A4(v->m0, &v->m34) >= 0) {
-            fn_803A979C();
+        SNDSYS_entercritical();
+        if (SNDSTRM_status(v->m0, &v->m34) >= 0) {
+            SNDSYS_leavecritical();
             if (v->m34 > 0) {
-                fn_803A975C();
-                fn_803AB644(v->m38, &v->m40);
-                fn_803A979C();
+                SNDSYS_entercritical();
+                SNDSTRM_requeststatus(v->m38, &v->m40);
+                SNDSYS_leavecritical();
                 if (v->m40 == 2 && v->m48 <= 0xC8) {
                     fn_8005AA00(v);
                 }
             }
         } else {
-            fn_803A979C();
+            SNDSYS_leavecritical();
         }
     }
 }
@@ -1085,17 +1085,17 @@ void fn_8005A240(Unk8005BA1C_Voice* v)
 void fn_8005A2E4(Unk8005BA1C_Voice* v, int k)
 {
     if (v->m1C == 0 && fn_8005A5FC(v, k) != 0 && v->m0 >= 0) {
-        fn_803A975C();
+        SNDSYS_entercritical();
         int f = 0;
-        if (fn_803AB8A4(v->m0, &v->m34) >= 0) {
-            fn_803A979C();
+        if (SNDSTRM_status(v->m0, &v->m34) >= 0) {
+            SNDSYS_leavecritical();
             int t = v->m34;
             if (t == 0) {
                 f = 1;
             } else if (t == 1) {
-                fn_803A975C();
-                fn_803AB644(v->m38, &v->m40);
-                fn_803A979C();
+                SNDSYS_entercritical();
+                SNDSTRM_requeststatus(v->m38, &v->m40);
+                SNDSYS_leavecritical();
                 if (v->m40 == 2) {
                     f = v->m48 <= 0xC8;
                 }
@@ -1108,7 +1108,7 @@ void fn_8005A2E4(Unk8005BA1C_Voice* v, int k)
                 }
             }
         } else {
-            fn_803A979C();
+            SNDSYS_leavecritical();
         }
     }
 }
@@ -1193,14 +1193,14 @@ int fn_8005A674(Unk8005BA1C_Voice* v, int a, int b)
                 a = 0x7F;
             }
             v->m20 = a;
-            fn_803A975C();
+            SNDSYS_entercritical();
             if (b <= 0) {
                 float f = (float)a * lbl_805ADC60;
                 r = fn_803AB9F0(v->m0, -1, f);
             } else {
-                r = fn_803AAFB8(v->m0, b, a);
+                r = SNDSTRM_autovol(v->m0, b, a);
             }
-            fn_803A979C();
+            SNDSYS_leavecritical();
         }
     }
     if (r >= 0) {
@@ -1255,12 +1255,12 @@ int fn_8005A8B4(Unk8005BA1C_Voice* v)
         } else if (v->m18 != 2) {
             v->m18 = 1;
         } else if (v->m1C == 0) {
-            fn_803A975C();
+            SNDSYS_entercritical();
             if (fn_803AB278(v->m0) <= 0) {
-                fn_803A979C();
+                SNDSYS_leavecritical();
                 fn_8005A9A8(v);
             } else {
-                fn_803A979C();
+                SNDSYS_leavecritical();
             }
         }
     }
@@ -1271,11 +1271,11 @@ int fn_8005A94C(Unk8005BA1C_Voice* v)
 {
     int r = -1;
     if (v->m1C == 0) {
-        fn_803A975C();
-        if (fn_803AB8A4(v->m0, &v->m34) >= 0) {
+        SNDSYS_entercritical();
+        if (SNDSTRM_status(v->m0, &v->m34) >= 0) {
             r = v->m34;
         }
-        fn_803A979C();
+        SNDSYS_leavecritical();
     }
     return r;
 }
@@ -1310,19 +1310,19 @@ int fn_8005AAA8(Unk8005BA1C_Voice* v)
 {
     int r = 0;
     if (v->m1C == 0) {
-        fn_803A975C();
-        if (fn_803AB8A4(v->m0, &v->m34) >= 0) {
-            if (fn_803AB644(v->m38, &v->m40) >= 0) {
-                fn_803A979C();
+        SNDSYS_entercritical();
+        if (SNDSTRM_status(v->m0, &v->m34) >= 0) {
+            if (SNDSTRM_requeststatus(v->m38, &v->m40) >= 0) {
+                SNDSYS_leavecritical();
                 int t = v->m40;
                 if (t == 0 || t == 2 || t == 1) {
                     r = 1;
                 }
             } else {
-                fn_803A979C();
+                SNDSYS_leavecritical();
             }
         } else {
-            fn_803A979C();
+            SNDSYS_leavecritical();
         }
     }
     return r;
@@ -1332,9 +1332,9 @@ int fn_8005AB44(Unk8005BA1C_Voice* v)
 {
     int r = 0;
     if (v->m1C == 0 && v->m0 >= 0) {
-        fn_803A975C();
+        SNDSYS_entercritical();
         r = fn_803AB278(v->m0);
-        fn_803A979C();
+        SNDSYS_leavecritical();
     }
     return r;
 }

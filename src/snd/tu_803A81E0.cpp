@@ -20,13 +20,13 @@ struct SndUserDataAttr {
 
 extern "C" {
 
-int fn_803A8648(int bhandle);
+int SNDbankremove(int bhandle);
 void* fn_803B1118(int a, int size);
 int fn_803B11A8(int a, void* src, void* dst, int n);
 int fn_803B11FC(int h);
-void fn_803A93D0(int a, void* src, void* dst, int* p);
+void SNDBANKI_asyncresolvepatch(int a, void* src, void* dst, int* p);
 
-void fn_803A81E0(SndUserDataAttr* attr, int type)
+void SNDBANKI_userdatacallback(SndUserDataAttr* attr, int type)
 {
     while (attr->numuserdata > 0) {
         SNDUSERDATACBINFO info;
@@ -43,7 +43,7 @@ void fn_803A81E0(SndUserDataAttr* attr, int type)
 
 int fn_803A82A8(int* phandle, BANKVER5* pb)
 {
-    sndgs.bankremove = fn_803A8648;
+    sndgs.bankremove = SNDbankremove;
     int h = SNDBANKI_alloc();
     *phandle = h;
     BANKLIST* list = sndgs.banklist;
@@ -75,7 +75,7 @@ int fn_803A82A8(int* phandle, BANKVER5* pb)
         int j;
         for (j = 0; j < pb->numpatches; j++) {
             if (pb->patch[j] != NULL) {
-                fn_803A93D0(0x200, reinterpret_cast<char*>(&pb->patch[j]) + reinterpret_cast<int>(pb->patch[j]), bl->pspuram, &local);
+                SNDBANKI_asyncresolvepatch(0x200, reinterpret_cast<char*>(&pb->patch[j]) + reinterpret_cast<int>(pb->patch[j]), bl->pspuram, &local);
             }
         }
     }

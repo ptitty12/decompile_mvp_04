@@ -170,7 +170,7 @@ int fn_801747A0()
     return lbl_8061C668;
 }
 
-/* near-miss: only the order of `li r4,1` / `mr r3,r31` before fn_80402DE4 differs (2 slots); treating the
+/* near-miss: only the order of `li r4,1` / `mr r3,r31` before LOCALE_create differs (2 slots); treating the
  * callee as a method call did not change it. */
 int fn_801747AC(const char* name)
 {
@@ -179,14 +179,14 @@ int fn_801747AC(const char* name)
     if (r == 0) {
         fn_804089B4(buf, lbl_805CB1DC, name);
     }
-    fn_80402DE4(r, 1);
+    LOCALE_create(r, 1);
     fn_80402BEC(r, 0, 0);
     return r;
 }
 
 void fn_80174824(int a)
 {
-    fn_80402CAC(lbl_8061C674, a);
+    LOCALE_getstr(lbl_8061C674, a);
 }
 
 struct Unk80174850_Cfg {
@@ -218,7 +218,7 @@ void fn_80174850()
 void fn_801748D8(Unk801748D8_Obj* o)
 {
     if (lbl_8061C674 != 0) {
-        fn_803EDA0C(lbl_8061C674);
+        MEM_free(lbl_8061C674);
         lbl_8061C674 = 0;
     }
     if (o != 0) {

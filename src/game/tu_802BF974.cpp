@@ -14,7 +14,7 @@ void fn_802C2A20(Unk802C2188* o, Unk802C2188_Pair* a, int b);
 void fn_802C2BB8(Unk802C2188* o, Unk802C2188_Pair* a);
 void fn_802C3974(Unk802C2188* o);
 extern "C" void fn_802C2FF4(void* im, int w, int h, int fmt, int hw, int z);
-extern "C" void* fn_803EBF2C(int h);
+extern "C" void* SHAPE_clone(int h);
 extern "C" int fn_803EC03C(void* im);
 void fn_802C36DC(Unk802C2188* o);
 int fn_8040B6A0(const char* s);
@@ -619,7 +619,7 @@ void fn_802C36DC(Unk802C2188* o)
 
 void* fn_802C3794(int, int, int h)
 {
-    Unk802C3794_Img* im = (Unk802C3794_Img*)fn_803EBF2C(h);
+    Unk802C3794_Img* im = (Unk802C3794_Img*)SHAPE_clone(h);
     int w = im->w;
     int ht = im->h;
     fn_802C2FF4(im, w, ht, fn_803EC03C(im), w / 2, 0);
@@ -629,7 +629,7 @@ void* fn_802C3794(int, int, int h)
 /* near-miss 99.8%: only the temp registers of the two (int)(w * k) results differ (lwz r11/r9 then addi into r7/r4; retail loads straight into r7/r4 and expands the 0.765625 product first) */
 void fn_802C37F8(Unk802C2188* o)
 {
-    Unk802C3794_Img* im = (Unk802C3794_Img*)fn_803EBF2C(o->a8[1]);
+    Unk802C3794_Img* im = (Unk802C3794_Img*)SHAPE_clone(o->a8[1]);
     o->a8[0x1C] = (int)im;
     int ht = im->h;
     int w = im->w;
@@ -637,7 +637,7 @@ void fn_802C37F8(Unk802C2188* o)
     int x7 = (int)((float)w * 0.765625f) - 2;
     int x4 = (int)((float)w * 0.46875f) - 4;
     fn_802C2FF4((void*)o->a8[0x1C], x4, ht * 3 / 4, fmt, x7, ht / 4);
-    im = (Unk802C3794_Img*)fn_803EBF2C(o->a8[2]);
+    im = (Unk802C3794_Img*)SHAPE_clone(o->a8[2]);
     o->a8[0x1D] = (int)im;
     w = im->w;
     ht = im->h;

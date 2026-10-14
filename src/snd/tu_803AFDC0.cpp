@@ -13,20 +13,20 @@ extern "C" void OSInitMutex(void* p);
 
 extern char lbl_806AA030[];
 
-extern "C" void fn_803B5D30(int a);
-extern "C" void* fn_803B5B6C(int a);
+extern "C" void SNDARAM_free(int a);
+extern "C" void* SNDARAM_alloc(int a);
 extern "C" void DCFlushRange(int a, int b);
 extern "C" void SNDDRV_dmapost(int a, int b, int c, int d, int e);
 extern int* lbl_806AA2C4;
 
 static inline CHANPUB* ChanAt(CHANPUB* a, int i) { return &a[i]; }
 
-extern "C" int fn_803B270C(int voice, int ch, int v);
-extern "C" int fn_803B2794(int idx);
-extern "C" void fn_803B27DC(int idx, int n);
-extern "C" void fn_803B28AC(int idx, float v);
-extern "C" void fn_803B22EC(int idx, int ch, float v);
-extern "C" void fn_803B2AB4(int idx, int v);
+extern "C" int MIX_filteradd(int voice, int ch, int v);
+extern "C" int MIX_getframe(int idx);
+extern "C" void MIX_sethighpass(int idx, int n);
+extern "C" void MIX_setlowpass(int idx, float v);
+extern "C" void SNDMIX_setdrygain(int idx, int ch, float v);
+extern "C" void MIX_settimemult(int idx, int v);
 extern "C" int fn_803B115C(int a, int p);
 
 struct Unk803B0714 {
@@ -65,17 +65,17 @@ extern "C" void OSLockMutex(void* p);
 
 extern "C" void OSUnlockMutex(void* p);
 
-extern "C" void fn_803B1B30();
-extern "C" void fn_803B1DF0();
-extern "C" void fn_803B2354();
-extern "C" void fn_803B1EF4(int slot, int kind, int mode, int a3, int a4, int a5, int a6, int a7, int p8, int p9, int p10, int p11, int p12, int p13);
-extern "C" void fn_803B5F9C(void* head, void* node);
-extern "C" int fn_803B3378(void* obj, int a, int b);
+extern "C" void MIX_create();
+extern "C" void MIX_destroy();
+extern "C" void MIX_audioslice();
+extern "C" void MIX_playinit(int slot, int kind, int mode, int a3, int a4, int a5, int a6, int a7, int p8, int p9, int p10, int p11, int p12, int p13);
+extern "C" void SFILTER_add(void* head, void* node);
+extern "C" int SFILTER_timestretchinit(void* obj, int a, int b);
 extern unsigned char lbl_8069C9EB;
 /* near-miss: 41 insns, identical except scratch register choice for the early li 0 / lis constants (retail: li r11,0 right after the lwz; ours li r0,0 after the lfs); statement-order variants tried */
-extern "C" void fn_803B2108();
-extern "C" void fn_803B21EC();
-extern "C" void fn_803B29F8();
+extern "C" void MIX_play();
+extern "C" void MIX_stop();
+extern "C" void MIX_setpitch();
 extern void* lbl_806AA4C8;
 extern void* lbl_806AA4CC;
 extern void* lbl_806AA4D0;
@@ -84,8 +84,8 @@ extern void* lbl_806AA4D8;
 extern void* lbl_806AA4DC;
 extern void* lbl_806AA4E0;
 
-extern "C" void fn_803B6AF8();
-extern "C" void fn_803B343C();
+extern "C" void mixc();
+extern "C" void decode16x87();
 
 struct Unk803B18C0_B4 {
     char pad0[0x3C];
@@ -179,10 +179,10 @@ extern Unk803B21EC_L* lbl_806AA4B0;
 extern float lbl_8060984C;
 
 extern float lbl_80609848;
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
 
-extern "C" int fn_803B02CC(int v)
+extern "C" int SNDDRV_getmastervoice(int v)
 {
     int idx = v + sndgs.sso.set.voicesdsp;
     int m = ChanAt(sndgs.chan, idx)->masterchan;
@@ -192,7 +192,7 @@ extern "C" int fn_803B02CC(int v)
 }
 
 /* One channel pointer reused for both entries: a fresh pointer dies at the lha and pulls masterchan into its register. */
-extern "C" int fn_803B02FC(int v)
+extern "C" int SNDDRV_getsamplechan(int v)
 {
     int idx = v + sndgs.sso.set.voicesdsp;
     CHANPUB* mc = ChanAt(sndgs.chan, idx);
@@ -265,7 +265,7 @@ void Snd::Hal::SetVol(int voice)
         n = ch;
     int i;
     for (i = 0; i < n; i++)
-        fn_803B22EC(voice - sndgs.sso.set.voicesdsp, i, vol * r->mVol[i]);
+        SNDMIX_setdrygain(voice - sndgs.sso.set.voicesdsp, i, vol * r->mVol[i]);
 }
 
 void Snd::Hal::SetDry(int voice)
@@ -280,7 +280,7 @@ extern "C" void SNDDRV_freeaxvoice(int v, int k);
 extern "C" void AXSetVoiceState(int h, int v);
 
 
-extern "C" int fn_803B0F24(int voice)
+extern "C" int SNDPLATFORM_stop(int voice)
 {
     CHANPUB* c = &sndgs.chan[voice];
     Unk8069E200_Rec* r = &lbl_8069E200.rec[voice];
@@ -309,13 +309,13 @@ extern "C" int fn_803B0F24(int voice)
     return 0;
 }
 
-extern "C" int fn_803B1080(int voice, int v)
+extern "C" int SNDPLATFORM_filteradd(int voice, int v)
 {
     CHANPUB* c = &sndgs.chan[voice];
     if (c->rendermode & 4) {
         int i;
         for (i = 0; i < c->numchan; i++)
-            fn_803B270C(c->voices[i] - sndgs.sso.set.voicesdsp, i, v);
+            MIX_filteradd(c->voices[i] - sndgs.sso.set.voicesdsp, i, v);
         return 0;
     }
     return -7;
@@ -326,13 +326,13 @@ extern "C" void* fn_803B1118(int unused, int size)
     size = (size + 0x1f) & ~0x1f;
     if (sndgs.sso.vec.aramalloc != 0)
         return (void*)sndgs.sso.vec.aramalloc(size);
-    return fn_803B5B6C(size);
+    return SNDARAM_alloc(size);
 }
 
 extern "C" int fn_803B115C(int unused, int p)
 {
     if (sndgs.sso.vec.aramfree == 0)
-        fn_803B5D30(p);
+        SNDARAM_free(p);
     else
         sndgs.sso.vec.aramfree(p);
     return 0;
@@ -386,7 +386,7 @@ extern "C" void fn_803B12F8()
     OSUnlockMutex(lbl_806AA030);
 }
 
-extern "C" int fn_803B1320(SNDSYSOPTS* p, int kind)
+extern "C" int SNDPLATFORM_ModeSetUp(SNDSYSOPTS* p, int kind)
 {
     switch (kind) {
     case 0:
@@ -408,7 +408,7 @@ extern "C" int fn_803B1364(int i)
 }
 
 /* near-miss: size expression (n+n+n)<<2 now matches; retail keeps only lbl_80625448 and lbl_806AA2C0 in saved registers (lbl_806AA2C4 is stored through a scratch lis) and does the m14/m100 stores before the memset; ours hoists lbl_806AA2C4 into r28 */
-extern "C" void fn_803B1378()
+extern "C" void MIX_createFxglobals()
 {
     int n = lbl_80625448;
     int t = n + n + n;
@@ -423,7 +423,7 @@ extern "C" void fn_803B1378()
     lbl_806262B0 = 1;
 }
 
-extern "C" void fn_803B141C()
+extern "C" void MIX_destroyFxglobals()
 {
     if (lbl_806262B0 != 0) {
         SNDMEMI_free(lbl_806AA2C4);
@@ -444,18 +444,18 @@ extern "C" void fn_803B141C()
     }
 }
 
-extern "C" void fn_803B14D0()
+extern "C" void SNDSYS_linkmaincpumixer()
 {
-    lbl_806AA4C8 = (void*)fn_803B1B30;
-    lbl_806AA4CC = (void*)fn_803B1DF0;
-    lbl_806AA4D0 = (void*)fn_803B2354;
-    lbl_806AA4D4 = (void*)fn_803B1EF4;
-    lbl_806AA4D8 = (void*)fn_803B2108;
-    lbl_806AA4DC = (void*)fn_803B21EC;
-    lbl_806AA4E0 = (void*)fn_803B29F8;
+    lbl_806AA4C8 = (void*)MIX_create;
+    lbl_806AA4CC = (void*)MIX_destroy;
+    lbl_806AA4D0 = (void*)MIX_audioslice;
+    lbl_806AA4D4 = (void*)MIX_playinit;
+    lbl_806AA4D8 = (void*)MIX_play;
+    lbl_806AA4DC = (void*)MIX_stop;
+    lbl_806AA4E0 = (void*)MIX_setpitch;
 }
 
-extern "C" void fn_803B1554(float* p, float* q)
+extern "C" void MIXI_interpolateto0(float* p, float* q)
 {
     q[0] = *p * (16.0f / 17.0f) + q[0];
     q[1] = *p * (15.0f / 17.0f) + q[1];
@@ -476,7 +476,7 @@ extern "C" void fn_803B1554(float* p, float* q)
     *p = 0.0f;
 }
 
-extern "C" void fn_803B16F4(float* a, float* b, float lo, float hi)
+extern "C" void MIXI_interpolatemix(float* a, float* b, float lo, float hi)
 {
     float s = (hi - lo) * (1.0f / 17.0f);
     b[0] = a[0] * (lo + s) + b[0];
@@ -501,7 +501,7 @@ extern "C" void fn_803B18BC(float)
 {
 }
 
-extern "C" int fn_803B18C0(Unk803B21EC_L* l)
+extern "C" int SNDMIXI_volramp(Unk803B21EC_L* l)
 {
     int i;
     if (((int (*)(void*, int, void*, void*, int))l->m40->m0)(l->m40, 0x10, lbl_806AA2D4.mB0, lbl_806AA2D4.mB4, 0) <= 0) {
@@ -517,7 +517,7 @@ extern "C" int fn_803B18C0(Unk803B21EC_L* l)
             float a = l->m34[i];
             float b = l->m38[i];
             if (a != b) {
-                fn_803B16F4((float*)lbl_806AA2D4.mB4, ((float**)lbl_806AA2C4)[i], a, b);
+                MIXI_interpolatemix((float*)lbl_806AA2D4.mB4, ((float**)lbl_806AA2C4)[i], a, b);
                 l->m34[i] = l->m38[i];
             } else if (b != 0.0f) {
                 ((void (*)(int, void*, void*, float))lbl_806AA2D4.m1E0)(0x10, lbl_806AA2D4.mB4, ((void**)lbl_806AA2C4)[i], b);
@@ -528,7 +528,7 @@ extern "C" int fn_803B18C0(Unk803B21EC_L* l)
         float a = l->m4[i];
         float b = l->m1C[i];
         if (a != b) {
-            fn_803B16F4((float*)lbl_806AA2D4.mB4, (float*)lbl_806AA2D4.mD0[i], a, b);
+            MIXI_interpolatemix((float*)lbl_806AA2D4.mB4, (float*)lbl_806AA2D4.mD0[i], a, b);
             l->m4[i] = l->m1C[i];
         } else if (b != 0.0f) {
             ((void (*)(int, void*, void*, float))lbl_806AA2D4.m1E0)(0x10, lbl_806AA2D4.mB4, lbl_806AA2D4.mD0[i], b);
@@ -547,11 +547,11 @@ extern "C" void fn_803B1B10(void* p)
     SNDMEMI_free(p);
 }
 
-extern "C" void fn_803B1DF0()
+extern "C" void MIX_destroy()
 {
     int i;
-    fn_803A975C();
-    fn_803B141C();
+    SNDSYS_entercritical();
+    MIX_destroyFxglobals();
     if (lbl_806AA2D4.m1DC != 0) {
         SNDMEMI_free(lbl_806AA2D4.m1DC);
         lbl_806AA2D4.m1DC = 0;
@@ -569,17 +569,17 @@ extern "C" void fn_803B1DF0()
         }
     }
     fn_803B18BC(lbl_80609848);
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }
 
 extern "C" void fn_803B1EC8()
 {
-    lbl_806AA2D4.m1E0 = (void*)fn_803B6AF8;
-    lbl_806AA2D4.m1E4 = (void*)fn_803B343C;
+    lbl_806AA2D4.m1E0 = (void*)mixc;
+    lbl_806AA2D4.m1E4 = (void*)decode16x87;
     lbl_806AA2D4.mC = 0x140;
 }
 
-extern "C" void fn_803B1EF4(int slot, int kind, int mode, int a3, int a4, int a5, int a6, int a7, int p8, int p9, int p10, int p11, int p12, int p13)
+extern "C" void MIX_playinit(int slot, int kind, int mode, int a3, int a4, int a5, int a6, int a7, int p8, int p9, int p10, int p11, int p12, int p13)
 {
     Unk803B21EC_L* e = &lbl_806AA4B0[slot];
     Unk803B1EF4_Args args;
@@ -628,7 +628,7 @@ extern "C" void fn_803B1EF4(int slot, int kind, int mode, int a3, int a4, int a5
         e->m48->m1A = p13;
         ((void (*)(void*, void*))lbl_806AA2D4.m18[k][idx])(e->m48, &args);
         e->m44 = args.m28;
-        fn_803B5F9C(&e->m40, e->m48);
+        SFILTER_add(&e->m40, e->m48);
     }
     if (a5 != 0) {
         if (mode != 0)
@@ -637,13 +637,13 @@ extern "C" void fn_803B1EF4(int slot, int kind, int mode, int a3, int a4, int a5
         e->m4C->m4 = 0;
         e->m4C->m18 = 0xC8;
         e->m4C->m1A = p13;
-        fn_803B3378(e->m4C, a5, slot);
-        fn_803B5F9C(&e->m40, e->m4C);
+        SFILTER_timestretchinit(e->m4C, a5, slot);
+        SFILTER_add(&e->m40, e->m4C);
     }
     e->m0 = 1;
 }
 
-extern "C" void fn_803B2108(int idx)
+extern "C" void MIX_play(int idx)
 {
     Unk803B21EC_L* e = &lbl_806AA4B0[idx];
     int i;
@@ -663,7 +663,7 @@ int SNDPLATFORM_timemult(int voice, int timemult)
     if (c->rendermode & 4) {
         int i;
         for (i = 0; i < c->numchan; i++)
-            fn_803B2AB4(c->voices[i] - sndgs.sso.set.voicesdsp, timemult);
+            MIX_settimemult(c->voices[i] - sndgs.sso.set.voicesdsp, timemult);
     }
     return 0;
 }
@@ -675,7 +675,7 @@ void SNDPLATFORM_lowpass(int voice, int cutofffreq)
         float f = (float)cutofffreq * (1.0f / ((float)(unsigned)sndgs.sso.set.outputrate * 0.5f));
         int i;
         for (i = 0; i < c->numchan; i++)
-            fn_803B28AC(c->voices[i] - sndgs.sso.set.voicesdsp, f);
+            MIX_setlowpass(c->voices[i] - sndgs.sso.set.voicesdsp, f);
     }
 }
 
@@ -685,7 +685,7 @@ void SNDPLATFORM_highpass(int voice, int cutofffreq)
     if (c->rendermode & 4) {
         int i;
         for (i = 0; i < c->numchan; i++)
-            fn_803B27DC(c->voices[i] - sndgs.sso.set.voicesdsp, cutofffreq);
+            MIX_sethighpass(c->voices[i] - sndgs.sso.set.voicesdsp, cutofffreq);
     }
 }
 
@@ -704,7 +704,7 @@ int SNDPLATFORM_getcurframe(int voice)
         }
         return pos - r->m18;
     }
-    return fn_803B2794(voice - sndgs.sso.set.voicesdsp);
+    return MIX_getframe(voice - sndgs.sso.set.voicesdsp);
 }
 
 extern "C" void AXSetVoiceSrcRatio(int h, float pitch);
@@ -740,7 +740,7 @@ extern unsigned char lbl_8069CBBC;
 extern int lbl_8069CBC0;
 extern unsigned char lbl_8069C8BB;
 extern unsigned short lbl_80625468[][4];
-extern "C" void fn_803B3908(unsigned short az, Unk8069E200_Rec* r);
+extern "C" void SNDI_aztospkrvol(unsigned short az, Unk8069E200_Rec* r);
 extern "C" void SNDDRV_DSPMixerSetPan(void* o, Unk8069E200_Rec* r, unsigned short az, int lfe);
 
 void Snd::Hal::SetPan(int voice)
@@ -759,7 +759,7 @@ void Snd::Hal::SetPan(int voice)
         r->mVol[4] = 0.0f;
         r->mVol[5] = 0.0f;
     } else {
-        fn_803B3908(c->azimuth, r);
+        SNDI_aztospkrvol(c->azimuth, r);
     }
     if ((c->rendermode & 4) && lbl_8069C8BB > 2 && c->isLfe == 0) {
         int o = (c->azimuth >> 5) & 0x7F8;

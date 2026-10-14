@@ -158,7 +158,7 @@ void fn_80195A9C(Unk80195A9C_O* o);
 
 extern "C" {
 float fn_8037A9AC(const Unk80183918_Vec3* a, const Unk80183918_Vec3* b);
-void fn_80402B48(const Unk80183918_Vec3* v, Unk80183918_Vec3* out);
+void v3unit(const Unk80183918_Vec3* v, Unk80183918_Vec3* out);
 }
 inline Unk80183918_Vec3 Unk801984FC_Cross(const Unk80183918_Vec3& a, const Unk80183918_Vec3& b)
 {
@@ -519,7 +519,7 @@ extern "C" Unk80183918_Vec3 fn_801984FC(const Unk80183918_Vec3* a, const Unk8018
         axis = lbl_806055AC;
     } else {
         axis = Unk801984FC_Cross(*a, *b);
-        fn_80402B48(&axis, &axis);
+        v3unit(&axis, &axis);
         Unk801984FC_Scale(&axis, ang);
         Unk801984FC_Scale(&axis, t);
     }

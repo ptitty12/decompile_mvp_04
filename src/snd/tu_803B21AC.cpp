@@ -8,10 +8,10 @@
 #include "snd/cmn/sndcmn.h"
 #include <string.h>
 
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
-extern "C" float fn_803B44E4(float x);
-extern "C" float fn_803B457C(float x);
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
+extern "C" float SNDI_cos(float x);
+extern "C" float SNDI_sin(float x);
 extern unsigned char* lbl_806AA4E8[];
 extern void* lbl_806AA4E4;
 extern unsigned char lbl_806262F4[];
@@ -83,16 +83,16 @@ extern Unk803B21EC* lbl_806AA4B0;
 extern int lbl_80625448;
 extern void (*lbl_806AA2D8)(int);
 
-extern "C" void fn_803B21EC(int idx);
+extern "C" void MIX_stop(int idx);
 
-extern "C" void fn_803B5F9C(Unk803B21EC_Node** head, void* node);
-extern "C" void fn_803B65BC(void* obj);
-extern "C" void fn_803B65FC(void* obj, int* buf);
+extern "C" void SFILTER_add(Unk803B21EC_Node** head, void* node);
+extern "C" void SFILTER_createLPFRC(void* obj);
+extern "C" void SFILTER_modifyLPFRC(void* obj, int* buf);
 extern unsigned short lbl_8069C8A2;
-extern "C" void fn_803B6004(Unk803B21EC_Node** head, void* node);
-extern "C" void fn_803B5EC4(void* obj);
-extern "C" void fn_803B5F18(void* obj, int* buf);
-extern "C" void fn_803B31B4(Unk803B31B4* obj, int v);
+extern "C" void SFILTER_remove(Unk803B21EC_Node** head, void* node);
+extern "C" void SFILTER_createHPFFIR8(void* obj);
+extern "C" void SFILTER_modifyHPFFIR8(void* obj, int* buf);
+extern "C" void SFILTER_timestretchsetratio(Unk803B31B4* obj, int v);
 
 struct Unk803B3334;
 struct Unk803B3334_Src {
@@ -121,29 +121,29 @@ struct Unk803B3334 {
     int m1830;
 };
 
-extern "C" int fn_803B02CC(int v);
-extern "C" int fn_803B4BEC(int v);
-extern "C" int fn_803B3F60(const unsigned char* p, int n);
-extern "C" int fn_803B2C0C(int n, unsigned char** pp, float* ps, float x);
-extern "C" int fn_803B31F4(Unk803B3334* o, int count, float* src, float* dst);
-extern "C" int fn_803B2F48(Unk803B3334* o, int count);
-extern "C" int fn_803B306C(Unk803B3334* o, int count, float* src, float* dst);
+extern "C" int SNDDRV_getmastervoice(int v);
+extern "C" int SNDPKTPLAYI_voicetopackethandle(int v);
+extern "C" int SNDI_getb(const unsigned char* p, int n);
+extern "C" int determineaction(int n, unsigned char** pp, float* ps, float x);
+extern "C" int SFILTER_timestretch(Unk803B3334* o, int count, float* src, float* dst);
+extern "C" int stretchframesneeded(Unk803B3334* o, int count);
+extern "C" int stretch(Unk803B3334* o, int count, float* src, float* dst);
 extern "C" void fn_803B3334(Unk803B3334* o);
 extern int lbl_8069CBC0;
 
-extern "C" void fn_803B1080(int voice, int v);
+extern "C" void SNDPLATFORM_filteradd(int voice, int v);
 
-extern "C" void fn_803B69AC(Unk803B27DC_Obj* o, int a, int flag);
+extern "C" void SFILTER_rsfinit(Unk803B27DC_Obj* o, int a, int flag);
 extern "C" void fn_803B66CC(Unk803B27DC_Obj* o, int v);
 extern unsigned char lbl_8069C9EB;
 
-extern "C" void fn_803B21AC(int idx)
+extern "C" void MIXI_stop(int idx)
 {
-    fn_803B21EC(idx);
+    MIX_stop(idx);
     lbl_806AA2D8(idx);
 }
 
-extern "C" void fn_803B21EC(int idx)
+extern "C" void MIX_stop(int idx)
 {
     Unk803B21EC* e = &lbl_806AA2D4.m1DC[idx];
     int i;
@@ -162,19 +162,19 @@ extern "C" void fn_803B21EC(int idx)
     e->m0 = 0;
 }
 
-extern "C" void fn_803B22EC(int idx, int ch, float v)
+extern "C" void SNDMIX_setdrygain(int idx, int ch, float v)
 {
     lbl_806AA2D4.m1DC[idx].m1C[ch] = v;
     lbl_806AA2D4.m1DC[idx].m1 = 1;
 }
 
-extern "C" void fn_803B2320(int idx, int ch, float v)
+extern "C" void SNDMIX_setwetgain(int idx, int ch, float v)
 {
     lbl_806AA2D4.m1DC[idx].m38[ch] = v;
     lbl_806AA2D4.m1DC[idx].m1 = 1;
 }
 
-extern "C" void fn_803B270C(int idx, int a, Unk803B270C_Desc* d)
+extern "C" void MIX_filteradd(int idx, int a, Unk803B270C_Desc* d)
 {
     Unk803B21EC* e = &lbl_806AA4B0[idx];
     Unk803B21EC_Node* n = (Unk803B21EC_Node*)SNDMEMI_allocz(d->m4);
@@ -183,16 +183,16 @@ extern "C" void fn_803B270C(int idx, int a, Unk803B270C_Desc* d)
     n->m0 = d->m10;
     n->m4 = d->m14;
     n->m1A = 0;
-    fn_803B5F9C(&e->m40, n);
+    SFILTER_add(&e->m40, n);
 }
 
-extern "C" int fn_803B2794(int idx)
+extern "C" int MIX_getframe(int idx)
 {
     Unk803B21EC* e = &lbl_806AA4B0[idx];
     return e->m44 != 0 ? e->m44(e->m48) : -1;
 }
 
-extern "C" void fn_803B27DC(int idx, int n)
+extern "C" void MIX_sethighpass(int idx, int n)
 {
     Unk803B21EC* e = &lbl_806AA4B0[idx];
     if (n > 0) {
@@ -203,21 +203,21 @@ extern "C" void fn_803B27DC(int idx, int n)
             o->m4 = 0;
             e->m58->m18 = 0x50;
             e->m58->m1A = 0;
-            fn_803B5EC4(e->m58);
-            fn_803B5F9C(&e->m40, e->m58);
+            SFILTER_createHPFFIR8(e->m58);
+            SFILTER_add(&e->m40, e->m58);
         }
         int buf[2];
         buf[0] = n << 8;
         buf[1] = sndgs.sso.set.outputrate << 8;
-        fn_803B5F18(e->m58, buf);
+        SFILTER_modifyHPFFIR8(e->m58, buf);
     } else if (e->m58 != 0) {
-        fn_803B6004(&e->m40, e->m58);
+        SFILTER_remove(&e->m40, e->m58);
         SNDMEMI_free(e->m58);
         e->m58 = 0;
     }
 }
 
-extern "C" void fn_803B28AC(int idx, float v)
+extern "C" void MIX_setlowpass(int idx, float v)
 {
     Unk803B21EC* e = &lbl_806AA4B0[idx];
     if (v < 1.0f) {
@@ -227,8 +227,8 @@ extern "C" void fn_803B28AC(int idx, float v)
             o->m4 = 0;
             e->m54->m18 = 0x28;
             e->m54->m1A = 0;
-            fn_803B65BC(e->m54);
-            fn_803B5F9C(&e->m40, e->m54);
+            SFILTER_createLPFRC(e->m54);
+            SFILTER_add(&e->m40, e->m54);
         }
         int buf[3];
         float t;
@@ -237,15 +237,15 @@ extern "C" void fn_803B28AC(int idx, float v)
         int r = (int)(t >= 0.0f ? t + 0.5f : t - 0.5f);
         buf[0] = r << 7;
         buf[2] = 0x100;
-        fn_803B65FC(e->m54, buf);
+        SFILTER_modifyLPFRC(e->m54, buf);
     } else if (e->m54 != 0) {
-        fn_803B6004(&e->m40, e->m54);
+        SFILTER_remove(&e->m40, e->m54);
         SNDMEMI_free(e->m54);
         e->m54 = 0;
     }
 }
 
-extern "C" void fn_803B29F8(int idx, int v)
+extern "C" void MIX_setpitch(int idx, int v)
 {
     Unk803B21EC* e = &lbl_806AA2D4.m1DC[idx];
     int big = 0;
@@ -260,20 +260,20 @@ extern "C" void fn_803B29F8(int idx, int v)
         o->m4 = 0;
         e->m50->m18 = 0xa0;
         e->m50->m1A = 0;
-        fn_803B69AC(e->m50, lbl_8069C9EB, big);
-        fn_803B5F9C(&e->m40, e->m50);
+        SFILTER_rsfinit(e->m50, lbl_8069C9EB, big);
+        SFILTER_add(&e->m40, e->m50);
     }
     fn_803B66CC(e->m50, v);
 }
 
-extern "C" void fn_803B2AB4(int idx, int v)
+extern "C" void MIX_settimemult(int idx, int v)
 {
     Unk803B21EC* e = &lbl_806AA4B0[idx];
     if (e->m4C != 0)
-        fn_803B31B4(e->m4C, v);
+        SFILTER_timestretchsetratio(e->m4C, v);
 }
 
-extern "C" void fn_803B2AF0(float* a, float* b, float* out, int n, int shift)
+extern "C" void crossfade(float* a, float* b, float* out, int n, int shift)
 {
     int off;
     float step, start;
@@ -297,7 +297,7 @@ extern "C" void fn_803B2AF0(float* a, float* b, float* out, int n, int shift)
     }
 }
 
-extern "C" void fn_803B2D58(Unk803B3334* o, float** pp, int shift)
+extern "C" void applyaction(Unk803B3334* o, float** pp, int shift)
 {
     float* a;
     float* b;
@@ -316,12 +316,12 @@ extern "C" void fn_803B2D58(Unk803B3334* o, float** pp, int shift)
     } else if (shift > 0) {
         int n = shift * 4;
         Snd::Util::MemCpy((char*)o + 0x838, a, n);
-        fn_803B2AF0(a, b, (float*)((char*)o + (n + 0x838)), o->m2C, shift);
+        crossfade(a, b, (float*)((char*)o + (n + 0x838)), o->m2C, shift);
         o->m30 = o->m30 - o->m2C;
         o->m38 = o->m2C + shift;
         *pp = b;
     } else {
-        fn_803B2AF0(a, b, (float*)((char*)o + 0x838), o->m2C, shift);
+        crossfade(a, b, (float*)((char*)o + 0x838), o->m2C, shift);
         Snd::Util::MemCpy((char*)o + (o->m2C * 4 + 0x838), b - shift, (o->m2C + shift) * 4);
         o->m30 = o->m30 - o->m2C * 2;
         o->m38 = o->m2C * 2 + shift;
@@ -332,7 +332,7 @@ extern "C" void fn_803B2D58(Unk803B3334* o, float** pp, int shift)
 }
 
 /* near-miss: 38 vs 39 insns: retail keeps o in r31 and n in r29 (loads m3C, m38, *count up front, then n = m38 / *count); ours swaps those two saved registers and orders the loads differently; local-variable and load-order variants tried */
-extern "C" int fn_803B2EAC(Unk803B3334* o, int* pcount, char** pdst)
+extern "C" int transferframes(Unk803B3334* o, int* pcount, char** pdst)
 {
     int pos = o->m3C;
     int avail = o->m38;
@@ -348,7 +348,7 @@ extern "C" int fn_803B2EAC(Unk803B3334* o, int* pcount, char** pdst)
     return n;
 }
 
-extern "C" int fn_803B2F48(Unk803B3334* o, int count)
+extern "C" int stretchframesneeded(Unk803B3334* o, int count)
 {
     if (count > o->m38) {
         int total = 0;
@@ -364,7 +364,7 @@ extern "C" int fn_803B2F48(Unk803B3334* o, int count)
             if (avail < o->m2C * 2)
                 last = 0;
             else
-                last = fn_803B2C0C(o->m2C, &sp8, &spC, o->m24);
+                last = determineaction(o->m2C, &sp8, &spC, o->m24);
             if (last >= 0) {
                 used = o->m2C;
                 got = used + last;
@@ -396,12 +396,12 @@ extern "C" int fn_803B2F48(Unk803B3334* o, int count)
 
 /* the loop test reads m30 through an accessor (retail copies the loaded value) */
 static inline int A30(Unk803B3334* o) { return o->m30; }
-extern "C" int fn_803B306C(Unk803B3334* o, int count, float* src, float* dst)
+extern "C" int stretch(Unk803B3334* o, int count, float* src, float* dst)
 {
     int sp8 = count;
     float* sp10 = src;
     char* spC = (char*)dst;
-    int total = fn_803B2EAC(o, &sp8, &spC);
+    int total = transferframes(o, &sp8, &spC);
     if (sp8 == 0)
         return total;
     int last = 0;
@@ -409,9 +409,9 @@ extern "C" int fn_803B306C(Unk803B3334* o, int count, float* src, float* dst)
         if (o->m30 < o->m2C * 2)
             last = 0;
         else
-            last = fn_803B2C0C(o->m2C, &o->m1C, &o->m28, o->m24);
-        fn_803B2D58(o, &sp10, last);
-        total += fn_803B2EAC(o, &sp8, &spC);
+            last = determineaction(o->m2C, &o->m1C, &o->m28, o->m24);
+        applyaction(o, &sp10, last);
+        total += transferframes(o, &sp8, &spC);
     }
     if (last > 0) {
         Snd::Util::MemCpy((char*)o + 0x40, sp10, o->m2C * 4);
@@ -431,19 +431,19 @@ extern "C" int fn_803B306C(Unk803B3334* o, int count, float* src, float* dst)
     return total;
 }
 
-extern "C" void fn_803B31B4(Unk803B31B4* o, int v)
+extern "C" void SFILTER_timestretchsetratio(Unk803B31B4* o, int v)
 {
     o->m24 = v * 0.000244140625f;
 }
 
-extern "C" int fn_803B31F4(Unk803B3334* o, int count, float* src, float* dst)
+extern "C" int SFILTER_timestretch(Unk803B3334* o, int count, float* src, float* dst)
 {
     float* buf = src;
     int need;
     int r;
     if (o->m30 == 0)
         return o->m8->fn(o->m8, 0xC8, dst, buf, o->m1A);
-    need = fn_803B2F48(o, count);
+    need = stretchframesneeded(o, count);
     if (o->m20 >= 0 && need > SNDPKTPLAY_framesoutstanding(o->m20))
         return 0;
     if (need > 0) {
@@ -458,7 +458,7 @@ extern "C" int fn_803B31F4(Unk803B3334* o, int count, float* src, float* dst)
         if (r <= 0)
             return r;
     }
-    r = fn_803B306C(o, count, buf, dst);
+    r = stretch(o, count, buf, dst);
     if (r < count)
         memset(dst + r, 0, (count - r) * 4);
     return count;
@@ -473,19 +473,19 @@ extern "C" void fn_803B3334(Unk803B3334* o)
     }
 }
 
-extern "C" int fn_803B3378(Unk803B3334* o, unsigned char* p, int v)
+extern "C" int SFILTER_timestretchinit(Unk803B3334* o, unsigned char* p, int v)
 {
-    o->m0 = (void*)fn_803B31F4;
+    o->m0 = (void*)SFILTER_timestretch;
     o->m4 = (void*)fn_803B3334;
     if (v >= 0)
-        o->m20 = fn_803B4BEC(fn_803B02CC(v));
+        o->m20 = SNDPKTPLAYI_voicetopackethandle(SNDDRV_getmastervoice(v));
     else
         o->m20 = -1;
     o->m1C = p + 6;
     o->m24 = 1.0f;
     o->m28 = 0.0f;
     o->m2C = p[1] * 2;
-    o->m30 = fn_803B3F60(p + 2, 4);
+    o->m30 = SNDI_getb(p + 2, 4);
     o->m1830 = 0xabc;
     o->m34 = 0;
     o->m38 = 0;
@@ -495,25 +495,25 @@ extern "C" int fn_803B3378(Unk803B3334* o, unsigned char* p, int v)
     return 0;
 }
 
-extern "C" void fn_803B343C(int n, short* src, float* dst)
+extern "C" void decode16x87(int n, short* src, float* dst)
 {
     int i;
     for (i = 0; i < n; i++)
         dst[i] = src[i];
 }
 
-extern "C" void fn_803B3494(float* out, float a, float b, float c)
+extern "C" void SNDI_equalpower(float* out, float a, float b, float c)
 {
     float bk = b * 0.0174532942f;
     float x = a * 0.0174532942f - bk;
     float y = c * 0.0174532942f - bk;
     y = y / x;
     y = y * 1.5707964f;
-    out[0] = fn_803B457C(y);
-    out[1] = fn_803B44E4(y);
+    out[0] = SNDI_sin(y);
+    out[1] = SNDI_cos(y);
 }
 
-extern "C" void fn_803B3908(unsigned int idx, float* out)
+extern "C" void SNDI_aztospkrvol(unsigned int idx, float* out)
 {
     int i;
     idx = (idx >> 8) & 0xff;
@@ -523,18 +523,18 @@ extern "C" void fn_803B3908(unsigned int idx, float* out)
         out[5] = 0.0f;
 }
 
-extern "C" void fn_803B39A4()
+extern "C" void SNDI_freespkrtable()
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     if (lbl_806AA4E8 != 0)
         SNDMEMI_free(lbl_806AA4E4);
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }
 
 extern unsigned char lbl_8069CBBC;
 extern float lbl_8069CBA8[5];
 /* 3D speaker angles per output layout (lbl_8069CBA8) and the source-channel angle table (srcchancfg3d). The stereo pair is stored in both arms, so jump2 merges the identical stores into the shared tail. */
-extern "C" void fn_803B39E4()
+extern "C" void SNDI_spkrconfig()
 {
     if (lbl_8069CBBC == 1) {
         lbl_8069CBC0 = 0;
@@ -584,7 +584,7 @@ extern "C" void fn_803B39E4()
     sndgs.srcchancfg3d[5][5] = 0;
 }
 
-extern "C" int fn_803B3B98(int a)
+extern "C" int iSNDdetunetolinear(int a)
 {
     int s = 0x1000;
     while (a > 0x4af) {
@@ -612,7 +612,7 @@ extern "C" int fn_803B3CF8(int shandle, int v)
     if (voice >= 0) {
         setvoice = -1;
         while (iSNDpatchkey(voice, &setvoice))
-            fn_803B1080(setvoice, v);
+            SNDPLATFORM_filteradd(setvoice, v);
     }
     return voice;
 }
@@ -634,7 +634,7 @@ void iSNDcalcpitch(int chan)
         }
         if (c->ppitchlfo != 0)
             pitch += ((((signed char*)c->ppitchlfo)[c->curpitchlfoentry] - 0x40) * c->pitchlfodepth) >> 6;
-        c->detunepitch = fn_803B3B98(pitch);
+        c->detunepitch = iSNDdetunetolinear(pitch);
     }
     c->finalpitch = (c->detunepitch * c->progpitch) >> 12;
 }

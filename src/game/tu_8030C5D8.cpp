@@ -494,7 +494,7 @@ void fn_803E6660(void* p);
 void fn_803DBD54(void* p);
 int fn_803E9B98(const void* a, void* b);
 void* fn_8030BDE8(void* p);
-void fn_80402B48(const Unk8030FC1C_V3* v, Unk8030FC1C_V3* out);
+void v3unit(const Unk8030FC1C_V3* v, Unk8030FC1C_V3* out);
 }
 
 int fn_8030C5D8(int p)
@@ -1310,7 +1310,7 @@ extern "C" void fn_8030FC1C(Unk8030FC1C_P* p, Unk8030FC1C_Src* src)
     p->m104.x = a * t.x + Unk8030FC1C_R01() * 0.03f;
     p->m104.y = -980.0f;
     p->m104.z = a * t.z + Unk8030FC1C_R01() * 0.03f;
-    fn_80402B48(&p->m104, &p->m104);
+    v3unit(&p->m104, &p->m104);
 }
 
 extern "C" void fn_8030FD50(Unk8030FD50_Obj* p, int i)

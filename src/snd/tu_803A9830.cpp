@@ -17,32 +17,32 @@ extern const float lbl_806095D8;
 extern int lbl_80625448;
 extern "C" int fn_803AB9F0(int h, int ch, float vol);
 
-extern "C" void* fn_803AB310(int h);
-extern "C" void fn_803B43FC(SNDLINKLIST* list, void* node);
-extern "C" void fn_803B4344(SNDLINKLIST* list, void* node);
-extern "C" void fn_803FE7E0(int handle, void* p);
+extern "C" void* SNDSTRMI_getrequestptr(int h);
+extern "C" void SNDLINKI_remove(SNDLINKLIST* list, void* node);
+extern "C" void SNDLINKI_push(SNDLINKLIST* list, void* node);
+extern "C" void STREAM_release(int handle, void* p);
 extern "C" int fn_803AA95C(int h);
 /* near-miss: 60 vs 70 insns: retail keeps both arms of the `if (req->isgeneric)` tests (numframes load and the psamples loop) as separate code with different temporaries, presumably an endian-conversion macro that expands to the same value in both arms; ours merges the arms. temp-variable variants tried */
-extern "C" void fn_803AA07C(SNDSTREAMCHANNEL* pssc, int* hdr);
-extern "C" void fn_803A9E40(int h, int* hdr);
+extern "C" void SNDSTRMI_parsedata(SNDSTREAMCHANNEL* pssc, int* hdr);
+extern "C" void SNDSTRMI_parseheader(int h, int* hdr);
 extern "C" int fn_803FE914(int handle);
 extern "C" int fn_803FE954(int handle);
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
-extern "C" int fn_803AA468();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
+extern "C" int SNDSTRMI_numcreated();
 extern "C" int fn_803AAA3C(int h);
-extern "C" void fn_803AA2E8();
-extern "C" void fn_803FDC80(int h);
-extern "C" void fn_803FE418(int h);
+extern "C" void SNDSTRMI_service();
+extern "C" void STREAM_destroy(int h);
+extern "C" void STREAM_kill(int h);
 struct RcHnd;
-extern "C" unsigned char* fn_803FE660(RcHnd* h);
-extern "C" int fn_803AA4B0(void* a, int b, void* c, void* d, int e, int f, int g);
+extern "C" unsigned char* STREAM_get(RcHnd* h);
+extern "C" int SNDSTRMI_create(void* a, int b, void* c, void* d, int e, int f, int g);
 extern void* lbl_8069CA44;
 extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type);
-extern "C" int fn_803FDEC0(int sh, void* a, void* b, int tag);
-extern "C" int fn_803FDFB4(int sh, void* a, int b, int tag);
-extern "C" void fn_803B4380(SNDLINKLIST* list, void* node);
-extern "C" void* fn_803B43BC(SNDLINKLIST* list);
+extern "C" int STREAM_queuefile(int sh, void* a, void* b, int tag);
+extern "C" int STREAM_queuemem(int sh, void* a, int b, int tag);
+extern "C" void SNDLINKI_pushtail(SNDLINKLIST* list, void* node);
+extern "C" void* SNDLINKI_pop(SNDLINKLIST* list);
 extern "C" void fn_803B3EA8(int shandle, int ch, int level);
 
 /* Average data rate of a sample format (bytes per second). */
@@ -73,7 +73,7 @@ extern "C" void fn_803A98B0(SNDSTREAMCHANNEL* pssc)
 }
 
 /* near-miss: instruction set matches; callee-saved/scratch registers are permuted (retail: rep r0, chans r9, rate r3, mult r11); declaration-order permutations tried */
-extern "C" int fn_803A9BEC(SNDSAMPLEFORMAT* ssf)
+extern "C" int SNDSTRMI_calcdatarate(SNDSAMPLEFORMAT* ssf)
 {
     int rep = ssf->samplerep;
     int chans = ssf->channels;
@@ -92,7 +92,7 @@ extern "C" int fn_803A9BEC(SNDSAMPLEFORMAT* ssf)
     return (rate * mult) >> 8;
 }
 
-extern "C" int fn_803A9C64()
+extern "C" int SNDSTRMI_destroyall()
 {
     int i;
     for (i = 0; i < sndgs.sso.set.maxstreams; i++)
@@ -107,24 +107,24 @@ SNDSTREAMCHANNEL* SNDSTRMI_getstreamptr(int sndstreamhandle)
     return lbl_8069CADC.pssc[sndstreamhandle];
 }
 
-/* fn_803AB310 takes the handle (its definition in tu_803AB310 reads r3), so h stays live in r3 across the index. */
-extern "C" void fn_803A9CF4(int h)
+/* SNDSTRMI_getrequestptr takes the handle (its definition in tu_803AB310 reads r3), so h stays live in r3 across the index. */
+extern "C" void SNDSTRMI_removerequest(int h)
 {
     SNDSTREAMCHANNEL* pssc = lbl_8069CADC.pssc[(unsigned char)h];
-    void* req = fn_803AB310(h);
-    fn_803B43FC(&pssc->allocatedrequests, req);
-    fn_803B4344(&pssc->freerequests, req);
+    void* req = SNDSTRMI_getrequestptr(h);
+    SNDLINKI_remove(&pssc->allocatedrequests, req);
+    SNDLINKI_push(&pssc->freerequests, req);
     if (pssc->parsingrequest == req)
         pssc->parsingrequest = 0;
 }
 
-extern "C" void fn_803A9D5C(int* p)
+extern "C" void SNDSTRMI_releasecallback(int* p)
 {
     unsigned char* hdr = (unsigned char*)p[-1];
-    fn_803FE7E0(lbl_8069CADC.pssc[hdr[3]]->streamhandle, hdr);
+    STREAM_release(lbl_8069CADC.pssc[hdr[3]]->streamhandle, hdr);
 }
 
-extern "C" void fn_803A9D98(int unused, unsigned int frames, SNDSTREAMCHANNEL* pssc)
+extern "C" void SNDSTRMI_framescallback(int unused, unsigned int frames, SNDSTREAMCHANNEL* pssc)
 {
     unsigned int leftover = 0;
     int iter = 0;
@@ -132,7 +132,7 @@ extern "C" void fn_803A9D98(int unused, unsigned int frames, SNDSTREAMCHANNEL* p
         iter++;
         Snd::SNDSTREAMREQUEST* r = (Snd::SNDSTREAMREQUEST*)pssc->allocatedrequests.phead;
         if (iter > 200) {
-            fn_803A9CF4(r->sndrequesthandle);
+            SNDSTRMI_removerequest(r->sndrequesthandle);
             return;
         }
         if (frames > r->outstandingframes) {
@@ -142,7 +142,7 @@ extern "C" void fn_803A9D98(int unused, unsigned int frames, SNDSTREAMCHANNEL* p
         r->currentframe += frames;
         r->outstandingframes -= frames;
         if (r->currentframe >= (unsigned int)r->totalframes)
-            fn_803A9CF4(r->sndrequesthandle);
+            SNDSTRMI_removerequest(r->sndrequesthandle);
         if (leftover == 0)
             return;
         frames = leftover;
@@ -150,7 +150,7 @@ extern "C" void fn_803A9D98(int unused, unsigned int frames, SNDSTREAMCHANNEL* p
     }
 }
 
-extern "C" void fn_803AA07C(SNDSTREAMCHANNEL* pssc, int* hdr)
+extern "C" void SNDSTRMI_parsedata(SNDSTREAMCHANNEL* pssc, int* hdr)
 {
     SNDPACKET psp;
     Snd::SNDSTREAMREQUEST* req = (Snd::SNDSTREAMREQUEST*)pssc->parsingrequest;
@@ -173,7 +173,7 @@ extern "C" void fn_803AA07C(SNDSTREAMCHANNEL* pssc, int* hdr)
         }
     }
     if (psp.numframes == 0) {
-        fn_803FE7E0(pssc->streamhandle, in);
+        STREAM_release(pssc->streamhandle, in);
     } else {
         ((int*)psp.psamples[0])[-1] = (int)in;
         in[0] = req->sndrequesthandle;
@@ -184,12 +184,12 @@ extern "C" void fn_803AA07C(SNDSTREAMCHANNEL* pssc, int* hdr)
     }
 }
 
-extern "C" void fn_803A9928(SNDSTREAMCHANNEL*);
-extern "C" int fn_803AA194(int,int*);
-extern "C" int fn_803AA20C(SNDSTREAMCHANNEL*);
-extern "C" void fn_803AA2E8()
+extern "C" void SNDSTRMI_startstream(SNDSTREAMCHANNEL*);
+extern "C" int SNDSTRMI_parsechunk(int,int*);
+extern "C" int SNDSTRMI_isheld(SNDSTREAMCHANNEL*);
+extern "C" void SNDSTRMI_service()
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     int i = 0;
     int limit = sndgs.sso.set.maxstreams;
     for (; i < limit; i++, limit = sndgs.sso.set.maxstreams) {
@@ -201,9 +201,9 @@ extern "C" void fn_803AA2E8()
             ch->cursa = ch->newsa;
             ch->newsa.ptsdata[0] = 0;
             SNDPKTPLAY_stop(ch->packetinstancehandle);
-            fn_803A9928(ch);
+            SNDSTRMI_startstream(ch);
         }
-        if (fn_803AA20C(ch)) continue;
+        if (SNDSTRMI_isheld(ch)) continue;
         int count;
         if (ch->state == 1) {
             count = SNDPKTPLAY_submitspace(ch->packetinstancehandle);
@@ -212,29 +212,29 @@ extern "C" void fn_803AA2E8()
         int result = 0;
         do {
             count--;
-            unsigned char* data = fn_803FE660((RcHnd*)ch->streamhandle);
-            if (data) result = fn_803AA194(i,(int*)data);
+            unsigned char* data = STREAM_get((RcHnd*)ch->streamhandle);
+            if (data) result = SNDSTRMI_parsechunk(i,(int*)data);
         } while (result && count > 0);
     }
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }
 
-extern "C" int fn_803AA194(int h, int* hdr)
+extern "C" int SNDSTRMI_parsechunk(int h, int* hdr)
 {
     SNDSTREAMCHANNEL* pssc = lbl_8069CADC.pssc[h];
     int tag = *hdr;
     if (tag == 0x5343446c) {
-        fn_803AA07C(pssc, hdr);
+        SNDSTRMI_parsedata(pssc, hdr);
     } else if (tag == 0x5343486c) {
-        fn_803A9E40(h, hdr);
+        SNDSTRMI_parseheader(h, hdr);
         return 0;
     } else {
-        fn_803FE7E0(pssc->streamhandle, hdr);
+        STREAM_release(pssc->streamhandle, hdr);
     }
     return 1;
 }
 
-extern "C" int fn_803AA20C(SNDSTREAMCHANNEL* pssc)
+extern "C" int SNDSTRMI_isheld(SNDSTREAMCHANNEL* pssc)
 {
     Snd::SNDSTREAMREQUEST* r = (Snd::SNDSTREAMREQUEST*)pssc->parsingrequest;
     if (r != 0 && r->avgdatarate != 0) {
@@ -261,7 +261,7 @@ extern "C" int fn_803AA20C(SNDSTREAMCHANNEL* pssc)
     return 0;
 }
 
-extern "C" int fn_803AA468()
+extern "C" int SNDSTRMI_numcreated()
 {
     int n = 0;
     int i;
@@ -278,18 +278,18 @@ extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type)
         return -8;
     if (pssc->freerequests.items == 0)
         return -13;
-    fn_803A975C();
+    SNDSYS_entercritical();
     if (type == 0)
-        b = (void*)fn_803FDEC0(pssc->streamhandle, a, b, 0x6c454353);
+        b = (void*)STREAM_queuefile(pssc->streamhandle, a, b, 0x6c454353);
     else if (type == 1)
-        b = (void*)fn_803FDFB4(pssc->streamhandle, a, 0, 0x6c454353);
+        b = (void*)STREAM_queuemem(pssc->streamhandle, a, 0, 0x6c454353);
     if (b == 0) {
-        fn_803A979C();
+        SNDSYS_leavecritical();
         return -1;
     }
-    Snd::SNDSTREAMREQUEST* r = (Snd::SNDSTREAMREQUEST*)fn_803B43BC(&pssc->freerequests);
+    Snd::SNDSTREAMREQUEST* r = (Snd::SNDSTREAMREQUEST*)SNDLINKI_pop(&pssc->freerequests);
     memset(r, 0, 0x28);
-    fn_803B4380(&pssc->allocatedrequests, r);
+    SNDLINKI_pushtail(&pssc->allocatedrequests, r);
     r->streamrequestid = (int)b;
     pssc->lastsndrequesthandle += 0x100;
     if (pssc->lastsndrequesthandle < 0)
@@ -297,36 +297,36 @@ extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type)
     r->sndrequesthandle = pssc->lastsndrequesthandle | h;
     r->holdtime = holdtime;
     int ret = r->sndrequesthandle;
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return ret;
 }
 
 extern "C" void fn_803AA934(void* a, int b, void* c, void* d, int e)
 {
-    fn_803AA4B0(a, b, c, d, e, 0, 0);
+    SNDSTRMI_create(a, b, c, d, e, 0, 0);
 }
 
 extern "C" int fn_803AA95C(int h)
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
     if (pssc == 0) {
-        fn_803A979C();
+        SNDSYS_leavecritical();
         return -8;
     }
     fn_803AAA3C(h);
     fn_803A98B0(pssc);
-    if (fn_803AA468() == 1) {
-        iSNDserverremoveclient(fn_803AA2E8);
+    if (SNDSTRMI_numcreated() == 1) {
+        iSNDserverremoveclient(SNDSTRMI_service);
         lbl_8069CA44 = 0;
     }
     SNDPKTPLAY_destroy(pssc->packetinstancehandle);
     int sh = pssc->streamhandle;
     int tap = pssc->fromtap;
     lbl_8069CADC.pssc[h] = 0;
-    fn_803A979C();
+    SNDSYS_leavecritical();
     if (tap == 0)
-        fn_803FDC80(sh);
+        STREAM_destroy(sh);
     return 0;
 }
 
@@ -337,18 +337,18 @@ extern "C" void fn_803AAA18(int a, int b, void* c, void* d)
 
 extern "C" int fn_803AAA3C(int h)
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
     if (pssc == 0) {
-        fn_803A979C();
+        SNDSYS_leavecritical();
         return -8;
     }
     if (pssc->shandle >= 0)
         SNDPKTPLAY_stop(pssc->packetinstancehandle);
     pssc->shandle = -1;
     if (pssc->fromtap == 0) {
-        fn_803FE418(pssc->streamhandle);
-        fn_803FE660((RcHnd*)pssc->streamhandle);
+        STREAM_kill(pssc->streamhandle);
+        STREAM_get((RcHnd*)pssc->streamhandle);
     }
     if (pssc->newsa.ptsdata[0] != 0) {
         int i;
@@ -357,9 +357,9 @@ extern "C" int fn_803AAA3C(int h)
     }
     void* node;
 again:
-    node = fn_803B43BC(&pssc->allocatedrequests);
+    node = SNDLINKI_pop(&pssc->allocatedrequests);
     if (node != 0) {
-        fn_803B4344(&pssc->freerequests, node);
+        SNDLINKI_push(&pssc->freerequests, node);
         goto again;
     }
     pssc->parsingrequest = 0;
@@ -368,7 +368,7 @@ again:
     memset(&pssc->newsf, 0, 4);
     memset(&pssc->cursa, 0, 0x68);
     memset(&pssc->newsa, 0, 0x68);
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return 0;
 }
 
@@ -408,7 +408,7 @@ extern "C" void fn_803AAE30(void* data)
         Snd::Util::RemoveVariableTimerClient(&s->fader.variableTimerClient);
 }
 
-extern "C" int fn_803AAFB8(int h, int time, int targetVol)
+extern "C" int SNDSTRM_autovol(int h, int time, int targetVol)
 {
     SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
     if (pssc == 0)
@@ -432,12 +432,12 @@ extern "C" int fn_803AAFB8(int h, int time, int targetVol)
     return 0;
 }
 
-extern "C" void fn_803AB13C(int a, void* b, int c, void* d, void* e, int f)
+extern "C" void SNDSTRM_createtap(int a, void* b, int c, void* d, void* e, int f)
 {
-    fn_803AA4B0(b, c, d, e, f, a, 1);
+    SNDSTRMI_create(b, c, d, e, f, a, 1);
 }
 
-extern "C" int fn_803AB17C(int h, int ch, int level)
+extern "C" int SNDSTRM_fxlevel(int h, int ch, int level)
 {
     SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
     if (pssc == 0)

@@ -77,7 +77,7 @@ public:
 
 extern "C" int fn_8038EA9C(VdCbObj* s);
 extern "C" void fn_8038EAF4(VdCbObj* s, int b);
-extern "C" void fn_803EC054(void* p);
+extern "C" void SHAPE_destroy(void* p);
 
 /* Frame pool of the VP6 codec: two intrusive lists (used at +0x24, free at +0x2C); a frame carries its
  * list node at +8 and a reference count at +0x10. */
@@ -209,7 +209,7 @@ struct VdVid {
 };
 
 
-extern "C" void* fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" void* SHAPE_create(int a, int b, int c, int d, int e, int f, int g, int h);
 
 extern "C" VdVid* fn_8038EC9C(VdVid* v, int a, int b)
 {
@@ -217,7 +217,7 @@ extern "C" VdVid* fn_8038EC9C(VdVid* v, int a, int b)
     v->m8 = 3;
     v->mC = 3;
     v->m0 = 3;
-    VdBlk* p = (VdBlk*)fn_803EBBA4(4, 1, 0x20, 0, 0, lbl_80699B94.m8, 0, 0);
+    VdBlk* p = (VdBlk*)SHAPE_create(4, 1, 0x20, 0, 0, lbl_80699B94.m8, 0, 0);
     v->m4 = p;
     p->m0 = 0x1C;
     v->m4->m4 = a;
@@ -228,7 +228,7 @@ extern "C" VdVid* fn_8038EC9C(VdVid* v, int a, int b)
 extern "C" void fn_8038ED2C(VdRes2* o, int chrg)
 {
     if (o->m4 != 0) {
-        fn_803EC054(o->m4);
+        SHAPE_destroy(o->m4);
         o->m4 = 0;
     }
     o->m8 = 7;

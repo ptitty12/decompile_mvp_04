@@ -55,7 +55,7 @@ void fn_8014D9EC(void* p, float a, float b, float c, float d, float e);
 void fn_80314B4C(FxCtx* p);
 void fn_80314854(FxCtx* p);
 void fn_803ED5E0();
-void fn_803EDA0C();
+void MEM_free();
 FxI* fn_8031CED8(FxI* self);
 void fn_8038D9B4(int p, int a);
 void fn_803E57F0(void* p, int a);
@@ -536,7 +536,7 @@ void fn_8031CE5C(FxH* self) { self->m24 = 1; }
 void fn_8031CE68() {
     FxI** pp = &lbl_80620144;
     lbl_80699B94.m0 = (void*)fn_803ED5E0;
-    lbl_80699B94.m4 = (void*)fn_803EDA0C;
+    lbl_80699B94.m4 = (void*)MEM_free;
     lbl_80699B94.m8 = 0x100;
     *pp = fn_8031CED8((FxI*)operator new(0x1B0, 0));
 }

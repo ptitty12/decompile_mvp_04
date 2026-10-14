@@ -1022,7 +1022,7 @@ public:
 extern "C" int fn_80166BD0(void* self);
 extern "C" void fn_80166FEC(void* self, int a, int b, int c, int d);
 extern "C" int fn_8018240C(void* p, int f);
-extern "C" int fn_803EE348(int a);
+extern "C" int MEM_largestunused(int a);
 void fn_80303CA0(const char* s, float a, float b, float c, ...);
 extern "C" void fn_8037893C(void* q, int id, void* e, int a, int b);
 
@@ -1033,7 +1033,7 @@ extern "C" void fn_8037893C(void* q, int id, void* e, int a, int b);
 void fn_80166E40(void* self) /* 80166E40 */
 {
     Unk80166E40_S* s = (Unk80166E40_S*)self;
-    if (fn_803EE348(0) > 0x1B7FF && s->m48 != 1) {
+    if (MEM_largestunused(0) > 0x1B7FF && s->m48 != 1) {
         s->mC->m6CC->fn_vslot8(1);
         int n = fn_80166BD0(self);
         fn_80303CA0("End of game intensity %d", 4.0f, 0.4f, 0.4f, n + 1);

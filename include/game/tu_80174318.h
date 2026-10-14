@@ -31,7 +31,7 @@ struct Unk801757D4_T {
     int mC0;
 };
 
-extern "C" void fn_80402CAC(int a, int b);
+extern "C" void LOCALE_getstr(int a, int b);
 
 /* 0x48-byte entry; five of them at container+0xC */
 struct Unk80176C0C_Entry {
@@ -165,7 +165,7 @@ public:
 struct Unk80173274_T;
 int fn_80173274(Unk80173274_T* p);
 extern "C" int fn_8000587C(int p);
-extern "C" void fn_803EDA0C(int a);
+extern "C" void MEM_free(int a);
 
 /* Player object (vptr at +0x98): only slot 8 is used here. */
 class Unk80177974_Obj {
@@ -228,7 +228,7 @@ extern const Unk80177A90_V3 lbl_806055AC;
 extern const char lbl_805CB1DC[];
 extern const char lbl_805CB208[];
 extern "C" int fn_802B9300(int n, int a, int b, int c);
-extern "C" int fn_80402DE4(int a, int b);
+extern "C" int LOCALE_create(int a, int b);
 extern "C" void fn_80402BEC(int a, int b, int c);
 int fn_804089B4(char* dst, const char* fmt, ...);
 extern "C" void fn_8040074C(void* p, unsigned int n);

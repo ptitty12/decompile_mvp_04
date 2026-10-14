@@ -7,8 +7,8 @@
 
 /*
  * RealCore heap manager types (src/ealib/tu_803ED700.cpp and neighbours).
- * Evidence: fn_803ED700 (block header init), fn_803EDE64/fn_803EDEE8 (free list
- * insert/unlink through +0x10/+0x14), fn_803ED188 (allocator), heap pointer table lbl_806AABF4[64].
+ * Evidence: fn_803ED700 (block header init), FREE_add/fn_803EDEE8 (free list
+ * insert/unlink through +0x10/+0x14), MEM_allocaligna (allocator), heap pointer table lbl_806AABF4[64].
  * Block tags: 0x4246 'BF' free (linked), 0x424D 'BM' allocated, 0x424F 'BO' unlinked, 0x4253 'BS' sentinel.
  */
 struct RcBlk {
@@ -40,16 +40,16 @@ extern RcHeap* lbl_806AABF4[64];
 
 extern "C" int fn_804007FC(void*);
 extern "C" void MEM_fill(void*, int, int);
-extern "C" int fn_803EDA0C(void*);
+extern "C" int MEM_free(void*);
 extern "C" int fn_803EE020(int, const void*, int (*)(const char*, ...));
 extern "C" int fn_803EE81C();
 extern "C" void fn_803EE878();
 extern "C" int fn_803EDF10(const char* fmt, ...);
 extern "C" void fn_803EE238();
-extern "C" int fn_803ED720(int, const void*, int, int, int, int, int, int, int, int);
+extern "C" int MEMCLASS_create(int, const void*, int, int, int, int, int, int, int, int);
 extern "C" int fn_803EE318(char* p);
 extern "C" int fn_803EE320(char* p);
-extern "C" int fn_803EE4B8(RcBlk*);
+extern "C" int checksentinel(RcBlk*);
 extern "C" int MEM_crc16(const void* p, int n, int seed);
 extern char lbl_8060DF90[];
 extern char lbl_8060DFE8[];
@@ -95,13 +95,13 @@ struct RcCb {
 };
 
 extern RcCb lbl_806AABE4;
-extern "C" void fn_803EDE64(RcHeap*, RcBlk*);
+extern "C" void FREE_add(RcHeap*, RcBlk*);
 extern "C" void fn_804007D4(void*);
 extern "C" char* strcpy(char*, const char*);
 extern "C" int sprintf(char*, const char*, ...);
 extern char lbl_8060DF50[];
 extern char lbl_8060DF58[];
-extern "C" int fn_803EDC98(void*, int);
+extern "C" int MEM_initadr(void*, int);
 extern "C" int fn_803EDC04(int);
 extern "C" int SYSTEM_addexit(void (*)(void));
 extern "C" void* OSAllocFromHeap(void*, int);
@@ -120,11 +120,11 @@ extern int lbl_806EEA0C;
 extern int lbl_806EEA00;
 extern "C" int fn_80400828(void*);
 extern "C" int fn_8040084C(void*);
-extern "C" RcBlk* fn_803EDCEC(RcHeap*, int, int);
-extern "C" int fn_803EDDF8(RcHeap*, int);
+extern "C" RcBlk* FREE_findlargest(RcHeap*, int, int);
+extern "C" int FREE_gettotalfree(RcHeap*, int);
 extern "C" int MEMSYS_validaddress(void*, int, int);
 extern "C" int fn_803EE450(RcBlk*);
-extern "C" int fn_803EE4B8(RcBlk*);
+extern "C" int checksentinel(RcBlk*);
 extern "C" int fn_803EE5A0(RcBlk*);
 extern "C" int fn_803EE688(RcBlk*);
 extern "C" int fn_803EE708(int);
@@ -157,7 +157,7 @@ extern "C" int fn_803ED700(RcBlk* b, int a, int size, int c, int tag, int flags,
     return size + 0x10;
 }
 
-extern "C" int fn_803ED720(int idx, const void* nm, int bs, int size, int a4, int align, int hdr, int fa, int fb, int fc)
+extern "C" int MEMCLASS_create(int idx, const void* nm, int bs, int size, int a4, int align, int hdr, int fa, int fb, int fc)
 {
     const char* name = (const char*)nm;
     RcBlk* base = (RcBlk*)bs;
@@ -195,7 +195,7 @@ extern "C" int fn_803ED720(int idx, const void* nm, int bs, int size, int a4, in
     h->head.m14 = &h->head;
     h->head.m4 = 0x7fffffff;
     h->m38 = 0;
-    fn_803EDE64(h, mid);
+    FREE_add(h, mid);
     if (fc != 0) {
         fn_804007D4((char*)base + 0x4c);
         h->m38 = 1;
@@ -203,7 +203,7 @@ extern "C" int fn_803ED720(int idx, const void* nm, int bs, int size, int a4, in
     return mid->m4;
 }
 
-extern "C" int fn_803ED8EC(int idx)
+extern "C" int MEMCLASS_remove(int idx)
 {
     RcHeap** tab = lbl_806AABF4;
     int off = (idx & 0x3f) * 4;
@@ -219,7 +219,7 @@ extern "C" int fn_803ED8EC(int idx)
     return r;
 }
 
-extern "C" int fn_803ED95C(int idx)
+extern "C" int MEMCLASS_purge(int idx)
 {
     RcHeap** tab = lbl_806AABF4;
     int off = (idx & 0x3f) * 4;
@@ -227,7 +227,7 @@ extern "C" int fn_803ED95C(int idx)
     RcBlk* b = (*(RcHeap**)((char*)tab + off))->m8;
     for (; b != 0 && r != 0; b = b->m8) {
         if ((b->m2 & 0xc000) == 0)
-            r = fn_803EDA0C((char*)b + 0x10);
+            r = MEM_free((char*)b + 0x10);
     }
     return r;
 }
@@ -249,7 +249,7 @@ extern "C" int fn_803ED9D4()
 }
 
 /* near-miss: 2 slots; retail loads the neighbour flags halfword into r4 instead of r0 */
-extern "C" int fn_803EDA0C(void* pp)
+extern "C" int MEM_free(void* pp)
 {
     char* p = (char*)pp;
     if (p == 0)
@@ -298,7 +298,7 @@ extern "C" int fn_803EDA0C(void* pp)
             pv->mC = b;
         }
     }
-    fn_803EDE64(h, b);
+    FREE_add(h, b);
     if (lbl_806AABE4.mC != 0) {
         if (info == 0) {
             RcInfo i2((int)p);
@@ -318,7 +318,7 @@ extern "C" int fn_803EDC04(int a)
     fn_803EE878();
     void* p = OSAllocFromHeap(lbl_806EF2C8, a);
     if (p != 0) {
-        r = fn_803EDC98(p, a);
+        r = MEM_initadr(p, a);
         lbl_806AABF4[0]->m58 = p;
     }
     return r;
@@ -329,12 +329,12 @@ extern "C" int fn_803EDC74()
     return fn_803EDC04(fn_803EE81C());
 }
 
-extern "C" int fn_803EDC98(void* a, int b)
+extern "C" int MEM_initadr(void* a, int b)
 {
-    return fn_803ED720(0, lbl_8060DF60, (int)a, b, 0x20, 0x20, 0, 0, 0, 1);
+    return MEMCLASS_create(0, lbl_8060DF60, (int)a, b, 0x20, 0x20, 0, 0, 0, 1);
 }
 
-extern "C" RcBlk* fn_803EDCEC(RcHeap* h, int n, int rev)
+extern "C" RcBlk* FREE_findlargest(RcHeap* h, int n, int rev)
 {
     RcBlk* best = 0;
     RcBlk* p = &h->head;
@@ -365,7 +365,7 @@ extern "C" RcBlk* fn_803EDCEC(RcHeap* h, int n, int rev)
     return best;
 }
 
-extern "C" RcBlk* fn_803EDD8C(RcHeap* h, int n, int rev, int off, int mask, int* out)
+extern "C" RcBlk* FREE_find(RcHeap* h, int n, int rev, int off, int mask, int* out)
 {
     RcBlk* p = &h->head;
     int pad,address;
@@ -386,7 +386,7 @@ extern "C" RcBlk* fn_803EDD8C(RcHeap* h, int n, int rev, int off, int mask, int*
     return p;
 }
 
-extern "C" int fn_803EDDF8(RcHeap* h, int rev)
+extern "C" int FREE_gettotalfree(RcHeap* h, int rev)
 {
     RcBlk* p = &h->head;
     int total = 0;
@@ -406,7 +406,7 @@ extern "C" int fn_803EDDF8(RcHeap* h, int rev)
     return total;
 }
 
-extern "C" void fn_803EDE64(RcHeap* h, RcBlk* blk)
+extern "C" void FREE_add(RcHeap* h, RcBlk* blk)
 {
     RcBlk* head = &h->head;
     RcBlk* prev = head;
@@ -490,12 +490,12 @@ extern "C" int fn_803EE020(int idx, const void* out, int (*pr)(const char*, ...)
                 if (sz > 0x10 && !(b->m2 & 0x8000))
                     crc = MEM_crc16((char*)b + 0x18, sz - 0x18, 0xfbea);
                 total += sz;
-                pr((const char*)out, lbl_8060E058, data, sz, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[fn_803EE4B8(b)], lbl_8060E054);
+                pr((const char*)out, lbl_8060E058, data, sz, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[checksentinel(b)], lbl_8060E054);
             } else {
                 crc = 0;
                 if (b->m4 != 0 && !(b->m2 & 0x8000))
                     crc = MEM_crc16(data, b->m4, 0xfbea);
-                pr((const char*)out, nm, data, b->m4, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[fn_803EE4B8(b)], nm2);
+                pr((const char*)out, nm, data, b->m4, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[checksentinel(b)], nm2);
             }
             pr(lbl_8060E064);
             b = b->m8;
@@ -525,7 +525,7 @@ extern "C" void fn_803EE238()
         RcHeap* h = lbl_806AABF4[i];
         if (h != 0) {
             void* m = h->m58;
-            fn_803ED8EC(i);
+            MEMCLASS_remove(i);
             if (m != 0)
                 OSFreeToHeap(lbl_806EF2C8, m);
             lbl_806AABF4[i] = 0;
@@ -552,27 +552,27 @@ extern "C" int fn_803EE320(char* p)
     return r;
 }
 
-extern "C" int fn_803EE348(int idx)
+extern "C" int MEM_largestunused(int idx)
 {
     if (idx == 0)
         idx = lbl_806EE9F0;
     RcHeap* h = lbl_806AABF4[idx & 0x3f];
     if (h->m38 != 0)
         fn_80400828(h->m3C);
-    RcBlk* b = fn_803EDCEC(h, 0, 0);
+    RcBlk* b = FREE_findlargest(h, 0, 0);
     if (h->m38 != 0)
         fn_8040084C(h->m3C);
     return b ? b->m4 : 0;
 }
 
-extern "C" int fn_803EE3D4(int idx)
+extern "C" int MEM_totalunused(int idx)
 {
     if (idx == 0)
         idx = lbl_806EE9F0;
     RcHeap* h = lbl_806AABF4[idx & 0x3f];
     if (h->m38 != 0)
         fn_80400828(h->m3C);
-    int r = fn_803EDDF8(h, 0);
+    int r = FREE_gettotalfree(h, 0);
     if (h->m38 != 0)
         fn_8040084C(h->m3C);
     return r;
@@ -588,7 +588,7 @@ extern "C" int fn_803EE450(RcBlk* p)
     return r;
 }
 
-extern "C" int fn_803EE4B8(RcBlk* p)
+extern "C" int checksentinel(RcBlk* p)
 {
     int r = 0;
     int t = p->m0;
@@ -680,7 +680,7 @@ extern "C" int fn_803EE708(int idx)
     int ok;
     do {
         ok = 0;
-        if (fn_803EE4B8(b) != 0) {
+        if (checksentinel(b) != 0) {
             if (fn_803EE5A0(b) != 0)
                 ok = 1;
         }

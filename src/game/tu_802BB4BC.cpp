@@ -10,7 +10,7 @@ extern Unk802BB4FC* lbl_8061EAF0;
 extern const void* lbl_80664080[];
 extern int lbl_8061E978;
 
-extern "C" void fn_803EDA0C(int p);
+extern "C" void MEM_free(int p);
 extern const char lbl_805E11C4[];
 extern int lbl_8061F688;
 extern char lbl_8068D9D8[];
@@ -19,7 +19,7 @@ void fn_802E377C(void* p);
 extern "C" void fn_802E3834(int a, char* b, int c);
 int fn_802E3F00(int a, int b, int c, int (*cb)(int, const char*, int*, char**));
 extern "C" void fn_80377408(void* p);
-extern "C" int fn_803EE3D4(int a);
+extern "C" int MEM_totalunused(int a);
 extern "C" void fn_803E9744(void* p, int a);
 void fn_8040B61C(void* dst, const void* src);
 extern "C" void fn_802AF6F8(int a, void* b, int c);
@@ -39,7 +39,7 @@ int fn_802BB4D0(char* o, int i)
 {
     char* b = o + 8;
     int off = i * 0x1C;
-    return fn_803EE3D4(*(int*)(b + off));
+    return MEM_totalunused(*(int*)(b + off));
 }
 
 extern "C" void* fn_802BB4FC(void* p)
@@ -54,7 +54,7 @@ extern "C" void* fn_802BB4FC(void* p)
 void fn_802BB518(Unk802BB4FC* o, int c)
 {
     if (o->m0 != 0) {
-        fn_803EDA0C(o->m0);
+        MEM_free(o->m0);
         o->m0 = 0;
     }
     if (o->m4 != 0) {

@@ -31,8 +31,8 @@ extern char lbl_80664AA8[];
 extern "C" int fn_803BE7B4(void* p);
 extern "C" void fn_80377458(void* p);
 extern "C" void fn_80377488(void* p);
-extern "C" void fn_803ED664(void* p);
-extern "C" void fn_803EDA0C(void* p);
+extern "C" void MEM_allocsize(void* p);
+extern "C" void MEM_free(void* p);
 extern "C" void fn_803EE310(void* p);
 struct Unk8035EDD8_T {
     int m0;
@@ -267,9 +267,9 @@ void fn_8035EF60() {}
 
 void fn_8035EF64() {}
 
-void fn_8035EF68(U* self, void* p) { fn_803ED664(p); }
+void fn_8035EF68(U* self, void* p) { MEM_allocsize(p); }
 
-void fn_8035EF8C(U* self, void* p) { fn_803EDA0C(p); }
+void fn_8035EF8C(U* self, void* p) { MEM_free(p); }
 
 void fn_8035EFB0(U* self, void* p) { fn_803EE310(p); }
 

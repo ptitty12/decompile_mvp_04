@@ -14,8 +14,8 @@ extern RcObj30* lbl_806AABF4[64];
 extern int lbl_806AABE4[4];
 extern void (*lbl_806EE9E8)(char*);
 
-extern "C" int fn_803EC368(int);
-extern "C" int fn_803ED010(int, int, int, int, int);
+extern "C" int SHAPE_isclut(int);
+extern "C" int GetSwizzledPixelOffset(int, int, int, int, int);
 
 struct RcNode {
     unsigned char tag;
@@ -30,7 +30,7 @@ inline RcNode* RcNext(RcNode* n)
     return r;
 }
 
-extern "C" int fn_803ED188(int, int, int, int, int, int);
+extern "C" int MEM_allocaligna(int, int, int, int, int, int);
 
 struct RcBlk {
     unsigned char tag;
@@ -52,22 +52,22 @@ struct RcBlk {
 };
 
 extern "C" int fn_803EC084(RcBlk*, int, int, int);
-extern "C" unsigned char* fn_803EC1C0(RcBlk*, int, int, int);
-extern "C" int fn_803EC83C(RcBlk*, RcBlk*);
-extern "C" int fn_803ECE48(unsigned char*, volatile unsigned char*, int, int);
-extern "C" int fn_803ECE88(unsigned char*, volatile unsigned char*, int, int);
-extern "C" int fn_803ECEC8(unsigned char*, volatile unsigned char*, int, int);
-extern "C" int fn_803ECF08(unsigned char*, volatile unsigned char*, int, int);
+extern "C" unsigned char* SHAPE_getpixeladr(RcBlk*, int, int, int);
+extern "C" int SHAPE_swizzleat(RcBlk*, RcBlk*);
+extern "C" int SHAPE_swizzle32(unsigned char*, volatile unsigned char*, int, int);
+extern "C" int SHAPE_swizzle16(unsigned char*, volatile unsigned char*, int, int);
+extern "C" int SHAPE_swizzle8(unsigned char*, volatile unsigned char*, int, int);
+extern "C" int SHAPE_swizzle4(unsigned char*, volatile unsigned char*, int, int);
 extern "C" int strlen(const char* s);
 extern "C" int sizerefpack(void*, int*);
 extern "C" int fn_803EC568(unsigned char, short, short, int, int);
-extern "C" RcBlk* fn_803EBF2C(RcBlk*);
+extern "C" RcBlk* SHAPE_clone(RcBlk*);
 
-extern "C" RcNode* fn_803EBF90(RcNode* n)
+extern "C" RcNode* SHAPE_clut(RcNode* n)
 {
     if (n != 0) {
         do {
-            if (fn_803EC368(n->tag) != 0)
+            if (SHAPE_isclut(n->tag) != 0)
                 return n;
             n = RcNext(n);
         } while (n != 0);
@@ -75,7 +75,7 @@ extern "C" RcNode* fn_803EBF90(RcNode* n)
     return 0;
 }
 
-extern "C" char* fn_803EBFF8(RcNode* n)
+extern "C" char* SHAPE_comment(RcNode* n)
 {
     if (n != 0) {
         do {
@@ -92,13 +92,13 @@ extern "C" int fn_803EC03C(RcNode* n)
     return lbl_8062E4A0[n->tag & 0x7f];
 }
 
-extern "C" void fn_803EC054(char* p)
+extern "C" void SHAPE_destroy(char* p)
 {
     *p = 0;
     lbl_806EE9E8(p);
 }
 
-extern "C" char* fn_803EC324(RcNode* n)
+extern "C" char* SHAPE_hotspots(RcNode* n)
 {
     if (n != 0) {
         do {
@@ -110,7 +110,7 @@ extern "C" char* fn_803EC324(RcNode* n)
     return 0;
 }
 
-extern "C" int fn_803EC368(int c)
+extern "C" int SHAPE_isclut(int c)
 {
     int r = 0;
     switch (c) {
@@ -134,7 +134,7 @@ extern "C" int fn_803EC368(int c)
     return r;
 }
 
-extern "C" char* fn_803EC3D4(RcNode* n)
+extern "C" char* SHAPE_longname(RcNode* n)
 {
     if (n != 0) {
         do {
@@ -146,7 +146,7 @@ extern "C" char* fn_803EC3D4(RcNode* n)
     return 0;
 }
 
-extern "C" unsigned fn_803EC418(RcBlk* t, int x, int y, int lvl)
+extern "C" unsigned SHAPE_readpixel(RcBlk* t, int x, int y, int lvl)
 {
     unsigned r = 0;
     if (x >= 0 && x < t->m4.s.s4 && y >= 0 && y < t->m4.s.s6 && lvl >= 0 && lvl <= (int)((t->mC >> 12) & 0xf)) {
@@ -250,7 +250,7 @@ extern "C" int fn_803EC568(unsigned char tag, short w, short h, int levels, int 
     return total;
 }
 
-extern "C" int fn_803EC6F8(RcBlk* n)
+extern "C" int SHAPE_size(RcBlk* n)
 {
     int r = 0;
     switch ((unsigned)n->tag) {
@@ -295,7 +295,7 @@ extern "C" int* fn_803EC814(RcArr* a, int i, int* out)
     return out;
 }
 
-extern "C" int fn_803EC83C(RcBlk* dst, RcBlk* src)
+extern "C" int SHAPE_swizzleat(RcBlk* dst, RcBlk* src)
 {
     int i = 0;
     int ok = 1;
@@ -303,21 +303,21 @@ extern "C" int fn_803EC83C(RcBlk* dst, RcBlk* src)
     int h = src->m4.s.s6;
     int n = ((src->mC >> 12) & 0xf) + 1;
     while (i < n && ok != 0) {
-        unsigned char* a = fn_803EC1C0(src, 0, 0, i);
-        unsigned char* b = fn_803EC1C0(dst, 0, 0, i);
+        unsigned char* a = SHAPE_getpixeladr(src, 0, 0, i);
+        unsigned char* b = SHAPE_getpixeladr(dst, 0, 0, i);
         switch (fn_803EC03C((RcNode*)src)) {
         case 4:
-            fn_803ECF08(b, a, w, h);
+            SHAPE_swizzle4(b, a, w, h);
             break;
         case 8:
-            fn_803ECEC8(b, a, w, h);
+            SHAPE_swizzle8(b, a, w, h);
             break;
         case 0xf:
         case 0x10:
-            fn_803ECE88(b, a, w, h);
+            SHAPE_swizzle16(b, a, w, h);
             break;
         case 0x20:
-            fn_803ECE48(b, a, w, h);
+            SHAPE_swizzle32(b, a, w, h);
             break;
         default:
             ok = 0;
@@ -331,15 +331,15 @@ extern "C" int fn_803EC83C(RcBlk* dst, RcBlk* src)
     return ok;
 }
 
-extern "C" RcBlk* fn_803EC984(RcBlk* x)
+extern "C" RcBlk* SHAPE_swizzle(RcBlk* x)
 {
-    RcBlk* p = fn_803EBF2C(x);
+    RcBlk* p = SHAPE_clone(x);
     if (p != 0 && (p->mC & 0x20000000) == 0)
-        fn_803EC83C(p, x);
+        SHAPE_swizzleat(p, x);
     return p;
 }
 
-extern "C" int fn_803EC9D4(int c)
+extern "C" int SHAPE_type(int c)
 {
     int r = 0;
     switch (c) {
@@ -367,7 +367,7 @@ extern "C" int fn_803EC9D4(int c)
     return r;
 }
 
-extern "C" void fn_803ECA70(RcBlk* t, int x, int y, int lvl, unsigned val)
+extern "C" void SHAPE_writepixel(RcBlk* t, int x, int y, int lvl, unsigned val)
 {
     if (x < 0 || x >= t->m4.s.s4 || y < 0 || y >= t->m4.s.s6 || lvl < 0 || lvl > (int)((t->mC >> 12) & 0xf))
         return;
@@ -410,7 +410,7 @@ extern "C" void fn_803ECA70(RcBlk* t, int x, int y, int lvl, unsigned val)
     }
 }
 
-extern "C" void fn_803ECBD0(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
+extern "C" void GC_swizzle32(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
 {
     int tpr = (w + 3) >> 2;
     w = w << 2;
@@ -425,7 +425,7 @@ extern "C" void fn_803ECBD0(volatile unsigned char* src, int w, int h, int pitch
     }
 }
 
-extern "C" void fn_803ECC78(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
+extern "C" void GC_swizzle16(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
 {
     int tpr = (w + 3) >> 2;
     w = w + w;
@@ -440,7 +440,7 @@ extern "C" void fn_803ECC78(volatile unsigned char* src, int w, int h, int pitch
     }
 }
 
-extern "C" void fn_803ECD10(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
+extern "C" void GC_swizzle8(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
 {
     int tpr = (w + 7) >> 3;
     int y, x;
@@ -454,7 +454,7 @@ extern "C" void fn_803ECD10(volatile unsigned char* src, int w, int h, int pitch
     }
 }
 
-extern "C" void fn_803ECDA4(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
+extern "C" void GC_swizzle4(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
 {
     int tpr = (w + 7) >> 3;
     w = (w + 1) / 2;
@@ -469,27 +469,27 @@ extern "C" void fn_803ECDA4(volatile unsigned char* src, int w, int h, int pitch
     }
 }
 
-extern "C" int fn_803ECE48(unsigned char* dst, volatile unsigned char* src, int w, int h)
+extern "C" int SHAPE_swizzle32(unsigned char* dst, volatile unsigned char* src, int w, int h)
 {
-    fn_803ECBD0(src, w, h, (w << 5) >> 3, dst);
+    GC_swizzle32(src, w, h, (w << 5) >> 3, dst);
     return 1;
 }
 
-extern "C" int fn_803ECE88(unsigned char* dst, volatile unsigned char* src, int w, int h)
+extern "C" int SHAPE_swizzle16(unsigned char* dst, volatile unsigned char* src, int w, int h)
 {
-    fn_803ECC78(src, w, h, (w << 4) >> 3, dst);
+    GC_swizzle16(src, w, h, (w << 4) >> 3, dst);
     return 1;
 }
 
-extern "C" int fn_803ECEC8(unsigned char* dst, volatile unsigned char* src, int w, int h)
+extern "C" int SHAPE_swizzle8(unsigned char* dst, volatile unsigned char* src, int w, int h)
 {
-    fn_803ECD10(src, w, h, (w << 3) >> 3, dst);
+    GC_swizzle8(src, w, h, (w << 3) >> 3, dst);
     return 1;
 }
 
-extern "C" int fn_803ECF08(unsigned char* dst, volatile unsigned char* src, int w, int h)
+extern "C" int SHAPE_swizzle4(unsigned char* dst, volatile unsigned char* src, int w, int h)
 {
-    fn_803ECDA4(src, w, h, ((w << 2) + 7) >> 3, dst);
+    GC_swizzle4(src, w, h, ((w << 2) + 7) >> 3, dst);
     return 1;
 }
 
@@ -513,7 +513,7 @@ extern "C" int fn_803ECFA0(int w, int h)
     return (((w + 7) >> 3) * ((h + 7) >> 3)) << 5;
 }
 
-extern "C" int fn_803ECFBC(int k)
+extern "C" int SHAPE_cluttype(int k)
 {
     int r = 0;
     switch (k) {
@@ -536,17 +536,17 @@ extern "C" int fn_803ECFBC(int k)
     return r;
 }
 
-extern "C" int fn_803ED0B0(int x, int y, int w);
+extern "C" int GC_swizzleGetPixelOffset32(int x, int y, int w);
 extern "C" int fn_803ED0E0(int x, int y, int w);
-extern "C" int fn_803ED110(int x, int y, int w);
-extern "C" int fn_803ED140(int x, int y, int w);
+extern "C" int GC_swizzleGetPixelOffset8(int x, int y, int w);
+extern "C" int GC_swizzleGetPixelOffset4(int x, int y, int w);
 
-extern "C" int fn_803ED010(int x, int y, int w, int h, int bpp)
+extern "C" int GetSwizzledPixelOffset(int x, int y, int w, int h, int bpp)
 {
     int r = 0;
     switch (bpp) {
     case 0x20:
-        r = fn_803ED0B0(x, y, w);
+        r = GC_swizzleGetPixelOffset32(x, y, w);
         break;
     case 0xf:
         r = fn_803ED0E0(x, y, w);
@@ -555,10 +555,10 @@ extern "C" int fn_803ED010(int x, int y, int w, int h, int bpp)
         r = fn_803ED0E0(x, y, w);
         break;
     case 8:
-        r = fn_803ED110(x, y, w);
+        r = GC_swizzleGetPixelOffset8(x, y, w);
         break;
     case 4:
-        r = fn_803ED140(x, y, w);
+        r = GC_swizzleGetPixelOffset4(x, y, w);
         if (x & 1)
             return (r << 3) | 4;
         break;
@@ -566,7 +566,7 @@ extern "C" int fn_803ED010(int x, int y, int w, int h, int bpp)
     return r << 3;
 }
 
-extern "C" int fn_803ED0B0(int x, int y, int w)
+extern "C" int GC_swizzleGetPixelOffset32(int x, int y, int w)
 {
     return ((((y >> 2) * ((w + 3) >> 2) + (x >> 2)) << 6) | (((y & 3) << 3) + ((x & 3) << 1)));
 }
@@ -576,12 +576,12 @@ extern "C" int fn_803ED0E0(int x, int y, int w)
     return ((((y >> 2) * ((w + 3) >> 2) + (x >> 2)) << 5) + (((y & 3) << 3) + ((x & 3) << 1)));
 }
 
-extern "C" int fn_803ED110(int x, int y, int w)
+extern "C" int GC_swizzleGetPixelOffset8(int x, int y, int w)
 {
     return ((((y >> 2) * ((w + 7) >> 3) + (x >> 3)) << 5) + (((y & 3) << 3) + (x & 7)));
 }
 
-extern "C" int fn_803ED140(int x, int y, int w)
+extern "C" int GC_swizzleGetPixelOffset4(int x, int y, int w)
 {
     return ((((y >> 3) * ((w + 7) >> 3) + (x >> 3)) << 5) + (((y & 7) << 2) + ((x >> 1) & 3)));
 }
@@ -593,22 +593,22 @@ extern "C" int fn_803ED170(int a, int idx)
 
 extern "C" int fn_803ED5E0(int a, int b, int c, int d, int e)
 {
-    return fn_803ED188(a, b, c, d, e, 1);
+    return MEM_allocaligna(a, b, c, d, e, 1);
 }
 
 extern "C" int fn_803ED604(int a, int b, int c)
 {
-    return fn_803ED188(a, b, 0, 0, c, 1);
+    return MEM_allocaligna(a, b, 0, 0, c, 1);
 }
 
 extern "C" int fn_803ED634(int a, int b, int c)
 {
-    return fn_803ED188(a, b, 0, 0, c, 0);
+    return MEM_allocaligna(a, b, 0, 0, c, 0);
 }
 
-extern "C" int fn_803ED664(int a)
+extern "C" int MEM_allocsize(int a)
 {
-    return fn_803ED188(0, a, 0, 0, 0, 1);
+    return MEM_allocaligna(0, a, 0, 0, 0, 1);
 }
 
 extern "C" void fn_803ED69C(int a, int b)

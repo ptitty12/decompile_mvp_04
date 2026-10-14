@@ -214,7 +214,7 @@ struct Unk803D5130Obj {
 };
 extern "C" {
 void* fn_803DD7C0(void* o);
-void fn_803EDA0C(void* o);
+void MEM_free(void* o);
 void fn_803DD73C(void* o, int c);
 void fn_803E9744(void* o, int c);
 void fn_803DBD84(void* o, int c);
@@ -234,7 +234,7 @@ extern "C" void fn_803D5130(Unk803D5130Obj* self, int c)
         self->m4 = 0;
     }
     if (self->mC != 0) {
-        fn_803EDA0C(fn_803DD7C0(self->mC));
+        MEM_free(fn_803DD7C0(self->mC));
         if (self->mC != 0)
             fn_803DD73C(self->mC, 3);
         self->mC = 0;

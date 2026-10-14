@@ -29,20 +29,20 @@ struct Unk803B5E44 {
     float m1C[12];
 };
 
-extern "C" int fn_803B5E44(Unk803B5E44* o, int a, float* b, float* c);
-extern "C" int fn_803B6514(Unk803B5E44* o, int a, float* b, float* c);
+extern "C" int SFILTER_hpfFIR8(Unk803B5E44* o, int a, float* b, float* c);
+extern "C" int SFILTER_lpfRC(Unk803B5E44* o, int a, float* b, float* c);
 extern "C" void fn_803B6428(float* p);
-extern "C" int fn_803B66D4(void* o);
-extern "C" int fn_803B9794(void* o);
-extern "C" void fn_803B6C08();
-extern "C" void fn_803B6D0C();
-extern "C" void fn_803B7534();
-extern "C" void fn_803B6E14();
-extern "C" void fn_803B7374();
-extern "C" void fn_803B7010();
-extern "C" void fn_803B7670();
-extern "C" void fn_803B79BC();
-extern "C" void fn_803B7C78();
+extern "C" int SFILTER_rsf(void* o);
+extern "C" int rsflc(void* o);
+extern "C" void SFILTER_unpackfinit();
+extern "C" void SFILTER_unpacklfinit();
+extern "C" void SFILTER_unpackpfinit();
+extern "C" void SFILTER_unpackmtfinit();
+extern "C" void SFILTER_unpackmtpfinit();
+extern "C" void SFILTER_unpackmtlfinit();
+extern "C" void SFILTER_unpackxafinit();
+extern "C" void SFILTER_unpackxalfinit();
+extern "C" void SFILTER_unpackxapfinit();
 extern float lbl_80609BA0;
 extern float lbl_80609BF4;
 extern int lbl_806AA2D4[];
@@ -73,19 +73,19 @@ extern int lbl_806AA884;
 extern int lbl_806AA888;
 extern float lbl_80609B98;
 
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
 extern "C" int fn_803B0360();
 extern "C" void fn_803B0714(int h);
 
-extern "C" int fn_803B5DCC(int unused, int n, float* in, int* out);
+extern "C" int SFILTER_ft24_32(int unused, int n, float* in, int* out);
 
 struct Unk803B5E2C {
     void* m0;
     int m4;
 };
 
-extern "C" void fn_803B6454(float* st, int n, float* in, float* out);
+extern "C" void SNDI_fir8(float* st, int n, float* in, float* out);
 
 struct Unk803B5EC4 {
     void* m0;
@@ -117,8 +117,8 @@ struct Unk803B69AC {
 
 extern "C" int fn_803AB480(int shandle);
 
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
 struct Unk803B0714;
 extern "C" int fn_803B0368(int slot, Unk803B0714* pmem);
 extern "C" int fn_803B0360();
@@ -135,7 +135,7 @@ extern "C" void fn_803B3E18(CHANPUB* pvoice);
 
 /* SNDPKTPLAY_start */
 
-extern "C" int fn_803B4BEC(int voice)
+extern "C" int SNDPKTPLAYI_voicetopackethandle(int voice)
 {
     int i;
     for (i = 0; i < sndgs.sso.set.maxstreams; i++) {
@@ -179,7 +179,7 @@ extern "C" int SNDPKTPLAY_create(void (*preleasefunc)(void*, void*), void (*pfra
     void* pplatformmem;
     int i = 0;
 
-    fn_803A975C();
+    SNDSYS_entercritical();
 
     for (; i < sndgs.sso.set.maxstreams; i++) {
         if (lbl_806AA804[i] == 0) {
@@ -187,13 +187,13 @@ extern "C" int SNDPKTPLAY_create(void (*preleasefunc)(void*, void*), void (*pfra
         }
     }
 
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return -9;
 
 allocated:
     packetinstancehandle = fn_803B0368(i, (Unk803B0714*)pmem);
     if (packetinstancehandle < 0) {
-        fn_803A979C();
+        SNDSYS_leavecritical();
         return -6;
     }
 
@@ -210,7 +210,7 @@ allocated:
     ppchan->shandle = -1;
     lbl_806AA500.ppc[i] = ppchan;
 
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return i;
 }
 
@@ -422,10 +422,10 @@ extern "C" int SNDPKTPLAY_stop(int h)
 
 extern "C" int SNDPKTPLAY_destroy(int h)
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     fn_803B0714(h);
     lbl_806AA500.ppc[h] = 0;
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return 0;
 }
 
@@ -551,7 +551,7 @@ void Snd::Util::ReallocBuf(void** buffer, int* curSize, int newMinSize, int size
     }
 }
 
-extern "C" int fn_803B59A4(int range)
+extern "C" int randrange(int range)
 {
     if (range > 0x10000)
         range = 0x10000;
@@ -577,16 +577,16 @@ extern "C" int fn_803B5A18(SndCopyCallback v)
     return 0;
 }
 
-extern "C" void fn_803B5A28(int n)
+extern "C" void SNDARAM_init(int n)
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     lbl_806AA88C.mC = (Unk806AA88C_Entry*)SNDMEMI_allocz(n * 8);
-    fn_803A979C();
+    SNDSYS_leavecritical();
     lbl_806AA88C.m2 = n;
     lbl_806AA88C.m0 = 0;
 }
 
-extern "C" void fn_803B5A78(unsigned int a, unsigned int b)
+extern "C" void SNDARAM_setpool(unsigned int a, unsigned int b)
 {
     lbl_806AA88C.m8 = (a + b) & ~4;
     if (a <= 0x1f)
@@ -598,17 +598,17 @@ extern "C" void fn_803B5A78(unsigned int a, unsigned int b)
     lbl_806AA88C.m8 = lbl_806AA88C.m8 >> 5;
 }
 
-extern "C" void fn_803B5ACC()
+extern "C" void SNDARAM_restore()
 {
     if (lbl_806AA88C.mC != 0) {
-        fn_803A975C();
+        SNDSYS_entercritical();
         SNDMEMI_free(lbl_806AA88C.mC);
-        fn_803A979C();
+        SNDSYS_leavecritical();
         lbl_806AA88C.mC = 0;
     }
 }
 
-extern "C" void fn_803B5B1C(unsigned int* a, unsigned int* b)
+extern "C" void SNDARAM_constrain(unsigned int* a, unsigned int* b)
 {
     unsigned int x = *a;
     unsigned int lo = lbl_806AA88C.m4;
@@ -621,7 +621,7 @@ extern "C" void fn_803B5B1C(unsigned int* a, unsigned int* b)
 }
 
 /* near-miss (99.3%): 113 insns, same flow, only the loop-body temporaries differ (retail off=r8 arr=r10, ours off=r7 arr=r8); address-form, declaration-order and pointer-vs-indexed variants tried */
-extern "C" int fn_803B5B6C(int size)
+extern "C" int SNDARAM_alloc(int size)
 {
     int sp8, spC;
     int i = 0;
@@ -632,7 +632,7 @@ extern "C" int fn_803B5B6C(int size)
     if (lbl_806AA88C.m0 == 0) {
         sp8 = lbl_806AA88C.m4;
         spC = lbl_806AA88C.m8 - lbl_806AA88C.m4;
-        fn_803B5B1C((unsigned int*)&sp8, (unsigned int*)&spC);
+        SNDARAM_constrain((unsigned int*)&sp8, (unsigned int*)&spC);
         if (size > spC)
             return 0;
         goto insert;
@@ -648,7 +648,7 @@ extern "C" int fn_803B5B6C(int size)
             sp8 = *(int*)(a + po) + *(int*)(a + po + 4);
             spC = *(int*)(a + off) - sp8;
         }
-        fn_803B5B1C((unsigned int*)&sp8, (unsigned int*)&spC);
+        SNDARAM_constrain((unsigned int*)&sp8, (unsigned int*)&spC);
         if (size <= spC) {
             int k;
             for (k = lbl_806AA88C.m0; k > i; k--)
@@ -661,7 +661,7 @@ extern "C" int fn_803B5B6C(int size)
         sp8 = e->m0 + e->m4;
         spC = lbl_806AA88C.m8 - sp8;
     }
-    fn_803B5B1C((unsigned int*)&sp8, (unsigned int*)&spC);
+    SNDARAM_constrain((unsigned int*)&sp8, (unsigned int*)&spC);
     if (size > spC)
         return 0;
 insert:
@@ -672,7 +672,7 @@ insert:
     return sp8 << 5;
 }
 
-extern "C" void fn_803B5D30(unsigned int addr)
+extern "C" void SNDARAM_free(unsigned int addr)
 {
     unsigned int key = addr >> 5;
     int i;
@@ -686,7 +686,7 @@ extern "C" void fn_803B5D30(unsigned int addr)
     }
 }
 
-extern "C" int fn_803B5DCC(int unused, int n, float* in, int* out)
+extern "C" int SFILTER_ft24_32(int unused, int n, float* in, int* out)
 {
     int i;
     for (i = 0; i < n; i++) {
@@ -706,10 +706,10 @@ extern "C" int fn_803B5DCC(int unused, int n, float* in, int* out)
 extern "C" void fn_803B5E2C(Unk803B5E2C* o)
 {
     o->m4 = 0;
-    o->m0 = (void*)fn_803B5DCC;
+    o->m0 = (void*)SFILTER_ft24_32;
 }
 
-extern "C" int fn_803B5E44(Unk803B5E44* o, int a, float* in, float* out)
+extern "C" int SFILTER_hpfFIR8(Unk803B5E44* o, int a, float* in, float* out)
 {
     int n;
     Unk803B5E44_Sub* s = o->m8;
@@ -720,11 +720,11 @@ extern "C" int fn_803B5E44(Unk803B5E44* o, int a, float* in, float* out)
     } else {
         n = a;
     }
-    fn_803B6454(o->m1C, n, in, out);
+    SNDI_fir8(o->m1C, n, in, out);
     return n;
 }
 
-extern "C" int fn_803B5EC4(Unk803B5EC4* o)
+extern "C" int SFILTER_createHPFFIR8(Unk803B5EC4* o)
 {
     o->m8 = 0;
     o->mC = 0;
@@ -732,12 +732,12 @@ extern "C" int fn_803B5EC4(Unk803B5EC4* o)
     o->m14 = 0;
     o->m1B = 0;
     o->m4 = 0;
-    o->m0 = (void*)fn_803B5E44;
+    o->m0 = (void*)SFILTER_hpfFIR8;
     fn_803B6428(o->m1C);
     return 0;
 }
 
-extern "C" void fn_803B5F9C(Unk803B5F9C** head, Unk803B5F9C* n)
+extern "C" void SFILTER_add(Unk803B5F9C** head, Unk803B5F9C* n)
 {
     Unk803B5F9C* cur = *head;
     Unk803B5F9C* prev = 0;
@@ -758,7 +758,7 @@ extern "C" void fn_803B5F9C(Unk803B5F9C** head, Unk803B5F9C* n)
     n->m10 = prev;
 }
 
-extern "C" void fn_803B6004(Unk803B5F9C** head, Unk803B5F9C* n)
+extern "C" void SFILTER_remove(Unk803B5F9C** head, Unk803B5F9C* n)
 {
     Unk803B5F9C* p = *head;
     if (n == p) {
@@ -787,7 +787,7 @@ extern "C" void fn_803B6428(float* p)
     p[7] = z;
 }
 
-extern "C" void fn_803B6454(float* st, int n, float* in, float* out)
+extern "C" void SNDI_fir8(float* st, int n, float* in, float* out)
 {
     int i;
     for (i = 0; i < n; i++) {
@@ -807,7 +807,7 @@ extern "C" void fn_803B6454(float* st, int n, float* in, float* out)
     }
 }
 
-extern "C" int fn_803B6514(Unk803B5E44* o, int n, float* in, float* out)
+extern "C" int SFILTER_lpfRC(Unk803B5E44* o, int n, float* in, float* out)
 {
     Unk803B5E44_Sub* s = o->m8;
     if (s != 0) {
@@ -825,11 +825,11 @@ extern "C" int fn_803B6514(Unk803B5E44* o, int n, float* in, float* out)
 }
 
 /* near-miss: 13-14/16 after 1800 annealed statement orders: retail stores m1B (stb) last, the scheduler hoists it first */
-extern "C" int fn_803B65BC(Unk803B5EC4* o)
+extern "C" int SFILTER_createLPFRC(Unk803B5EC4* o)
 {
     o->m1C[0] = lbl_80609BA0;
     o->m4 = 0;
-    o->m0 = (void*)fn_803B6514;
+    o->m0 = (void*)SFILTER_lpfRC;
     o->m8 = 0;
     o->mC = 0;
     o->m10 = 0;
@@ -843,53 +843,53 @@ extern "C" void fn_803B66CC(Unk803B66CC* p, int v)
     p->m1C = v;
 }
 
-extern "C" void fn_803B69AC(Unk803B69AC* o, int a, int flag)
+extern "C" void SFILTER_rsfinit(Unk803B69AC* o, int a, int flag)
 {
-    o->m0 = (void*)fn_803B66D4;
+    o->m0 = (void*)SFILTER_rsf;
     o->m4 = 0;
     o->m20 = 0;
     o->m28 = 0;
     o->m2A = 0;
     if (flag == 0)
-        o->m24 = (void*)fn_803B9794;
+        o->m24 = (void*)rsflc;
     int i;
     for (i = 0; i < 4; i++)
         o->m2C[i] = lbl_80609BF4;
 }
 
-extern "C" void fn_803B6A08()
+extern "C" void MIXI_initunpack16()
 {
-    lbl_806AA2D4[0x18 / 4] = (int)fn_803B6C08;
+    lbl_806AA2D4[0x18 / 4] = (int)SFILTER_unpackfinit;
     lbl_806AA2D4[0x60 / 4] = 0x2c;
-    lbl_806AA2D4[0x1c / 4] = (int)fn_803B6D0C;
+    lbl_806AA2D4[0x1c / 4] = (int)SFILTER_unpacklfinit;
     lbl_806AA2D4[0x64 / 4] = 0x30;
-    lbl_806AA2D4[0x20 / 4] = (int)fn_803B7534;
+    lbl_806AA2D4[0x20 / 4] = (int)SFILTER_unpackpfinit;
     lbl_806AA2D4[0x68 / 4] = 0x34;
 }
 
-extern "C" void fn_803B6A50()
+extern "C" void MIXI_initunpackmt()
 {
-    lbl_806AA2D4[0x30 / 4] = (int)fn_803B6E14;
+    lbl_806AA2D4[0x30 / 4] = (int)SFILTER_unpackmtfinit;
     lbl_806AA2D4[0x78 / 4] = 0x2c;
-    lbl_806AA2D4[0x38 / 4] = (int)fn_803B7374;
+    lbl_806AA2D4[0x38 / 4] = (int)SFILTER_unpackmtpfinit;
     lbl_806AA2D4[0x80 / 4] = 0x3c;
-    lbl_806AA2D4[0x34 / 4] = (int)fn_803B7010;
+    lbl_806AA2D4[0x34 / 4] = (int)SFILTER_unpackmtlfinit;
     lbl_806AA2D4[0x7c / 4] = 0x30;
     lbl_806AA2D4[0x88 / 4] = 0x30;
     lbl_806AA2D4[0x84 / 4] = 0x2c;
-    lbl_806AA2D4[0x44 / 4] = (int)fn_803B7374;
+    lbl_806AA2D4[0x44 / 4] = (int)SFILTER_unpackmtpfinit;
     lbl_806AA2D4[0x8c / 4] = 0x3c;
-    lbl_806AA2D4[0x40 / 4] = (int)fn_803B7010;
-    lbl_806AA2D4[0x3c / 4] = (int)fn_803B6E14;
+    lbl_806AA2D4[0x40 / 4] = (int)SFILTER_unpackmtlfinit;
+    lbl_806AA2D4[0x3c / 4] = (int)SFILTER_unpackmtfinit;
 }
 
-extern "C" void fn_803B6AB0()
+extern "C" void MIXI_initunpackxa()
 {
-    lbl_806AA2D4[0x24 / 4] = (int)fn_803B7670;
+    lbl_806AA2D4[0x24 / 4] = (int)SFILTER_unpackxafinit;
     lbl_806AA2D4[0x6c / 4] = 0x2c;
     lbl_806AA2D4[0x70 / 4] = 0x54;
-    lbl_806AA2D4[0x28 / 4] = (int)fn_803B79BC;
-    lbl_806AA2D4[0x2c / 4] = (int)fn_803B7C78;
+    lbl_806AA2D4[0x28 / 4] = (int)SFILTER_unpackxalfinit;
+    lbl_806AA2D4[0x2c / 4] = (int)SFILTER_unpackxapfinit;
     lbl_806AA2D4[0x74 / 4] = 0x3c;
 }
 
@@ -899,13 +899,13 @@ struct Unk803B5F18 {
     float m50;
 };
 
-extern "C" void fn_803B6080(void* o, int type);
+extern "C" void calcFIRCoeffs(void* o, int type);
 
-extern "C" void fn_803B5F18(Unk803B5F18* o, int* buf)
+extern "C" void SFILTER_modifyHPFFIR8(Unk803B5F18* o, int* buf)
 {
     float f = (float)(buf[0] >> 7) / (float)(buf[1] >> 8);
     o->m50 = f;
-    fn_803B6080(o->m1C, 3);
+    calcFIRCoeffs(o->m1C, 3);
 }
 
 struct Unk803B65FC {
@@ -914,7 +914,7 @@ struct Unk803B65FC {
     float m24;
 };
 
-extern "C" void fn_803B65FC(Unk803B65FC* o, int* in)
+extern "C" void SFILTER_modifyLPFRC(Unk803B65FC* o, int* in)
 {
     float f = (2.0f * (float)in[0]) / (float)in[1];
     float g = 1.0f - f;

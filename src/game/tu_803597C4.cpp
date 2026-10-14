@@ -249,7 +249,7 @@ void fn_8035A028(char* self, int v)
 extern "C" void fn_8035A09C(char* self, int unused)
 {
     THREAD_waitexit(self + 0x14, 0);
-    fn_803EDA0C(F(int, self, 0x10));
+    MEM_free(F(int, self, 0x10));
     F(int, self, 0x330) = 0;
 }
 
@@ -321,7 +321,7 @@ void fn_8035A214(void* a, int b, Unk8035A214_Opt* p)
     fn_803ED5E0((const void*)v1, b, v2, 0, 0x100);
 }
 
-void fn_8035A28C(void* a, int b) { fn_803EDA0C(b); }
+void fn_8035A28C(void* a, int b) { MEM_free(b); }
 
 int fn_8035A2B0() { return 0; }
 

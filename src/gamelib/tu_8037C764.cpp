@@ -204,7 +204,7 @@ struct Unk8037DAD0 {
 extern "C" {
 int fn_80401904(void* h);
 int fn_804017B0(void* h, void* buf);
-void fn_803EDA0C(void* h);
+void MEM_free(void* h);
 void fn_8037D2B0(void* tbl, void* data, int size);
 char* strcat(char* dst, const char* src);
 char* strcpy(char* dst, const char* src);
@@ -407,7 +407,7 @@ extern "C" int fn_8037CA4C(void* selfv, const char* name, void* fieldv, int id)
             fn_8037D2B0(*field, data, size);
         if (self->m18 != 0 && data != 0)
             fn_80377488(data);
-        fn_803EDA0C(h);
+        MEM_free(h);
     }
     return 1;
 }

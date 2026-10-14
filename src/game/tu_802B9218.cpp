@@ -23,13 +23,13 @@ extern int lbl_8061EAD8;
 extern int lbl_8061EADC;
 extern Unk8068B4F8 lbl_8068B4F8;
 
-extern "C" void fn_803EDA0C(int p);
+extern "C" void MEM_free(int p);
 Unk8000E618* fn_8000E65C();
 void* fn_8040B190(void* dst, const void* src, ...);
-extern "C" void fn_803ED95C(int a);
-extern "C" void fn_803ED8EC(int a);
+extern "C" void MEMCLASS_purge(int a);
+extern "C" void MEMCLASS_remove(int a);
 extern "C" int fn_803ED9D4();
-extern "C" int fn_803ED720(int a, const char* b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern "C" int MEMCLASS_create(int a, const char* b, int c, int d, int e, int f, int g, int h, int i, int j);
 extern const char lbl_805E10B8[];
 extern const char lbl_805E0F5C[];
 extern const char lbl_805E0F68[];
@@ -40,14 +40,14 @@ extern "C" int unpacksizez(int a);
 extern "C" int fn_803ED604(const char* name, int a, int b);
 extern "C" int fn_803EE310(int a);
 extern "C" void MEM_copy(int a, int b, int n);
-extern "C" int fn_803FBD28(int a, int b, int c);
+extern "C" int FILE_loadat(int a, int b, int c);
 extern "C" int fn_803FB954(int a);
-extern "C" int fn_803FB9E8(int a);
+extern "C" int FILE_size(int a);
 extern "C" int fn_803FBF10(int a, int b);
 extern "C" int fn_803FC190(int a, int b);
 extern "C" int fn_803FC2E0(int a, int b, int c);
 extern "C" int fn_803FC034(int a);
-extern "C" int fn_803FB64C(int a, int b, int c);
+extern "C" int ASYNCFILE_loadat(int a, int b, int c);
 void fn_802B9EFC(Unk8068B4F8* p, int v);
 void* fn_802B9CCC(int a, int* b, int c);
 void fn_802B9ED4(int a);
@@ -63,19 +63,19 @@ int fn_8000446C(int a, int b);
 extern "C" int fn_804017B0(int a, int b);
 extern "C" int fn_80401904(int a);
 extern "C" void DCStoreRange(void* p, int n);
-extern "C" int fn_803EBFF8(void* p);
-extern "C" int fn_803EC3D4(void* p);
+extern "C" int SHAPE_comment(void* p);
+extern "C" int SHAPE_longname(void* p);
 void fn_8040B61C(void* dst, int src);
 int fn_803EBD14(void* a, int b);
-void* fn_803EBF90(void* p);
+void* SHAPE_clut(void* p);
 int fn_8040B574(const char* a, const char* b);
 void fn_802B0638(int a, void* b, int c);
-extern "C" int fn_803EC418(void* a, int x, int y, int z);
-extern "C" void fn_803ECA70(void* a, int x, int y, int z, unsigned v);
+extern "C" int SHAPE_readpixel(void* a, int x, int y, int z);
+extern "C" void SHAPE_writepixel(void* a, int x, int y, int z, unsigned v);
 
 void fn_802B9218()
 {
-    fn_803EDA0C(lbl_8061EAE0);
+    MEM_free(lbl_8061EAE0);
     lbl_8061EAE0 = 0;
 }
 
@@ -85,7 +85,7 @@ int fn_802B9250(int a, int b, int c)
     int tries = 1;
     do {
         fn_802B9EFC(&lbl_8068B4F8, 0);
-        r = fn_803FBD28(a, b, c);
+        r = FILE_loadat(a, b, c);
     } while (lbl_8068B4F8.Get() != 0 && --tries > 0);
     if (lbl_8068B4F8.Get() != 0) {
         fn_802B9ED4(a);
@@ -230,17 +230,17 @@ extern "C" void fn_802B961C(const char* p, int x)
             break;
         }
     case 2:
-        fn_803EDA0C(obj);
+        MEM_free(obj);
         break;
     case 3:
-        fn_803EDA0C(obj);
+        MEM_free(obj);
         break;
     }
 }
 
 int fn_802B96A4(int a, int b, int c)
 {
-    return fn_803FB64C(a, b, c);
+    return ASYNCFILE_loadat(a, b, c);
 }
 
 int fn_802B96C4(int a)
@@ -264,7 +264,7 @@ int fn_802B9764(int a)
     int tries = 1;
     do {
         fn_802B9EFC(&lbl_8068B4F8, 0);
-        r = fn_803FB9E8(a);
+        r = FILE_size(a);
     } while (lbl_8068B4F8.Get() != 0 && --tries > 0);
     if (lbl_8068B4F8.Get() != 0) {
         fn_802B9ED4(a);
@@ -510,13 +510,13 @@ void fn_802B9FF0(void* a, Unk802B9FF0_Hdr* b)
         for (int n = cnt; n != 0; n--) {
             char* e = (char*)b + *pp;
             pp += 2;
-            void* tex = (void*)fn_803EBD14(a, fn_803EC3D4(e));
+            void* tex = (void*)fn_803EBD14(a, SHAPE_longname(e));
             int w = *(short*)(e + 4);
             int h = *(short*)(e + 6);
-            Unk802B9FF0_Pal* pal = (Unk802B9FF0_Pal*)fn_803EBF90(e);
+            Unk802B9FF0_Pal* pal = (Unk802B9FF0_Pal*)SHAPE_clut(e);
             for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {
-                    int idx = fn_803EC418(e, x, y, 0);
+                    int idx = SHAPE_readpixel(e, x, y, 0);
                     unsigned short* tab;
                     if (pal->mC & 0x10000000) {
                         tab = (unsigned short*)((char*)pal + pal->m10);
@@ -524,8 +524,8 @@ void fn_802B9FF0(void* a, Unk802B9FF0_Hdr* b)
                         tab = (unsigned short*)((char*)pal + 0x10);
                     }
                     unsigned c = fn_802B9FA8(tab[idx]) & 0xFFFFFF;
-                    unsigned o = fn_803EC418(tex, x, y, 0) & 0xFF000000;
-                    fn_803ECA70(tex, x, y, 0, c | o);
+                    unsigned o = SHAPE_readpixel(tex, x, y, 0) & 0xFF000000;
+                    SHAPE_writepixel(tex, x, y, 0, c | o);
                 }
             }
         }
@@ -544,14 +544,14 @@ void fn_802BA110(void* a, Unk802BA110_Src* b)
 
 void fn_802BA194(Unk802B9F40* p, Unk802B9FF0_Hdr* h)
 {
-    if (fn_803EBFF8((char*)h + h->m14) == 0) {
+    if (SHAPE_comment((char*)h + h->m14) == 0) {
         int n = h->m8;
         int i;
         if (n > 0) {
             char* d = (char*)p + 0x12;
             int* s = &h->m14;
             for (i = n; i != 0; i--) {
-                fn_8040B61C(d, fn_803EC3D4((char*)h + *s));
+                fn_8040B61C(d, SHAPE_longname((char*)h + *s));
                 s += 2;
                 d += 5;
             }
@@ -1215,13 +1215,13 @@ void fn_802BB400(Unk802BB1E4_Obj*, Unk802BB1E4_Obj* o)
     int h = fn_803ED9D4();
     o->m8 = h;
     int hi = o->m4;
-    o->mC = fn_803ED720(h, lbl_805E10B8, o->m0 + 0x10, hi - 0x20, 0x20, 0x20, 0, 0, 0, 1);
+    o->mC = MEMCLASS_create(h, lbl_805E10B8, o->m0 + 0x10, hi - 0x20, 0x20, 0x20, 0, 0, 0, 1);
 }
 
 void fn_802BB474(Unk802BB1E4_Obj*, Unk802BB1E4_Obj* o)
 {
-    fn_803ED95C(o->m8);
-    fn_803ED8EC(o->m8);
+    MEMCLASS_purge(o->m8);
+    MEMCLASS_remove(o->m8);
     o->m8 = 0;
     o->mC = 0;
 }

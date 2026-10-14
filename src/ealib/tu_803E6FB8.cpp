@@ -26,7 +26,7 @@ extern "C" void fn_803E9E30(void* p, int a);
 extern "C" void fn_803EA160(void* p, int a, int b);
 extern "C" void* fn_803E9F50(void* p, int a, int* count);
 extern "C" void fn_803EA08C(void* p);
-extern "C" void fn_803EDA0C(void* menu, int a);
+extern "C" void MEM_free(void* menu, int a);
 
 struct Unk803E9994_Ent {
     int m0;
@@ -56,7 +56,7 @@ extern "C" void fn_803E6FB8(void* a, void* b)
 
 extern "C" void fn_803E6FE8(void* self, int a)
 {
-    fn_803EDA0C(self, a);
+    MEM_free(self, a);
 }
 
 extern "C" void fn_803E7008(Unk803E7008_Pair* p, int chrg)
@@ -437,7 +437,7 @@ extern "C" int fn_803E910C(Unk803E910C_Obj* o, const char* key2, const char* key
 }
 
 /* near-miss: 3 slots; the bound t->m10 is loaded into r6 (ours r0) and the entry address is ents + i*16 in the other operand order */
-extern "C" int fn_803E945C(Unk803E945C_T* t, const char* name)
+extern "C" int dlsym(Unk803E945C_T* t, const char* name)
 {
     const char* p = name;
     Unk803E945C_Ent* ents = t->m14;

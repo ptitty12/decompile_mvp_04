@@ -55,7 +55,7 @@ extern "C" void* memcpy(void*, const void*, unsigned);
 extern "C" McObjB* iSPCH_FindEvent(int*);
 extern "C" int fn_80392B80(int);
 extern "C" int iSPCH_AddEvent(int*);
-extern "C" void fn_80392BC0(int);
+extern "C" void iSPCH_MemFree(int);
 
 struct McCfg2 {
     int m0;
@@ -411,7 +411,7 @@ extern "C" void iSPCH_CsisCb(void* src, int key)
             buf[0] = sp;
             ((McMemcpyV)memcpy)(buf + 1, src, sz);
             if (iSPCH_AddEvent(buf) == 0)
-                fn_80392BC0((int)buf);
+                iSPCH_MemFree((int)buf);
         }
     }
 }

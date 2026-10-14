@@ -42,7 +42,7 @@ struct RcMap {
     int m8;
 };
 
-/* evidence: fn_803FCCCC (handle -> object 'MRTS'), fn_803FCDCC/CE50/CF1C (node lists at +0x68..+0x74), fn_803FDBC4 (map at +0x28/+0x2C) */
+/* evidence: validatehandle (handle -> object 'MRTS'), getfreerequest/CE50/CF1C (node lists at +0x68..+0x74), STREAM_setfilter (map at +0x28/+0x2C) */
 struct RcFile {
     int m0;
     char m4[0x24];
@@ -79,20 +79,20 @@ struct RcBuf14 {
 };
 extern RcBuf14 lbl_806ADE8C;
 extern void (*lbl_806ADE94[3])(int);
-extern "C" int fn_803FBC34(int, int*, int);
+extern "C" int FILE_loadsizez(int, int*, int);
 extern "C" int unpackz(void*, void*);
 extern "C" void DCFlushRange(void*, int);
 extern "C" void MEM_copy(void*, void*, int);
 extern "C" int fn_803FBF54(int, RcCtx*);
 extern "C" int FILESYS_atomic(int (*)(int, RcCtx*), int, int, RcArgs*);
-extern "C" void fn_803FBD78(int, char*, int);
+extern "C" void FILE_loadatz(int, char*, int);
 extern "C" void unpacksizez(char*);
-extern "C" int fn_803FC064(int, int);
+extern "C" int FILE_loadpackz(int, int);
 extern "C" int fn_803FC1B0(int, char*, int);
 extern "C" int fn_803FC798(int, int, int, int, int, int, int);
 extern "C" int fn_803FCCAC(int, int, int, int, int, int, int);
 extern "C" int fn_803FC438(int, int);
-extern "C" int fn_803FCCCC(RcHnd*, RcFile**, RcHnd**);
+extern "C" int validatehandle(RcHnd*, RcFile**, RcHnd**);
 
 extern int lbl_806EF478;
 extern "C" int fn_80400828(void*);
@@ -105,7 +105,7 @@ extern "C" int FILESYS_close(int, int, RcFile*);
 extern "C" int FILESYS_completeop(int);
 extern "C" int FILESYS_open(void*, int, int, void*);
 extern "C" void FILESYS_callbackop(int, void (*)(int, int, RcFile*));
-extern "C" void fn_803FD5F8(RcFile*, int);
+extern "C" void restartstream(RcFile*, int);
 
 struct RcMapTab {
     char pad[0x28];
@@ -113,13 +113,13 @@ struct RcMapTab {
     int m2C;
 };
 
-extern "C" void fn_803FE418(int);
+extern "C" void STREAM_kill(int);
 extern "C" int THREAD_iscurrent(int);
 extern "C" void fn_80400CE4(int);
 extern "C" void THREAD_yield(int);
 extern "C" void fn_804007FC(void*);
 extern "C" void fn_803FEC9C(int, int);
-extern "C" void fn_803FDDEC(int, int);
+extern "C" void STREAM_setgreedystate(int, int);
 
 extern "C" int fn_803FEBDC(int, int, int, int*);
 extern "C" int fn_803FEC74(int, int, int, int, int);
@@ -139,12 +139,12 @@ struct FsReqC {
 extern "C" void fn_803FEA38(int h, int k, FsReqC* r);
 
 extern "C" char* strncpy(char*, const char*, unsigned);
-extern "C" void fn_803FD494(RcFile*, int);
-extern "C" RcNd* fn_803FCDCC(RcFile*);
-extern "C" void fn_803FCE50(RcFile*, RcNd*);
+extern "C" void startnextrequest(RcFile*, int);
+extern "C" RcNd* getfreerequest(RcFile*);
+extern "C" void queuerequest(RcFile*, RcNd*);
 #define RCI(p, off) (*(int*)((char*)(p) + (off)))
 
-extern "C" int fn_803FD010(RcFile*);
+extern "C" int parsechunks(RcFile*);
 
 extern "C" int fn_803FBF54(int n, RcCtx* ctx)
 {
@@ -171,15 +171,15 @@ extern "C" int fn_803FBFE0(int a, int b, int c)
 extern "C" void fn_803FC034(int a)
 {
     char buf[0x80];
-    fn_803FBD78(a, buf, 0x80);
+    FILE_loadatz(a, buf, 0x80);
     unpacksizez(buf);
 }
 
 /* near-miss: 2 slots; retail moves r3 (src) before r4 (len) for the DCFlushRange call; return-type toggles of the neighbouring callees did not change it */
-extern "C" int fn_803FC064(int a, int b)
+extern "C" int FILE_loadpackz(int a, int b)
 {
     int sz;
-    char* src = (char*)fn_803FBC34(a, &sz, b);
+    char* src = (char*)FILE_loadsizez(a, &sz, b);
     if (src == 0)
         return 0;
     int len = ((int (*)(char*))unpacksizez)(src);
@@ -206,7 +206,7 @@ extern "C" int fn_803FC064(int a, int b)
 
 extern "C" void fn_803FC190(int a, int b)
 {
-    fn_803FC064(a, b);
+    FILE_loadpackz(a, b);
 }
 
 extern "C" void fn_803FC2E0(int a, char* b, int c)
@@ -323,7 +323,7 @@ extern "C" int fn_803FC610(const unsigned char* p)
     return r;
 }
 
-extern "C" int fn_803FC698(const unsigned char* base, int* pa, int* pb)
+extern "C" int BIG_debuginfo(const unsigned char* base, int* pa, int* pb)
 {
     int r = 0;
     const unsigned char* e = base + fn_803FC610(base);
@@ -355,7 +355,7 @@ extern "C" int fn_803FCCAC(int a, int b, int c, int d, int e, int f, int g)
     return fn_803FC798(a, b, c, d, e, f, g);
 }
 
-extern "C" int fn_803FCCCC(RcHnd* h, RcFile** o1, RcHnd** o2)
+extern "C" int validatehandle(RcHnd* h, RcFile** o1, RcHnd** o2)
 {
     if (h == 0)
         return 1;
@@ -367,7 +367,7 @@ extern "C" int fn_803FCCCC(RcHnd* h, RcFile** o1, RcHnd** o2)
     return 0;
 }
 
-extern "C" int fn_803FCD0C(unsigned x, unsigned a, unsigned b)
+extern "C" int inbetween(unsigned x, unsigned a, unsigned b)
 {
     if (x <= a) {
         return b >= x && b < a;
@@ -375,7 +375,7 @@ extern "C" int fn_803FCD0C(unsigned x, unsigned a, unsigned b)
     return b >= x || b < a;
 }
 
-extern "C" void fn_803FCD4C(RcFile* o, int n)
+extern "C" void decbufferusage(RcFile* o, int n)
 {
     fn_80400828(o->m4);
     int old = o->m58;
@@ -389,7 +389,7 @@ extern "C" void fn_803FCD4C(RcFile* o, int n)
     }
 }
 
-extern "C" RcNd* fn_803FCDCC(RcFile* o)
+extern "C" RcNd* getfreerequest(RcFile* o)
 {
     RcNd* r = 0;
     fn_80400828(o->m4);
@@ -406,7 +406,7 @@ extern "C" RcNd* fn_803FCDCC(RcFile* o)
     return r;
 }
 
-extern "C" void fn_803FCE50(RcFile* o, RcNd* n)
+extern "C" void queuerequest(RcFile* o, RcNd* n)
 {
     n->m4 = 1;
     n->mC = 0;
@@ -425,7 +425,7 @@ extern "C" void fn_803FCE50(RcFile* o, RcNd* n)
     fn_8040084C(o->m4);
 }
 
-extern "C" RcSlot* fn_803FCECC(RcTab* t, int k)
+extern "C" RcSlot* locaterequest__FP15STREAMHEADERtagi(RcTab* t, int k)
 {
     int idx = k & 0xff;
     if (idx >= t->m24)
@@ -440,7 +440,7 @@ extern "C" RcSlot* fn_803FCECC(RcTab* t, int k)
     return 0;
 }
 
-extern "C" void fn_803FCF1C(RcFile* o, RcNd* n)
+extern "C" void freerequest(RcFile* o, RcNd* n)
 {
     if (n == o->m68)
         o->m68 = n->mC;
@@ -462,7 +462,7 @@ extern "C" void fn_803FCF1C(RcFile* o, RcNd* n)
 }
 
 /* near-miss: 1 slot; retail loads t->m28 after the count test and copies the bound (mr r11,r8) */
-extern "C" int fn_803FCF9C(RcMapTab* t, const unsigned char* p)
+extern "C" int filterchunk(RcMapTab* t, const unsigned char* p)
 {
     int k = (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
     int i;
@@ -475,24 +475,24 @@ extern "C" int fn_803FCF9C(RcMapTab* t, const unsigned char* p)
     return -2;
 }
 
-extern "C" void fn_803FD2F4(int a, int b, RcFile* o)
+extern "C" void opencallback(int a, int b, RcFile* o)
 {
     int t = FILESYS_completeop(*(int*)((char*)o + 0x180));
     *(int*)((char*)o + 0x178) = t;
     if (t != 0)
-        fn_803FD5F8(o, o->m4C);
+        restartstream(o, o->m4C);
 }
 
-extern "C" void fn_803FD33C(int a, int b, RcFile* o)
+extern "C" void closecallback(int a, int b, RcFile* o)
 {
     FILESYS_completeop(o->m180);
     int h = FILESYS_open((char*)o + 0x78, 1, o->m4C, o);
     o->m180 = h;
     if (h != 0)
-        FILESYS_callbackop(h, fn_803FD2F4);
+        FILESYS_callbackop(h, opencallback);
 }
 
-extern "C" void fn_803FD398(int, int, RcFile* f)
+extern "C" void readcallback(int, int, RcFile* f)
 {
     RcNd* p = f->m6C;
     int amt;
@@ -507,22 +507,22 @@ extern "C" void fn_803FD398(int, int, RcFile* f)
     }
     f->m17C += amt;
     RCI(f, 0x64) += amt;
-    r = fn_803FD010(f);
+    r = parsechunks(f);
     if (p->m4 == 4) {
-        fn_803FD494(f, f->m4C);
+        startnextrequest(f, f->m4C);
     } else if (flag != 0 || r != 0) {
         fn_80400828(f->m4);
         if (p->m4 != 4)
             p->m4 = 3;
         fn_8040084C(f->m4);
-        fn_803FD494(f, f->m4C);
+        startnextrequest(f, f->m4C);
     } else {
-        fn_803FD5F8(f, f->m4C - 1);
+        restartstream(f, f->m4C - 1);
     }
 }
 
 /* near-miss: 96.5%; callee-saved registers rotated (retail: a=r27 job=r28 cr=r29 empty=r30; ours a=r28 job=r29 cr=r30 empty=r27) */
-extern "C" void fn_803FD494(RcFile* o, int a)
+extern "C" void startnextrequest(RcFile* o, int a)
 {
     char* job = 0;
     fn_80400828(o->m4);
@@ -562,17 +562,17 @@ extern "C" void fn_803FD494(RcFile* o, int a)
                     int hd = FILESYS_open((char*)o + 0x78, 1, a, o);
                     o->m180 = hd;
                     if (hd != 0)
-                        FILESYS_callbackop(hd, fn_803FD2F4);
+                        FILESYS_callbackop(hd, opencallback);
                 } else {
                     int hd = FILESYS_close(k, a, o);
                     o->m180 = hd;
                     if (hd != 0)
-                        FILESYS_callbackop(hd, fn_803FD33C);
+                        FILESYS_callbackop(hd, closecallback);
                 }
                 return;
             }
         }
-        fn_803FD5F8(o, a);
+        restartstream(o, a);
     }
 }
 
@@ -585,11 +585,11 @@ extern "C" int fn_803FD944(int a, int b, int c)
     return t3 + t1 + t2 + 0x20;
 }
 
-extern "C" void fn_803FDBC4(int h, int a, int b, int c, int d)
+extern "C" void STREAM_setfilter(int h, int a, int b, int c, int d)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC((RcHnd*)h, &o, &p) == 0) {
+    if (validatehandle((RcHnd*)h, &o, &p) == 0) {
         if (a > 0) {
             RcFile* q = o;
             if (a <= o->m2C) {
@@ -612,12 +612,12 @@ extern "C" void fn_803FDBC4(int h, int a, int b, int c, int d)
     }
 }
 
-extern "C" void fn_803FDC80(int h)
+extern "C" void STREAM_destroy(int h)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC((RcHnd*)h, &o, &p) == 0) {
-        fn_803FE418(h);
+    if (validatehandle((RcHnd*)h, &o, &p) == 0) {
+        STREAM_kill(h);
         while (o->m44 == 1) {
             if (THREAD_iscurrent(0) != 0)
                 fn_80400CE4(0);
@@ -630,65 +630,65 @@ extern "C" void fn_803FDC80(int h)
     }
 }
 
-extern "C" void fn_803FDD28(RcHnd* h, int a, int b)
+extern "C" void STREAM_setpriority(RcHnd* h, int a, int b)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC(h, &o, &p) == 0) {
+    if (validatehandle(h, &o, &p) == 0) {
         o->m48 = a;
         o->m4C = b;
     }
 }
 
-extern "C" void fn_803FDD78(int h, int v)
+extern "C" void STREAM_setgreedylevel(int h, int v)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC((RcHnd*)h, &o, &p) == 0) {
+    if (validatehandle((RcHnd*)h, &o, &p) == 0) {
         int old = o->m50;
         o->m50 = v;
         int a = o->m58 < v;
         int b = o->m58 < old;
         if (b != a)
-            fn_803FDDEC(h, a);
+            STREAM_setgreedystate(h, a);
     }
 }
 
-extern "C" void fn_803FDDEC(int h, int flag)
+extern "C" void STREAM_setgreedystate(int h, int flag)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC((RcHnd*)h, &o, &p) == 0) {
+    if (validatehandle((RcHnd*)h, &o, &p) == 0) {
         o->m54 = flag;
         if (flag != 0 && o->m44 == 1)
             FILESYS_priorityop(o->m180, o->m4C);
     }
 }
 
-extern "C" char* fn_803FDE54(int h, int n)
+extern "C" char* STREAM_taphandle(int h, int n)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC((RcHnd*)h, &o, &p) != 0 || n <= 0 || n > o->m34)
+    if (validatehandle((RcHnd*)h, &o, &p) != 0 || n <= 0 || n > o->m34)
         return 0;
     return o->m30 + (n * 16 - 16);
 }
 
-extern "C" int fn_803FDEC0(RcHnd* h, const char* name, int a, int b)
+extern "C" int STREAM_queuefile(RcHnd* h, const char* name, int a, int b)
 {
     RcFile* o;
     RcHnd* p;
-    int err = fn_803FCCCC(h, &o, &p);
+    int err = validatehandle(h, &o, &p);
     if (err != 0)
         return 0;
-    RcNd* n = fn_803FCDCC(o);
+    RcNd* n = getfreerequest(o);
     if (n == 0)
         return 0;
     RCI(n, 0x10) = err;
     strncpy((char*)n + 0x14, name, 0xfe);
     RCI(n, 0x118) = a;
     RCI(n, 0x11c) = b;
-    fn_803FCE50(o, n);
+    queuerequest(o, n);
     fn_80400828(o->m4);
     int was = o->m44;
     if (was == 0)
@@ -696,9 +696,9 @@ extern "C" int fn_803FDEC0(RcHnd* h, const char* name, int a, int b)
     fn_8040084C(o->m4);
     if (was == 0) {
         if (o->m54 != 0)
-            fn_803FD494(o, o->m4C);
+            startnextrequest(o, o->m4C);
         else
-            fn_803FD494(o, o->m48);
+            startnextrequest(o, o->m48);
     }
     return n->m0;
 }
@@ -708,13 +708,13 @@ struct RcHndV {
     unsigned char* mC;
 };
 /* near-miss: 2 slots; the loop-back compare value is r0 in retail (or r0,r9,r10; cmpw r0,r28), r9 here */
-extern "C" int fn_803FDFB4(RcHnd* h, unsigned char* data, int len, int tag)
+extern "C" int STREAM_queuemem(RcHnd* h, unsigned char* data, int len, int tag)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC(h, &o, &p) != 0)
+    if (validatehandle(h, &o, &p) != 0)
         return 0;
-    RcNd* n = fn_803FCDCC(o);
+    RcNd* n = getfreerequest(o);
     if (n == 0)
         return 0;
     if (len == 0) {
@@ -734,18 +734,18 @@ extern "C" int fn_803FDFB4(RcHnd* h, unsigned char* data, int len, int tag)
     RCI(n, 0x118) = len;
     RCI(n, 0x11c) = tag;
     RCI(n, 0x10) = 1;
-    fn_803FCE50(o, n);
+    queuerequest(o, n);
     fn_80400828(o->m4);
     int was = o->m44;
     if (was == 0)
         o->m44 = 1;
     fn_8040084C(o->m4);
     if (was == 0)
-        fn_803FD494(o, 0);
+        startnextrequest(o, 0);
     return n->m0;
 }
 
-extern "C" void fn_803FCF1C(RcFile*, RcNd*);
+extern "C" void freerequest(RcFile*, RcNd*);
 struct RcFileV {
     char pad0[0x30];
     char* m30;
@@ -763,7 +763,7 @@ struct RcFileV {
     RcNd* m6C;
     RcNd* m70;
 };
-extern "C" void fn_803FE154(int, int);
+extern "C" void STREAM_cancelrequest(int, int);
 struct RcSlotV {
     int m0, m4, m8;
     RcSlotV* mC;
@@ -773,10 +773,10 @@ struct RcSlotV {
 struct RcMapE {
     int m0, m4, m8, mC;
 };
-extern "C" unsigned char* fn_803FE660(RcHnd*);
-extern "C" void fn_803FE7E0(RcHnd*, char*);
-/* near-miss: 99.3%; retail keeps lo/cur in r22/r26 (ours swapped) and holds the fn_803FE660 result in r31 across the handle reload */
-extern "C" void fn_803FE154(int h, int key)
+extern "C" unsigned char* STREAM_get(RcHnd*);
+extern "C" void STREAM_release(RcHnd*, char*);
+/* near-miss: 99.3%; retail keeps lo/cur in r22/r26 (ours swapped) and holds the STREAM_get result in r31 across the handle reload */
+extern "C" void STREAM_cancelrequest(int h, int key)
 {
     RcFileV* o;
     RcMapE* e;
@@ -784,14 +784,14 @@ extern "C" void fn_803FE154(int h, int key)
     char* cur = 0;
     char* hi = 0;
     int skip;
-    if (fn_803FCCCC((RcHnd*)h, (RcFile**)&o, (RcHnd**)&e) == 0) {
+    if (validatehandle((RcHnd*)h, (RcFile**)&o, (RcHnd**)&e) == 0) {
         fn_80400828(o->pad0 + 4);
-        RcSlotV* nd = (RcSlotV*)fn_803FCECC((RcTab*)o, key);
+        RcSlotV* nd = (RcSlotV*)locaterequest__FP15STREAMHEADERtagi((RcTab*)o, key);
         if (nd == 0 || nd->m4 == 4)
             skip = 1;
         else if (nd->m4 == 1) {
             skip = 1;
-            fn_803FCF1C((RcFile*)o, (RcNd*)nd);
+            freerequest((RcFile*)o, (RcNd*)nd);
         } else {
             nd->m4 = 4;
             lo = (char*)((int*)o)[0x5c / 4];
@@ -811,7 +811,7 @@ extern "C" void fn_803FE154(int h, int key)
             for (i = 0; i < o->m34; i++) {
                 e = (RcMapE*)(o->m30 + i * 0x10);
                 if (e->m8 > 0) {
-                    if (fn_803FCD0C((unsigned)lo, (unsigned)cur, e->mC) != 0) {
+                    if (inbetween((unsigned)lo, (unsigned)cur, e->mC) != 0) {
                         char* q = cur;
                         int tag = e->m4 << 24;
                         if (cur != hi) {
@@ -826,7 +826,7 @@ extern "C" void fn_803FE154(int h, int key)
                                         fn_80400828(o->pad0 + 4);
                                         e->m8 = e->m8 - sz;
                                         fn_8040084C(o->pad0 + 4);
-                                        fn_803FCD4C((RcFile*)o, sz);
+                                        decbufferusage((RcFile*)o, sz);
                                         q[0] = -2;
                                         q[1] = -1;
                                         q[2] = -1;
@@ -841,13 +841,13 @@ extern "C" void fn_803FE154(int h, int key)
                             } while (q != hi);
                         }
                     } else {
-                        if (fn_803FCD0C((unsigned)cur, (unsigned)hi, e->mC) != 0) {
+                        if (inbetween((unsigned)cur, (unsigned)hi, e->mC) != 0) {
                             do {
-                                char* hh = (char*)fn_803FE660((RcHnd*)e);
-                                fn_803FE7E0((RcHnd*)e, hh);
+                                char* hh = (char*)STREAM_get((RcHnd*)e);
+                                STREAM_release((RcHnd*)e, hh);
                                 if (e->m8 <= 0)
                                     break;
-                            } while (fn_803FCD0C((unsigned)cur, (unsigned)hi, e->mC) != 0);
+                            } while (inbetween((unsigned)cur, (unsigned)hi, e->mC) != 0);
                         }
                     }
                 }
@@ -857,25 +857,25 @@ extern "C" void fn_803FE154(int h, int key)
 }
 
 /* near-miss: 96.0%; retail reuses the reloaded handle (r3 / r8) across the loop bodies, ours reloads it from the stack in each body */
-extern "C" void fn_803FE418(int h)
+extern "C" void STREAM_kill(int h)
 {
     RcFileV* o;
     RcHnd* p;
     unsigned sz = 0;
-    if (fn_803FCCCC((RcHnd*)h, (RcFile**)&o, &p) == 0) {
+    if (validatehandle((RcHnd*)h, (RcFile**)&o, &p) == 0) {
         RcNd* nd = o->m70;
         if (nd != 0) {
             while ((unsigned)(nd->m4 - 1) <= 1) {
-                fn_803FE154(h, nd->m0);
+                STREAM_cancelrequest(h, nd->m0);
                 nd = o->m70;
             }
             while (o->m68 != o->m6C)
-                fn_803FCF1C((RcFile*)o, o->m68);
+                freerequest((RcFile*)o, o->m68);
             o->m6C->m4 = 4;
             int i;
             for (i = 0; i < o->m34; i++)
                 RCI(o->m30, i * 0x10 + 8) = 0;
-            fn_803FCD4C((RcFile*)o, o->m58);
+            decbufferusage((RcFile*)o, o->m58);
             char* q = o->m5C;
             if (q != o->m60) {
                 do {
@@ -920,11 +920,11 @@ extern "C" void fn_803FE418(int h)
 }
 
 /* near-miss: 2 slots; retail schedules slwi before the mr r4,r9 copy of the handle in the first loop test */
-extern "C" unsigned char* fn_803FE660(RcHnd* hnd)
+extern "C" unsigned char* STREAM_get(RcHnd* hnd)
 {
     RcFile* o;
     RcHndV* h;
-    if (fn_803FCCCC(hnd, &o, (RcHnd**)&h) != 0)
+    if (validatehandle(hnd, &o, (RcHnd**)&h) != 0)
         return 0;
     {
         if (h->m8 == 0)
@@ -960,18 +960,18 @@ extern "C" unsigned char* fn_803FE660(RcHnd* hnd)
     }
 }
 
-extern "C" void fn_803FE7E0(RcHnd* h, char* p)
+extern "C" void STREAM_release(RcHnd* h, char* p)
 {
     RcFile* o;
     RcHnd* hh;
-    if (fn_803FCCCC(h, &o, &hh) == 0 && (unsigned)p >= (unsigned)o->pad3C && (unsigned)p <= (unsigned)(o->m40 - 8)
+    if (validatehandle(h, &o, &hh) == 0 && (unsigned)p >= (unsigned)o->pad3C && (unsigned)p <= (unsigned)(o->m40 - 8)
         && (((unsigned char)p[3] << 24) | ((unsigned char)p[2] << 16) | ((unsigned char)p[1] << 8) | (unsigned char)p[0]) != -2) {
         p[0] = -2;
         const unsigned char* t = (unsigned char*)p + 4;
         p[1] = -1;
         p[2] = -1;
         p[3] = -1;
-        fn_803FCD4C(o, (t[3] << 24) | (t[2] << 16) | (t[1] << 8) | (unsigned char)p[4]);
+        decbufferusage(o, (t[3] << 24) | (t[2] << 16) | (t[1] << 8) | (unsigned char)p[4]);
         fn_80400828(o->m4);
         int v = o->m44;
         if (v == 2)
@@ -979,9 +979,9 @@ extern "C" void fn_803FE7E0(RcHnd* h, char* p)
         fn_8040084C(o->m4);
         if (v == 2) {
             if (o->m54 != 0)
-                fn_803FD5F8(o, o->m4C);
+                restartstream(o, o->m4C);
             else
-                fn_803FD5F8(o, o->m48);
+                restartstream(o, o->m48);
         }
     }
 }
@@ -991,7 +991,7 @@ extern "C" int fn_803FE914(RcHnd* h)
     RcFile* o;
     RcHnd* p;
     int r;
-    if (fn_803FCCCC(h, &o, &p) == 0)
+    if (validatehandle(h, &o, &p) == 0)
         r = p->m8;
     else
         r = 0;
@@ -1003,18 +1003,18 @@ extern "C" int fn_803FE954(RcHnd* h)
     RcFile* o;
     RcHnd* p;
     int r;
-    if (fn_803FCCCC(h, &o, &p) == 0)
+    if (validatehandle(h, &o, &p) == 0)
         r = o->m44;
     else
         r = 0;
     return r;
 }
 
-extern "C" int fn_803FE994(RcHnd* h)
+extern "C" int STREAM_isendofstream(RcHnd* h)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC(h, &o, &p) != 0)
+    if (validatehandle(h, &o, &p) != 0)
         return 0;
     int r = 0;
     if (o->m44 == 0)
@@ -1022,11 +1022,11 @@ extern "C" int fn_803FE994(RcHnd* h)
     return r;
 }
 
-extern "C" int fn_803FE9F0(RcHnd* h)
+extern "C" int STREAM_buffersize(RcHnd* h)
 {
     RcFile* o;
     RcHnd* p;
-    if (fn_803FCCCC(h, &o, &p) != 0)
+    if (validatehandle(h, &o, &p) != 0)
         return 0;
     return o->m40 - o->m38;
 }

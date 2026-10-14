@@ -145,7 +145,7 @@ void fn_80377408(void* p);
 void fn_8030ACCC(void* p);
 void fn_8030AD10(void* p, int a, int b, int c, int d);
 void fn_803DD73C(int h, int k);
-void fn_803EDA0C(int h);
+void MEM_free(int h);
 void fn_803063E8();
 void fn_803063C4();
 int fn_80306438();
@@ -535,7 +535,7 @@ int fn_80306438()
     if (lbl_8061F970 != 0) {
         fn_803DD73C(lbl_8061F970, 3);
         lbl_8061F970 = 0;
-        fn_803EDA0C(lbl_8061F974);
+        MEM_free(lbl_8061F974);
         lbl_8061F974 = 0;
     }
     fn_803063E8();

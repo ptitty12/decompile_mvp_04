@@ -128,7 +128,7 @@ int fn_802AF624(void* a, void* b, int c);
 extern "C" void* fn_803ED604(void* a, int b, void* c);
 extern "C" void* fn_803DD628(void* a, void* b);
 extern "C" void fn_803DD73C(void* a, int b);
-extern "C" void* fn_803EDA0C(void* a);
+extern "C" void* MEM_free(void* a);
 unsigned int fn_80378568(const char* s, int n);
 int fn_80377E90(void* t, int* a, int* b, unsigned int h);
 int fn_802AFB88(Mgr* m);
@@ -834,7 +834,7 @@ void* fn_802AFC3C(void* p)
 {
     if (p != 0)
         fn_803DD73C(p, 2);
-    return fn_803EDA0C(p);
+    return MEM_free(p);
 }
 
 /* near-miss: retail keeps only m+0x10000 in a register and re-forms every table address per use (no cached table pointers) */
@@ -1058,11 +1058,11 @@ struct Unk802B09CC_Obj {
     short m6;
 };
 extern "C" int fn_80377F00(void* t, int* a, int* b, int key, int c);
-void* fn_803EBF90(void* p);
-extern "C" void fn_803ECA70(void* a, int x, int y, int z, int v);
+void* SHAPE_clut(void* p);
+extern "C" void SHAPE_writepixel(void* a, int x, int y, int z, int v);
 extern "C" int fn_8014DD30(void* p);
 extern "C" void fn_803DDA68(void* a, void* b);
-extern "C" int fn_803EC6F8(void* p);
+extern "C" int SHAPE_size(void* p);
 extern "C" void DCStoreRange(void* a, int b);
 
 struct Unk802B9F40;
@@ -1172,17 +1172,17 @@ extern "C" void fn_802B09CC(void* mem, const char* name, int base, int n, int pp
     char* t = (char*)m + 0x10000;
     if (fn_80377F00(t - 0x580, &a, &b, key, 0) != 0) {
         Unk802B09CC_Ent* e0 = (Unk802B09CC_Ent*)((char*)m + 0x402C);
-        Unk802B09CC_Obj* o = (Unk802B09CC_Obj*)fn_803EBF90((void*)e0[a].m0);
+        Unk802B09CC_Obj* o = (Unk802B09CC_Obj*)SHAPE_clut((void*)e0[a].m0);
         if (o != 0 && o->m6 == 1) {
             for (int i = 0; i < n; i++) {
                 int v = fn_8014DD30(p);
                 p += 0x10;
-                fn_803ECA70(o, base + i, 0, 0, v);
+                SHAPE_writepixel(o, base + i, 0, 0, v);
             }
             Unk802B09CC_Ent* e1 = (Unk802B09CC_Ent*)((char*)m + 0x4030);
             void** tb = (void**)(t - 0x1C28);
             fn_803DDA68(tb[e1[a].m0], o);
-            DCStoreRange(o, fn_803EC6F8(o));
+            DCStoreRange(o, SHAPE_size(o));
         }
     }
 }

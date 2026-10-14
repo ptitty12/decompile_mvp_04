@@ -109,7 +109,7 @@ extern "C" void* fn_802B9300(const char* name, int a, int b, int c);
 void* fn_802B98AC(const char* name, int a);
 extern "C" int fn_803FED48(const char* name, int a, int b, void* c);
 extern "C" void fn_803FEDB8(void* p, int a);
-extern "C" void fn_803EDA0C(void* p);
+extern "C" void MEM_free(void* p);
 int fn_8040B574(const char* a, const char* b);
 void fn_802AEBF0(void* a, const char* s);
 void fn_802AEBCC(void* a, const char* s);
@@ -125,7 +125,7 @@ extern "C" void* fn_8018466C(char* buf, void* a);
 extern "C" void* fn_8014EB44(void* x);
 extern "C" void fn_8014EBEC(void* x, char* buf);
 struct Unk802B8388_O;
-extern "C" Unk802B8388_O* fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" Unk802B8388_O* SHAPE_create(int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" void* fn_803DD628(void* a, void* b);
 void fn_802B832C(Mgr* m);
 void* fn_8037C7FC();
@@ -147,11 +147,11 @@ extern "C" void fn_803DDA8C(void* a, void* b);
 int fn_803D81FC();
 int fn_803D817C();
 extern "C" int fn_803EC03C(void* im);
-extern "C" int fn_803EC9D4(int f);
+extern "C" int SHAPE_type(int f);
 extern "C" void fn_803D9E70(void* o, int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" void fn_803D9ECC(void* o, void* img, int a, int b, int c);
 
-extern "C" void* fn_803EC324(void* a);
+extern "C" void* SHAPE_hotspots(void* a);
 int fn_8040B750(const char* a, const char* b, int n);
 }
 
@@ -310,7 +310,7 @@ int fn_802B54F4(Unk802B54F4_Hdr* self)
             if (t != 0) {
                 fn_803EC814(self, i, name);
                 if (fn_8040B750(name, tag, 4) == 0) {
-                    int* q = (int*)fn_803EC324(t);
+                    int* q = (int*)SHAPE_hotspots(t);
                     int n = q[-1];
                     int j;
                     extra = n / 2;
@@ -728,7 +728,7 @@ void fn_802B832C(Mgr* m)
         *(void**)((char*)m + 0x18718) = 0;
     }
     if (*(void**)((char*)m + 0x1871C) != 0) {
-        fn_803EDA0C(*(void**)((char*)m + 0x1871C));
+        MEM_free(*(void**)((char*)m + 0x1871C));
         *(void**)((char*)m + 0x1871C) = 0;
     }
 }
@@ -737,7 +737,7 @@ void fn_802B8388(Mgr* m)
 {
     char* b = (char*)m + 0x20000;
     fn_802B832C(m);
-    Unk802B8388_O* o = fn_803EBBA4(0x100, 0x100, 0x20, 0, 0, 0x100, 0, 0);
+    Unk802B8388_O* o = SHAPE_create(0x100, 0x100, 0x20, 0, 0, 0x100, 0, 0);
     *(Unk802B8388_O**)(b - 0x78E4) = o;
     if (o != 0) {
         o->mC |= 0x20000000;
@@ -773,7 +773,7 @@ void fn_802B8418(Mgr* m)
         short* im = *(short**)(b - 0x78E4);
         int w = im[2];
         int h = im[3];
-        int fmt = fn_803EC9D4(fn_803EC03C(im)) & 0xF;
+        int fmt = SHAPE_type(fn_803EC03C(im)) & 0xF;
         float x;
         float y;
         o->s3(&x, &y);
@@ -928,7 +928,7 @@ void fn_802B8B34()
 void fn_802B8BBC()
 {
     if (lbl_8061EAB4 != 0) {
-        fn_803EDA0C(lbl_8061EAB4);
+        MEM_free(lbl_8061EAB4);
         lbl_8061EAB4 = 0;
     }
 }
@@ -948,7 +948,7 @@ void fn_802B8BFC()
 void fn_802B8C84()
 {
     if (lbl_8061EAB8 != 0) {
-        fn_803EDA0C(lbl_8061EAB8);
+        MEM_free(lbl_8061EAB8);
         lbl_8061EAB8 = 0;
     }
 }
@@ -972,7 +972,7 @@ void fn_802B8CCC()
 void fn_802B8D34()
 {
     if (lbl_8061EABC != 0) {
-        fn_803EDA0C(lbl_8061EABC);
+        MEM_free(lbl_8061EABC);
         lbl_8061EABC = 0;
     }
 }
@@ -988,7 +988,7 @@ void fn_802B8D74()
 void fn_802B8DDC()
 {
     if (lbl_8061EAC0 != 0) {
-        fn_803EDA0C(lbl_8061EAC0);
+        MEM_free(lbl_8061EAC0);
         lbl_8061EAC0 = 0;
     }
 }
@@ -1004,7 +1004,7 @@ void fn_802B8E1C()
 void fn_802B8E84()
 {
     if (lbl_8061EAC4 != 0) {
-        fn_803EDA0C(lbl_8061EAC4);
+        MEM_free(lbl_8061EAC4);
         lbl_8061EAC4 = 0;
     }
 }
@@ -1020,7 +1020,7 @@ void fn_802B8EC4()
 void fn_802B8F2C()
 {
     if (lbl_8061EAC8 != 0) {
-        fn_803EDA0C(lbl_8061EAC8);
+        MEM_free(lbl_8061EAC8);
         lbl_8061EAC8 = 0;
     }
 }
@@ -1036,7 +1036,7 @@ void fn_802B8F6C(const char* name)
 void fn_802B8FC0()
 {
     if (lbl_8061EACC != 0) {
-        fn_803EDA0C(lbl_8061EACC);
+        MEM_free(lbl_8061EACC);
         lbl_8061EACC = 0;
     }
 }
@@ -1068,7 +1068,7 @@ void fn_802B9098(const char* name)
 void fn_802B90EC()
 {
     if (lbl_8061EAD8 != 0) {
-        fn_803EDA0C(lbl_8061EAD8);
+        MEM_free(lbl_8061EAD8);
         lbl_8061EAD8 = 0;
     }
 }
@@ -1084,7 +1084,7 @@ void fn_802B912C(const char* name)
 void fn_802B9180()
 {
     if (lbl_8061EADC != 0) {
-        fn_803EDA0C(lbl_8061EADC);
+        MEM_free(lbl_8061EADC);
         lbl_8061EADC = 0;
     }
 }

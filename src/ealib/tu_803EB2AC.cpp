@@ -18,16 +18,16 @@ extern int lbl_8062C76C[];
 
 extern "C" void REAL_removeexit(void (*cb)());
 extern "C" void MEM_copy(int* a, int* b, int c);
-extern "C" void fn_803EB330(void* p);
-extern "C" void fn_803EB560(void);
+extern "C" void FONT_destroy(void* p);
+extern "C" void FONT_restore(void);
 extern "C" void SYSTEM_addexit(void (*cb)());
-extern "C" void* fn_803EB2EC(void* self);
+extern "C" void* FONT_create(void* self);
 extern char lbl_8062C7A0[];
-extern "C" int fn_803EC9D4(int c);
+extern "C" int SHAPE_type(int c);
 extern "C" int fn_803EC03C(char* p);
 
 /* binary search over `n` records of `size` bytes whose first halfword is the key */
-extern "C" void* fn_803EB2AC(int key, char* base, int n, int size)
+extern "C" void* FONT_bsearch(int key, char* base, int n, int size)
 {
     while (n != 0) {
         int off = (n >> 1) * size;
@@ -45,21 +45,21 @@ extern "C" void* fn_803EB2AC(int key, char* base, int n, int size)
     return 0;
 }
 
-extern "C" void* fn_803EB2EC(void* self)
+extern "C" void* FONT_create(void* self)
 {
     if (lbl_806EE9D8->mC)
         lbl_806EE9D8->mC();
     return self;
 }
 
-extern "C" void fn_803EB330(void* p)
+extern "C" void FONT_destroy(void* p)
 {
     if (lbl_806EE9D8->m10)
         lbl_806EE9D8->m10();
 }
 
 /* swaps the case of an ASCII or Latin-1 letter, 0 for anything else */
-extern "C" int fn_803EB364(int c)
+extern "C" int FONT_switchcase(int c)
 {
     if ((unsigned)(c - 0x41) <= 0x19)
         return c + 0x20;
@@ -116,7 +116,7 @@ typedef va_list_tag va_list[1];
 
 extern "C" int vsprintf(char* buf, const char* fmt, va_list ap);
 
-extern "C" void fn_803EB454(int obj, float f1, float f2, const char* fmt, ...)
+extern "C" void FONT_drawtextfa(int obj, float f1, float f2, const char* fmt, ...)
 {
     va_list ap;
     char buf[0x2000];
@@ -131,7 +131,7 @@ extern "C" void fn_803EB520(Unk803EB2AC_Hooks* h)
     lbl_806EE9D8 = h;
 }
 
-extern "C" void fn_803EB528(int* p)
+extern "C" void FONT_installdriverextensions(int* p)
 {
     MEM_copy(lbl_8062C76C, p, *p);
 }
@@ -141,20 +141,20 @@ extern "C" int fn_803EB558(char* p)
     return *(int*)(p + 0x24);
 }
 
-extern "C" void fn_803EB560(void)
+extern "C" void FONT_restore(void)
 {
     if (lbl_806EE9DC) {
-        fn_803EB330(lbl_806EE9DC);
+        FONT_destroy(lbl_806EE9DC);
         lbl_806EE9DC = 0;
-        REAL_removeexit(fn_803EB560);
+        REAL_removeexit(FONT_restore);
     }
 }
 
-extern "C" void fn_803EB5A0(void)
+extern "C" void FONT_init(void)
 {
     if (lbl_806EE9DC == 0) {
-        lbl_806EE9DC = fn_803EB2EC(lbl_8062C7A0);
-        SYSTEM_addexit(fn_803EB560);
+        lbl_806EE9DC = FONT_create(lbl_8062C7A0);
+        SYSTEM_addexit(FONT_restore);
     }
 }
 
@@ -167,7 +167,7 @@ struct Unk803EB5E4_Rec {
 
 /* near-miss (flags): both functions are exact at -O2 -fno-strength-reduce (0 slots, probed with the unit's other
  * flags); with the configured flags the loop gets strength-reduced and 12 / 14 slots differ. */
-extern "C" Unk803EB5E4_Rec* fn_803EB5E4(int n, Unk803EB5E4_Rec* tbl, int key)
+extern "C" Unk803EB5E4_Rec* FONT_findkern16(int n, Unk803EB5E4_Rec* tbl, int key)
 {
     for (int i = 0; i < n; i++) {
         if (tbl[i].m0 == key)
@@ -176,7 +176,7 @@ extern "C" Unk803EB5E4_Rec* fn_803EB5E4(int n, Unk803EB5E4_Rec* tbl, int key)
     return 0;
 }
 
-extern "C" Unk803EB5E4_Rec* fn_803EB61C(int n, Unk803EB5E4_Rec* tbl, int key, int flag)
+extern "C" Unk803EB5E4_Rec* FONT_findkern12(int n, Unk803EB5E4_Rec* tbl, int key, int flag)
 {
     for (int i = 0; i < n; i++) {
         if (tbl[i].m0 == key && tbl[i].m3 == flag)
@@ -199,16 +199,16 @@ struct Unk803EB660_Tbl {
     int m18;
 };
 
-extern "C" int fn_803EB660(Unk803EB660_Tbl* t, Unk803EB660_Entry* e, int key)
+extern "C" int FONT_getkern(Unk803EB660_Tbl* t, Unk803EB660_Entry* e, int key)
 {
     signed char r = 0;
     if (e->mB) {
         Unk803EB5E4_Rec* f;
         if (t->mC & 0x40000) {
-            f = fn_803EB5E4(e->mB, (Unk803EB5E4_Rec*)((char*)t + t->m18 + (e->mC * 4 + 4)), key);
+            f = FONT_findkern16(e->mB, (Unk803EB5E4_Rec*)((char*)t + t->m18 + (e->mC * 4 + 4)), key);
         } else {
             int off = t->m18;
-            f = fn_803EB61C(*(int*)((char*)t + off), (Unk803EB5E4_Rec*)((char*)t + off + 4), key, e->m0);
+            f = FONT_findkern12(*(int*)((char*)t + off), (Unk803EB5E4_Rec*)((char*)t + off + 4), key, e->m0);
         }
         if (f)
             r = f->m2;
@@ -220,22 +220,22 @@ extern "C" void fn_803EB6F4(void)
 {
 }
 
-extern "C" int fn_803EB6F8(int c)
+extern "C" int SHAPE_bpctobpp(int c)
 {
     if (c == 0)
         c = 0x20;
-    char ch = fn_803EC9D4(c);
+    char ch = SHAPE_type(c);
     return fn_803EC03C(&ch);
 }
 
-extern "C" int fn_803EB730(int w, int h, int fmt, int lvl)
+extern "C" int SHAPE_imagesize(int w, int h, int fmt, int lvl)
 {
-    int k = fn_803EB6F8(fmt);
+    int k = SHAPE_bpctobpp(fmt);
     int total = 0;
     int bpp = 0x10;
     if (k != 0xf)
         bpp = k;
-    if ((unsigned)(w - 1) > 0xffff || h <= 0 || h > 0x10000 || w * h > 1000000000 || fn_803EC9D4(k) == 0)
+    if ((unsigned)(w - 1) > 0xffff || h <= 0 || h > 0x10000 || w * h > 1000000000 || SHAPE_type(k) == 0)
         return 0;
     int i;
     for (i = 0; i <= lvl; i++) {
@@ -266,10 +266,10 @@ extern "C" int fn_803EB83C(int k)
     }
 }
 
-extern "C" int fn_803EB864(int a, int b, int c, int d, int e, int f, int g)
+extern "C" int SHAPE_createsize(int a, int b, int c, int d, int e, int f, int g)
 {
-    int k = fn_803EB6F8(c);
-    int sz = fn_803EB730(a, b, c, e);
+    int k = SHAPE_bpctobpp(c);
+    int sz = SHAPE_imagesize(a, b, c, e);
     sz += 0x10;
     if (k <= 8 && d != 0) {
         if (d == 0xf)
@@ -288,19 +288,19 @@ extern "C" int fn_803EB864(int a, int b, int c, int d, int e, int f, int g)
 
 extern char lbl_8060DBF8[];
 extern "C" int sprintf(char*, const char*, ...);
-extern "C" void fn_803EB940(int r, int a, int b, int c, int d, int e, int g, int h);
+extern "C" void SHAPE_createat(int r, int a, int b, int c, int d, int e, int g, int h);
 extern int (*lbl_806EE9E4)(int a, int b, int c, int d, int e);
 
-extern "C" int fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h)
+extern "C" int SHAPE_create(int a, int b, int c, int d, int e, int f, int g, int h)
 {
     int r = 0;
-    int sz = fn_803EB864(a, b, c, d, e, g, h);
+    int sz = SHAPE_createsize(a, b, c, d, e, g, h);
     if (sz != 0) {
         char buf[16];
         sprintf(buf, lbl_8060DBF8, a, b, c);
         r = lbl_806EE9E4((int)buf, sz, 0, 0x10, f);
         if (r != 0)
-            fn_803EB940(r, a, b, c, d, e, g, h);
+            SHAPE_createat(r, a, b, c, d, e, g, h);
     }
     return r;
 }
@@ -315,18 +315,18 @@ struct Unk803EBC70_Tbl {
     Unk803EBC70_Ent e[1];
 };
 
-extern "C" int fn_803EC3D4(int x);
+extern "C" int SHAPE_longname(int x);
 extern "C" void fn_803EC814(Unk803EBC70_Tbl* t, int i, char* out);
 extern "C" int strcmp(const char*, const char*);
 
-/* near-miss (flags): exact at -O2 -fno-strength-reduce (see fn_803EB5E4); with the configured flags the loop is strength-reduced */
+/* near-miss (flags): exact at -O2 -fno-strength-reduce (see FONT_findkern16); with the configured flags the loop is strength-reduced */
 extern "C" char* fn_803EBC70(Unk803EBC70_Tbl* t, int name)
 {
     int i;
     int n = t->m8;
     for (i = 0; i < n; i++) {
         char buf[8];
-        char* s = (char*)fn_803EC3D4((int)((char*)t + *(int*)((char*)t + i * 8 + 0x14)));
+        char* s = (char*)SHAPE_longname((int)((char*)t + *(int*)((char*)t + i * 8 + 0x14)));
         if (s == 0) {
             buf[4] = 0;
             fn_803EC814(t, i, buf);
@@ -343,10 +343,10 @@ extern "C" void fn_803EBD14(Unk803EBC70_Tbl* self, int a)
     fn_803EBC70(self, a);
 }
 
-extern "C" int fn_803EBD34(int x);
-extern "C" void fn_803EBDF4(int r, int x);
-extern "C" int fn_803EC368(int c);
-extern "C" int fn_803EC6F8(unsigned char* n);
+extern "C" int SHAPE_clonesize(int x);
+extern "C" void SHAPE_cloneat(int r, int x);
+extern "C" int SHAPE_isclut(int c);
+extern "C" int SHAPE_size(unsigned char* n);
 
 struct Unk803EBDF4_Nd {
     unsigned tag : 8;
@@ -367,7 +367,7 @@ inline unsigned char* Unk803EBD34_Next(unsigned char* n)
     return r;
 }
 
-extern "C" int fn_803EBD34(int x)
+extern "C" int SHAPE_clonesize(int x)
 {
     unsigned char* n = (unsigned char*)x;
     int r = 0;
@@ -376,9 +376,9 @@ extern "C" int fn_803EBD34(int x)
     if (n != 0) {
         int k = a32 - 0x10;
         do {
-            int sz = fn_803EC6F8(n);
+            int sz = SHAPE_size(n);
             if (r != 0) {
-                if (fn_803EC368(*n) != 0)
+                if (SHAPE_isclut(*n) != 0)
                     r = (((r - a32) + 0x2f) & ~0x1f) + k;
                 else
                     r = (((r - a16) + 0xf) & ~0xf) + a16;
@@ -390,7 +390,7 @@ extern "C" int fn_803EBD34(int x)
     return r;
 }
 
-extern "C" void fn_803EBDF4(int dst, int x)
+extern "C" void SHAPE_cloneat(int dst, int x)
 {
     Unk803EBDF4_Nd* n = (Unk803EBDF4_Nd*)x;
     int a32 = (((int)n + 0x1f) & ~0x1f) - (int)n;
@@ -400,9 +400,9 @@ extern "C" void fn_803EBDF4(int dst, int x)
     if (n != 0) {
         int k = a32 - 0x10;
         do {
-            int sz = fn_803EC6F8((unsigned char*)n);
+            int sz = SHAPE_size((unsigned char*)n);
             if (pos != 0) {
-                if (fn_803EC368(n->tag) != 0)
+                if (SHAPE_isclut(n->tag) != 0)
                     pos = (((pos - a32) + 0x2f) & ~0x1f) + k;
                 else
                     pos = (((pos - a16) + 0xf) & ~0xf) + a16;
@@ -423,12 +423,12 @@ extern "C" void fn_803EBDF4(int dst, int x)
     }
 }
 
-extern "C" int fn_803EC3D4(int x);
+extern "C" int SHAPE_longname(int x);
 
-extern "C" int fn_803EBF2C(int x)
+extern "C" int SHAPE_clone(int x)
 {
-    int a = fn_803EBD34(x);
-    int r = lbl_806EE9E4(fn_803EC3D4(x), a, 0, 0x10, 0x400);
-    fn_803EBDF4(r, x);
+    int a = SHAPE_clonesize(x);
+    int r = lbl_806EE9E4(SHAPE_longname(x), a, 0, 0x10, 0x400);
+    SHAPE_cloneat(r, x);
     return r;
 }

@@ -27,7 +27,7 @@ extern "C" int strcmp(const char* a, const char* b);
 extern "C" char* strcpy(char* d, const char* s);
 extern "C" void fn_803EA1E0(Unk803EA068* o);
 extern "C" void fn_803E9C20(void* o, const char* s, void* v);
-extern "C" void fn_803EABA8();
+extern "C" void RenderSingleDrawTexture();
 extern "C" void* fn_803DA440(void* self, void (*fn)(), void* a, void* b, void* c);
 
 /* Open-addressing string hash table: m0 = live entries, m4 = slot count, m8 = slot array. An entry is the value
@@ -453,7 +453,7 @@ extern "C" void fn_803EA500(Unk803E3C08* a, Unk80623E94* b)
 extern "C" void fn_803EAEC4(int initialize, int priority)
 {
     if (priority == 0xFFFF && initialize)
-        fn_803DA440(lbl_806AABD0, fn_803EABA8, lbl_8062C688, lbl_8062C6A8, lbl_8060DAA8);
+        fn_803DA440(lbl_806AABD0, RenderSingleDrawTexture, lbl_8062C688, lbl_8062C6A8, lbl_8060DAA8);
 }
 
 extern "C" void fn_803EAF24()

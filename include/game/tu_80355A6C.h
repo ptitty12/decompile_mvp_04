@@ -413,7 +413,7 @@ extern "C" void fn_8037936C(void*, void*);
 extern "C" void fn_8037B424(void*, int);
 extern "C" void fn_803DF74C(void*);
 extern "C" int fn_803ED5E0(const void*, int, int, int, int);
-extern "C" void fn_803EDA0C(int);
+extern "C" void MEM_free(int);
 extern "C" void THREAD_createparam(void*, void (*)(void*), void*, int, int, int);
 extern "C" void THREAD_destroy(void*);
 extern "C" void THREAD_yield(int);

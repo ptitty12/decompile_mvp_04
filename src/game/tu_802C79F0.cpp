@@ -21,7 +21,7 @@ extern int lbl_805E1B34[];
 extern const char lbl_805E1884[];
 extern const char lbl_805E1898[];
 
-extern "C" void fn_803EDA0C(int p);
+extern "C" void MEM_free(int p);
 extern "C" void fn_80377408(void* p);
 extern "C" void fn_80377488(void* p);
 extern "C" void* fn_803774A8(unsigned n, int heap);
@@ -114,7 +114,7 @@ void fn_802C7B54(Unk802C7B54* o)
         int off2 = 0;
         do {
             char* b = (char*)o + 0xA8;
-            fn_803EDA0C(*(int*)(b + off2));
+            MEM_free(*(int*)(b + off2));
             *(int*)(b + off2) = 0;
             off2 += 0xC;
         } while (--i != 0);
@@ -243,9 +243,9 @@ void fn_802C8564(Unk802C851C* o)
 
 void fn_802C85AC(Unk802C83A4* o)
 {
-    fn_803EDA0C(o->m0);
+    MEM_free(o->m0);
     o->m0 = 0;
-    fn_803EDA0C(o->m4);
+    MEM_free(o->m4);
     o->m4 = 0;
 }
 

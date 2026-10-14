@@ -39,7 +39,7 @@ extern char lbl_805B56C0[];
 float fn_800799D0(void* a, int v);
 float fn_80079A90(void* a, int v);
 void* fn_80329FA0(void* out, int v, ...);
-extern "C" void fn_803EDA0C(void* p);
+extern "C" void MEM_free(void* p);
 extern "C" void fn_80377408(void* p);
 extern "C" void fn_80534E80(void* a, const char* b);
 Unk8008CE64_Own* fn_80090744(Unk8008CE64_Own* p);
@@ -246,7 +246,7 @@ void fn_80090814(Unk8008CE64_Own* self, int a, int b);
 extern const char* lbl_80619764[];
 extern "C" void fn_80534F64(void* obj, int a, int b, int c, int d, int e, int f);
 extern "C" const char* fn_802B9300(const char* s, int a, int b, unsigned int* outn);
-extern "C" int fn_80402DE4(const void* p, int n);
+extern "C" int LOCALE_create(const void* p, int n);
 
 
 
@@ -2220,18 +2220,18 @@ void fn_800907A4(Unk8008CE64_Own* p, int idx, int flag)
         p->m0 = idx;
         const char* r = fn_802B9300(lbl_80619764[idx], 0, 0xE, 0);
         *slot = (void*)r;
-        fn_80402DE4(r, 1);
+        LOCALE_create(r, 1);
     }
 }
 
 void fn_80090814(Unk8008CE64_Own* self, int a, int b)
 {
     if (self->m4 != 0 && a != 0) {
-        fn_803EDA0C(self->m4);
+        MEM_free(self->m4);
         self->m4 = 0;
     }
     if (self->m8 != 0 && b != 0) {
-        fn_803EDA0C(self->m8);
+        MEM_free(self->m8);
         self->m8 = 0;
     }
 }

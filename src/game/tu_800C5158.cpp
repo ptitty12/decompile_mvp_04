@@ -27,7 +27,7 @@ int fn_800C59E8(Unk800C341C_Mgr* m);
 int fn_802B9804(const char* path, int a);
 int fn_803FC410(int h, int a, int b, int c, int d);
 int fn_803FC034(int size);
-void fn_803EDA0C(int h);
+void MEM_free(int h);
 int FILESYS_bypassqueuefileinfo(const char* path, int a, int* out);
 }
 
@@ -319,7 +319,7 @@ extern "C" int fn_800C5C0C(const char* path)
     int h = fn_802B9804(path, 0);
     int size = fn_803FC410(h, 0, 0, 0, 0);
     int p = fn_803FC034(size + 1);
-    fn_803EDA0C(h);
+    MEM_free(h);
     return p + 0x3E8;
 }
 

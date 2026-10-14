@@ -302,8 +302,8 @@ void fn_803BD61C(int a, int b);
 void fn_803E73F4(int v);
 void* fn_8031DD54(void* p, int a, int b, int c, int d);
 void fn_803EB520(void* p);
-void fn_803EB528(void* p);
-void fn_803EB5A0();
+void FONT_installdriverextensions(void* p);
+void FONT_init();
 void* fn_802CB924(void* p, int a);
 void* fn_803E4A50(void* p);
 int fn_803E4C30(void* p);
@@ -323,7 +323,7 @@ extern "C" {
 void fn_803164A0__Fv(void* x);
 void fn_803E4B40(void* p, int c);
 void fn_803BD75C();
-void fn_803EB560();
+void FONT_restore();
 void fn_803E9B6C(void* p);
 void fn_803E57F0(void* p, int c);
 void fn_803D7B40(void* p, int c);
@@ -356,7 +356,7 @@ int fn_803D986C(int h, int* out);
 int fn_803ED604(int b, int a, int k);
 void MEM_fill(int a, unsigned int tag, int b);
 int fn_803EE310(int a);
-void fn_803EDA0C(int a);
+void MEM_free(int a);
 int fn_803DBD84(void* p, int k);
 void fn_803198B8(void* p, int k);
 int fn_803120CC(void* p, int a, int b, int c, int d, int e);
@@ -370,7 +370,7 @@ int fn_803D9824(int h);
 int OSGetResetCode();
 int OSGetProgressiveMode();
 int VIGetDTVStatus();
-Unk80310934_Tx* fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
+Unk80310934_Tx* SHAPE_create(int a, int b, int c, int d, int e, int f, int g, int h);
 void* fn_803DD628(void* a, void* b);
 void fn_803DD7C8(void* h, int v);
 void fn_803E0810(lbl_Owner* o, void* a, int b);
@@ -661,12 +661,12 @@ int fn_803120CC(void* p, int a, int b, int d, int e, int f)
     self->m1C = w;
     self->m20 = h;
     self->m24 = d;
-    self->m8 = fn_803EBBA4(w, h, d, 0, 0, 0, 0, 0);
+    self->m8 = SHAPE_create(w, h, d, 0, 0, 0, 0, 0);
     self->m8->mC |= 0x20000000;
     self->m8->m0 = 0x16;
     self->m14 = fn_803DD628(lbl_8062C668(0x58, 0), self->m8);
     fn_803DD7C8(self->m14, 0);
-    self->mC = fn_803EBBA4(w, h, d, 0, 0, 0, 0, 0);
+    self->mC = SHAPE_create(w, h, d, 0, 0, 0, 0, 0);
     self->mC->m0 = 0x16;
     self->mC->mC |= 0x20000000;
     self->m10 = fn_803DD628(lbl_8062C668(0x58, 0), self->mC);
@@ -855,7 +855,7 @@ int fn_8031263C(int a, int b)
 void fn_8031268C(int a)
 {
     MEM_fill(a, 0xDD55DD55u, fn_803EE310(a));
-    fn_803EDA0C(a);
+    MEM_free(a);
 }
 
 int fn_803126D4()
@@ -949,7 +949,7 @@ extern "C" void fn_8031378C(Unk8031378C_Obj* p, int c)
         p->m5C = 0;
     }
     fn_803BD75C();
-    fn_803EB560();
+    FONT_restore();
     if (p->m1D4 != 0) {
         fn_803DD73C((void*)p->m1D4, 3);
         p->m1D4 = 0;
@@ -1009,8 +1009,8 @@ extern "C" void fn_8031392C(Unk8031392C_Obj* p)
     h = p->m38;
     h->mC = (Unk8031378C_DB*)fn_8031DD54(operator new(0xB4, 0), 0, 0, 3, 0);
     fn_803EB520(lbl_8062C620);
-    fn_803EB528(lbl_8062C634);
-    fn_803EB5A0();
+    FONT_installdriverextensions(lbl_8062C634);
+    FONT_init();
     fn_80317AB0(1);
     p->m3C = lbl_8061FF44;
     fn_802B1CB4();

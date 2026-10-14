@@ -55,7 +55,7 @@ extern const char lbl_805E02C0[];
 
 extern "C++" {
 extern "C" int fn_80377F00(void* t, int* a, int* b, int key, int c);
-extern "C" void fn_803EB330(void* p);
+extern "C" void FONT_destroy(void* p);
 char* fn_8040B8FC(const char* s, int c);
 char* fn_8040B61C(char* d, const char* s);
 char* fn_8040B448(char* d, const char* s);
@@ -65,7 +65,7 @@ void fn_802B1D44(T* t);
 void* fn_802B98AC(const char* name, int a);
 extern "C" int fn_800057D8();
 extern "C" int fn_800057E4();
-extern "C" void* fn_803EB2EC(void* p);
+extern "C" void* FONT_create(void* p);
 void* fn_802B23F0(void* p, void* a);
 int fn_80075E7C(int a);
 int fn_8040ABA0();
@@ -147,7 +147,7 @@ void fn_802B0C44(Mgr* m, int t)
         if (t == 0x16)
             mm->a11E88[0x16] = (void*)fn_800057E4();
         else
-            mm->a11E88[t] = fn_803EB2EC(mm->a11E10[t]);
+            mm->a11E88[t] = FONT_create(mm->a11E10[t]);
         float f = 0.0f;
         *(float*)((char*)mm->a11E88[t] + 0x28) = f;
     }
@@ -223,7 +223,7 @@ void fn_802B0DB0(Mgr* m)
     for (int i = 0; i <= 29; i++) {
         if (i != 22) {
             if (mm->a11E88[i] != 0)
-                fn_803EB330(mm->a11E88[i]);
+                FONT_destroy(mm->a11E88[i]);
             if (mm->a11E10[i] != 0) {
                 delete mm->a11E10[i];
                 mm->a11E10[i] = 0;

@@ -235,7 +235,7 @@ extern "C" int fn_803F89B0(void*, int, void*);
 extern "C" int fn_803F8A2C(void*);
 extern "C" char* strcpy(char*, const char*);
 extern "C" void* memset(void*, int, unsigned);
-extern "C" char fn_803F2404(const char* wild, const char* str);
+extern "C" char WildCardCompare(const char* wild, const char* str);
 
 extern "C" RcFeE* fn_803F2240(int, const char*, int);
 
@@ -345,7 +345,7 @@ extern "C" RcFeE* fn_803F2240(int a0, const char* pat, int a2)
         r = fn_803F8A2C(lbl_806EEA2C);
     int found = 0;
     while (r == 0 && found == 0) {
-            int t = fn_803F2404(pat, lbl_806AB5B8.m4);
+            int t = WildCardCompare(pat, lbl_806AB5B8.m4);
             if (t == 0) {
                 found = 1;
                 lbl_806AADFC.m4 = t;
@@ -361,7 +361,7 @@ extern "C" RcFeE* fn_803F2240(int a0, const char* pat, int a2)
     return &lbl_806AADFC;
 }
 
-extern "C" char fn_803F2404(const char* wild, const char* str)
+extern "C" char WildCardCompare(const char* wild, const char* str)
 {
     const char* cp = 0;
     const char* mp = 0;

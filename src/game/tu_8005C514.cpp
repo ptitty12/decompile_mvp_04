@@ -123,7 +123,7 @@ void fn_8005C868(Unk8005BA1C_Obj* o)
 
 int fn_8005C924(int self, int a, int b)
 {
-    return fn_803AB528(lbl_805AE420[b].e[a].m18, lbl_805AE420[b].e[a].m1C) + lbl_805AE420[b].e[a].m20;
+    return SNDSTRM_overhead(lbl_805AE420[b].e[a].m18, lbl_805AE420[b].e[a].m1C) + lbl_805AE420[b].e[a].m20;
 }
 
 Unk8005C97C_Q* fn_8005C97C(Unk8005C97C_Q* self, unsigned n)

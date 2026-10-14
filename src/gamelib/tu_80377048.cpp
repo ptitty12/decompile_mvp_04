@@ -49,7 +49,7 @@ void* fn_8037704C(void* a, const char* name, unsigned size, int heap, int flag);
 void* fn_803771F4(void* a, const char* name, unsigned size, int flags);
 void fn_803772E0(void* p);
 unsigned fn_803EE310(void* p);
-void fn_803EDA0C(void* p);
+void MEM_free(void* p);
 void fn_80377408(void* p);
 void fn_80377488(void* p);
 void fn_80408774(const char* fmt, ...);
@@ -177,7 +177,7 @@ extern "C" void fn_803772E0(void* p)
         }
     }
     MEM_fill(p, 0xAA55AA55, fn_803EE310(p));
-    fn_803EDA0C(p);
+    MEM_free(p);
 }
 
 extern "C" void* fn_803773D8(unsigned size)

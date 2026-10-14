@@ -7,7 +7,7 @@
  */
 #include "snd/cmn/sndcmn.h"
 
-extern "C" int fn_803A8548(int bhandle, int patnum)
+extern "C" int SNDbankpatpresent(int bhandle, int patnum)
 {
     if (SNDBANKI_valid(bhandle) >= 0) {
         return SNDBANKI_getppatch(sndgs.banklist[bhandle].phdr, patnum) != NULL ? 1 : 0;

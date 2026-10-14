@@ -95,11 +95,11 @@ struct Unk803B7DA0_Parser {
     int m10;
 };
 
-extern "C" int fn_803B4074(Unk803B7DA0_Parser* s);
+extern "C" int SNDI_gettag(Unk803B7DA0_Parser* s);
 extern unsigned short lbl_8069CA54[6][6];
 
 /* Reads the tagged header of a sample stream: ids 0..0x2A and 0x80..0xAD fill two int tables each, id 0x14 collects user-data blobs, 0xFE ends. The break is written as "if (id != 0xFE) continue; break;" to get retail's bne-over-b pair. */
-extern "C" void fn_803B7DA0(int unused, unsigned char* pdata, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDSAMPLEDESC* pssd)
+extern "C" void SNDI_patchtohdrgen(int unused, unsigned char* pdata, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDSAMPLEDESC* pssd)
 {
     int hdrA[0x2B];
     int hdrB[0x2B];
@@ -121,7 +121,7 @@ extern "C" void fn_803B7DA0(int unused, unsigned char* pdata, SNDSAMPLEFORMAT* p
     hdrC[4] = 0xBB80;
     hdrC[5] = 0;
     hdrC[0x20] = 10;
-    while (fn_803B4074(&p)) {
+    while (SNDI_gettag(&p)) {
         if (p.m4 <= 0x2A) {
             hdrA[p.m4] = p.m8;
             hdrB[p.m4] = p.mC;
@@ -423,7 +423,7 @@ extern "C" void fn_803B978C(SndDec* d, int v)
     d->mD64 = v;
 }
 
-extern "C" void fn_803B9794(int n, float* src, float* dst, int* idx, unsigned* fr, unsigned stepHi, unsigned stepLo)
+extern "C" void rsflc(int n, float* src, float* dst, int* idx, unsigned* fr, unsigned stepHi, unsigned stepLo)
 {
     int i;
     unsigned step = (stepHi << 16) | (stepLo >> 16);

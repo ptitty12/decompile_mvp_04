@@ -14,9 +14,9 @@ int fn_803BA80C(Csis::GlobalVariableHandle*, void*);
 int fn_803A9204(SNDPLAYOPTS*);
 int fn_803AB480(int);
 int SNDvol(int, int);
-int fn_803A8648(int);
-void fn_803A975C(void);
-void fn_803A979C(void);
+int SNDbankremove(int);
+void SNDSYS_entercritical(void);
+void SNDSYS_leavecritical(void);
 }
 
 
@@ -1086,16 +1086,16 @@ void SNDAEMSI_CreateModuleInstance(Csis::Class *pClass, Csis::Parameter *pParame
     AemsDef::MODULEINSTANCE *pModuleInstance;
     AemsDef::DESTROYSTATE *pds;
 
-    fn_803A975C();
+    SNDSYS_entercritical();
 
     if (pModule->curinstances < pModule->maxinstances) {
         pModuleInstance = reinterpret_cast<AemsDef::MODULEINSTANCE *>(SNDMEMI_allocz(pModule->datasize));
         if (pModuleInstance == NULL) {
-            fn_803A979C();
+            SNDSYS_leavecritical();
             return;
         }
     } else {
-        fn_803A979C();
+        SNDSYS_leavecritical();
         return;
     }
 
@@ -1152,11 +1152,11 @@ void SNDAEMSI_CreateModuleInstance(Csis::Class *pClass, Csis::Parameter *pParame
 
     pModule->curinstances++;
 
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }
 
 void SNDAEMSI_restore() {
-    fn_803A975C();
+    SNDSYS_entercritical();
 
     while (!sndaems.modulebank.IsEmpty()) {
         AemsDef::ModuleBank *pModuleBank;
@@ -1165,7 +1165,7 @@ void SNDAEMSI_restore() {
         SNDAEMS_removemodulebank(pModuleBank->modulebankhandle);
     }
 
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }
 
 int SNDAEMS_removemodulebank(int mbhandle) {
@@ -1173,7 +1173,7 @@ int SNDAEMS_removemodulebank(int mbhandle) {
         sndaems.logremovemodulebank();
     }
 
-    fn_803A975C();
+    SNDSYS_entercritical();
 
     AemsDef::ModuleBank *pModuleBank = reinterpret_cast<AemsDef::ModuleBank *>(&sndaems.modulebank.GetHead()[-10]);
     while (pModuleBank != NULL) {
@@ -1206,10 +1206,10 @@ int SNDAEMS_removemodulebank(int mbhandle) {
                 SNDMEMI_free(pModuleBank->streamfilepath);
             }
             if (pModuleBank->sfxbhandle >= 0) {
-                fn_803A8648(pModuleBank->sfxbhandle);
+                SNDbankremove(pModuleBank->sfxbhandle);
             }
             if (pModuleBank->midibhandle >= 0) {
-                fn_803A8648(pModuleBank->midibhandle);
+                SNDbankremove(pModuleBank->midibhandle);
             }
 
             sndaems.modulebank.Remove(&pModuleBank->ln);
@@ -1218,7 +1218,7 @@ int SNDAEMS_removemodulebank(int mbhandle) {
                 Snd::Util::RemoveVariableTimerClient(&sndaems.variabletimerclient);
             }
 
-            fn_803A979C();
+            SNDSYS_leavecritical();
             return 0;
         }
 
@@ -1227,7 +1227,7 @@ int SNDAEMS_removemodulebank(int mbhandle) {
 
 
 
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return -8;
 }
 
@@ -1252,7 +1252,7 @@ void SNDAEMSI_resolvemodulebank(
 ) {
     sndgs.aemsrestore = SNDAEMSI_restore;
 
-    fn_803A975C();
+    SNDSYS_entercritical();
 
     AemsDef::Module *pModule;
     AemsDef::FUNCFIXUPHEADER *pffh;
@@ -1369,5 +1369,5 @@ void SNDAEMSI_resolvemodulebank(
     ICInvalidateRange(pModuleBank, pModuleBank->totalsize);
     DCFlushRange(pModuleBank, pModuleBank->totalsize);
 #endif
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }

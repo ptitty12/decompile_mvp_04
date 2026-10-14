@@ -60,7 +60,7 @@ extern const char* lbl_80615844;
 extern const char lbl_805A3800[];
 extern char* lbl_806EEA1C;
 
-extern "C" Unk8060F740* fn_803EB2EC(Unk8060F740*);
+extern "C" Unk8060F740* FONT_create(Unk8060F740*);
 
 extern "C" Unk8060F740* fn_800057D8()
 {
@@ -74,7 +74,7 @@ extern "C" Unk8060F740* fn_800057E4()
 
 extern "C" void fn_800057F0()
 {
-    Unk8060F740* p = fn_803EB2EC(&lbl_8060F740);
+    Unk8060F740* p = FONT_create(&lbl_8060F740);
     lbl_806EF98C = p;
     float f = 0.0f;
     p->m28 = f;

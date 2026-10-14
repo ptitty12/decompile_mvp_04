@@ -44,7 +44,7 @@ extern char lbl_806872E4[];
 
 extern "C" int fn_803FED48(int h, int a, int b, int* out);
 extern "C" void fn_803FEDB8(int h, int a);
-extern "C" void fn_803EDA0C(int h);
+extern "C" void MEM_free(int h);
 int fn_804089B4(char* buf, const char* fmt, ...);
 extern "C" void fn_803917D0(int v);
 extern "C" void fn_803EE7BC();
@@ -106,7 +106,7 @@ void Unk800642F0::fn_80064D48()
                 m28 = m28 + 1;
             fn_803FEDB8(f, 0);
         }
-        fn_803EDA0C(h);
+        MEM_free(h);
     }
 }
 
@@ -119,7 +119,7 @@ void Unk800642F0::fn_80064F0C(Rec* r)
     }
     r->m4 = 0;
     if (r->m8) {
-        fn_803EDA0C(r->m8);
+        MEM_free(r->m8);
         r->m8 = 0;
     }
 }

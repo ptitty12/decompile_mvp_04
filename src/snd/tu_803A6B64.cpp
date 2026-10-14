@@ -16,7 +16,7 @@ typedef void* ModuleBankAllocFn(AemsDef::ModuleBank*, int, int);
 extern "C" {
 
 int fn_803A82A8(int* phandle, BANKVER5* pb);
-int fn_803A8648(int bhandle);
+int SNDbankremove(int bhandle);
 
 /* near-miss: same instructions; pmb and rc swap r30/r31 (global-alloc priority of rc vs pmb). */
 int fn_803A6B64(AemsDef::ModuleBank* pmb, char* streamfilename, int streamfileoffset, ModuleBankAllocFn* alloc)
@@ -81,10 +81,10 @@ int fn_803A6B64(AemsDef::ModuleBank* pmb, char* streamfilename, int streamfileof
     }
 fail:
     if (sfxrc > 0) {
-        fn_803A8648(pmb->sfxbhandle);
+        SNDbankremove(pmb->sfxbhandle);
     }
     if (midirc > 0) {
-        fn_803A8648(pmb->midibhandle);
+        SNDbankremove(pmb->midibhandle);
     }
     return rc;
 }

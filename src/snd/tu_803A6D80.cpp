@@ -47,31 +47,31 @@ struct StreamListHead {
 };
 
 extern "C" {
-void fn_803A975C();
-void fn_803A979C();
+void SNDSYS_entercritical();
+void SNDSYS_leavecritical();
 int fn_803AAA18(int sndstrmhandle, int arg, const char* filename, int offset);
 void fn_803AAA3C(int sndstrmhandle);
-AemsDef::PLAYERHANDLE* fn_803A710C(AemsDef::PLAYERHANDLE* out, AemsDef::PLAYERSTATE* ps, AemsDef::SAMPLEENTRY* se);
-int fn_803A7490(AemsDef::PLAYERSTATE* ps);
+AemsDef::PLAYERHANDLE* SNDAEMSI_playerplaystream(AemsDef::PLAYERHANDLE* out, AemsDef::PLAYERSTATE* ps, AemsDef::SAMPLEENTRY* se);
+int SNDAEMSI_playerupdatestream(AemsDef::PLAYERSTATE* ps);
 int fn_803A7ADC();
-void fn_803A77A8();
+void SNDAEMSI_streamsystemtask();
 void fn_803AC7F0(void (*fn)());
 void fn_803AC7C4(void (*fn)());
 void fn_803AA95C(int sndstrmhandle);
 int fn_803AA934(SNDPLAYOPTS* spo, int a, int b, void* mem, int size);
 void fn_803A9204(SNDPLAYOPTS* spo);
-int fn_803AB528(int a, int b);
-void fn_803A73D4(AemsDef::PLAYERSTATE* ps);
+int SNDSTRM_overhead(int a, int b);
+void SNDAEMSI_playerunpausestream(AemsDef::PLAYERSTATE* ps);
 void fn_803AB56C(int handle, int value);
-void fn_803AB984(int handle, int value);
+void SNDSTRM_timemult(int handle, int value);
 void fn_803AB9F0(int handle, int arg, float v);
 void fn_803AAB7C(int handle, int arg, float v);
-void fn_803AB17C(int handle, int arg, int value);
+void SNDSTRM_fxlevel(int handle, int arg, int value);
 void fn_803AB430(int handle, int value);
 void fn_803AB388(int handle, int value);
-void fn_803AB5F4(int handle, int value);
+void SNDSTRM_drylevel(int handle, int value);
 
-int fn_803A6D80(int priority)
+int SNDAEMSI_streamgethandle(int priority)
 {
     AemsDef::SNDAEMSSTREAMCHANNEL* pchan;
     CListDNode* head = sndaems.freestreams.GetHead();
@@ -123,23 +123,23 @@ void fn_803A6ED8(int handle, int value)
     } else if (value < 0x800) {
         value = 0x800;
     }
-    fn_803AB984(handle, value);
+    SNDSTRM_timemult(handle, value);
 }
 
-void fn_803A6F14(int handle, int value)
+void SNDAEMSI_streamvol(int handle, int value)
 {
     fn_803AB9F0(handle, -1, SNDI_clipint32(value, 0, 0x7FFF) * (1.0f / 32767.0f));
 }
 
-void fn_803A6F84(int handle, int value)
+void SNDAEMSI_streamazimuth(int handle, int value)
 {
     SNDSTRMI_getstreamptr(handle);
     fn_803AAB7C(handle, -1, static_cast<unsigned short>(value) * (360.0f / 65535.0f));
 }
 
-void fn_803A6FF4(int handle, int value)
+void SNDAEMSI_streamfxwet0(int handle, int value)
 {
-    fn_803AB17C(handle, 0, SNDI_clipint32(value, 0, 0x7FFF) >> 8);
+    SNDSTRM_fxlevel(handle, 0, SNDI_clipint32(value, 0, 0x7FFF) >> 8);
 }
 
 void fn_803A7038(int handle, int value)
@@ -152,19 +152,19 @@ void fn_803A7080(int handle, int value)
     fn_803AB388(handle, SNDI_clipint32(value, 0, 0xFFFF));
 }
 
-void fn_803A70C8(int handle, int value)
+void SNDAEMSI_streamdrylevel(int handle, int value)
 {
-    fn_803AB5F4(handle, SNDI_clipint32(value, 0, 0x7FFF) >> 8);
+    SNDSTRM_drylevel(handle, SNDI_clipint32(value, 0, 0x7FFF) >> 8);
 }
 
 void fn_803A7108()
 {
 }
 
-AemsDef::PLAYERHANDLE* fn_803A710C(AemsDef::PLAYERHANDLE* out, AemsDef::PLAYERSTATE* ps, AemsDef::SAMPLEENTRY* se)
+AemsDef::PLAYERHANDLE* SNDAEMSI_playerplaystream(AemsDef::PLAYERHANDLE* out, AemsDef::PLAYERSTATE* ps, AemsDef::SAMPLEENTRY* se)
 {
     int in[12];
-    int h = fn_803A6D80(se->priority);
+    int h = SNDAEMSI_streamgethandle(se->priority);
     if (h >= 0) {
         AemsDef::PLAYERINPUTSTATE* pin;
         int i;
@@ -203,7 +203,7 @@ AemsDef::PLAYERHANDLE* fn_803A710C(AemsDef::PLAYERHANDLE* out, AemsDef::PLAYERST
     return out;
 }
 
-void fn_803A7280(AemsDef::PLAYERSTATE* ps)
+void SNDAEMSI_playerstopstream(AemsDef::PLAYERSTATE* ps)
 {
     AemsDef::SNDAEMSSTREAMCHANNEL* pchan = GetStreamChannel(ps->settings.handle.u.streamhandle);
     if (pchan != NULL) {
@@ -211,12 +211,12 @@ void fn_803A7280(AemsDef::PLAYERSTATE* ps)
         sndaems.allocatedstreams.Remove(&pchan->ln);
         sndaems.freestreams.Push(&pchan->ln);
         if (ps->settings.prevplaycontrol[0] == 2) {
-            fn_803A73D4(ps);
+            SNDAEMSI_playerunpausestream(ps);
         }
     }
 }
 
-void fn_803A735C(AemsDef::PLAYERHANDLE h)
+void SNDAEMSI_playerpausestream(AemsDef::PLAYERHANDLE h)
 {
     AemsDef::SNDAEMSSTREAMCHANNEL* pchan = GetStreamChannel(h.u.streamhandle);
     if (pchan != NULL) {
@@ -225,7 +225,7 @@ void fn_803A735C(AemsDef::PLAYERHANDLE h)
     }
 }
 
-void fn_803A73D4(AemsDef::PLAYERSTATE* ps)
+void SNDAEMSI_playerunpausestream(AemsDef::PLAYERSTATE* ps)
 {
     AemsDef::SNDAEMSSTREAMCHANNEL* pchan = GetStreamChannel(ps->settings.handle.u.streamhandle);
     if (pchan != NULL) {
@@ -238,14 +238,14 @@ void fn_803A73D4(AemsDef::PLAYERSTATE* ps)
             }
         }
         fn_803A6E90(pchan->sndstrmhandle, pchan->input[0]);
-        fn_803A6F14(pchan->sndstrmhandle, pchan->input[2]);
+        SNDAEMSI_streamvol(pchan->sndstrmhandle, pchan->input[2]);
     }
 }
 
 /* near-miss: control flow and calls as in the original code, but the original keeps pchan,
    pss and ps in r27/r26/r28 (7 saved registers, ours uses 8) and converts the sample rate with
    a signed int-to-float; the free path is laid out before the update block there. */
-int fn_803A7490(AemsDef::PLAYERSTATE* ps)
+int SNDAEMSI_playerupdatestream(AemsDef::PLAYERSTATE* ps)
 {
     AemsDef::SNDAEMSSTREAMCHANNEL* pchan = GetStreamChannel(ps->settings.handle.u.streamhandle);
     if (pchan != NULL) {
@@ -291,31 +291,31 @@ int fn_803A7490(AemsDef::PLAYERSTATE* ps)
     return SNDAEMSI_playerresetoutputs(ps);
 }
 
-void fn_803A77A8()
+void SNDAEMSI_streamsystemtask()
 {
     sndaems.instreamsynctask = true;
-    fn_803A975C();
+    SNDSYS_entercritical();
     AemsDef::SNDAEMSSTREAMCHANNEL* pchan = reinterpret_cast<AemsDef::SNDAEMSSTREAMCHANNEL*>(sndaems.allocatedstreams.GetHead());
     for (; pchan != NULL; pchan = reinterpret_cast<AemsDef::SNDAEMSSTREAMCHANNEL*>(pchan->ln.GetNext())) {
         if (pchan->state == 0) {
             pchan->leadinsamples = 0;
             pchan->leadinrequesthandle = -1;
             if (pchan->psampleentry->type == 1) {
-                fn_803A979C();
+                SNDSYS_leavecritical();
                 fn_803AAA18(pchan->sndstrmhandle, 0, pchan->filename, pchan->fileoffset + pchan->psampleentry->u.loopedstream.leadinoffset);
-                fn_803A975C();
+                SNDSYS_entercritical();
             } else {
-                fn_803A979C();
+                SNDSYS_leavecritical();
                 pchan->leadinrequesthandle = fn_803AAA18(pchan->sndstrmhandle, 1000, pchan->filename, pchan->fileoffset + pchan->psampleentry->u.loopedstream.leadinoffset);
-                fn_803A975C();
+                SNDSYS_entercritical();
             }
             pchan->state = 1;
         }
         if (pchan->state == 1 && pchan->psampleentry->type == 2) {
             if (SNDSTRMI_getstreamptr(pchan->sndstrmhandle)->freerequests.items > 0) {
-                fn_803A979C();
+                SNDSYS_leavecritical();
                 fn_803AAA18(pchan->sndstrmhandle, 0, pchan->filename, pchan->fileoffset + pchan->psampleentry->u.loopedstream.loopoffset);
-                fn_803A975C();
+                SNDSYS_entercritical();
             }
         }
     }
@@ -324,21 +324,21 @@ void fn_803A77A8()
         SNDAEMSI_timerupdate(SNDAEMS_V.clientData);
         SNDAEMS_V.timerUpdatesSkipped--;
     }
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }
 
-int fn_803A7924(void* pmem, int memsize, int count)
+int SNDAEMS_streaminit(void* pmem, int memsize, int count)
 {
     SNDPLAYOPTS spo;
     int i;
     fn_803A7ADC();
     lbl_8069CA34 = fn_803A7ADC;
-    lbl_806250BC[2] = lbl_806250BC[1] = reinterpret_cast<AemsDef::PLAYERPLAYFN*>(fn_803A710C);
-    lbl_806250CC[2] = lbl_806250CC[1] = reinterpret_cast<AemsDef::PLAYERSTOPFN*>(fn_803A7280);
-    lbl_806250DC[2] = lbl_806250DC[1] = reinterpret_cast<AemsDef::PLAYERPAUSEFN*>(fn_803A735C);
-    lbl_806250EC[2] = lbl_806250EC[1] = reinterpret_cast<AemsDef::PLAYERUNPAUSEFN*>(fn_803A73D4);
-    lbl_806250FC[2] = lbl_806250FC[1] = reinterpret_cast<AemsDef::PLAYERUPDATEFN*>(fn_803A7490);
-    fn_803A975C();
+    lbl_806250BC[2] = lbl_806250BC[1] = reinterpret_cast<AemsDef::PLAYERPLAYFN*>(SNDAEMSI_playerplaystream);
+    lbl_806250CC[2] = lbl_806250CC[1] = reinterpret_cast<AemsDef::PLAYERSTOPFN*>(SNDAEMSI_playerstopstream);
+    lbl_806250DC[2] = lbl_806250DC[1] = reinterpret_cast<AemsDef::PLAYERPAUSEFN*>(SNDAEMSI_playerpausestream);
+    lbl_806250EC[2] = lbl_806250EC[1] = reinterpret_cast<AemsDef::PLAYERUNPAUSEFN*>(SNDAEMSI_playerunpausestream);
+    lbl_806250FC[2] = lbl_806250FC[1] = reinterpret_cast<AemsDef::PLAYERUPDATEFN*>(SNDAEMSI_playerupdatestream);
+    SNDSYS_entercritical();
     sndaems.pstreamchannel = reinterpret_cast<AemsDef::SNDAEMSSTREAMCHANNEL*>(pmem);
     sndaems.streamchannels = count;
     memsize = (memsize - count * 0x60) / count;
@@ -362,9 +362,9 @@ int fn_803A7924(void* pmem, int memsize, int count)
         pchan->input[7] = 0;
         pchan->input[8] = 0x7FFF;
     }
-    fn_803AC7C4(fn_803A77A8);
-    fn_803A979C();
-    return memsize - fn_803AB528(3, 0x2D);
+    fn_803AC7C4(SNDAEMSI_streamsystemtask);
+    SNDSYS_leavecritical();
+    return memsize - SNDSTRM_overhead(3, 0x2D);
 }
 
 int fn_803A7ADC()
@@ -373,7 +373,7 @@ int fn_803A7ADC()
         return 0;
     }
     int i;
-    fn_803AC7F0(fn_803A77A8);
+    fn_803AC7F0(SNDAEMSI_streamsystemtask);
     for (i = 0; i < sndaems.streamchannels; i++) {
         AemsDef::SNDAEMSSTREAMCHANNEL* p = &sndaems.pstreamchannel[i];
         fn_803AA95C(p->sndstrmhandle);
