@@ -53,7 +53,7 @@ included, can never break a mod. It only makes the game easier to understand.
 
 ## 3. Where we are (2026-10-14)
 
-- **Engine:** not started. E0 is next.
+- **Engine:** E0a is done (`docs/engine/E0_SURVEY.md`; D1 and D4 decided). E0b, the native boot spike, is next.
 - **Decomp** (main `d0a166c2`): 21,109 / 24,158 functions matched (87.4%);
   3,075,304 / 5,896,176 code bytes (52.2%); 234 of 847 units built from source. The
   live card is in `README.md`.
@@ -114,8 +114,8 @@ Each milestone has a hard exit you can check. Don't advance on vibes.
    functions against dolsdk2004 and the mitsevox SDK. Then rename them in
    `symbols.txt` with evidence. List them with
    `python tools/goals/targets.py --list K1 --todo`.
-2. **E0a survey** (one Opus side session). Write `docs/engine/E0_SURVEY.md` and record D1-D2.
-3. **E0b boot spike** (the same side session, once D1 is decided).
+2. ~~**E0a survey**~~ Done 2026-10-14: write our own translator (D1), with resumable guest threads (D4).
+3. **E0b boot spike** (one Opus side session): the 10 items in `docs/engine/E0_SURVEY.md` §8, MSVC + CMake natively.
 4. **K2-K4 worker batches** (Sonnet). Build batches from
    `python tools/goals/targets.py --units K3` (and K2, K4). In these batches, names
    and types are the deliverable. Match a function whenever the type knowledge

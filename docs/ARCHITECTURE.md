@@ -211,10 +211,10 @@ Lead decisions under the owner's 2026-10-14 delegation. Settled ones are also in
 
 | # | Question | Status |
 |---|---|---|
-| D1 | Adopt, fork or write the translator | **Open, settles in E0a.** Choose on license (must allow our use), Gekko coverage and whether a WebAssembly backend fits. Writing our own is acceptable: the instruction set is fixed and the binary is static |
+| D1 | Adopt, fork or write the translator | **Decided (E0a, 2026-10-14):** write our own in C++20. One decoder and IR with a WebAssembly emitter (the product) and a C++ emitter (native development), plus a reference interpreter on the same semantics library. Every mature GameCube recompiler is GPL and none emits WebAssembly; `symbols.txt` already solves function discovery. Permissive pieces (gcn-recomp upstream MIT, pureikyubu CC0, Aurora MIT, N64Recomp MIT) are reused per `docs/engine/E0_SURVEY.md` §5 |
 | D2 | Where translation runs, and what it emits | **Decided:** in the player's browser on first load, cached in browser storage (§3 requires it). The backend emits WebAssembly. A CLI build of the same translator serves development. Whether to emit one module or translate lazily per function is measured in E2 |
 | D3 | Languages and toolchain | **Decided:** C++20 for the translator and runtime (Emscripten for the browser; clang or MSVC natively for development and tests); `webgpu.h` (Dawn natively, browser WebGPU under Emscripten); TypeScript for the web shell and the VPS services, so the protocol types are shared. Revisit only if D1 adopts a codebase in another language |
-| D4 | How guest threads switch | **Open, settles in E0b:** resumable translated functions, JSPI/Asyncify, or separate stacks |
+| D4 | How guest threads switch | **Chosen (E0a), confirmed by E0b item 9:** resumable guest threads on one host thread. A context switch unwinds to the dispatcher, and the target resumes at its guest PC, with the reference interpreter running what's left of the suspended frames. This keeps all state in guest memory plus the CPU context, so save states and rollback stay possible. Fallback if it costs too much: one host thread per guest thread with a baton (`E0_SURVEY.md` §6) |
 | D5 | Audio replacement level | **Open, settles in E3:** AX API or DSP command lists |
 | D6 | Renderer input | **Decided:** the GX command stream (§6) |
 | D7 | Disc image formats | **Decided:** ISO and CISO first; RVZ later |
