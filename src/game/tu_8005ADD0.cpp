@@ -168,13 +168,13 @@ void fn_8005B1F0(Unk8005ADD0_Obj* o, int ch)
         fn_803A9204(lbl_80687628);
         char* b = lbl_80687628;
         lbl_80687628[0] = 0;
-        fn_803A975C();
+        SNDSYS_entercritical();
         o->mC[ch].mHandle = fn_803A85B0(h, 0, b);
-        fn_803A979C();
+        SNDSYS_leavecritical();
         if (o->mC[ch].mHandle >= 0) {
-            fn_803A975C();
+            SNDSYS_entercritical();
             SNDvol(o->mC[ch].mHandle, o->m78);
-            fn_803A979C();
+            SNDSYS_leavecritical();
             o->mC[ch].mState = 3;
             return;
         }
@@ -243,9 +243,9 @@ void fn_8005B4D0(Unk8005ADD0_Obj* o)
         }
         break;
     case 1:
-        fn_803A975C();
+        SNDSYS_entercritical();
         int h = fn_803A914C(o->mC[o->mA8].mHandle);
-        fn_803A979C();
+        SNDSYS_leavecritical();
         if (h > 0) {
             o->mC[o->mA8].mState = 5;
             fn_800403EC(&o->mAC);
@@ -267,9 +267,9 @@ void fn_8005B58C(Unk8005ADD0_Obj* o, int a)
             fn_8005C75C(fn_8005BA9C(), 1, 0);
             return;
         case 1:
-            fn_803A975C();
+            SNDSYS_entercritical();
             fn_803AB480(o->mC[o->mA8].mHandle);
-            fn_803A979C();
+            SNDSYS_leavecritical();
             break;
         }
     }
@@ -305,9 +305,9 @@ void fn_8005B76C(Unk8005ADD0_Obj* o, int vol)
             fn_8005C654(fn_8005BA9C(), 1, o->m78, 0);
             return;
         case 1:
-            fn_803A975C();
+            SNDSYS_entercritical();
             SNDvol(o->mC[o->mA8].mHandle, o->m78);
-            fn_803A979C();
+            SNDSYS_leavecritical();
             break;
         }
     }

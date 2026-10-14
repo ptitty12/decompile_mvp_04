@@ -47,7 +47,7 @@ extern "C" int fn_803A9204(SNDPLAYOPTS* pspo)
     return 0;
 }
 
-extern "C" int fn_803A925C()
+extern "C" int SNDPROFILE_outputlatency()
 {
     if (lbl_8069C9E4[0] == 0)
         return 0;
@@ -55,7 +55,7 @@ extern "C" int fn_803A925C()
 }
 
 /* Seeds the iSNDrandom state: six words of the seed table plus the given seed. */
-extern "C" void fn_803A9294(unsigned int seed)
+extern "C" void SNDI_randomseed(unsigned int seed)
 {
     int i;
     for (i = 0; i <= 5; i++)
@@ -92,7 +92,7 @@ unsigned int iSNDrandom()
 }
 
 /* near-miss: all 32 insns, but retail loads r4 (a) before the addi r3 for &pph in the SNDPLATFORM_asyncresolvetimbre call; inline wrapper, local pointer and != / > 0 loop forms did not move it */
-extern "C" int fn_803A93D0(unsigned int rendermodes, void* ptp, int a, int b)
+extern "C" int SNDBANKI_asyncresolvepatch(unsigned int rendermodes, void* ptp, int a, int b)
 {
     SNDIPATCHHEADER pph;
     void* p = (char*)ptp + 4;
@@ -108,7 +108,7 @@ extern "C" int fn_803A93D0(unsigned int rendermodes, void* ptp, int a, int b)
 }
 
 /* Runs the variable-timer clients once the timer period changes. */
-extern "C" void fn_803A9450()
+extern "C" void SNDSYSI_variabletimerservice()
 {
     if (lbl_8069CAD4 != lbl_80625208) {
         lbl_80625208 = lbl_8069CAD4;
@@ -122,7 +122,7 @@ extern "C" void fn_803A9450()
 }
 
 /* near-miss: 152 insns, same control flow as retail now (the fade clamp is `if (fade < Z) {if (!(v > t)) clamp} else {if (!(v < t)) clamp}`, as matched in fn_803AAE30), but the zero constant (extern const float lbl_80609598) is hoisted out of the loop into f31/a saved register; retail reloads it with lis/lfs in each block. Literal 0.0f, extern float, local float and single-clamp goto forms tried */
-extern "C" void fn_803A94BC()
+extern "C" void SNDSYSI_100hzserver()
 {
     int i = 0;
     sndgs.audiotick++;
@@ -199,14 +199,14 @@ extern "C" void fn_803A973C(void* s, int chrg)
 }
 
 /* SNDSYS_entercritical */
-extern "C" void fn_803A975C()
+extern "C" void SNDSYS_entercritical()
 {
     lbl_8062520C();
     sndgs.incritical++;
 }
 
 /* SNDSYS_leavecritical */
-extern "C" void fn_803A979C()
+extern "C" void SNDSYS_leavecritical()
 {
     sndgs.incritical--;
     lbl_80625210();

@@ -26,13 +26,13 @@ struct LowMem {
 };
 #define LOWMEM ((LowMem*)0x80000000)
 
-extern "C" int fn_803A975C();
-extern "C" int fn_803A979C();
-extern "C" int fn_803AB8A4(int h, void* out);
-extern "C" int fn_803AB644(int h, void* out);
+extern "C" int SNDSYS_entercritical();
+extern "C" int SNDSYS_leavecritical();
+extern "C" int SNDSTRM_status(int h, void* out);
+extern "C" int SNDSTRM_requeststatus(int h, void* out);
 extern "C" int fn_8038E468(VdClock* c);
 extern "C" unsigned fn_8038E080(VdMain* s);
-extern "C" int fn_803A925C();
+extern "C" int SNDPROFILE_outputlatency();
 extern unsigned lbl_800000F8;
 
 
@@ -703,11 +703,11 @@ extern "C" unsigned fn_8038E080(VdMain* s)
     if (s->m58 != 0) {
         struct { int w, x, y, z; } b;
         struct { int w, x, y, z; } a;
-        fn_803A975C();
-        fn_803AB8A4(s->m0->mC, &a);
-        fn_803AB644(a.x, &b);
-        fn_803A979C();
-        int v = b.x - fn_803A925C();
+        SNDSYS_entercritical();
+        SNDSTRM_status(s->m0->mC, &a);
+        SNDSTRM_requeststatus(a.x, &b);
+        SNDSYS_leavecritical();
+        int v = b.x - SNDPROFILE_outputlatency();
         if (v > s->m54) {
             int diff = v - t;
             s->m54 = v;
@@ -756,8 +756,8 @@ extern "C" int fn_8038E468(VdClock* c)
 extern "C" int fn_803AC11C();
 extern "C" void DEBUG_break();
 extern "C" void fn_803A9204(void* out);
-extern "C" int fn_803AB4E0(int a, int b);
-extern "C" int fn_803AB13C(int a, void* b, int c, int d, int e, int f);
+extern "C" int SNDSTRM_overheadtap(int a, int b);
+extern "C" int SNDSTRM_createtap(int a, void* b, int c, int d, int e, int f);
 extern "C" int fn_803AB5C8(int a, int b, int c);
 struct VdRes2 {
     float m0;
@@ -776,10 +776,10 @@ extern "C" VdRes2* fn_8038E534(VdRes2* o, int a, int b)
         o->m10 = -1;
         o->mC = -1;
         fn_803A9204(q);
-        int sz = fn_803AB4E0(1, 0x1E);
+        int sz = SNDSTRM_overheadtap(1, 0x1E);
         int p = (int)lbl_80699B94.m0("AV::audiobuff", sz, 0, 0, lbl_80699B94.m8);
         o->m4 = p;
-        o->mC = fn_803AB13C(a, q, 1, 0x1E, p, sz);
+        o->mC = SNDSTRM_createtap(a, q, 1, 0x1E, p, sz);
         o->m10 = fn_803AB5C8(o->mC, -1, b);
         o->m0 = 1.0f;
     }
@@ -788,7 +788,7 @@ extern "C" VdRes2* fn_8038E534(VdRes2* o, int a, int b)
 
 extern "C" void fn_803AA95C(int a);
 extern "C" int fn_803AB56C(int a, int b);
-extern "C" int fn_803AB3D8(int a, int b);
+extern "C" int SNDSTRM_modifyhold(int a, int b);
 
 extern "C" void fn_8038E61C(VdRes* o, int chrg)
 {
@@ -804,9 +804,9 @@ extern "C" void fn_8038E61C(VdRes* o, int chrg)
 extern "C" int fn_8038E694(VdRes* o, int a)
 {
     if (o->mC != -1) {
-        fn_803A975C();
+        SNDSYS_entercritical();
         int r = fn_803AB56C(o->mC, a);
-        fn_803A979C();
+        SNDSYS_leavecritical();
         return r;
     }
     return 0;
@@ -815,9 +815,9 @@ extern "C" int fn_8038E694(VdRes* o, int a)
 extern "C" int fn_8038E6F0(VdRes* o)
 {
     if (o->m10 != -1) {
-        fn_803A975C();
-        int r = fn_803AB3D8(o->m10, 0);
-        fn_803A979C();
+        SNDSYS_entercritical();
+        int r = SNDSTRM_modifyhold(o->m10, 0);
+        SNDSYS_leavecritical();
         return r;
     }
     return 0;
@@ -832,12 +832,12 @@ extern "C" int fn_8038E748(VdRes* o)
 {
     VdQ16 a;
     VdQ16 b;
-    fn_803A975C();
-    if (fn_803AB8A4(o->mC, &b) >= 0 && fn_803AB644(b.m4, &a) >= 0) {
-        fn_803A979C();
+    SNDSYS_entercritical();
+    if (SNDSTRM_status(o->mC, &b) >= 0 && SNDSTRM_requeststatus(b.m4, &a) >= 0) {
+        SNDSYS_leavecritical();
         return a.m8 == 0;
     }
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return 0;
 }
 

@@ -73,8 +73,8 @@ extern int lbl_806AA884;
 extern int lbl_806AA888;
 extern float lbl_80609B98;
 
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
 extern "C" int fn_803B0360();
 extern "C" void fn_803B0714(int h);
 
@@ -117,8 +117,8 @@ struct Unk803B69AC {
 
 extern "C" int fn_803AB480(int shandle);
 
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
 struct Unk803B0714;
 extern "C" int fn_803B0368(int slot, Unk803B0714* pmem);
 extern "C" int fn_803B0360();
@@ -179,7 +179,7 @@ extern "C" int SNDPKTPLAY_create(void (*preleasefunc)(void*, void*), void (*pfra
     void* pplatformmem;
     int i = 0;
 
-    fn_803A975C();
+    SNDSYS_entercritical();
 
     for (; i < sndgs.sso.set.maxstreams; i++) {
         if (lbl_806AA804[i] == 0) {
@@ -187,13 +187,13 @@ extern "C" int SNDPKTPLAY_create(void (*preleasefunc)(void*, void*), void (*pfra
         }
     }
 
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return -9;
 
 allocated:
     packetinstancehandle = fn_803B0368(i, (Unk803B0714*)pmem);
     if (packetinstancehandle < 0) {
-        fn_803A979C();
+        SNDSYS_leavecritical();
         return -6;
     }
 
@@ -210,7 +210,7 @@ allocated:
     ppchan->shandle = -1;
     lbl_806AA500.ppc[i] = ppchan;
 
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return i;
 }
 
@@ -422,10 +422,10 @@ extern "C" int SNDPKTPLAY_stop(int h)
 
 extern "C" int SNDPKTPLAY_destroy(int h)
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     fn_803B0714(h);
     lbl_806AA500.ppc[h] = 0;
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return 0;
 }
 
@@ -579,9 +579,9 @@ extern "C" int fn_803B5A18(SndCopyCallback v)
 
 extern "C" void fn_803B5A28(int n)
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     lbl_806AA88C.mC = (Unk806AA88C_Entry*)SNDMEMI_allocz(n * 8);
-    fn_803A979C();
+    SNDSYS_leavecritical();
     lbl_806AA88C.m2 = n;
     lbl_806AA88C.m0 = 0;
 }
@@ -601,9 +601,9 @@ extern "C" void fn_803B5A78(unsigned int a, unsigned int b)
 extern "C" void fn_803B5ACC()
 {
     if (lbl_806AA88C.mC != 0) {
-        fn_803A975C();
+        SNDSYS_entercritical();
         SNDMEMI_free(lbl_806AA88C.mC);
-        fn_803A979C();
+        SNDSYS_leavecritical();
         lbl_806AA88C.mC = 0;
     }
 }

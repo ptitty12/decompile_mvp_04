@@ -10,8 +10,8 @@
 
 extern "C" {
 
-void fn_803A975C();
-void fn_803A979C();
+void SNDSYS_entercritical();
+void SNDSYS_leavecritical();
 void fn_803AB480(int shandle);
 int fn_803AD2F0(void* ppatch, void* attr);
 void SNDBANKI_userdatacallback(void* attr, int type);
@@ -29,7 +29,7 @@ int SNDbankremove(int bhandle)
     if (SNDBANKI_valid(bhandle) != 0) {
         return -8;
     }
-    fn_803A975C();
+    SNDSYS_entercritical();
     BANKVER5* phdr = sndgs.banklist[bhandle].phdr;
     for (i = 0; i < sndgs.voicestotal; i++) {
         int o = i * 0x90;
@@ -58,7 +58,7 @@ int SNDbankremove(int bhandle)
     }
     sndgs.banklist[bhandle].phdr = NULL;
     sndgs.banklist[bhandle].locked = 0;
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return 0;
 }
 

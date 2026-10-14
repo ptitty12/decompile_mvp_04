@@ -30,9 +30,9 @@ int fn_80041350(Unk80040640* self, int id);
 int fn_80041418(Unk80040640* self, int i);
 void fn_80041478(Unk80040640* self, int id);
 extern "C" int SNDbankpatpresent(int a, int b);
-extern "C" void fn_803A975C();
+extern "C" void SNDSYS_entercritical();
 int fn_803A85B0(int a, int b, void* out);
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_leavecritical();
 void fn_803A9204(void* p);
 void fn_8006772C();
 
@@ -534,9 +534,9 @@ int fn_80041350(Unk80040640* self, int id)
     if (r30 >= 0 || (r30 = fn_80041418(self, lbl_805AEAB8[a].m50), r31 = lbl_805AF688[id].m10, r30 >= 0)) {
         fn_80041478(self, id);
         if (SNDbankpatpresent(r30, r31) != 0) {
-            fn_803A975C();
+            SNDSYS_entercritical();
             ret = fn_803A85B0(r30, r31, &self->m600);
-            fn_803A979C();
+            SNDSYS_leavecritical();
         }
     }
     return ret;

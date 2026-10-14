@@ -8,8 +8,8 @@
 #include "snd/cmn/sndcmn.h"
 #include <string.h>
 
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
 extern "C" float fn_803B44E4(float x);
 extern "C" float fn_803B457C(float x);
 extern unsigned char* lbl_806AA4E8[];
@@ -525,10 +525,10 @@ extern "C" void fn_803B3908(unsigned int idx, float* out)
 
 extern "C" void fn_803B39A4()
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     if (lbl_806AA4E8 != 0)
         SNDMEMI_free(lbl_806AA4E4);
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }
 
 extern unsigned char lbl_8069CBBC;

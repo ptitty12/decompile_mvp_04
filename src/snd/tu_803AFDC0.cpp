@@ -179,8 +179,8 @@ extern Unk803B21EC_L* lbl_806AA4B0;
 extern float lbl_8060984C;
 
 extern float lbl_80609848;
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
 
 extern "C" int fn_803B02CC(int v)
 {
@@ -550,7 +550,7 @@ extern "C" void fn_803B1B10(void* p)
 extern "C" void fn_803B1DF0()
 {
     int i;
-    fn_803A975C();
+    SNDSYS_entercritical();
     fn_803B141C();
     if (lbl_806AA2D4.m1DC != 0) {
         SNDMEMI_free(lbl_806AA2D4.m1DC);
@@ -569,7 +569,7 @@ extern "C" void fn_803B1DF0()
         }
     }
     fn_803B18BC(lbl_80609848);
-    fn_803A979C();
+    SNDSYS_leavecritical();
 }
 
 extern "C" void fn_803B1EC8()

@@ -122,8 +122,8 @@ extern "C" void fn_803B5ACC();
 extern "C" int AXRegisterAuxACallback(int a, int b);
 extern "C" void OSCancelThread(void* p);
 extern "C" void fn_80417808();
-extern "C" void fn_803A979C();
-extern "C" void fn_803A975C();
+extern "C" void SNDSYS_leavecritical();
+extern "C" void SNDSYS_entercritical();
 extern "C" void SNDDRV_restoremixer();
 extern char lbl_8069FCC8[];
 
@@ -643,13 +643,13 @@ extern "C" void SNDDRV_initmixer()
     b.fn = fn_803AE5EC;
     b.m12 = 0;
     lbl_806AA4C8(&b);
-    fn_803A975C();
+    SNDSYS_entercritical();
     for (i = 0; i < b.m11; i++) {
         void* p = SNDMEMI_allocz(0x2a0);
         lbl_8069E200.mBufs[i] = p;
         lbl_8069E200.mAligned[i] = ((unsigned int)p + 0x1f) & ~0x1f;
     }
-    fn_803A979C();
+    SNDSYS_leavecritical();
     lbl_8069E200.mC048 = 1;
 }
 
@@ -657,15 +657,15 @@ extern "C" void SNDDRV_restoremixer()
 {
     int i;
     lbl_8069E200.mC048 = 0;
-    fn_803A975C();
+    SNDSYS_entercritical();
     for (i = 0; i < sndgs.sso.set.outputchannels; i++)
         SNDMEMI_free(lbl_8069E200.mBufs[i]);
-    fn_803A979C();
+    SNDSYS_leavecritical();
     lbl_806AA4CC();
 }
 
-extern "C" void fn_803A94BC();
-extern "C" void fn_803A9450();
+extern "C" void SNDSYSI_100hzserver();
+extern "C" void SNDSYSI_variabletimerservice();
 extern "C" void OSSleepThread(void* p);
 extern void (*lbl_806AA4D0)(void*, int);
 extern char lbl_806AA268[];
@@ -751,7 +751,7 @@ extern "C" void SNDDRV_thread()
             SNDPKTPLAYI_flushcallbackdata();
         }
         if (lbl_80625C68 & 1) {
-            fn_803A94BC();
+            SNDSYSI_100hzserver();
             int* pq = &lbl_8069CAD4;
             lbl_80625C6C = lbl_80625C6C + lbl_8069E200.m1400;
             float t = lbl_80625C6C;
@@ -763,7 +763,7 @@ extern "C" void SNDDRV_thread()
             *pq = iv;
             if (!(lbl_80625C6C <= 30.0f))
                 lbl_80625C6C -= 30.0f;
-            fn_803A9450();
+            SNDSYSI_variabletimerservice();
         }
         if (sndgs.profileleave != 0)
             sndgs.profileleave();
@@ -830,7 +830,7 @@ extern "C" int SNDPLATFORM_restore()
     fn_803B5ACC();
     if (sndgs.incritical != 0) {
         do {
-            fn_803A979C();
+            SNDSYS_leavecritical();
         } while (sndgs.incritical != 0);
     }
     OSCancelThread(lbl_8069FCC8);

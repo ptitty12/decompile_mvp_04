@@ -8,8 +8,8 @@
 #include "snd/cmn/sndcmn.h"
 #include <string.h>
 
-extern "C" void fn_803A975C();
-extern "C" void fn_803A979C();
+extern "C" void SNDSYS_entercritical();
+extern "C" void SNDSYS_leavecritical();
 extern "C" void fn_803B4160(int shandle, int cutoff);
 extern "C" void fn_803B445C(int shandle, int cutoff);
 extern "C" void fn_803B0F24(int voice);
@@ -22,7 +22,7 @@ extern "C" void SNDCTRL_timemult(int shandle, int v);
 extern unsigned char lbl_8069C9E4[7];
 extern int lbl_8062543C;
 /* near-miss: all 62 insns; retail uses r30 for both the sndgs base and (after the last base use) the SNDMEMI_restore result (stb installed, then mr r30,r3); ours keeps the base in r31 and the result in r30 */
-extern "C" int fn_803AC5CC();
+extern "C" int SNDSYS_restore();
 
 extern const signed char lbl_80609630[6][6];
 extern int lbl_80625448;
@@ -32,7 +32,7 @@ extern int lbl_80625448;
 extern int lbl_8062544C;
 extern int lbl_80625450;
 extern "C" int SNDPLATFORM_outputcaps();
-extern "C" int fn_803AC214(SNDSYSOPTS* sso);
+extern "C" int SNDSYS_getopts(SNDSYSOPTS* sso);
 
 static inline void ErrNop(int) { }
 
@@ -44,7 +44,7 @@ struct Unk8069CB5C {
     int mFlag;
 };
 extern Unk8069CB5C lbl_8069CB5C[];
-extern "C" int fn_803AC368(SNDSYSOPTS* sso);
+extern "C" int SNDSYS_setopts(SNDSYSOPTS* sso);
 
 extern int lbl_8069CBA4;
 
@@ -60,7 +60,7 @@ extern "C" void fn_803B39A4();
 extern "C" void fn_803B12CC();
 extern "C" int SNDMEMI_restore();
 
-extern "C" Snd::SNDSTREAMREQUEST* fn_803AB310(int h)
+extern "C" Snd::SNDSTREAMREQUEST* SNDSTRMI_getrequestptr(int h)
 {
     if (h < 0)
         return 0;
@@ -83,16 +83,16 @@ extern "C" int fn_803AB388(int h, int v)
     return 0;
 }
 
-extern "C" int fn_803AB3D8(int h, int v)
+extern "C" int SNDSTRM_modifyhold(int h, int v)
 {
-    fn_803A975C();
+    SNDSYS_entercritical();
     int ret = -8;
-    Snd::SNDSTREAMREQUEST* r = fn_803AB310(h);
+    Snd::SNDSTREAMREQUEST* r = SNDSTRMI_getrequestptr(h);
     if (r != 0) {
         ret = 0;
         r->holdtime = (short)v;
     }
-    fn_803A979C();
+    SNDSYS_leavecritical();
     return ret;
 }
 
@@ -118,7 +118,7 @@ extern "C" int fn_803AB480(int shandle)
     return voice;
 }
 
-extern "C" int fn_803AB4E0(int maxrequests, int maxchunks)
+extern "C" int SNDSTRM_overheadtap(int maxrequests, int maxchunks)
 {
     int n = lbl_80625448 * 4;
     n += 0x214;
@@ -126,9 +126,9 @@ extern "C" int fn_803AB4E0(int maxrequests, int maxchunks)
     return n + SNDPKTPLAY_overhead(maxchunks);
 }
 
-extern "C" int fn_803AB528(int a, int b)
+extern "C" int SNDSTRM_overhead(int a, int b)
 {
-    int n = fn_803AB4E0(a, b);
+    int n = SNDSTRM_overheadtap(a, b);
     return n + fn_803FD944(a + 2, 1, 1);
 }
 
@@ -149,7 +149,7 @@ extern "C" void fn_803AB5C8(int a, int b, int c)
     fn_803AA810(a, b, 0, c, 2);
 }
 
-extern "C" int fn_803AB5F4(int h, int v)
+extern "C" int SNDSTRM_drylevel(int h, int v)
 {
     SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
     if (pssc == 0)
@@ -159,7 +159,7 @@ extern "C" int fn_803AB5F4(int h, int v)
     return 0;
 }
 
-extern "C" int fn_803AB644(int h, SNDREQUESTSTATUS* s)
+extern "C" int SNDSTRM_requeststatus(int h, SNDREQUESTSTATUS* s)
 {
     s->state = 0;
     s->currenttime = 0;
@@ -170,7 +170,7 @@ extern "C" int fn_803AB644(int h, SNDREQUESTSTATUS* s)
     SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr((unsigned char)h);
     if (pssc == 0)
         return -8;
-    Snd::SNDSTREAMREQUEST* r = fn_803AB310(h);
+    Snd::SNDSTREAMREQUEST* r = SNDSTRMI_getrequestptr(h);
     if (r != 0) {
         if (r->continuation != 0) {
             int rate;
@@ -194,7 +194,7 @@ extern "C" int fn_803AB644(int h, SNDREQUESTSTATUS* s)
     return 0;
 }
 
-extern "C" int fn_803AB858(int h, int v)
+extern "C" int SNDSTRM_setgreedylevel(int h, int v)
 {
     SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
     if (pssc == 0)
@@ -203,7 +203,7 @@ extern "C" int fn_803AB858(int h, int v)
     return 0;
 }
 
-extern "C" int fn_803AB8A4(int h, SNDSTREAMSTATUS* s)
+extern "C" int SNDSTRM_status(int h, SNDSTREAMSTATUS* s)
 {
     s->timebuffered = 0;
     s->currentrequest = 0;
@@ -219,7 +219,7 @@ extern "C" int fn_803AB8A4(int h, SNDSTREAMSTATUS* s)
         if (pssc->cursf.samplerate != 0) {
             s->timebuffered = (unsigned int)SNDPKTPLAY_framesoutstanding(pssc->packetinstancehandle) * 1000 / pssc->cursf.samplerate;
             if (s->timebuffered == 0) {
-                r = fn_803AB310(s->currentrequest);
+                r = SNDSTRMI_getrequestptr(s->currentrequest);
                 if (r->avgdatarate != 0) {
                     unsigned int t = fn_803FE914(pssc->streamhandle);
                     if (t > 0x3D0900)
@@ -232,7 +232,7 @@ extern "C" int fn_803AB8A4(int h, SNDSTREAMSTATUS* s)
     return 0;
 }
 
-extern "C" int fn_803AB984(int h, int v)
+extern "C" int SNDSTRM_timemult(int h, int v)
 {
     if (v > 0x2000)
         v = 0x2000;
@@ -312,7 +312,7 @@ extern "C" int fn_803ABCB4(int k, int* out)
     SNDSYSOPTS sso;
     int r = 0;
     *out = 0;
-    int e = fn_803AC214(&sso);
+    int e = SNDSYS_getopts(&sso);
     switch (e) {
     case -18:
         e = 0;
@@ -361,7 +361,7 @@ extern "C" int fn_803ABDD0(int k, int v)
 {
     SNDSYSOPTS sso;
     SNDSYSOPTS* ps = &sso;
-    int e = fn_803AC214(ps);
+    int e = SNDSYS_getopts(ps);
     switch (e) {
     case -18:
         e = 0;
@@ -393,7 +393,7 @@ extern "C" int fn_803ABDD0(int k, int v)
         return -5;
     }
     if (lbl_8069C9E4[0] == 0) {
-        e = fn_803AC368(ps);
+        e = SNDSYS_setopts(ps);
         switch (e) {
         case -18:
             e = 0;
@@ -420,7 +420,7 @@ extern "C" int fn_803AC11C()
 
 extern "C" int fn_803AC134()
 {
-    fn_803AC5CC();
+    SNDSYS_restore();
     lbl_8062543C = 0;
     return 0;
 }
@@ -436,7 +436,7 @@ extern "C" int fn_803AC164(int k, int a, int b)
     case 2: {
         SNDSYSOPTS sso;
         SNDSYSOPTS* ps = &sso;
-        int e = fn_803AC214(ps);
+        int e = SNDSYS_getopts(ps);
         switch (e) {
         case -18:
             e = 0;
@@ -449,7 +449,7 @@ extern "C" int fn_803AC164(int k, int a, int b)
         }
         ps->set.arampooladdr = a;
         ps->set.arampoolsize = b;
-        e = fn_803AC368(ps);
+        e = SNDSYS_setopts(ps);
         switch (e) {
         case -18:
             e = 0;
@@ -468,7 +468,7 @@ extern "C" int fn_803AC164(int k, int a, int b)
     return 0;
 }
 
-extern "C" int fn_803AC214(SNDSYSOPTS* sso)
+extern "C" int SNDSYS_getopts(SNDSYSOPTS* sso)
 {
     if (lbl_8062544C == 0) {
         sndgs.sso.set.maxbanks = 0x10;
@@ -486,7 +486,7 @@ extern "C" int fn_803AC214(SNDSYSOPTS* sso)
 
 extern "C" void SNDPLATFORM_outputset();
 
-extern "C" int fn_803AC368(SNDSYSOPTS* sso)
+extern "C" int SNDSYS_setopts(SNDSYSOPTS* sso)
 {
     sndgs.sso.set = sso->set;
     sndgs.sso.vec = sso->vec;
@@ -495,7 +495,7 @@ extern "C" int fn_803AC368(SNDSYSOPTS* sso)
     return 0;
 }
 
-extern "C" int fn_803AC5CC()
+extern "C" int SNDSYS_restore()
 {
     if (fn_803AC11C() == 0)
         return -14;
@@ -513,17 +513,17 @@ extern "C" int fn_803AC5CC()
     if (sndgs.bankremove != 0)
         sndgs.bankremove(-1);
     SNDPLATFORM_restore(0);
-    fn_803A975C();
+    SNDSYS_entercritical();
     SNDMEMI_free(sndgs.chan);
     SNDMEMI_free(sndgs.banklist);
-    fn_803A979C();
+    SNDSYS_leavecritical();
     int r = SNDMEMI_restore();
     sndgs.installed = 0;
     fn_803B12CC();
     return r;
 }
 
-extern "C" int fn_803AC6C4()
+extern "C" int SNDSYSI_chanpubinit()
 {
     int n = lbl_80625448;
     int nv = sndgs.voicestotal;
