@@ -469,15 +469,14 @@ extern "C" int fn_803FF714(int a, int b, int c, int d)
     return 1;
 }
 
-/* near-miss: 26 vs 25 slots. */
+/* EA writefile (reference-build name): seek then write through the host file interface. */
 extern "C" int fn_803FF760(FsState* s, int a, int b, int c)
 {
     int r = -1;
     if (s->m0 == 3) {
-        int h = ((int*)s)[0x108 / 4];
-        PClseek(h, b, 0);
-        PCwrite(h, a, c);
-        r = 1;
+        PClseek(((int*)s)[0x108 / 4], b, 0);
+        PCwrite(((int*)s)[0x108 / 4], a, c);
+        return 1;
     }
     return r;
 }
