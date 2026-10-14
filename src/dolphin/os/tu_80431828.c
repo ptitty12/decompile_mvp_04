@@ -242,7 +242,7 @@ extern u8 fn_80432044[];   /* __OSEVStart: OSExceptionVector (original code) */
 extern u8 lbl_8043209C[];
 extern u8 lbl_804320AC[];
 extern u8 lbl_804320DC[];
-extern void fn_804320E0(void);   /* OSDefaultExceptionHandler (original code) */
+extern void fn_804320E0(__OSException exception, OSContext* context);   /* OSDefaultExceptionHandler (original code) */
 void DBPrintf(char* str, ...);
 BOOL fn_80421C04(__OSException exception);      /* __DBIsExceptionMarked */
 
