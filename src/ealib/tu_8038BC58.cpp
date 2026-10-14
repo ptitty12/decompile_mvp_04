@@ -910,9 +910,11 @@ extern "C" int fn_8038EA64(VdCbObj* h, int)
 
 extern "C" int fn_8038EA9C(VdCbObj* s)
 {
-    int v = s->m0;
-    if (v != 0) {
+    int v;
+    int r = s->m0;
+    if (r != 0) {
         s->m0 = 0;
+        v = r;
         return v;
     }
     s->m8(s, s->m4, &v);
