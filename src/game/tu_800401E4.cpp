@@ -45,7 +45,7 @@ void fn_803A6644(int a);
 extern "C" int fn_803A82A8(int* out, int a);
 int fn_803A8530(int a);
 void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
-int fn_803A84BC(int a);
+int fn_803A84BC(int a, int b);
 extern "C" int fn_803A6B64(int a, const char* b, int c, void (*cb)(int, int));
 Unk80040640* fn_8004072C();
 void fn_800404A8(int u, int size);
@@ -155,11 +155,10 @@ int Unk800401E4::fn_800404E0(int* p, const char* name)
     int r = fn_803A82A8(&m4, *p);
     if (r >= 0) {
         if (r == 7) {
-            char* t = new (0x400) char[fn_803A8530(m4)];
-            m0 = (int)t;
-            if (t == 0) {
+            m0 = (int)(new (0x400) char[fn_803A8530(m4)]);
+            if (m0 == 0) {
                 ok = 0;
-            } else if (fn_803A84BC(m4) < 0) {
+            } else if (fn_803A84BC(m0, m4) < 0) {
                 ok = 0;
                 if (m0 != 0)
                     delete[] (char*)m0;
@@ -443,6 +442,68 @@ void fn_80040DCC(Unk80040640* self, int a, int b)
             fn_80040E9C(self, 13);
         }
     }
+}
+
+extern char lbl_805AE920[][0x1b];
+extern char lbl_805AE971[][0x51];
+extern char lbl_805AE98C[][0x51];
+struct Unk805AEACC_Ent {
+    char m0[0x44];
+    int m44;
+    char m48[0x7c - 0x48];
+};
+extern Unk805AEACC_Ent lbl_805AEACC[];
+extern "C" int rand();
+
+extern "C" int fn_80040E9C(Unk80040640* self, int a)
+{
+    int ret = 1;
+    int skip = 0;
+    int off = a * 0x3c;
+    if (((Unk800401E4*)(off + (int)self))->m8 == 1) {
+        if ((a == 13 && self->m5F8 != lbl_806177DC) || (a == 12 && self->m5FC != lbl_806177DC))
+            fn_80040C58(self, a);
+        else
+            skip = 1;
+    }
+    if (skip == 0) {
+        int j;
+        for (j = 0; j < 8; j++) {
+            if (self->m5D4[j] >= 0 && lbl_805AEAB8[a].m30[j] == 1) {
+                ret = 0;
+                break;
+            }
+        }
+        if (ret == 1) {
+            const char* name;
+            const char* name2 = 0;
+            switch (a) {
+            case 13:
+                name = lbl_805AE971[lbl_806177DC];
+                name2 = lbl_805AE971[lbl_806177DC] + 0x36;
+                break;
+            case 12:
+                name = lbl_805AE98C[lbl_806177DC];
+                break;
+            case 0:
+                name = lbl_805AE920[rand() % 3];
+                break;
+            default:
+                name = lbl_805AEACC[a].m0;
+                if (lbl_805AEACC[a].m44 == 1)
+                    name2 = lbl_805AEACC[a].m48;
+                break;
+            }
+            ret = self->m0[a].fn_8004028C(name, lbl_805AEAB8[a].m54, name2, lbl_805AEAB8[a].m78);
+            if (ret != 0) {
+                if (a == 13)
+                    self->m5F8 = lbl_806177DC;
+                else if (a == 12)
+                    self->m5FC = lbl_806177DC;
+            }
+        }
+    }
+    return ret;
 }
 
 int fn_800412AC(Unk80040640* self, int id, int a, int b, int c, int d)

@@ -415,6 +415,57 @@ double fn_80396328(double a, double b, double c)
     return lbl_80607420[0] / (a * fn_804101AC(lbl_80607418[0])) * e;
 }
 
+extern "C" int rand();
+extern const double lbl_80607450[];
+
+/* VP6 postprocess "PlaneAddNoise_C" (EA reference-build name, same code): dithers one plane with Gaussian noise drawn
+ * through rand() (the C library generator the game shares): 2048 draws to fill the noise table plus one per row.
+ * CharDist[0] must be read inside the loops (the loop optimizer hoists the load), `pad` reproduces retail's frame. */
+void fn_80396398(unsigned char* Start, unsigned Width, unsigned Height, int Pitch, int q)
+{
+    unsigned i, j;
+    char A[16];
+    char B[16];
+    char C[16];
+    char CharDist[304];
+    char Rand[2048];
+    char pad[48]; /* unused in retail too: its frame has 48 spare bytes here */
+    double sigma = 1.0 + (63 - q) * (0.8 / 63.0);
+    int idx = 0;
+    double x;
+    for (x = -32.0; x < 32.0; x += 1.0) {
+        int n = (int)(fn_80396328(sigma, lbl_80607450[0], x) * 256.0 + 0.5);
+        if (n) {
+            int k;
+            for (k = 0; k < n; k++)
+                CharDist[idx + k] = (char)(int)x;
+            idx += k;
+        }
+    }
+    for (; idx <= 255; idx++)
+        CharDist[idx] = 0;
+    for (i = 0; i < 2048; i++)
+        Rand[i] = CharDist[rand() & 0xff];
+    for (i = 0; i < 16; i++) {
+        A[i] = -CharDist[0];
+        B[i] = -CharDist[0];
+        C[i] = CharDist[0] * -2;
+    }
+    for (i = 0; i < Height; i++) {
+        unsigned char* p = Start + i * Pitch;
+        char* noise = &Rand[rand() & 0xff];
+        for (j = 0; j < Width; j++) {
+            if (p[j] < -CharDist[0])
+                p[j] = -CharDist[0];
+            if (p[j] > 255 - CharDist[0])
+                p[j] = 255 - CharDist[0];
+            p[j] += noise[j];
+        }
+    }
+}
+
+
+
 void fn_80396ADC(Vp6Tbl* t)
 {
     *(Vp6Blk100*)((char*)t + 0x3C) = lbl_80607468;

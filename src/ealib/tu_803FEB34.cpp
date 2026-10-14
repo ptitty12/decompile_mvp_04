@@ -47,7 +47,7 @@ void fn_803FF5E8(int, int);
 }
 
 extern "C" {
-void fn_803F96B0(void* p);
+void fn_803F96B0(int h, void* cb);
 int fn_803F99E8(int h);
 int fn_803F9664(int h);
 int fn_803F9A80(int h);
@@ -106,10 +106,22 @@ typedef void (*Fn0)(void);
 extern Fn0 lbl_8062EE40[8];
 extern char lbl_8060E7D4[];
 
-/* near-miss: 43 vs 42 slots; retail compares a reloaded r.len and stores fn after that load (volatile struct is the closest). */
+/* Request block on the stack: every field but h is volatile (retail reloads len/c/d around the call and keeps h in a
+   register), and fn is stored after the first read of len, hence the volatile fn pointer. */
+struct FsReqV {
+    volatile int e;
+    volatile int a;
+    volatile int b;
+    volatile int d;
+    volatile int result;
+    volatile int len;
+    volatile int c;
+    int (* volatile fn)(int, int, int, int, int, FsReq*);
+    int h;
+};
 extern "C" int fn_803FEB34(int a, int b, int c, int d, int e, int (*fn)(int, int, int, int, int, FsReq*))
 {
-    volatile FsReq r;
+    FsReqV r;
     r.e = e;
     r.a = a;
     r.b = b;
@@ -117,12 +129,14 @@ extern "C" int fn_803FEB34(int a, int b, int c, int d, int e, int (*fn)(int, int
     r.result = 0;
     r.len = d;
     r.c = c;
+    int ln0 = r.len;
     r.fn = fn;
-    if (r.len > 0x100000)
+    if (ln0 > 0x100000)
         r.len = 0x100000;
-    r.h = fn(a, b, r.c, r.len, e, (FsReq*)&r);
+    int ln = r.len;
+    r.h = fn(a, b, r.c, ln, e, (FsReq*)&r);
     if (r.h != 0) {
-        fn_803F96B0(fn_803FEA38);
+        fn_803F96B0(r.h, fn_803FEA38);
         do {
             fn_803F99E8(r.h);
         } while (r.d != 0 || r.h != 0);
@@ -293,6 +307,73 @@ test:
     return 0;
 }
 
+struct DevPrefixes {
+    const char* m0;
+    const char* m4;
+    const char* m8;
+};
+extern const DevPrefixes lbl_8060E80C;
+extern "C" int DVDConvertPathToEntrynum(const char* path);
+extern "C" int DVDFastOpen(int entry, void* fi);
+
+/* File open front end of the RealCore file device (no EA name known; its callees are EA's FixSlash, MyStrCmpi and
+ * openfile_plat = fn_803FEEE8): prefixes from lbl_8060E80C (or a non-read mode) go to the host file interface (PC*),
+ * everything else through DVDConvertPathToEntrynum/DVDFastOpen. Backslashes become slashes.
+ * near-miss (97%): 89 insns as retail; viaPC and the loop end pointer have swapped callee-saved registers (retail
+ * viaPC r30, end r28) and the first character of path is loaded with lbz 0(r29) instead of li r9,0 / lbzx. */
+extern "C" int fn_803FF058(const unsigned char* path, unsigned mode, FsState* s)
+{
+    char buf[0x100];
+    char* fi = (char*)s + 0x108;
+    DevPrefixes pref = lbl_8060E80C;
+    int n = 0;
+    int viaPC = (mode ^ 1) & 1;
+    int r;
+    if (viaPC == 0) {
+        const char** q;
+        for (q = &pref.m0; q <= &pref.m8; q++) {
+            n = fn_803FF008((const char*)path, *q);
+            if (n != 0) {
+                viaPC = 1;
+                break;
+            }
+        }
+    }
+    if (viaPC != 0) {
+        fn_803FEFC4(buf, path + n);
+        r = fn_803FEEE8((int)buf, mode, (int*)((char*)s + 0x108));
+        if (r == 0)
+            PCclose(((int*)s)[0x108 / 4]);
+        else
+            s->m0 = 3;
+    } else {
+        int i = 0;
+        unsigned char c = path[i];
+        if (c != 0) {
+            do {
+                if (c == 0x5C)
+                    buf[i] = '/';
+                else
+                    buf[i] = c;
+                i++;
+                c = path[i];
+            } while (c != 0);
+        }
+        buf[i] = path[i];
+        int e = DVDConvertPathToEntrynum(buf);
+        if (e == -1) {
+            r = 0;
+        } else {
+            r = DVDFastOpen(e, fi);
+            if (r == 0)
+                DVDClose((char*)s + 0x108);
+        }
+        if (r != 0)
+            s->m0 = 2;
+    }
+    return r;
+}
+
 /* subfic/adde converts zero to one after the shared close result. */
 extern "C" int fn_803FF1BC(FsState* s)
 {
@@ -308,6 +389,51 @@ extern "C" void fn_803FF210()
 {
     lbl_806ADEC0.m0 = 5;
     fn_803FF5E8(0, 0);
+}
+
+extern "C" void fn_803FFA60(char* d, const char* s, int n);
+extern "C" int DVDReadAsyncPrio(void* fi, void* addr, int len, int off, void (*cb)(int, int), int prio);
+extern "C" void DCInvalidateRange(void* p, int n);
+
+extern "C" void fn_803FF244(void* fi)
+{
+    int st = lbl_806ADEC0.m0;
+    if (st == 2) {
+        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)(((int*)&lbl_806ADEC0)[0x30 / 4] + (int)((char*)&lbl_806ADEC0 + 0x60)), lbl_806ADEC0.m34);
+        lbl_806ADEC0.m8 += lbl_806ADEC0.m34;
+        lbl_806ADEC0.m4 += lbl_806ADEC0.m34;
+    } else if (st == 3) {
+        DCInvalidateRange((void*)lbl_806ADEC0.m4, lbl_806ADEC0.m1C - lbl_806ADEC0.m4);
+        int t = lbl_806ADEC0.m1C - lbl_806ADEC0.m4;
+        lbl_806ADEC0.m8 += t;
+        lbl_806ADEC0.m4 += t;
+    } else if (st == 4) {
+        int n = lbl_806ADEC0.m18 - lbl_806ADEC0.m4;
+        if (n > 0x4000)
+            n = 0x4000;
+        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)&lbl_806ADEC0 + 0x60, n);
+        lbl_806ADEC0.m8 += n;
+        lbl_806ADEC0.m4 += n;
+    } else if (st == 1) {
+        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)(((int*)&lbl_806ADEC0)[0x30 / 4] + (int)((char*)&lbl_806ADEC0 + 0x60)), lbl_806ADEC0.mC);
+        lbl_806ADEC0.m0 = st;
+        fn_803FF210();
+        return;
+    }
+    if (lbl_806ADEC0.m4 == lbl_806ADEC0.m14 && lbl_806ADEC0.m4 < lbl_806ADEC0.m1C) {
+        lbl_806ADEC0.m0 = 3;
+        lbl_806ADEC0.m38 = DVDReadAsyncPrio(fi, (void*)lbl_806ADEC0.m4, lbl_806ADEC0.m1C - lbl_806ADEC0.m4, lbl_806ADEC0.m8, fn_803FF5E8, 2);
+        return;
+    }
+    if (lbl_806ADEC0.m18 > lbl_806ADEC0.m4) {
+        int n = (lbl_806ADEC0.m18 - lbl_806ADEC0.m4 + 0x1f) & ~0x1f;
+        if (n > 0x4000)
+            n = 0x4000;
+        lbl_806ADEC0.m0 = 4;
+        lbl_806ADEC0.m38 += DVDReadAsyncPrio(fi, (char*)&lbl_806ADEC0 + 0x60, n, lbl_806ADEC0.m8, fn_803FF5E8, 2);
+        return;
+    }
+    fn_803FF210();
 }
 
 extern "C" void fn_803FF5E8(int, int)
@@ -346,26 +472,26 @@ extern "C" int fn_803FF618()
 }
 
 
-/* near-miss: same length; the queue address (lis/addi) is formed between the stores in retail. */
+/* EA readfile (reference-build name): queues a read request for the worker thread. near-miss (89.5%): the request fields
+   are volatile stores in retail's order; only li r4,0 and the last store (m48) are swapped (2 insns). */
 extern "C" int fn_803FF714(int a, int b, int c, int d)
 {
-    lbl_806ADEC0.m3C = a;
-    lbl_806ADEC0.m44 = c;
-    lbl_806ADEC0.m40 = b;
-    lbl_806ADEC0.m48 = d;
+    ((volatile FsState*)&lbl_806ADEC0)->m3C = a;
+    ((volatile FsState*)&lbl_806ADEC0)->m44 = c;
+    ((volatile FsState*)&lbl_806ADEC0)->m40 = b;
+    ((volatile FsState*)&lbl_806ADEC0)->m48 = d;
     OSSendMessage(lbl_806B8238, 0, 1);
     return 1;
 }
 
-/* near-miss: 26 vs 25 slots. */
+/* EA writefile (reference-build name): seek then write through the host file interface. */
 extern "C" int fn_803FF760(FsState* s, int a, int b, int c)
 {
     int r = -1;
     if (s->m0 == 3) {
-        int h = ((int*)s)[0x108 / 4];
-        PClseek(h, b, 0);
-        PCwrite(h, a, c);
-        r = 1;
+        PClseek(((int*)s)[0x108 / 4], b, 0);
+        PCwrite(((int*)s)[0x108 / 4], a, c);
+        return 1;
     }
     return r;
 }
@@ -398,6 +524,39 @@ extern "C" void fn_803FF850()
         OSInitAlarm();
         lbl_806EEAB0++;
     }
+}
+
+/* OS low-memory globals: 0xF8 bus clock (read as 0x800000F8). */
+struct LowMem {
+    char pad[0xF8];
+    unsigned busClock;
+};
+#define LOWMEM ((LowMem*)0x80000000)
+extern int lbl_806EEADC;
+extern "C" {
+long long OSGetTime(void);
+void OSSetPeriodicAlarm(void* alarm, long long start, long long period, void (*handler)());
+void fn_8040015C(void);
+void fn_80400690(void (*cb)());
+void fn_803FF994();
+void fn_803FFA3C();
+}
+
+/* EA TIMER_init(int hz): starts the periodic alarm that ticks the RealCore timer thread (hz defaults to 100). */
+extern "C" int fn_803FF888(int hz)
+{
+    if (lbl_806EEAB1 != 0)
+        return lbl_806EEADC;
+    if (hz == 0)
+        hz = 100;
+    lbl_806EEADC = hz;
+    long long start = OSGetTime();
+    long long period = (int)((float)(LOWMEM->busClock >> 2) * (1.0f / (float)hz));
+    fn_8040015C();
+    OSSetPeriodicAlarm(lbl_806B82E0, start, period, fn_803FFA3C);
+    lbl_806EEAB1 = 1;
+    fn_80400690(fn_803FF994);
+    return lbl_806EEADC;
 }
 
 extern "C" void fn_803FF994()

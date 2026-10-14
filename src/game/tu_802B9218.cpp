@@ -94,38 +94,44 @@ int fn_802B9250(int a, int b, int c)
     return r;
 }
 
-/* near-miss: 123 insns as retail; sp14/sp18 stack slots swapped (retail &sp18 = sp+0x18, &sp14 = sp+0x14) and name/result
-   callee-saved registers swapped (name r28, result r29 in retail). Declaration and init order of the five locals do not change it. */
+/* near-miss: 123 insns as retail, stack slots and callee-saved numbering now match; the only difference is where the
+   low half (addi) of the "Loading %s" format address is scheduled (retail: after the first two zeroing stores).
+   Notes: the five address-taken locals must be members of one struct (as separate scalars GCC numbers them in order
+   of first use, which swapped sp14/sp18); routing sp8 + sp10 through r (r = ...; int a = r;) raises r's register
+   priority above name's, which is what makes name r28 / r r29 as in retail (permuter find). */
 extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigned int* outn)
 {
-    int sp8;
-    int spC;
-    int sp10;
-    int sp14;
-    int sp18;
+    struct {
+        int sp8;
+        int spC;
+        int sp10;
+        int sp14;
+        int sp18;
+    } s;
     int r = 0;
     int h;
-    sp10 = 0;
-    sp18 = 0;
-    sp14 = 0;
-    sp8 = 0;
-    spC = 0;
+    s.sp10 = 0;
+    s.sp18 = 0;
+    s.sp14 = 0;
+    s.sp8 = 0;
+    s.spC = 0;
     fn_8033E958(lbl_805E0F5C, name);
-    fn_802B9D7C(kind, &sp8, &spC);
-    switch (spC) {
+    fn_802B9D7C(kind, &s.sp8, &s.spC);
+    switch (s.spC) {
     case 0:
         break;
     case 1:
-        if (sp8 != 0) {
-            fn_803FC410(sp8, name, 0, &sp10, outn);
-            r = sp8 + sp10;
+        if (s.sp8 != 0) {
+            fn_803FC410(s.sp8, name, 0, &s.sp10, outn);
+            r = s.sp8 + s.sp10;
             break;
         }
         goto L_default;
     case 2:
-        if (sp8 != 0) {
-            fn_803FC410(sp8, name, 0, &sp10, &sp18);
-            int a = sp8 + sp10;
+        if (s.sp8 != 0) {
+            fn_803FC410(s.sp8, name, 0, &s.sp10, &s.sp18);
+            r = s.sp8 + s.sp10;
+            int a = r;
             int n = fn_804017D0(a);
             if (n != 0) {
                 if (outn != 0) {
@@ -135,22 +141,22 @@ extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigne
                 fn_804017B0(a, h);
             } else {
                 if (outn != 0) {
-                    *outn = sp18;
+                    *outn = s.sp18;
                 }
-                h = fn_803ED604(name, sp18, size);
-                fn_803FFA60(h, a, sp18);
+                h = fn_803ED604(name, s.sp18, size);
+                fn_803FFA60(h, a, s.sp18);
             }
             r = h;
             break;
         }
     L_default:
-        r = (int)fn_802B9CCC((int)name, &sp14, size);
+        r = (int)fn_802B9CCC((int)name, &s.sp14, size);
         if (outn != 0) {
-            *outn = sp14;
+            *outn = s.sp14;
         }
         break;
     case 3:
-        r = (int)fn_802B9CCC((int)name, &sp14, size);
+        r = (int)fn_802B9CCC((int)name, &s.sp14, size);
         if (r != 0) {
             if (outn != 0) {
                 *outn = fn_803EE310(r);
