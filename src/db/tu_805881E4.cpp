@@ -491,6 +491,151 @@ extern "C" DB_OVERLAY void fn_80589020(int* self, int a)
     }
 }
 
+struct Db8058928C_Tmp {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    int At(unsigned i)
+    {
+        int o = i * 4;
+        return *(int*)((char*)m0 + o);
+    }
+};
+extern "C" int fn_800B56C4(Db800B555C_Obj* o);
+extern "C" void fn_80538BF8(void* l, int x, int y);
+extern "C" int fn_80582F40(void* self, int a, int b, int c, float x, float y, float z);
+extern "C" int fn_80583000(void* self, int a);
+extern "C" int fn_80582E38(void* self, int a, int b);
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8064A2A8[];
+extern char lbl_8064A4C8[];
+extern const float lbl_80600820;
+extern "C" void fn_8040074C(void* p, unsigned n);
+extern "C" void fn_805371C4(void* l, unsigned f);
+
+/* K3: picks the subject of fn_80589020's news event. Roll rand() % 3 picks one of three candidate masks, fn_805371C4 fills a
+ * list with the matching players (up to 130), and players are drawn at random (rand() % count, then removed from the list)
+ * until one has a partner list (fn_80538BF8) on a different team than `a`; then partners are drawn the same way until one
+ * passes fn_80582E38 and the rating gate (fn_80074754(1, ..) >= lbl_80600820 for type 0, else fn_800739E0(0xB, ..) > 29).
+ * Returns the partner id, or 0. near-miss: retail keeps the two return-0 exits as separate blocks (each with its own lis) and
+ * tests found with cr0; here jump2 merges the exits and the final select uses cr7. */
+extern "C" DB_OVERLAY int fn_8058928C(void* self, int a, int sc, float f1, float f2, float f3)
+{
+    Unk80536990_Screen* s = (Unk80536990_Screen*)lbl_8061930C;
+    Db8058928C_Tmp t0;
+    int b0[0x82];
+    Db8058928C_Tmp t1;
+    int b1[0x28];
+    unsigned i;
+    unsigned k;
+    unsigned mask = 0x1FC0;
+    int r = rand() % 3;
+    if (r == 1)
+        mask = 0x7E000;
+    else if (r == 2)
+        mask = 0x1F80000;
+    int t;
+    if (fn_800B56C4(fn_800B555C()) != 0 || sc == 0)
+        t = fn_80582F40(self, 2, 3, 4, f1, f2, f3);
+    else
+        t = fn_80583000(self, ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007CBB8(0xE, sc));
+    Db8058928C_Tmp* p0 = &t0;
+    Db8058928C_Tmp* p1 = &t1;
+    t0.m0 = b0;
+    t0.vp = lbl_8064B298;
+    p0->m8 = 0x82;
+    fn_8040074C(t0.m0, t0.m8 * 4);
+    p0->m4 = 0;
+    p0->mC = 0;
+    t0.vp = lbl_8064A550;
+    fn_8040074C(t0.m0, t0.m8 * 4);
+    p0->m4 = 0;
+    p0->mC = 0;
+    p0->m14 = 0;
+    t0.vp = lbl_8064A2A8;
+    t1.m0 = b1;
+    t1.vp = lbl_8064B298;
+    p1->m8 = 0x28;
+    fn_8040074C(t1.m0, t1.m8 * 4);
+    p1->m4 = 0;
+    p1->mC = 0;
+    t1.vp = lbl_8064A550;
+    fn_8040074C(t1.m0, t1.m8 * 4);
+    p1->m4 = 0;
+    p1->mC = 0;
+    p1->m14 = 0;
+    t1.vp = lbl_8064A4C8;
+    fn_805371C4(p0, mask);
+    if (t0.m4 != 0)
+        i = rand() % t0.m4;
+    else
+        i = 0;
+    int x = t0.At(i);
+    if (i < t0.m4) {
+        for (k = i; k < t0.m4; k++)
+            t0.m0[k] = t0.m0[k + 1];
+        t0.m4--;
+    }
+    int team = ((Unk8007B2B0_Screen*)s)->fn_80075948(x);
+    int found = 0;
+    do {
+        fn_80538BF8(p1, t, x);
+        if (t1.m4 == 0 || team == a) {
+            if (t0.m4 != 0)
+                i = rand() % t0.m4;
+            else
+                i = 0;
+            x = t0.At(i);
+            team = ((Unk8007B2B0_Screen*)s)->fn_80075948(x);
+            if (i < t0.m4) {
+                for (k = i; k < t0.m4; k++)
+                    t0.m0[k] = t0.m0[k + 1];
+                t0.m4--;
+            }
+        } else {
+            found = 1;
+        }
+    } while (found == 0 && t0.m4 != 0);
+    int res;
+    if (found == 0) {
+        res = 0;
+    } else {
+        int w = fn_80084014__Fii(((Unk8007B2B0_Screen*)s)->fn_80078A38(x), 1);
+        found = 0;
+        int y;
+        do {
+            if (t1.m4 != 0)
+                i = rand() % t1.m4;
+            else
+                i = 0;
+            y = t1.At(i);
+            if (i < t1.m4) {
+                for (k = i; k < t1.m4; k++)
+                    t1.m0[k] = t1.m0[k + 1];
+                t1.m4--;
+            }
+            int cls = s->fn_8007A6A0(5, y);
+            if (cls != 10 && fn_80582E38(self, y, 1) == 0) {
+                if (cls == 0) {
+                    float v = (float)s->fn_80074754(1, y, w);
+                    if (!(v < lbl_80600820))
+                        found = 1;
+                } else if (s->fn_800739E0(0xB, y, w, 2) > 0x1D) {
+                    found = 1;
+                }
+            }
+        } while (found == 0 && t1.m4 != 0);
+        res = found ? y : 0;
+    }
+    t1.vp = lbl_8064A550;
+    t0.vp = lbl_8064A550;
+    return res;
+}
+
 extern "C" DB_OVERLAY void fn_80589720(void* self, void* rec, unsigned short* dst)
 {
     fn_8058233C(self);
