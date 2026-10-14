@@ -356,3 +356,20 @@
   - "private" wording removed from AGENTS.md and prompts/11_TEAM_WORKER.md (DECISIONS 2026-10-13); HANDOFF.md points at `ptitty12/mvp2005-decomp`. The lead-owned briefs in tools/team/lead/worker_prompt_*.md still say "private"; claude-lead was told.
   - Tool READMEs: check_literals.py, passthru.py, branch_targets.py (match) and units.py (recon) added; the swarm README's done item marked.
   | Owner: nothing new. The 125 still-open provisional unit issues on GitHub are unused (claims live in coord.py); closing them is a possible cleanup.
+- 2026-10-13 | Claude Opus 5.5 (lead) + 11 Claude Fable 5.1 workers, 21:28-22:12 CDT | Fable hard-function pass on game/ and animation/ (owner: "go hard with Fable on the harder ones") | 9 functions matched, all merged to main by 23:10. Spun down early: the all-models weekly limit hit 100% at about 22:10.
+  - Setup:
+    - 10 workers on parked near-misses and big unmatched functions, 3 units each (queue/hard_NN.txt, template tools/team/lead/worker_prompt_hard.md);
+    - 1 worker on the provider-contract declaration fixes Codex asked for.
+  - Matched:
+    - fn_802A1790 (animation/goals/tu_8029EE50), fn_802C0050 (game/tu_802BF974);
+    - fn_80249D44 and fn_80248370 (game/tu_80246D04), fn_801852A4 (game/tu_8018423C);
+    - fn_801971B8 (game/tu_80194D44), fn_802F35A4 (game/tu_802EFF28);
+    - fn_8020C5FC (85.1% -> 100%) and fn_8020C9CC (game/tu_8020ADC4).
+    - 6 of 11 workers matched at least one function.
+  - Cost and yield: the Fable weekly limit went from 5% to 22% and all-models from 91% to 100%, in about 40 minutes. That is about 1.3 matches per worker-hour on parked functions, where Sonnet's earlier near-miss batches got about 9 on easier ones. Fable showed its value in explanations, not throughput: every unmatched function now has a root cause in its notes, and several general compiler rules came out of it (PATTERNS "Fable hard-function pass").
+  - Contract worker (no commits, evidence complete): exact edits for fn_800B7A94/7AB8 (pointer result), fn_8007F198, fn_8007BB28 (float), fn_8007FB40 (unsigned), fn_8007F524, fn_80077D88, fn_80071EF8, fn_8007824C, with symbols.txt renames. fn_803FFA60's exact prototype waits on a Codex caller (db/tu_8053CC9C.cpp:676) that passes an int as the source pointer. Details: docs/notes/fable-2026-10-13/W12.md.
+  - Source bug found: fn_8028C6B8 is missing `case 1:` (retail routes m48 == 1 to the case-0 body).
+  - Process problems found and fixed:
+    - verify fails on a leftover `build/_baseline/wt` from an interrupted run; integ.sh now clears it inside the lock.
+    - Two of the lead's own integrations under the same agent name ran at once: `coord.py run-locked` treated a second run under the same name as re-entrant, and the first to finish released the lock while the other was still verifying. Fixed: `run-locked` is no longer re-entrant, so a second run under the same name waits (tested with two overlapping runs in a scratch COORD_DIR). The explicit `lock` command is unchanged.
+  - Notes for every function attempted: docs/notes/fable-2026-10-13/.

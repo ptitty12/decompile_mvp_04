@@ -2047,3 +2047,44 @@ instructions longer until this was understood:
   `int off = j << 2; j++; *(int*)(off + (int)self->m10) = v;` instead of `self->m10[j++] = v;`.
 - Things that do NOT change the count: dead counters, `(unsigned short)` casts and `int x = call()` temporaries are
   gone before the loop pass. Volatile junk stores raise the count but change the output.
+## Fable hard-function pass (2026-10-13 evening)
+
+Eleven Fable 5.1 workers ran on parked near-misses and big unmatched functions in game/ and animation/ for 35-45 minutes each, then were spun down when the weekly limit ran out. Per-function notes (what fixed each match, every failed approach, untried leads) are in `docs/notes/fable-2026-10-13/W*.md`. Read a function's entry there before re-attempting it.
+
+Stack frame layout (inlines, -ffloat-store):
+- An inline's whole frame is ONE 8-aligned block: its -ffloat-store float parameters, its locals and the frames of inlines nested in it. A 4-byte float slot in the gap right after an inline's parameter slot can only be a local of that same inline.
+- Inline blocks are freed at the end of the containing statement and reused whole by the next inline; they are not split. Exception: an inline in an `if` condition stays allocated through both arms. SFmode locals never reuse freed blocks.
+- A by-value aggregate parameter (`f(Vec3 v)`) is passed by hidden reference (EABI): the caller allocates a separate 16-byte temp before the inline's own frame. `const Vec3&` costs nothing.
+- `*out = Add(...)` allocates its return temp at the start of the statement. Splitting `Vec3 d = Sub(...);` into its own statement lets that temp reuse Sub's freed slot. Only offsets move, so score it with rv.py rather than by eye.
+- A spilled float parameter is loaded first by emit_cmp_insn. When retail loads the member before the parameter with the same fcmpu order, the member was read through an inline getter (its return value is a pseudo).
+
+Parameter order and register allocation:
+- A float parameter's position in the prototype orders its f1 copy (the -ffloat-store stfs) among the int argument moves at sched1. Every int parameter whose move follows it gets one more insn of live length, which flips allocno priority ties between callee-saved pairs.
+- Moving the float earlier changes only the mangled name, not the ABI (FPRs and GPRs are assigned independently); rename with tools/scout/rename.py. This matched fn_802C0050.
+- Check callee float positions too: fn_8024796C's real signature has the float second.
+- REG_LIVE_LENGTH after sched1 counts insns from the pseudo's definition to its death, summed over blocks. Sched1 keeps priority-0 parameter copies in LUID order, so the entry copy order decides register ties.
+- One named local assigned several times (6 refs) outranks a parameter and takes its preferred r3. This is the tell when a parameter is copied out of r3 at entry while repeated loads land in r3.
+- cse1 picks as canonical the register that lives longer. gcse copy propagation, cse1 and regmove re-merge every plain C copy, so a two-pseudo loop pointer (one dying at the argument load, a copy kept across the call) must come from loop strength reduction (fn_80221A70, open).
+- regclass: a constant index gets BASE_REGS (`li r9,off; stwx`) only when neither address operand is pointer-flagged. Casts, int locals and reference parameters all keep the flag (fn_8028C6B8, open).
+- floor_log2 priority near-ties (0.80 vs 0.85, cliff at 16 refs): one extra reference is the lever (fn_80227564, open).
+
+Scheduling and store order:
+- Two stores of the same constant share one pseudo. sched1 ranks the store where it dies (the later one in source) at weight -1 and pushes the earlier store to the end of the block. So among same-value stores, retail's LAST store was written FIRST in source; equal-weight stores keep source order.
+- Read store order off the compiler instead of brute-forcing: `cc1plus -dS` (sched/sched2 dumps). The "Ready list" picks its last entry, and the visualization table gives per-cycle issue order.
+- Under -ffloat-store cse never forwards a float stack store to a following load (`float c = a;` always reloads), so only constant-folded forms keep a single lfs.
+- When cse merges two pool loads of the same float constant into one pseudo, the pseudo dies at the last store in RTL order and sched1 schedules that dying store first (fn_801F0004, open).
+
+Control flow:
+- Retail entering a loop by jumping past the first of two tests is `for (i = 0; i < N && cond(i); i++)`: cse folds the entry copy of `i < N`. A hand-written goto layout gives the same instructions but different registers.
+- "X computed in both arms, only the tail cross-jumped" means the whole statement is written once per arm, and each arm must END in `r = ...` to a shared local. A per-arm `return` reorders the block copy's stores.
+- `return K` inside an if-block right after `if (r == 2) return C;` is an else arm starting with a set of r3, so jump.c hoists `li r3,C` above the bne. Retail's `bne; li; b` comes from one shared return after a real if/else.
+- fold turns `s >= 1` into `s > 0`, so retail `cmpwi 1; blt` / `cmpwi 6; bgt` against literal bounds is a switch case range (`case 1 ... 6:`), which stmt.c compares unfolded.
+- cse's extended basic block runs over an `if (a == K) {...}` chain: each bne to the next test is an around-path entry (max 9). Whether a duplicated compare is CSE'd depends on where the ebb started.
+
+Source bug found: fn_8028C6B8 (animation/goals/tu_8028C6B8) routes m48 == 1 to the case-0 body in retail. Our source is missing `case 1:` in the `case 0: case 20:` group. It must ship with the next fix to that function.
+
+Process:
+- diff_unit.py prints retail on the LEFT and ours on the RIGHT; our side shows `.rodata+0xN` relocations.
+- rv.py's QDIR must be private per worker: the shared scratchpad `q/rvtmp` was overwritten by other workers mid-run.
+- verify.py fails when a previous run was interrupted and left `build/_baseline/wt` behind (`git worktree add` refuses). Fix: delete the directory, `git worktree unlock` if it is locked, then `git worktree prune`. tools/team/lead/integ.sh now clears it inside the integration lock.
+- Under load, verify takes 10-20 minutes per commit and dominates a worker's time.
