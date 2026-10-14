@@ -431,13 +431,15 @@ DB_OVERLAY void fn_8054788C(void* unused, int mode)
     fn_80400CE4(0);
 }
 
-/* near-miss: 96.3%; callee-saved registers permuted (object in r29/list in r30 instead of r30/r28); instruction stream identical */
+/* K3: Fisher-Yates shuffle of the int list at +0x32E0 with rand() (called from the roster/lineup code; seed comes from the global rand state). */
 DB_OVERLAY void fn_805479F0(char* o, int kind, int x)
 {
+    char* oo;
     IntSet(o + 0x10000, 0x7F8, x);
     IntSet(o + 0x10000, 0x7F0, 1);
-    char* l = o + 0x32E0;
-    fn_80546D0C(o);
+    oo = o;
+    char* l = oo + 0x32E0;
+    fn_80546D0C(oo);
     unsigned i = 0;
     fn_8053967C(l);
     if (kind == 0) {
@@ -446,45 +448,48 @@ DB_OVERLAY void fn_805479F0(char* o, int kind, int x)
         if (i < ll->m4) {
             int off = 0;
             do {
-                ll = (Db8053967C_List*)(o + 0x32E0);
+                ll = (Db8053967C_List*)(oo + 0x32E0);
                 unsigned r;
                 if (ll->m4 != i)
                     r = rand() % (ll->m4 - i);
                 else
                     r = 0;
                 unsigned j = r + i;
+                int flag = i >= ll->m4;
                 int jo = j * 4;
-                int* d = (int*)IntAt(o, 0x32E0);
-                int xv = *(int*)((char*)d + jo);
+                int* d = (int*)IntAt(oo, 0x32E0);
                 int yv = *(int*)((char*)d + off);
-                if (i >= ll->m4)
+                int xv = *(int*)((char*)d + jo);
+                if (flag)
                     ll->m4 = i + 1;
-                *(int*)(off + IntAt(o, 0x32E0)) = xv;
+                *(int*)(off + IntAt(oo, 0x32E0)) = xv;
                 if (j >= ll->m4)
                     ll->m4 = j + 1;
-                *(int*)(jo + IntAt(o, 0x32E0)) = yv;
+                *(int*)(jo + IntAt(oo, 0x32E0)) = yv;
                 i++;
                 off += 4;
             } while (i < ll->m4);
         }
     } else if (kind == 2) {
-        fn_805482D4(o);
+        fn_805482D4(oo);
     }
-    IntSet(o, 0x32EC, 0);
-    fn_8053971C(o);
-    IntSet(o + 0x10000, 0x7EC, *(int*)(o + 4));
-    fn_805362AC(o, 1);
-    fn_80542580(o + 0x10800);
+    IntSet(oo, 0x32EC, 0);
+    fn_8053971C(oo);
+    IntSet(oo + 0x10000, 0x7EC, *(int*)(oo + 4));
+    fn_805362AC(oo, 1);
+    fn_80542580(oo + 0x10800);
     fn_80400CE4(0);
 }
 
-/* near-miss: 95.9%; callee-saved registers permuted (retail reuses the list/kind registers inside the loop); instruction stream identical */
+/* K3: second copy of the rand() shuffle (list at +0x3500), see fn_805479F0. */
 DB_OVERLAY void fn_80547B38(char* o, int kind, int x)
 {
-    IntSet(o + 0x10000, 0x7FC, x);
+    char* oo;
     IntSet(o + 0x10000, 0x7F4, 1);
-    char* l = o + 0x3500;
-    fn_80546D4C(o);
+    IntSet(o + 0x10000, 0x7FC, x);
+    oo = o;
+    char* l = oo + 0x3500;
+    fn_80546D4C(oo);
     unsigned i = 0;
     fn_80535EAC(l);
     if (kind == 0) {
@@ -493,31 +498,32 @@ DB_OVERLAY void fn_80547B38(char* o, int kind, int x)
         if (i < ll->m4) {
             int off = 0;
             do {
-                ll = (Db8053967C_List*)(o + 0x3500);
+                ll = (Db8053967C_List*)(oo + 0x3500);
                 unsigned r;
                 if (ll->m4 != i)
                     r = rand() % (ll->m4 - i);
                 else
                     r = 0;
                 unsigned j = r + i;
+                int flag = i >= ll->m4;
                 int jo = j * 4;
-                int* d = (int*)IntAt(o, 0x3500);
-                int xv = *(int*)((char*)d + jo);
+                int* d = (int*)IntAt(oo, 0x3500);
                 int yv = *(int*)((char*)d + off);
-                if (i >= ll->m4)
+                int xv = *(int*)((char*)d + jo);
+                if (flag)
                     ll->m4 = i + 1;
-                *(int*)(off + IntAt(o, 0x3500)) = xv;
+                *(int*)(off + IntAt(oo, 0x3500)) = xv;
                 if (j >= ll->m4)
                     ll->m4 = j + 1;
-                *(int*)(jo + IntAt(o, 0x3500)) = yv;
+                *(int*)(jo + IntAt(oo, 0x3500)) = yv;
                 i++;
                 off += 4;
             } while (i < ll->m4);
         }
     } else if (kind == 2) {
-        fn_805483C4(o);
+        fn_805483C4(oo);
     }
-    IntSet(o, 0x350C, 0);
+    IntSet(oo, 0x350C, 0);
     fn_80400CE4(0);
 }
 
