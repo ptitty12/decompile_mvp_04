@@ -16,7 +16,7 @@ extern "C" void fn_8015FC00(Unk80159F28* self, Unk8015ABB8_Rec r, Unk8016D9A0_Re
 int fn_80166440(void* self, int v);
 extern "C" void fn_8015F918(Unk80159F28* self, int a);
 int fn_801A4F40(Unk8019F8C0_Owner* o);
-extern "C" int fn_803EE348(int a);
+extern "C" int MEM_largestunused(int a);
 extern "C" int fn_80166BD0(Unk80159F28* self);
 void fn_80303CA0(const char* s, float a, float b, float c, ...);
 extern "C" int fn_8017706C__FP13Unk8017706C_Ti(void* t, int i);
@@ -286,7 +286,7 @@ void Unk80159F28::fn_8015FB84(int a, int b, Unk8015FB08_Rec rec) /* 8015FB84 */
 
 extern "C" void fn_80160640(Unk80159F28* self) /* 80160640 */
 {
-    if (fn_803EE348(0) > 0x1B7FF) {
+    if (MEM_largestunused(0) > 0x1B7FF) {
         int r = fn_80166BD0(self);
         fn_80303CA0("End of game intensity %d", 4.0f, 0.4f, 0.4f, r + 1);
         if (r != 3) {

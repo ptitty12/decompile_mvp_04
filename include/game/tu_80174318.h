@@ -165,7 +165,7 @@ public:
 struct Unk80173274_T;
 int fn_80173274(Unk80173274_T* p);
 extern "C" int fn_8000587C(int p);
-extern "C" void fn_803EDA0C(int a);
+extern "C" void MEM_free(int a);
 
 /* Player object (vptr at +0x98): only slot 8 is used here. */
 class Unk80177974_Obj {

@@ -116,7 +116,7 @@ extern "C" {
 void* fn_803D9BE0(struct Unk803D8234Light* sub, void* owner);
 void fn_803DD73C(void* o, int c);
 void* fn_803DD7C0(void* o);
-void fn_803EDA0C(void* o);
+void MEM_free(void* o);
 void* fn_803D9A24(struct Unk803D8234Sub* sub, void* owner);
 void GXReadPixMetric(int* a, int* b, int* c, int* d, int* e, int* f);
 void fn_803D9664(void);
@@ -730,7 +730,7 @@ extern "C" void fn_803D9AD0(Unk803D8234Sub* self, int c)
         VISetPostRetraceCallback(0);
     }
     if (self->m94) {
-        fn_803EDA0C(fn_803DD7C0((void*)self->m94));
+        MEM_free(fn_803DD7C0((void*)self->m94));
         if (self->m94)
             fn_803DD73C((void*)self->m94, 3);
     }

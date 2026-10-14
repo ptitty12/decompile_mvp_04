@@ -48,7 +48,7 @@ Str* fn_8040B61C(Str* s, const char* name); /* strcpy: returns s */
 Str* fn_8040B448(Str* s, const char* t);    /* strcat: returns s */
 extern "C" int fn_803FED48(int h, int a, int b, int* out);
 extern "C" void fn_803FEDB8(int h, int a);
-extern "C" void fn_803EDA0C(int h);
+extern "C" void MEM_free(int h);
 int fn_804089B4(char* buf, const char* fmt, ...);
 extern "C" int fn_8009E1D4(char* p, int a, int b);
 extern "C" void fn_803EE7BC();
@@ -540,7 +540,7 @@ void Unk800642F0::fn_80064858()
             }
             fn_803FEDB8(f, 0);
         }
-        fn_803EDA0C(h);
+        MEM_free(h);
     }
 }
 
@@ -563,7 +563,7 @@ void Unk800642F0::fn_800649C0()
             }
             fn_803FEDB8(f, 0);
         }
-        fn_803EDA0C(h);
+        MEM_free(h);
     }
 }
 
@@ -589,7 +589,7 @@ void Unk800642F0::fn_80064AB0()
             }
             fn_803FEDB8(f, 0);
         }
-        fn_803EDA0C(h);
+        MEM_free(h);
     }
 }
 
@@ -615,6 +615,6 @@ void Unk800642F0::fn_80064BFC()
             }
             fn_803FEDB8(f, 0);
         }
-        fn_803EDA0C(h);
+        MEM_free(h);
     }
 }

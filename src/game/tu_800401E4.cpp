@@ -39,7 +39,7 @@ void fn_8006772C();
 int fn_802B96C4(const char* name, int a);
 int fn_802B9764(const char* name);
 extern "C" int fn_802B9300(const char* name, int a, int b, int* out);
-extern "C" void fn_803EDA0C(int p);
+extern "C" void MEM_free(int p);
 extern "C" void SNDbankremove(int a);
 void fn_803A6644(int a);
 extern "C" int fn_803A82A8(int* out, int a);
@@ -107,7 +107,7 @@ int Unk800401E4::fn_8004028C(const char* name, int type, const char* name2, int 
     m8 = ok;
     if (ok == 0) {
         if (spC != 0)
-            fn_803EDA0C(spC);
+            MEM_free(spC);
         m0 = ok;
         m4 = -1;
     } else {
@@ -163,7 +163,7 @@ int Unk800401E4::fn_800404E0(int* p, const char* name)
                 if (m0 != 0)
                     delete[] (char*)m0;
             } else {
-                fn_803EDA0C(*p);
+                MEM_free(*p);
                 *p = 0;
             }
         } else {
@@ -185,7 +185,7 @@ int Unk800401E4::fn_80040598(int* p, const char* name, const char* name2, int fl
             if (lbl_80617050 != 0) {
                 m0 = lbl_80617050;
                 lbl_80617050 = 0;
-                fn_803EDA0C(*p);
+                MEM_free(*p);
                 *p = 0;
             }
         } else {
@@ -263,9 +263,9 @@ void fn_800408A0(Unk80040640* self)
     }
     if (self->m5D0 == 1) {
         fn_803A8B4C();
-        fn_803EDA0C(self->m5CC);
+        MEM_free(self->m5CC);
         fn_803B9FBC(self->m5C8);
-        fn_803EDA0C(self->m5C8);
+        MEM_free(self->m5C8);
         self->m5D0 = 0;
     }
     if (lbl_806177D4 != 0) {

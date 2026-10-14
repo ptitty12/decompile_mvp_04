@@ -339,7 +339,7 @@ void fn_80322450();
 extern void* lbl_806EF9C0;
 extern const char lbl_805C5260[];
 int fn_803ED9D4();
-void fn_803ED720(int, const char*, void*, int, int, int, int, int, int, int);
+void MEMCLASS_create(int, const char*, void*, int, int, int, int, int, int, int);
 
 void fn_80149DD4(void* a, Unk80149DD4_B* b)
 {
@@ -881,7 +881,7 @@ void fn_8014BE28()
     lbl_806EF9C0 = operator new[](0x181BE0, 0);
     int h = fn_803ED9D4();
     lbl_806EF9B4 = h;
-    fn_803ED720(h, lbl_805C5260, lbl_806EF9C0, 0x181BE0, 4, 4, 0, 0, 0, 0);
+    MEMCLASS_create(h, lbl_805C5260, lbl_806EF9C0, 0x181BE0, 4, 4, 0, 0, 0, 0);
 }
 
 }

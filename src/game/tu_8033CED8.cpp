@@ -46,8 +46,8 @@ void fn_8033E5A4(MList* l, MNodeBase* n);
 void fn_8033E530(MList* l, MNodeBase* n);
 void fn_8033E6DC();
 void fn_8033E670(int a, unsigned* b, unsigned* c, unsigned* d, unsigned* e);
-unsigned fn_803EE3D4(int a);
-unsigned fn_803EE348(int a);
+unsigned MEM_totalunused(int a);
+unsigned MEM_largestunused(int a);
 }
 
 /* 4-byte calendar record: fn_8033E8E8 builds {3, 26, 2005} (month, day, year)
@@ -609,11 +609,11 @@ void fn_8033E600(MList* l)
 
 void fn_8033E670(int a, unsigned* b, unsigned* c, unsigned* d, unsigned* e)
 {
-    unsigned t = fn_803EE3D4(a);
+    unsigned t = MEM_totalunused(a);
     *b = t;
     if (t < *d)
         *d = t;
-    t = fn_803EE348(a);
+    t = MEM_largestunused(a);
     *c = t;
     if (t < *e)
         *e = t;

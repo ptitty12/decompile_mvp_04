@@ -62,7 +62,7 @@ extern "C" void fn_803DBD54(void* p);
 extern "C" void fn_803DBD84(void* p, int chrg);
 extern "C" void GXBegin(int prim, int fmt, unsigned short n);
 extern "C" void fn_803E3280(Unk803E3AFC_Obj* o, Unk803E3280_Item* items, int count);
-extern "C" void fn_803EDA0C(void* p);
+extern "C" void MEM_free(void* p);
 extern "C" void GXSetProjection(void* m, int type);
 
 /* near-miss: dataflow matches the original code but the float register allocation/schedule differs
@@ -233,7 +233,7 @@ extern "C" void fn_803E3AFC(Unk803E3AFC_Obj* o)
 {
     Unk803E3AFC_Gfx* g = &o->m20;
     if (g->m5C) {
-        fn_803EDA0C(g->m5C);
+        MEM_free(g->m5C);
         g->m5C = 0;
     }
 }

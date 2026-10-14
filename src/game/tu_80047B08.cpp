@@ -234,7 +234,7 @@ int fn_8004838C(Unk8004763C* t, int idx)
             char* q = lbl_805B0A95 + 0x23;
             if (SPCH_AddEventDB(buf, *(int*)(q + off)) <= 0) {
                 t->mSlots[idx].m0 = 0;
-                fn_803EDA0C((void*)t->mSlots[idx].mC);
+                MEM_free((void*)t->mSlots[idx].mC);
                 t->mSlots[idx].mC = 0;
             } else {
                 r = 1;
@@ -249,7 +249,7 @@ void fn_80048464(Unk8004763C* t, int idx)
     char* base = (char*)t + 0xC;
     int off = idx * 0x1C;
     if (*(int*)(base + off) != 0) {
-        fn_803EDA0C(*(void**)(base + off));
+        MEM_free(*(void**)(base + off));
         *(int*)(base + off) = 0;
     }
 }
@@ -259,7 +259,7 @@ void fn_80048818(Unk8004763C* t, int idx)
     int off = idx * 0x1C;
     char* b8 = (char*)t + 8;
     if (*(int*)(b8 + off) != 0) {
-        fn_803EDA0C(*(void**)(b8 + off));
+        MEM_free(*(void**)(b8 + off));
         *(int*)(b8 + off) = 0;
     }
     char* b14 = (char*)t + 0x14;

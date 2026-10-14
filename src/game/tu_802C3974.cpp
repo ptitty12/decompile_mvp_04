@@ -47,7 +47,7 @@ int fn_802B98AC(int a, int b);
 extern "C" int fn_803EE310(int a);
 extern "C" void MEM_copy(int dst, int src, int n);
 extern "C" void DCStoreRange(int p, int n);
-extern "C" void fn_803EDA0C(int p);
+extern "C" void MEM_free(int p);
 extern const char lbl_805DFC34[];
 extern const char lbl_805E144C[];
 extern const char lbl_805E1468[];
@@ -325,7 +325,7 @@ void fn_802C3EC0(Unk802C3B60* o)
                 if (e->m14 != 0)
                     SHAPE_destroy(e->m14);
                 if (e->m4 != 0) {
-                    fn_803EDA0C(e->m4);
+                    MEM_free(e->m4);
                     e->m4 = 0;
                 }
             }
@@ -1025,7 +1025,7 @@ void fn_802C5A08(int, Unk802C58E0_Slot* o, Unk802C59D0_Req* req)
     int h = fn_802B98AC((int)buf, 0x500);
     MEM_copy(o->m4, h, fn_803EE310(h));
     DCStoreRange(o->m4, 0x4070);
-    fn_803EDA0C(h);
+    MEM_free(h);
     o->m0 = fn_803EBD14(o->m4, lbl_805E15E0);
 }
 
@@ -1468,6 +1468,6 @@ void fn_802C7720()
             d = t;
         }
     }
-    fn_803EDA0C(h);
+    MEM_free(h);
     float f = 0.9f;
 }

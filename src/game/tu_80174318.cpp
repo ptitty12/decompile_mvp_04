@@ -218,7 +218,7 @@ void fn_80174850()
 void fn_801748D8(Unk801748D8_Obj* o)
 {
     if (lbl_8061C674 != 0) {
-        fn_803EDA0C(lbl_8061C674);
+        MEM_free(lbl_8061C674);
         lbl_8061C674 = 0;
     }
     if (o != 0) {

@@ -123,7 +123,7 @@ void fn_80331294(void* p);
 void fn_802D7ACC();
 int fn_802B96C4(void* a, int b);
 int fn_802B9300(void* a, int b, int c, int d);
-void fn_803EDA0C();
+void MEM_free();
 // PROTOS-BEGIN
 void fn_80327214(FxAI* self);
 void fn_80327274(FxAI* self);
@@ -672,7 +672,7 @@ int fn_80329DF0(void* a, int* out, int c) {
 }
 
 int fn_80329E50() {
-    fn_803EDA0C();
+    MEM_free();
     return 1;
 }
 

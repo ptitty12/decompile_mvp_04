@@ -255,7 +255,7 @@ void DCStoreRange(void* a, int n);
 int fn_80400DA4();
 void* fn_803DD628(void* a, void* b);
 void fn_803155B4(void* self, int tex, int a, int b, float f1, float f2, float f3, float f4);
-void fn_803EDA0C(void* b);
+void MEM_free(void* b);
 void fn_803220F4(void* s, char* a, int n, char* b, int m);
 void fn_803221D4(void* s, char* a, int n, char* b, int m);
 }
@@ -648,7 +648,7 @@ void fn_80315FFC(char* self)
     fn_80313E00(lbl_8061FEDC, 3);
     if (tex != 0)
         fn_803DD73C((void*)tex, 3);
-    fn_803EDA0C(buf);
+    MEM_free(buf);
 }
 
 /* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the unpacksizez size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
@@ -673,7 +673,7 @@ extern "C" void fn_8031618C(char* self)
     fn_80313E00(lbl_8061FEDC, 3);
     if (tex != 0)
         fn_803DD73C((void*)tex, 3);
-    fn_803EDA0C(buf);
+    MEM_free(buf);
 }
 
 /* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the unpacksizez size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
@@ -698,7 +698,7 @@ void fn_80316310(char* self)
     fn_80313E00(lbl_8061FEDC, 3);
     if (tex != 0)
         fn_803DD73C((void*)tex, 3);
-    fn_803EDA0C(buf);
+    MEM_free(buf);
     lbl_8061FF3C = fn_80400DA4();
 }
 

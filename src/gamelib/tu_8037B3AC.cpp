@@ -92,7 +92,7 @@ extern "C" Unk8037B3E8* fn_8037D680(int c, int hash, int a);
 
 extern "C" int fn_803EE310(void* o);
 extern "C" void MEM_copy(void* dst, const void* src, unsigned n);
-extern "C" void fn_803EDA0C(void* p);
+extern "C" void MEM_free(void* p);
 
 /* View of the root class vtable with the true signatures of slots 5 and 7..9 (fn_8037C3F8). */
 struct Unk8037C3F8_View {
@@ -504,7 +504,7 @@ extern "C" void fn_8037C3F8(int hash, int a, int flag, Unk8037C3F8_View* obj)
             MEM_copy(obj, lbl_806E9684[idx], n);
             void* v = ((Unk8037C3F8_View*)lbl_806E9684[idx])->v5();
             MEM_copy(lbl_806E9684[idx], v, n);
-            fn_803EDA0C(v);
+            MEM_free(v);
             obj->v9();
         }
     }

@@ -10,7 +10,7 @@ the Unk8004763C manager).
 
 extern "C" void SPCH_ClearEventQueue();
 extern "C" void fn_80392DF4();
-extern "C" void fn_803EDA0C(void* p);
+extern "C" void MEM_free(void* p);
 extern "C" void fn_80377488(void* p); /* __builtin_vec_delete */
 extern "C" void fn_803917D0(int a);
 void fn_80057778(void* p);

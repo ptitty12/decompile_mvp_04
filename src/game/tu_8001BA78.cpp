@@ -13,9 +13,9 @@
 #include "game/tu_8001B190.h"
 #include "game/tu_8001BA78.h"
 
-extern "C" void* fn_803ED8EC(int);
+extern "C" void* MEMCLASS_remove(int);
 extern "C" int fn_803ED9D4();
-extern "C" void fn_803ED720(int h, const char* name, void* buf, int a, int b, int c, int d, int e, int f, int g);
+extern "C" void MEMCLASS_create(int h, const char* name, void* buf, int a, int b, int c, int d, int e, int f, int g);
 int fn_80020BCC(int);
 extern const char lbl_805A50B8[];
 extern Unk8001BA78* lbl_806164E8;
@@ -30,12 +30,12 @@ Unk8001BA78::Unk8001BA78()
 {
     m8 = new (0) char[0x6400];
     m4 = fn_803ED9D4();
-    fn_803ED720(m4, lbl_805A50B8, m8, 0x6400, 4, 4, 0, 0, 0, 1);
+    MEMCLASS_create(m4, lbl_805A50B8, m8, 0x6400, 4, 4, 0, 0, 0, 1);
 }
 
 Unk8001BA78::~Unk8001BA78()
 {
-    fn_803ED8EC(m4);
+    MEMCLASS_remove(m4);
     if (m8) {
         delete[] m8;
     }

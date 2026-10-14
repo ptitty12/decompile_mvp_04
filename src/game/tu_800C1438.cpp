@@ -62,9 +62,9 @@ void* fn_803774A8(unsigned n, int heap);
 void fn_80377408(void* p);
 void fn_800C17D4(Unk800C1754_Pool* p);
 void* fn_803ED9D4();
-void fn_803ED95C(void* h);
-void fn_803ED8EC(void* h);
-void fn_803ED720(void* h, const char* name, void* buf, unsigned size, int a, int b, int c, int d, int e, int f);
+void MEMCLASS_purge(void* h);
+void MEMCLASS_remove(void* h);
+void MEMCLASS_create(void* h, const char* name, void* buf, unsigned size, int a, int b, int c, int d, int e, int f);
 int fn_8007F7D0(void* a, int b);
 void fn_8057CF60(int a, int b);
 int fn_800A2AE8(void* a);
@@ -122,14 +122,14 @@ extern "C" void fn_800C1754(Unk800C1754_Pool* p, int n)
     p->m18 = fn_803774A8(size, 0);
     p->m0 = (int)fn_803ED9D4();
     lbl_8061A5A8 = (void*)p->m0;
-    fn_803ED720((void*)p->m0, lbl_805BB014, p->m18, size, 4, 0x80, 0, 0, zero, zero);
+    MEMCLASS_create((void*)p->m0, lbl_805BB014, p->m18, size, 4, 0x80, 0, 0, zero, zero);
 }
 
 extern "C" void fn_800C17D4(Unk800C1754_Pool* p)
 {
     if ((void*)p->m0 != 0) {
-        fn_803ED95C((void*)p->m0);
-        fn_803ED8EC((void*)p->m0);
+        MEMCLASS_purge((void*)p->m0);
+        MEMCLASS_remove((void*)p->m0);
         fn_80377408(p->m18);
         p->m0 = 0;
         lbl_8061A5A8 = 0;

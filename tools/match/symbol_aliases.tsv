@@ -791,3 +791,15 @@ fn_803ED110	GC_swizzleGetPixelOffset8
 fn_803ED140	GC_swizzleGetPixelOffset4
 fn_803ED188	MEM_allocaligna
 fn_803ED664	MEM_allocsize
+fn_803ED720	MEMCLASS_create
+fn_803ED8EC	MEMCLASS_remove
+fn_803ED95C	MEMCLASS_purge
+fn_803EDA0C	MEM_free
+fn_803EDC98	MEM_initadr
+fn_803EDCEC	FREE_findlargest
+fn_803EDD8C	FREE_find
+fn_803EDDF8	FREE_gettotalfree
+fn_803EDE64	FREE_add
+fn_803EE348	MEM_largestunused
+fn_803EE3D4	MEM_totalunused
+fn_803EE4B8	checksentinel

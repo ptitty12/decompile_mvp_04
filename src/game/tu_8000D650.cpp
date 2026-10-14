@@ -34,10 +34,10 @@
 typedef Unk8000E618_Vec3 Vec3;
 
 extern "C" void* fn_803ED604(const char* name, int size, int flags);
-extern "C" void fn_803EDA0C();
+extern "C" void MEM_free();
 void fn_8033E958(const char* fmt, ...);
 extern "C" void fn_803EDC74();
-extern "C" int fn_803EE3D4(int a);
+extern "C" int MEM_totalunused(int a);
 extern "C" int OSGetResetCode();
 int fn_8043D6A8();
 extern "C" void OSSetProgressiveMode(int a);
@@ -59,7 +59,7 @@ static inline void* fn_8000E56C(int size)
 
 static inline void fn_8000E59C()
 {
-    fn_803EDA0C();
+    MEM_free();
 }
 
 void* fn_8000E5BC(int size)
@@ -74,7 +74,7 @@ void fn_8000D650()
     fn_803EDC74();
     lbl_806EEB30 = fn_8000E56C;
     lbl_806EEB34 = fn_8000E59C;
-    int size = fn_803EE3D4(0);
+    int size = MEM_totalunused(0);
     fn_8033E958("Memory initialized: Mempool is %d bytes (%dKb)", size, size / 1024);
 }
 

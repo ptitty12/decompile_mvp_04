@@ -356,7 +356,7 @@ int fn_803D986C(int h, int* out);
 int fn_803ED604(int b, int a, int k);
 void MEM_fill(int a, unsigned int tag, int b);
 int fn_803EE310(int a);
-void fn_803EDA0C(int a);
+void MEM_free(int a);
 int fn_803DBD84(void* p, int k);
 void fn_803198B8(void* p, int k);
 int fn_803120CC(void* p, int a, int b, int c, int d, int e);
@@ -855,7 +855,7 @@ int fn_8031263C(int a, int b)
 void fn_8031268C(int a)
 {
     MEM_fill(a, 0xDD55DD55u, fn_803EE310(a));
-    fn_803EDA0C(a);
+    MEM_free(a);
 }
 
 int fn_803126D4()

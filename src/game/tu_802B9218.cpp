@@ -23,13 +23,13 @@ extern int lbl_8061EAD8;
 extern int lbl_8061EADC;
 extern Unk8068B4F8 lbl_8068B4F8;
 
-extern "C" void fn_803EDA0C(int p);
+extern "C" void MEM_free(int p);
 Unk8000E618* fn_8000E65C();
 void* fn_8040B190(void* dst, const void* src, ...);
-extern "C" void fn_803ED95C(int a);
-extern "C" void fn_803ED8EC(int a);
+extern "C" void MEMCLASS_purge(int a);
+extern "C" void MEMCLASS_remove(int a);
 extern "C" int fn_803ED9D4();
-extern "C" int fn_803ED720(int a, const char* b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern "C" int MEMCLASS_create(int a, const char* b, int c, int d, int e, int f, int g, int h, int i, int j);
 extern const char lbl_805E10B8[];
 extern const char lbl_805E0F5C[];
 extern const char lbl_805E0F68[];
@@ -75,7 +75,7 @@ extern "C" void SHAPE_writepixel(void* a, int x, int y, int z, unsigned v);
 
 void fn_802B9218()
 {
-    fn_803EDA0C(lbl_8061EAE0);
+    MEM_free(lbl_8061EAE0);
     lbl_8061EAE0 = 0;
 }
 
@@ -230,10 +230,10 @@ extern "C" void fn_802B961C(const char* p, int x)
             break;
         }
     case 2:
-        fn_803EDA0C(obj);
+        MEM_free(obj);
         break;
     case 3:
-        fn_803EDA0C(obj);
+        MEM_free(obj);
         break;
     }
 }
@@ -1215,13 +1215,13 @@ void fn_802BB400(Unk802BB1E4_Obj*, Unk802BB1E4_Obj* o)
     int h = fn_803ED9D4();
     o->m8 = h;
     int hi = o->m4;
-    o->mC = fn_803ED720(h, lbl_805E10B8, o->m0 + 0x10, hi - 0x20, 0x20, 0x20, 0, 0, 0, 1);
+    o->mC = MEMCLASS_create(h, lbl_805E10B8, o->m0 + 0x10, hi - 0x20, 0x20, 0x20, 0, 0, 0, 1);
 }
 
 void fn_802BB474(Unk802BB1E4_Obj*, Unk802BB1E4_Obj* o)
 {
-    fn_803ED95C(o->m8);
-    fn_803ED8EC(o->m8);
+    MEMCLASS_purge(o->m8);
+    MEMCLASS_remove(o->m8);
     o->m8 = 0;
     o->mC = 0;
 }

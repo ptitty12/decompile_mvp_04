@@ -61,7 +61,7 @@ const char* fn_802B9300(int v, int a, int b, int* outn);
 void* fn_803FC480(int path);
 int fn_80401904(void* f);
 void fn_804017B0(void* f, void* buf);
-int fn_803EE3D4(int a);
+int MEM_totalunused(int a);
 void* fn_800ED534(void* o, const char* name);
 int fn_8040B574(const char* a, const char* b);
 int fn_8011B5A4();
@@ -144,7 +144,7 @@ extern "C" void fn_800B8B3C(FEObj68* self, int k)
 
 extern "C" void* fn_800B8CA4(FEObj68* self, const char* name)
 {
-    self->m4 = fn_803EE3D4(self->m0);
+    self->m4 = MEM_totalunused(self->m0);
     self->m58 = 0;
     self->m10 = (int)fn_800ED534(operator new(0x1D0, self->m0), name);
     if (fn_8040B574(name, lbl_805BA5B4) == 0) {

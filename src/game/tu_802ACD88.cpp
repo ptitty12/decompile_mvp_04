@@ -128,7 +128,7 @@ int fn_802AF624(void* a, void* b, int c);
 extern "C" void* fn_803ED604(void* a, int b, void* c);
 extern "C" void* fn_803DD628(void* a, void* b);
 extern "C" void fn_803DD73C(void* a, int b);
-extern "C" void* fn_803EDA0C(void* a);
+extern "C" void* MEM_free(void* a);
 unsigned int fn_80378568(const char* s, int n);
 int fn_80377E90(void* t, int* a, int* b, unsigned int h);
 int fn_802AFB88(Mgr* m);
@@ -834,7 +834,7 @@ void* fn_802AFC3C(void* p)
 {
     if (p != 0)
         fn_803DD73C(p, 2);
-    return fn_803EDA0C(p);
+    return MEM_free(p);
 }
 
 /* near-miss: retail keeps only m+0x10000 in a register and re-forms every table address per use (no cached table pointers) */
