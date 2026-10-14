@@ -751,7 +751,7 @@ void* memset(void* p, int c, unsigned n, ...);
 
 /* Draws the loading-progress gradient (misc/textures/grad.gsh); progress is clamped to [0, 1].
    The first call stamps the time base (fn_80400DA4) that the debug line reports against. */
-extern "C" void fn_80316614(Unk80313C14_Fade* self, int state, float progress)
+extern "C" void DrawLoadingProgress(Unk80313C14_Fade* self, int state, float progress)
 {
     if (self->m1D8 == 0) {
         char name[0x40] = "";

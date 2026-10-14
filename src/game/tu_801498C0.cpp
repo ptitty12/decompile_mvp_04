@@ -138,7 +138,7 @@ extern "C" void fn_800C3A4C(void*);
 extern "C" int fn_80400DA4();
 extern "C" void fn_8037CDA4(void*);
 extern "C" void fn_80148394(void*);
-extern "C" void fn_80316614(int, int, float);
+extern "C" void DrawLoadingProgress(int, int, float);
 extern "C" void fn_8031618C(int);
 extern "C" void fn_801498BC();
 void fn_80313BA4(Unk80310934_P38*);
@@ -359,8 +359,8 @@ void fn_80149DD4(void* a, Unk80149DD4_B* b)
     if (kind >= 1 && kind <= 3) {
         ((Unk8001C314*)fn_8001C394())->fn_8001C89C(2);
     } else if (kind == 5) {
-        fn_80316614(lbl_8061FEDC, 3, 0.095238097f);
-        fn_80316614(lbl_8061FEDC, 5, 0.088495575f);
+        DrawLoadingProgress(lbl_8061FEDC, 3, 0.095238097f);
+        DrawLoadingProgress(lbl_8061FEDC, 5, 0.088495575f);
         ((Unk8001C314*)fn_8001C394())->fn_8001C89C(1);
     } else if (kind == 6) {
         ((Unk8001C314*)fn_8001C394())->fn_8001C89C(5);

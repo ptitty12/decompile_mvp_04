@@ -97,5 +97,5 @@ void fn_802B91C0();
 void fn_802B9218();
 void fn_802B03F4(int g);
 void fn_802B0388(int g, char* s, int a);
-extern "C" void fn_80316614(int g, int a, float f);
+extern "C" void DrawLoadingProgress(int g, int a, float f);
 #endif

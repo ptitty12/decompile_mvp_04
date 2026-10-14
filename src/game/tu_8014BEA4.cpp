@@ -213,8 +213,8 @@ void fn_802D7A74();
 void fn_802D5BF4(Unk802D58E8* o, int a, const char* s);
 extern "C" {
 void fn_8006A1F4__11Unk80069F0C(void* self);
-void fn_80316614(void* o, int a, float f);
-int fn_801498C0(void* a, void* b);
+void DrawLoadingProgress(void* o, int a, float f);
+int LoadGameAssets(void* a, void* b);
 void fn_801810C8();
 void fn_8014CBE8(void* a, int b);
 Unk802D58E8* fn_801A4CE8(void* a, int b);
@@ -612,7 +612,7 @@ void fn_8014BEB8(int argc, char** argv)
     DVDChangeDir(lbl_805C55F4);
     ((Unk8014BEB8_Scr*)lbl_8061FEDC)->m1DC = 2;
     fn_803167F0((void*)lbl_8061FEDC, 0.323f, 0.838f, 0.358f, 0.022f);
-    fn_80316614((void*)lbl_8061FEDC, 2, 0.02f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 0.02f);
     fn_800308FC();
     fn_8014B514();
     fn_802D3804();
@@ -692,7 +692,7 @@ void fn_8014C5A4(int a, char** b)
     fy->m18 = lbl_8065D5A0;
     fn_8033E958(lbl_805C5694);
     fn_8037C924(fn_8037C7FC__Fv());
-    fn_80316614((void*)lbl_8061FEDC, 2, 0.39999998f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 0.39999998f);
     fn_8014BB70();
     lbl_80624270 = lbl_8068B618;
     lbl_80624278 = lbl_8061E978;
@@ -706,8 +706,8 @@ void fn_8014C5A4(int a, char** b)
     snd->fn_8001C05C(2, (unsigned)levels[2] * (1.0f / 255.0f), 1);
     fn_8031CE68();
     fn_802ACFB0(lbl_8061E978);
-    fn_80316614((void*)lbl_8061FEDC, 2, 0.7804878f);
-    fn_80316614((void*)lbl_8061FEDC, 2, 0.88780487f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 0.7804878f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 0.88780487f);
     fn_802BB894(fn_802BB580());
     fn_8031E1D4(fn_80314790((void*)lbl_8061FEDC), lbl_80620150);
     lbl_8061FF64->v2();
@@ -721,7 +721,7 @@ void fn_8014C5A4(int a, char** b)
     if (!lbl_8061A32C) {
         lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
     }
-    fn_80316614((void*)lbl_8061FEDC, 2, 1.0f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 1.0f);
     fn_803164A0__Fv((void*)lbl_8061FEDC);
     ((X1DC_8014D1EC*)lbl_8061FEDC)->m1DC = 0;
     fn_8033E958(lbl_805C56A0);
@@ -753,11 +753,11 @@ int fn_8014D1EC() /* 8014D1EC */
     fn_8006A1F4__11Unk80069F0C(p);
     fn_8014C540();
     fn_8014C3BC();
-    fn_80316614(x, 1, 0.02f);
-    fn_80316614(x, 3, 0.02f);
-    fn_80316614(x, 5, 0.02f);
+    DrawLoadingProgress(x, 1, 0.02f);
+    DrawLoadingProgress(x, 3, 0.02f);
+    DrawLoadingProgress(x, 5, 0.02f);
     fn_802BB1E4__FP15Unk802BB1E4_Obji(fn_802BB19C__Fv(), 1);
-    if (fn_801498C0(lbl_8068B618, p) == 0) {
+    if (LoadGameAssets(lbl_8068B618, p) == 0) {
         return 0;
     }
     fn_801810C8();

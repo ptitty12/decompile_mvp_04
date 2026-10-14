@@ -414,7 +414,7 @@ void fn_800E2A58(int unused)
         fn_802B0388(g, fn_803FC548(p, i, buf), 1);
         if (i % d == 1) {
             f1 += f2;
-            fn_80316614((int)lbl_8061FEDC, 4, f1);
+            DrawLoadingProgress((int)lbl_8061FEDC, 4, f1);
         }
     }
     fn_803FEDB8(sp90, 0x64);

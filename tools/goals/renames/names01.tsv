@@ -186,3 +186,5 @@ fn_803AF61C	SNDPLATFORM_init	E	EA SNDPLATFORM_init__F9StartMode [ge,hp,moh4,nasc
 fn_803AF934	SNDPLATFORM_restore	E	EA SNDPLATFORM_restore__F9StartMode [nascar]
 fn_803AF9C0	iSNDserve	E	EA iSNDserve__Fv [ge,hp,moh4,nascar,nfsmw]
 fn_803AFD88	SNDPLATFORM_asyncresolvetimbre	E	EA SNDPLATFORM_asyncresolvetimbre(SNDIPATCHHEADER *, char *, int *)/SNDPLATFORM_asyncresolvetimbre__FP15SNDIPATCHHEADERPcPi [fifa05,ge,hp,moh3,moh4,nascar,nfsmw,nfsu,uefa]
+fn_801498C0	LoadGameAssets	S	string "end of LoadGameAssets" (lbl_805C4F8C, referenced at 80149DA8 inside the function)
+fn_80316614	DrawLoadingProgress	S	format string "DrawLoadingProgress: %d, %.3f @ %.3f seconds" printed by the function

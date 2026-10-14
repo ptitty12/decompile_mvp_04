@@ -809,7 +809,7 @@ void fn_80189E58(void* p);
 void fn_802B8A90(void* p);
 void fn_80198DB8(void* p);
 void fn_801A656C(Unk8019F8C0_Owner* o, void* x, int k);
-void fn_80316614(int h, int a, float v);
+void DrawLoadingProgress(int h, int a, float v);
 int fn_8031C6A8();
 void fn_8031C6B4();
 void fn_803295F0();
@@ -982,13 +982,13 @@ extern "C" void fn_801A41D0(Unk8019F8C0_Owner* o)
     if (v->m6EC != 0)
         fn_8019B1A8(v->m6EC);
     fn_801A4CE8(o, 1)->fn_vslot6();
-    fn_80316614((int)lbl_8061FEDC, 1, lbl_805CE7D4);
+    DrawLoadingProgress((int)lbl_8061FEDC, 1, lbl_805CE7D4);
     if (v->m700 != 0)
         fn_8017AC7C(v->m700);
     ((Unk801A41D0_OV*)lbl_80619D10)->s22();
     if (v->m6F4 != 1)
         lbl_805D05AC[v->m6F4].m4(o);
-    fn_80316614((int)lbl_8061FEDC, 1, lbl_805CE7D8);
+    DrawLoadingProgress((int)lbl_8061FEDC, 1, lbl_805CE7D8);
     k = 0;
     ((Unk801A41D0_OV*)o)->s24();
     do {
@@ -1034,9 +1034,9 @@ extern "C" void fn_801A41D0(Unk8019F8C0_Owner* o)
     fn_8019B2AC(v->m77C);
     fn_803295F0();
     fn_803296AC();
-    fn_80316614((int)lbl_8061FEDC, 1, lbl_805CE7E0);
-    fn_80316614((int)lbl_8061FEDC, 3, lbl_805CE7E0);
-    fn_80316614((int)lbl_8061FEDC, 5, lbl_805CE7E0);
+    DrawLoadingProgress((int)lbl_8061FEDC, 1, lbl_805CE7E0);
+    DrawLoadingProgress((int)lbl_8061FEDC, 3, lbl_805CE7E0);
+    DrawLoadingProgress((int)lbl_8061FEDC, 5, lbl_805CE7E0);
 }
 
 /* The team counter lives in memory (stack slot reloaded per use): a volatile local reproduces it. */

@@ -388,7 +388,7 @@ int fn_8005BEE4(Unk8005BA9C* o, int idx);
 
 void fn_800407EC(Unk8004072C* o);
 extern "C" void fn_80038F28(Unk80038EB4* o);
-extern "C" void fn_80316614(int h, int a, float v);
+extern "C" void DrawLoadingProgress(int h, int a, float v);
 void fn_800477D4(Unk800475EC* o);
 void fn_8005AD30(Unk8005ACE4* o);
 extern "C" void fn_80030944(Unk80030938* o);
@@ -407,11 +407,11 @@ void Unk8001C314::fn_8001C568()
             fn_8005BEE4(fn_8005BA9C(), 0);
             fn_800407EC(fn_8004072C());
             fn_80038F28(fn_80038EB4());
-            fn_80316614(lbl_8061FEDC, 2, lbl_805A5114);
+            DrawLoadingProgress(lbl_8061FEDC, 2, lbl_805A5114);
             fn_800477D4(fn_800475EC());
             fn_8005AD30(fn_8005ACE4());
             fn_80030944(fn_80030938());
-            fn_80316614(lbl_8061FEDC, 2, lbl_805A5118);
+            DrawLoadingProgress(lbl_8061FEDC, 2, lbl_805A5118);
         }
     }
 }

@@ -212,7 +212,7 @@ int fn_802B96C4(int a);
 void fn_802B8B34();
 void fn_802B8BFC();
 extern "C" int fn_803FED48(const char* fmt, int a, int b, int* out);
-extern "C" void fn_80316614(Unk802B0778_C* h, int a, float v);
+extern "C" void DrawLoadingProgress(Unk802B0778_C* h, int a, float v);
 extern "C" void* fn_803DD628(void* mem, void* p);
 void fn_802BACDC(void* p);
 void fn_802C4294(void* p);
@@ -254,7 +254,7 @@ void fn_802ACFB0(Mgr* m)
             lbl_8061E9F8 = 1;
             fn_803FED48(nm, 0, 0, &v->m3B74);
         }
-        fn_80316614(lbl_8061FEDC, 2, 0.4292683f);
+        DrawLoadingProgress(lbl_8061FEDC, 2, 0.4292683f);
         fn_802B8B34();
         fn_802B8BFC();
         fn_802ACF58(m);
@@ -283,7 +283,7 @@ void fn_802ACFB0(Mgr* m)
         fn_802AE13C(m);
         fn_802C4294((char*)m + 0x11F78);
         fn_802C8008((char*)m + 0x12204);
-        fn_80316614(lbl_8061FEDC, 2, 0.5512195f);
+        DrawLoadingProgress(lbl_8061FEDC, 2, 0.5512195f);
         fn_802AD538(m, 0);
         fn_802AEB7C(m);
     }

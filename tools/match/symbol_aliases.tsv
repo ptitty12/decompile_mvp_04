@@ -428,3 +428,5 @@ fn_803AF61C	SNDPLATFORM_init
 fn_803AF934	SNDPLATFORM_restore
 fn_803AF9C0	iSNDserve
 fn_803AFD88	SNDPLATFORM_asyncresolvetimbre
+fn_801498C0	LoadGameAssets
+fn_80316614	DrawLoadingProgress
