@@ -329,7 +329,7 @@ extern "C" void fn_800D8EE0(void* t, int mode)
     ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B924(2, away, n_away);
     ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B924(2, home, n_home);
     fn_8033E958(lbl_805BD528);
-    fn_8033E958(lbl_805BD65C, mode == 4 ? lbl_805B7FE4 : lbl_805B7FF0, lbl_8061ADEC);
+    fn_8033E958(lbl_805BD65C, mode == 4 ? lbl_805B7FF0 : lbl_805B7FE4, lbl_8061ADEC);
     fn_8033E958(lbl_805BD574, home, n_home, away, n_away, lbl_8061C728[sel]);
     fn_8033E958(lbl_805BD5A4, *(int*)((char*)m + 0x78), *(int*)((char*)m + 0x7C), *(int*)((char*)m + 0x80), *(int*)((char*)m + 0x84));
     fn_8033E958(lbl_805BD600);
