@@ -98,7 +98,7 @@ extern char lbl_80606398[];
 extern char lbl_806061F0[];
 
 extern "C" int fn_804002BC(const char* fmt, ...);
-extern "C" void* fn_803FFC58(void* p, int v, int n);
+extern "C" void* MEM_fill(void* p, int v, int n);
 extern "C" int fn_8038EA9C(VdCbObj* s);
 extern "C" void fn_8038EAF4(VdCbObj* s, int b);
 
@@ -133,7 +133,7 @@ extern "C" McVid* fn_8038F7C8(McVid* v, unsigned w, unsigned h)
     v->m8 = 3;
     v->m10 = 0;
     v->m4 = (McHdr*)lbl_80699B94.m0("MAD_FRAME::m_Shape", sz, 0, 0x10, lbl_80699B94.m8);
-    fn_803FFC58(v->m4, 0, 0x10);
+    MEM_fill(v->m4, 0, 0x10);
     v->m4->m0 = 0x6C;
     v->m4->m4 = w;
     v->m4->m6 = h;

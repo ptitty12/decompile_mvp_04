@@ -6,7 +6,7 @@
 
 extern "C" void fn_80377408(void* p);
 extern "C" void fn_80377488(void* p);
-extern "C" void fn_803FFA60(void* dst, void* src, int n);
+extern "C" void MEM_copy(void* dst, void* src, int n);
 extern "C" void fn_802B961C(const char* p, int a);
 void fn_802C2254(Unk802C2188* o);
 extern "C" void fn_802C2408(Unk802C2188* o, Unk802C2188_Pair* a);
@@ -584,9 +584,9 @@ void fn_802C2F08(Unk802C2E60* a)
 void fn_802C2F98(void* a, void* b)
 {
     char tmp[0x20];
-    fn_803FFA60(tmp, a, 0x20);
-    fn_803FFA60(a, b, 0x20);
-    fn_803FFA60(b, tmp, 0x20);
+    MEM_copy(tmp, a, 0x20);
+    MEM_copy(a, b, 0x20);
+    MEM_copy(b, tmp, 0x20);
 }
 
 void fn_802C36DC(Unk802C2188* o)

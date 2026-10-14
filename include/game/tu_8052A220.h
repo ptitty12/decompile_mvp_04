@@ -77,7 +77,7 @@ struct Unk8052A220_Pal : Unk8052A220_PalData {
  * (fn_8052BED8 sets it to 8; fn_8052BCC8 tests it for 0). Two 12-byte subrecords
  * follow at +4 and +0x10 (fn_8052B204 streams m0 then the other 8 bytes).
  */
-extern "C" void* fn_803FFC58(void* p, int v, int n);
+extern "C" void* MEM_fill(void* p, int v, int n);
 struct Unk8052B1DC_Sub {
     int m0;
     unsigned char m4;

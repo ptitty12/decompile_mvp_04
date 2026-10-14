@@ -56,7 +56,7 @@ int fn_80324E38(FxZ* a);
 int fn_80324E54(FxZ* a);
 int fn_80324E6C(FxZ* a);
 int fn_80324E84(short* p);
-void fn_803FFA60(unsigned dst, char* src, int n);
+void MEM_copy(unsigned dst, char* src, int n);
 char* fn_80324EC8(char* a);
 void fn_80324ED0(short* p, int v);
 FxZT* fn_80324EF0(FxZT* self, int a, int b, int c);
@@ -588,7 +588,7 @@ extern "C" void fn_80326610(FxAI* self, char* name, int a, float c) {
             r->m1C = (r->m1C + 1) % r->m24;
         }
     } while (removed != 0);
-    fn_803FFA60(pos, name, len);
+    MEM_copy(pos, name, len);
     ((FxRingE*)(r->m20 * 16 + (int)r->m0))->m0 = pos;
     ((FxRingE*)(r->m20 * 16 + (int)r->m0))->mC = len;
     ((FxRingE*)(r->m20 * 16 + (int)r->m0))->m4 = a;

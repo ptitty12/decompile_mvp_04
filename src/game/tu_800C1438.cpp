@@ -74,7 +74,7 @@ int fn_800C519C(Unk800C341C_Mgr* mgr, int n);
 
 extern "C" {
 int fn_804089B4(char* dst, const char* fmt, ...);
-int fn_803FAB68(const char* path, int a, int* out);
+int FILESYS_bypassqueuefileinfo(const char* path, int a, int* out);
 void fn_800C3054(Unk800C2250_File* f, const char* name, Unk800C1BE4_Widget* w, int c, float t);
 }
 
@@ -621,7 +621,7 @@ extern "C" int fn_800C22C0(Unk800C2250_File* f, int kind, const char* name, Unk8
         fn_804089B4(b, lbl_805BBD44, lbl_8061AB8C, a);
     else
         fn_804089B4(b, lbl_805BBD44, lbl_8061AB80[kind], a);
-    int c = fn_803FAB68(b, 1, &out);
+    int c = FILESYS_bypassqueuefileinfo(b, 1, &out);
     int ok = 0;
     if (c)
         ok = 1;
@@ -675,7 +675,7 @@ extern "C" void fn_800C2580(Unk800C2250_File* f, const char* name, Unk800C1BE4_W
         fn_804089B4(b, lbl_805BBD44, lbl_8061ABA4, a);
     else
         fn_804089B4(b, lbl_805BBD44, lbl_8061ABA0, a);
-    if (fn_803FAB68(b, 1, &out)) {
+    if (FILESYS_bypassqueuefileinfo(b, 1, &out)) {
         fn_800C3054(f, name, w, c, t);
     } else if (w != 0) {
         w->fn_vslot28(&lbl_805B6F58, 0);
@@ -696,7 +696,7 @@ extern "C" void fn_800C26D0(Unk800C2250_File* f, const char* name, Unk800C1BE4_W
         fn_804089B4(b, lbl_805BBD44, lbl_8061AB8C, a);
     else
         fn_804089B4(b, lbl_805BBD44, lbl_8061AB88, a);
-    if (fn_803FAB68(b, 1, &out)) {
+    if (FILESYS_bypassqueuefileinfo(b, 1, &out)) {
         fn_800C3054(f, name, w, c, t);
     } else if (w != 0) {
         w->fn_vslot28(&lbl_805B6F58, 0);

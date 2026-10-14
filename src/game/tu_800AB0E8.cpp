@@ -211,8 +211,8 @@ void fn_800B0564(void* p);
 void* fn_800AF020(void* p);
 int fn_800AB850(UnkFETable* t, int i);
 void fn_800AB0E8(UnkFEArr* a, int i);
-void fn_803FFC58(void* p, int v, int n);
-void fn_803FFA60(char* d, const char* s, int n);
+void MEM_fill(void* p, int v, int n);
+void MEM_copy(char* d, const char* s, int n);
 int fn_800ABB94(void* self, int k);
 void fn_800ADFC4(void* p);
 void fn_800AD948(void* p, int a, float f);
@@ -549,9 +549,9 @@ extern "C" void fn_800ABB20(UnkFE40* self, int a, int b, char* s, int d)
 {
     if (s) {
         int k = fn_800ABB94(self, b);
-        fn_803FFA60(self->m40, s, k);
+        MEM_copy(self->m40, s, k);
     } else {
-        fn_803FFC58(self->m40, 0, 0x400);
+        MEM_fill(self->m40, 0, 0x400);
     }
     self->m34 = b;
     self->m38 = d;
@@ -624,7 +624,7 @@ extern "C" void fn_800ABD80(UnkFE40* self)
     self->m34 = 0xC7;
     self->m38 = 0;
     self->m3C = 0;
-    fn_803FFC58(self->m40, 0, 0x400);
+    MEM_fill(self->m40, 0, 0x400);
 }
 
 extern "C" int fn_800ABDC4(UnkFETable* t, int k)

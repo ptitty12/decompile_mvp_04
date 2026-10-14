@@ -122,7 +122,7 @@ void fn_800901C0(char* a, int b, unsigned c, char* d, int e, unsigned f);
 int fn_80090244(unsigned v);
 unsigned fn_8032A2CC(unsigned m, unsigned short y);
 int fn_80329E74(Db8053CC9C_Date d);
-void* fn_803FFA60(void* s, int a, int n);
+void* MEM_copy(void* s, int a, int n);
 }
 
 /*

@@ -12,7 +12,7 @@ extern const char lbl_805FE19C[];
 extern const float lbl_805FE1D0;
 extern char lbl_805FE1D4[];
 extern "C" void* fn_803774A8(unsigned n, int heap);
-extern "C" void* fn_803FFA60(void* d, const void* s, unsigned n);
+extern "C" void* MEM_copy(void* d, const void* s, unsigned n);
 extern "C" void fn_8052DD58(Unk8052DD58_Ent* e);
 extern "C" void fn_8052DFDC(Unk8052DD58_Set* self, unsigned i);
 extern "C" void fn_8052E158(Unk8052DD58_Ent* self, char a, int b, int c, int d, unsigned e, unsigned f, unsigned g, int h);
@@ -512,7 +512,7 @@ extern "C" DB_OVERLAY char* fn_8052D9D0(Unk80071604* self, int i)
 
 extern "C" DB_OVERLAY void* fn_8052DC60(void* self, const void* src)
 {
-    fn_803FFA60(self, src, 8);
+    MEM_copy(self, src, 8);
     return self;
 }
 

@@ -340,7 +340,7 @@ int fn_8014D1EC();
 void fn_8014D5C0();
 void fn_8014D488();
 extern const char lbl_805C5F90[];
-void fn_803FFA60(void*, const char*, int);
+void MEM_copy(void*, const char*, int);
 extern const float lbl_805C58AC;
 extern const float lbl_805C58B0;
 unsigned fn_8014DDAC(Vec4f8014DAFC* v);
@@ -452,11 +452,11 @@ void* fn_80357A70(void* self);
 void* fn_80357AEC(void* self);
 void fn_80377048();
 void fn_803FFE14();
-void fn_803FF888(int hz);
+void TIMER_init(int hz);
 int fn_80316B90();
-int fn_803FACFC(void* p);
-int fn_803FAD60(void* p);
-int fn_803F9494(int a, int b, int c);
+int FILESYS_getopts(void* p);
+int FILESYS_setopts(void* p);
+int FILESYS_init(int a, int b, int c);
 void* fn_802BB19C__Fv();
 void fn_8014BE28();
 int fn_803EE3D4(int i);
@@ -550,18 +550,18 @@ void fn_8014BEB8(int argc, char** argv)
     lbl_80624294 = 0x1F4;
     fn_803FFE14();
     fn_8033E958(lbl_805C544C);
-    fn_803FF888(0x3C);
+    TIMER_init(0x3C);
     fn_8033E958(lbl_805C5464, 0x3C);
     fn_80316B90();
     Unk8014BEB8_FsOpts opts;
     opts.size = 0x14;
-    fn_803FACFC(&opts);
+    FILESYS_getopts(&opts);
     opts.alloc = (void*)fn_803ED604;
     opts.free = (void*)fn_803EDA0C;
     opts.heap = lbl_8068A3CC;
     opts.heapSize = 0x1000;
-    fn_803FAD60(&opts);
-    fn_803F9494(0x20, 0x800, 0x30);
+    FILESYS_setopts(&opts);
+    FILESYS_init(0x20, 0x800, 0x30);
     fn_802BB19C__Fv();
     fn_8014BE28();
     lbl_8061B88C = savedFlag;
@@ -891,7 +891,7 @@ void fn_8014D6A4()
 
 void fn_8014D81C(int* p)
 {
-    fn_803FFA60(p + 1, lbl_805C5F90, 0x18);
+    MEM_copy(p + 1, lbl_805C5F90, 0x18);
     *p = 0;
 }
 

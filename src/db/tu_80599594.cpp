@@ -91,7 +91,7 @@ struct Unk80084910_K {
 
 typedef Unk80084910_K<Unk80084910_T8> K8;
 
-extern "C" void* fn_803FFA60(void* s, int a, int n);
+extern "C" void* MEM_copy(void* s, int a, int n);
 
 struct Db80599A6C_Tab {
     int w[1];
@@ -363,7 +363,7 @@ extern "C" DB_OVERLAY Db805997C4_Rec* fn_805997C4(Db805997C4_Rec* dst, Db805997C
 
 extern "C" DB_OVERLAY void* fn_805999B4(void* self, int a)
 {
-    fn_803FFA60(self, a, 8);
+    MEM_copy(self, a, 8);
     return self;
 }
 

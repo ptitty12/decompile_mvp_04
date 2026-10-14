@@ -381,7 +381,7 @@ struct Unk80134D58 {
     char pad0[0xE04];
     int mE04;
 };
-extern "C" void fn_803FFC58(char* p, int v, int n);
+extern "C" void MEM_fill(char* p, int v, int n);
 struct Unk80134D74 : Unk800C7B40_Widget {
     char pad40[0xDC4];
     int mE04;
@@ -458,7 +458,7 @@ extern "C" int fn_80134CD0(Unk80134D58* x)
             if (q != 0) {
                 delete q;
             }
-            fn_803FFC58(p, 0, 0x234);
+            MEM_fill(p, 0, 0x234);
             i = i + 1;
             p = p + 0x234;
             off = off + 0x234;

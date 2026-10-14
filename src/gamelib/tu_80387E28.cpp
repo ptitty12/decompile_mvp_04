@@ -192,7 +192,7 @@ struct GlBufs {
     char* m8;
 };
 extern GlBufs lbl_806242D4;
-extern "C" void* fn_803FFA60(void* d, const void* s, int n);
+extern "C" void* MEM_copy(void* d, const void* s, int n);
 
 extern "C" void fn_8038806C(GlPool* self, int flags)
 {
@@ -202,13 +202,13 @@ extern "C" void fn_8038806C(GlPool* self, int flags)
         int b = ((GlBig*)lbl_80624278)->v17();
         if (self->m288 & 1) {
             int n = a * 0x30;
-            fn_803FFA60(lbl_806242D4.m0 + ((GlBig*)lbl_80624278)->v15() * 0x30, lbl_806242D4.m8, n);
-            fn_803FFA60(lbl_806242D4.m0 + ((GlBig*)lbl_80624278)->v14() * 0x30, lbl_806242D4.m8 + n, b * 0x30);
+            MEM_copy(lbl_806242D4.m0 + ((GlBig*)lbl_80624278)->v15() * 0x30, lbl_806242D4.m8, n);
+            MEM_copy(lbl_806242D4.m0 + ((GlBig*)lbl_80624278)->v14() * 0x30, lbl_806242D4.m8 + n, b * 0x30);
         }
         if (self->m288 & 2) {
             int n = a * 0x30;
-            fn_803FFA60(lbl_806242D4.m4 + ((GlBig*)lbl_80624278)->v15() * 0x30, lbl_806242D4.m8, n);
-            fn_803FFA60(lbl_806242D4.m4 + ((GlBig*)lbl_80624278)->v14() * 0x30, lbl_806242D4.m8 + n, b * 0x30);
+            MEM_copy(lbl_806242D4.m4 + ((GlBig*)lbl_80624278)->v15() * 0x30, lbl_806242D4.m8, n);
+            MEM_copy(lbl_806242D4.m4 + ((GlBig*)lbl_80624278)->v14() * 0x30, lbl_806242D4.m8 + n, b * 0x30);
         }
     }
 }

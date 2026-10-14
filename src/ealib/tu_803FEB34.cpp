@@ -47,19 +47,19 @@ void fn_803FF5E8(int, int);
 }
 
 extern "C" {
-void fn_803F96B0(int h, void* cb);
-int fn_803F99E8(int h);
-int fn_803F9664(int h);
-int fn_803F9A80(int h);
-int fn_803F9C58(const char* a, int b, int c, int d);
-int fn_803F9CE8(int a, int b, int c);
-int fn_803F9E90(int a, int b, int c);
-int fn_803FA100(const char* a, int b, int c, int d);
-int fn_803FA248(int a, int b, int c);
-int fn_803F9BC8(int a, int b, int c);
+void FILESYS_callbackop(int h, void* cb);
+int FILESYS_waitop(int h);
+int FILESYS_opstatus(int h);
+int FILESYS_completeop(int h);
+int FILESYS_open(const char* a, int b, int c, int d);
+int FILESYS_close(int a, int b, int c);
+int FILESYS_size(int a, int b, int c);
+int FILESYS_addbig(const char* a, int b, int c, int d);
+int FILESYS_delbig(int a, int b, int c);
+int FILESYS_exists(int a, int b, int c);
 extern char fn_803FEA38[];
-extern char fn_803F9D74[];
-extern char fn_803F9E0C[];
+extern char FILESYS_read[];
+extern char FILESYS_write[];
 }
 
 /* One transfer request, passed by address to the low-level read/write routine in the last argument. */
@@ -86,12 +86,12 @@ void PCinit(void);
 int PCopen(int h, int a, int b);
 int PCcreat(int h, int a);
 int fn_804002BC(const char* fmt, ...);
-int fn_803FF618();
+int ReadFileThreadFunc();
 int PCread(int h, int a, int b);
 int DVDGetDriveStatus();
-int fn_803FF424(void* p, int a, int c, int b);
-void fn_803FF244(void* p);
-void fn_803FA888(int);
+int StartNonAlignedAyncRead(void* p, int a, int c, int b);
+void AyncDVDRead(void* p);
+void iFILE_CommandCompleteCallback(int);
 void fn_803FFFA8(int);
 }
 extern unsigned char lbl_806EEAB1;
@@ -136,9 +136,9 @@ extern "C" int fn_803FEB34(int a, int b, int c, int d, int e, int (*fn)(int, int
     int ln = r.len;
     r.h = fn(a, b, r.c, ln, e, (FsReq*)&r);
     if (r.h != 0) {
-        fn_803F96B0(r.h, fn_803FEA38);
+        FILESYS_callbackop(r.h, fn_803FEA38);
         do {
-            fn_803F99E8(r.h);
+            FILESYS_waitop(r.h);
         } while (r.d != 0 || r.h != 0);
     }
     return r.result;
@@ -148,11 +148,11 @@ extern "C" int fn_803FEB34(int a, int b, int c, int d, int e, int (*fn)(int, int
 extern "C" int fn_803FEBDC(int a, int b, int c, int* out)
 {
     int ok = 0;
-    int h = fn_803F9C58((const char*)a, b, c, 0);
+    int h = FILESYS_open((const char*)a, b, c, 0);
     if (h != 0) {
-        fn_803F99E8(h);
-        ok = fn_803F9664(h) == 1;
-        *out = fn_803F9A80(h);
+        FILESYS_waitop(h);
+        ok = FILESYS_opstatus(h) == 1;
+        *out = FILESYS_completeop(h);
     } else {
         *out = ok;
     }
@@ -161,34 +161,34 @@ extern "C" int fn_803FEBDC(int a, int b, int c, int* out)
 
 extern "C" void fn_803FEC4C(int a, int b, int c, int d, int e)
 {
-    fn_803FEB34(a, b, c, d, e, (int (*)(int, int, int, int, int, FsReq*))fn_803F9D74);
+    fn_803FEB34(a, b, c, d, e, (int (*)(int, int, int, int, int, FsReq*))FILESYS_read);
 }
 
 extern "C" void fn_803FEC74(int a, int b, int c, int d, int e)
 {
-    fn_803FEB34(a, b, c, d, e, (int (*)(int, int, int, int, int, FsReq*))fn_803F9E0C);
+    fn_803FEB34(a, b, c, d, e, (int (*)(int, int, int, int, int, FsReq*))FILESYS_write);
 }
 
 extern "C" int fn_803FEC9C(int a, int b)
 {
     int ok = 0;
-    int h = fn_803F9CE8(a, b, 0);
+    int h = FILESYS_close(a, b, 0);
     if (h != 0) {
         ok = 1;
-        fn_803F99E8(h);
-        if (fn_803F9A80(h) == 0)
+        FILESYS_waitop(h);
+        if (FILESYS_completeop(h) == 0)
             ok = 0;
     }
     return ok;
 }
 
-extern "C" int fn_803FECF8(int a, int b)
+extern "C" int FILESYS_sizesync(int a, int b)
 {
     int r = 0;
-    int h = fn_803F9E90(a, b, 0);
+    int h = FILESYS_size(a, b, 0);
     if (h != 0) {
-        fn_803F99E8(h);
-        r = fn_803F9A80(h);
+        FILESYS_waitop(h);
+        r = FILESYS_completeop(h);
     }
     return r;
 }
@@ -197,11 +197,11 @@ extern "C" int fn_803FECF8(int a, int b)
 extern "C" int fn_803FED48(int a, int b, int c, int* out)
 {
     int ok = 0;
-    int h = fn_803FA100((const char*)a, b, c, 0);
+    int h = FILESYS_addbig((const char*)a, b, c, 0);
     if (h != 0) {
-        fn_803F99E8(h);
-        ok = fn_803F9664(h) == 1;
-        *out = fn_803F9A80(h);
+        FILESYS_waitop(h);
+        ok = FILESYS_opstatus(h) == 1;
+        *out = FILESYS_completeop(h);
     } else {
         *out = ok;
     }
@@ -211,11 +211,11 @@ extern "C" int fn_803FED48(int a, int b, int c, int* out)
 extern "C" int fn_803FEDB8(int a, int b)
 {
     int ok = 0;
-    int h = fn_803FA248(a, b, 0);
+    int h = FILESYS_delbig(a, b, 0);
     if (h != 0) {
         ok = 1;
-        fn_803F99E8(h);
-        if (fn_803F9A80(h) == 0)
+        FILESYS_waitop(h);
+        if (FILESYS_completeop(h) == 0)
             ok = 0;
     }
     return ok;
@@ -224,19 +224,19 @@ extern "C" int fn_803FEDB8(int a, int b)
 extern "C" int fn_803FEE14(int a, int b)
 {
     int ok = 0;
-    int h = fn_803F9BC8(a, b, 0);
+    int h = FILESYS_exists(a, b, 0);
     if (h != 0) {
         ok = 1;
-        fn_803F99E8(h);
-        if (fn_803F9A80(h) == 0)
+        FILESYS_waitop(h);
+        if (FILESYS_completeop(h) == 0)
             ok = 0;
     }
     return ok;
 }
 
-extern "C" void fn_803FEE70()
+extern "C" void initfiledev()
 {
-    OSCreateThread(lbl_806B5F20, (void*)fn_803FF618, 0, lbl_806EEAAC + lbl_806EEAA8, lbl_806EEAA8, 2, 1);
+    OSCreateThread(lbl_806B5F20, (void*)ReadFileThreadFunc, 0, lbl_806EEAAC + lbl_806EEAA8, lbl_806EEAA8, 2, 1);
     OSInitMessageQueue(lbl_806B8238, lbl_806B8258, 0x20);
     OSResumeThread(lbl_806B5F20);
     PCinit();
@@ -244,7 +244,7 @@ extern "C" void fn_803FEE70()
 
 extern "C" void fn_8040021C(int on);
 
-extern "C" int fn_803FEEE8(int h, unsigned mode, int* out)
+extern "C" int openfile_plat(int h, unsigned mode, int* out)
 {
     switch (mode & 7) {
     case 0:
@@ -268,7 +268,7 @@ extern "C" int fn_803FEEE8(int h, unsigned mode, int* out)
     return *out != -1;
 }
 
-extern "C" void fn_803FEFC4(char* dst, const unsigned char* src)
+extern "C" void FixSlash(char* dst, const unsigned char* src)
 {
     int i = 0;
     unsigned char c = src[i];
@@ -286,7 +286,7 @@ extern "C" void fn_803FEFC4(char* dst, const unsigned char* src)
 }
 
 /* Prefix scan with the increment block preceding the shared test. */
-extern "C" int fn_803FF008(const char* a, const char* b)
+extern "C" int MyStrCmpi(const char* a, const char* b)
 {
     const unsigned char* table = (const unsigned char*)_ctype_ + 1;
     int i = 0;
@@ -317,7 +317,7 @@ extern "C" int DVDConvertPathToEntrynum(const char* path);
 extern "C" int DVDFastOpen(int entry, void* fi);
 
 /* File open front end of the RealCore file device (no EA name known; its callees are EA's FixSlash, MyStrCmpi and
- * openfile_plat = fn_803FEEE8): prefixes from lbl_8060E80C (or a non-read mode) go to the host file interface (PC*),
+ * openfile_plat): prefixes from lbl_8060E80C (or a non-read mode) go to the host file interface (PC*),
  * everything else through DVDConvertPathToEntrynum/DVDFastOpen. Backslashes become slashes.
  * near-miss (97%): 89 insns as retail; viaPC and the loop end pointer have swapped callee-saved registers (retail
  * viaPC r30, end r28) and the first character of path is loaded with lbz 0(r29) instead of li r9,0 / lbzx. */
@@ -332,7 +332,7 @@ extern "C" int fn_803FF058(const unsigned char* path, unsigned mode, FsState* s)
     if (viaPC == 0) {
         const char** q;
         for (q = &pref.m0; q <= &pref.m8; q++) {
-            n = fn_803FF008((const char*)path, *q);
+            n = MyStrCmpi((const char*)path, *q);
             if (n != 0) {
                 viaPC = 1;
                 break;
@@ -340,8 +340,8 @@ extern "C" int fn_803FF058(const unsigned char* path, unsigned mode, FsState* s)
         }
     }
     if (viaPC != 0) {
-        fn_803FEFC4(buf, path + n);
-        r = fn_803FEEE8((int)buf, mode, (int*)((char*)s + 0x108));
+        FixSlash(buf, path + n);
+        r = openfile_plat((int)buf, mode, (int*)((char*)s + 0x108));
         if (r == 0)
             PCclose(((int*)s)[0x108 / 4]);
         else
@@ -375,7 +375,7 @@ extern "C" int fn_803FF058(const unsigned char* path, unsigned mode, FsState* s)
 }
 
 /* subfic/adde converts zero to one after the shared close result. */
-extern "C" int fn_803FF1BC(FsState* s)
+extern "C" int closefile(FsState* s)
 {
     int r = 0;
     if (s->m0 == 3)
@@ -385,21 +385,21 @@ extern "C" int fn_803FF1BC(FsState* s)
     return r == 0;
 }
 
-extern "C" void fn_803FF210()
+extern "C" void QEndOp()
 {
     lbl_806ADEC0.m0 = 5;
     fn_803FF5E8(0, 0);
 }
 
-extern "C" void fn_803FFA60(char* d, const char* s, int n);
+extern "C" void MEM_copy(char* d, const char* s, int n);
 extern "C" int DVDReadAsyncPrio(void* fi, void* addr, int len, int off, void (*cb)(int, int), int prio);
 extern "C" void DCInvalidateRange(void* p, int n);
 
-extern "C" void fn_803FF244(void* fi)
+extern "C" void AyncDVDRead(void* fi)
 {
     int st = lbl_806ADEC0.m0;
     if (st == 2) {
-        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)(((int*)&lbl_806ADEC0)[0x30 / 4] + (int)((char*)&lbl_806ADEC0 + 0x60)), lbl_806ADEC0.m34);
+        MEM_copy((char*)lbl_806ADEC0.m4, (char*)(((int*)&lbl_806ADEC0)[0x30 / 4] + (int)((char*)&lbl_806ADEC0 + 0x60)), lbl_806ADEC0.m34);
         lbl_806ADEC0.m8 += lbl_806ADEC0.m34;
         lbl_806ADEC0.m4 += lbl_806ADEC0.m34;
     } else if (st == 3) {
@@ -411,13 +411,13 @@ extern "C" void fn_803FF244(void* fi)
         int n = lbl_806ADEC0.m18 - lbl_806ADEC0.m4;
         if (n > 0x4000)
             n = 0x4000;
-        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)&lbl_806ADEC0 + 0x60, n);
+        MEM_copy((char*)lbl_806ADEC0.m4, (char*)&lbl_806ADEC0 + 0x60, n);
         lbl_806ADEC0.m8 += n;
         lbl_806ADEC0.m4 += n;
     } else if (st == 1) {
-        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)(((int*)&lbl_806ADEC0)[0x30 / 4] + (int)((char*)&lbl_806ADEC0 + 0x60)), lbl_806ADEC0.mC);
+        MEM_copy((char*)lbl_806ADEC0.m4, (char*)(((int*)&lbl_806ADEC0)[0x30 / 4] + (int)((char*)&lbl_806ADEC0 + 0x60)), lbl_806ADEC0.mC);
         lbl_806ADEC0.m0 = st;
-        fn_803FF210();
+        QEndOp();
         return;
     }
     if (lbl_806ADEC0.m4 == lbl_806ADEC0.m14 && lbl_806ADEC0.m4 < lbl_806ADEC0.m1C) {
@@ -433,7 +433,7 @@ extern "C" void fn_803FF244(void* fi)
         lbl_806ADEC0.m38 += DVDReadAsyncPrio(fi, (char*)&lbl_806ADEC0 + 0x60, n, lbl_806ADEC0.m8, fn_803FF5E8, 2);
         return;
     }
-    fn_803FF210();
+    QEndOp();
 }
 
 extern "C" void fn_803FF5E8(int, int)
@@ -441,7 +441,7 @@ extern "C" void fn_803FF5E8(int, int)
     OSSendMessage(lbl_806B8238, 1, 1);
 }
 
-extern "C" int fn_803FF618()
+extern "C" int ReadFileThreadFunc()
 {
     int msg;
     for (;;) {
@@ -454,10 +454,10 @@ extern "C" int fn_803FF618()
             PClseek(((int*)d)[0x108 / 4], c, 0);
             PCread(((int*)d)[0x108 / 4], a, b);
         } else {
-            fn_803FF424((char*)d + 0x108, a, c, b);
+            StartNonAlignedAyncRead((char*)d + 0x108, a, c, b);
             OSReceiveMessage(lbl_806B8238, &msg, 1);
             while (lbl_806ADEC0.m0 != 5) {
-                fn_803FF244((char*)d + 0x108);
+                AyncDVDRead((char*)d + 0x108);
                 OSReceiveMessage(lbl_806B8238, &msg, 1);
             }
         }
@@ -467,14 +467,14 @@ extern "C" int fn_803FF618()
                 break;
             fn_803FFFA8(100);
         }
-        fn_803FA888(1);
+        iFILE_CommandCompleteCallback(1);
     }
 }
 
 
 /* EA readfile (reference-build name): queues a read request for the worker thread. near-miss (89.5%): the request fields
    are volatile stores in retail's order; only li r4,0 and the last store (m48) are swapped (2 insns). */
-extern "C" int fn_803FF714(int a, int b, int c, int d)
+extern "C" int readfile(int a, int b, int c, int d)
 {
     ((volatile FsState*)&lbl_806ADEC0)->m3C = a;
     ((volatile FsState*)&lbl_806ADEC0)->m44 = c;
@@ -485,7 +485,7 @@ extern "C" int fn_803FF714(int a, int b, int c, int d)
 }
 
 /* EA writefile (reference-build name): seek then write through the host file interface. */
-extern "C" int fn_803FF760(FsState* s, int a, int b, int c)
+extern "C" int writefile(FsState* s, int a, int b, int c)
 {
     int r = -1;
     if (s->m0 == 3) {
@@ -497,7 +497,7 @@ extern "C" int fn_803FF760(FsState* s, int a, int b, int c)
 }
 
 /* Reload the request handle after each seek call. */
-extern "C" int fn_803FF7C4(FsState* s)
+extern "C" int getfilesize(FsState* s)
 {
     int r;
     if (s->m0 == 3) {
@@ -518,7 +518,7 @@ extern "C" int fn_803FF848()
     return -1;
 }
 
-extern "C" void fn_803FF850()
+extern "C" void InitAlarm()
 {
     if (lbl_806EEAB0 == 0) {
         OSInitAlarm();
@@ -538,12 +538,12 @@ long long OSGetTime(void);
 void OSSetPeriodicAlarm(void* alarm, long long start, long long period, void (*handler)());
 void fn_8040015C(void);
 void fn_80400690(void (*cb)());
-void fn_803FF994();
+void TIMER_restore();
 void fn_803FFA3C();
 }
 
 /* EA TIMER_init(int hz): starts the periodic alarm that ticks the RealCore timer thread (hz defaults to 100). */
-extern "C" int fn_803FF888(int hz)
+extern "C" int TIMER_init(int hz)
 {
     if (lbl_806EEAB1 != 0)
         return lbl_806EEADC;
@@ -555,11 +555,11 @@ extern "C" int fn_803FF888(int hz)
     fn_8040015C();
     OSSetPeriodicAlarm(lbl_806B82E0, start, period, fn_803FFA3C);
     lbl_806EEAB1 = 1;
-    fn_80400690(fn_803FF994);
+    fn_80400690(TIMER_restore);
     return lbl_806EEADC;
 }
 
-extern "C" void fn_803FF994()
+extern "C" void TIMER_restore()
 {
     if (lbl_806EEAB1) {
         lbl_806EEAB1 = 0;
@@ -568,7 +568,7 @@ extern "C" void fn_803FF994()
     }
 }
 
-extern "C" void fn_803FF9D4()
+extern "C" void ttDoTimerMsg()
 {
     lbl_806EEAE0++;
     lbl_806EEAE4++;
@@ -581,7 +581,7 @@ extern "C" void fn_803FF9D4()
 
 extern "C" void fn_803FFA3C() { fn_8040021C(0); }
 
-extern "C" void fn_803FFA60(char* d, const char* s, int n)
+extern "C" void MEM_copy(char* d, const char* s, int n)
 {
     int diff = s - d;
     if (n == 0)
@@ -681,7 +681,7 @@ extern "C" void fn_803FFA60(char* d, const char* s, int n)
         *d = *s;
 }
 
-extern "C" void fn_803FFC58(char* p, int v, int n)
+extern "C" void MEM_fill(char* p, int v, int n)
 {
     if (n > 0 && ((unsigned)p & 1)) {
         *p = v;

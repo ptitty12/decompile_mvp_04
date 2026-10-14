@@ -36,7 +36,7 @@ extern "C" double floor(double x);
 extern "C" int fn_8052A35C(Unk8052A220_PalData* self, float a, float b);
 extern "C" float fn_8052A3C0(Unk8052A220_PalData* self, float a, int b);
 extern "C" void fn_8052A220(Unk8052A220_PalData* p);
-extern "C" void* fn_803FFA60(void* d, const void* s, unsigned n);
+extern "C" void* MEM_copy(void* d, const void* s, unsigned n);
 
 /* Q18 types */
 struct Db8052A220_S12 {
@@ -475,7 +475,7 @@ extern "C" DB_OVERLAY void fn_8052AE1C(Unk8052A220_Pal* self, int a, Unk80070DDC
 
 extern "C" DB_OVERLAY void fn_8052B1DC(Unk8052B1DC_Sub* p)
 {
-    fn_803FFC58(p, 0, 0xC);
+    MEM_fill(p, 0, 0xC);
 }
 
 extern "C" DB_OVERLAY void fn_8052B204(Unk8052B1DC_Sub* self, int a, Unk80070DDC_Stream* io)
@@ -486,13 +486,13 @@ extern "C" DB_OVERLAY void fn_8052B204(Unk8052B1DC_Sub* self, int a, Unk80070DDC
 
 extern "C" DB_OVERLAY Unk8052A220_PalData* fn_8052B568(Unk8052A220_PalData* self, const Unk8052A220_PalData* src)
 {
-    fn_803FFA60(self, src, 0x1C);
+    MEM_copy(self, src, 0x1C);
     return self;
 }
 
 extern "C" DB_OVERLAY void fn_8052B59C(Unk8052B5C4_Ent* p)
 {
-    fn_803FFC58(p, 0, 0x1C);
+    MEM_fill(p, 0, 0x1C);
 }
 
 extern "C" DB_OVERLAY void fn_8052B5C4(Unk8052B5C4_Ent* e, int v)

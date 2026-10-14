@@ -39,7 +39,7 @@ struct RcHeap {
 extern RcHeap* lbl_806AABF4[64];
 
 extern "C" int fn_804007FC(void*);
-extern "C" void fn_803FFC58(void*, int, int);
+extern "C" void MEM_fill(void*, int, int);
 extern "C" int fn_803EDA0C(void*);
 extern "C" int fn_803EE020(int, const void*, int (*)(const char*, ...));
 extern "C" int fn_803EE81C();
@@ -180,7 +180,7 @@ extern "C" int fn_803ED720(int idx, const void* nm, int bs, int size, int a4, in
     sprintf(buf, lbl_8060DF58, name);
     fn_803ED700(end, (int)buf, 0, hdr, 0x4253, flags | 0x8100, mid, 0);
     lbl_806AABF4[idx & 0x3f] = h;
-    fn_803FFC58(h, 0, 0x5c);
+    MEM_fill(h, 0, 0x5c);
     strcpy((char*)h, name);
     h->mC = (int)end;
     h->m8 = base;
@@ -212,7 +212,7 @@ extern "C" int fn_803ED8EC(int idx)
     if (h != 0) {
         if (h->m38 != 0)
             fn_804007FC(h->m3C);
-        fn_803FFC58(h, 0, 0x5c);
+        MEM_fill(h, 0, 0x5c);
         *(RcHeap**)((char*)tab + off) = 0;
         r = 1;
     }

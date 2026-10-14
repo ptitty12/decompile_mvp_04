@@ -26,7 +26,7 @@ extern const char lbl_805C5044[];
 extern const char lbl_805C5054[];
 extern const char lbl_805C506C[];
 extern "C" int fn_803FEE14(char*, int);
-extern "C" int fn_803FECF8(int, int);
+extern "C" int FILESYS_sizesync(int, int);
 char* fn_8040B448(char*, const char*);
 struct Unk8014AD2C_V2 {
     float x;
@@ -550,7 +550,7 @@ void fn_8014A468(Unk8014A468_Obj* self, int a, int b, int c, int d, int e)
                 fn_804089B4(s4, lbl_805C5054);
                 fn_803FEC74(h, 0, s4, fn_8040B6A0(s4), 0x64);
             }
-            int pos = fn_803FECF8(h, 0x64);
+            int pos = FILESYS_sizesync(h, 0x64);
             fn_803FEC74(h, pos, s2, fn_8040B6A0(s2), 0x64);
             fn_803FEC9C(h, 0x64);
             s2[0] = 0;
@@ -599,7 +599,7 @@ void fn_8014A784(void* self, int a, int b, int c, int d, int e)
             return;
         fn_804089B4(s3, lbl_805C50F0, s1, b, c, d, e);
     }
-    fn_8014A2B8(self, h, fn_803FECF8(h, 0x64), s3);
+    fn_8014A2B8(self, h, FILESYS_sizesync(h, 0x64), s3);
     fn_803FEC9C(h, 0x64);
     fn_8014A1BC(self, (int)lbl_805C5100, s1);
 }

@@ -317,7 +317,7 @@ UiScrA70C* fn_8010A70C(UiScrA70C* self, int a, int b, int c, int d, int e, int f
     self->m164 = 0;
     self->m168 = 0;
     self->m234 = 1;
-    fn_803FFC58(self->m238, 0, 12);
+    MEM_fill(self->m238, 0, 12);
     return self;
 }
 

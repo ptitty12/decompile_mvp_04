@@ -780,7 +780,7 @@ void fn_80086030(Unk80084910_N* self, char* buf);
 void fn_80086078(Unk80084910_N* self, char* buf);
 void fn_800860E0(Unk80084910_N* self, char* buf);
 extern "C" int sprintf(char*, const char*, ...);
-extern "C" int fn_803FAB68(const char* path, int a, int* out);
+extern "C" int FILESYS_bypassqueuefileinfo(const char* path, int a, int* out);
 extern const float lbl_805BBE64;
 extern const float lbl_805BBE68;
 extern const char lbl_805BBD44[];
@@ -810,7 +810,7 @@ extern "C" int fn_800C45C8(Unk800C341C_Mgr* m, Unk800D2338_Obj* w, int x)
         n2.m4 = i;
         fn_80086078(&n2, b);
         sprintf(d, lbl_805BBD44, lbl_8061AB98, b);
-        if (fn_803FAB68(d, 1, &out) != 0) {
+        if (FILESYS_bypassqueuefileinfo(d, 1, &out) != 0) {
             cnt++;
             fn_800860E0(&n2, c);
             w->fn_vslot31(c, 0, 1);

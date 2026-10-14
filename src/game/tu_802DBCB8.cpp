@@ -6,7 +6,7 @@
 
 void Unk803414A4::vslot2()
 {
-    fn_803FFC58(m10BC, 0, 0x480);
+    MEM_fill(m10BC, 0, 0x480);
     m1550 = 0;
     m1554 = 0;
 }
@@ -157,7 +157,7 @@ void Unk803414A4::fn_802DC8E4()
 void Unk803414A4::fn_802DC974()
 {
     m10B8 = -1;
-    fn_803FFC58(m10BC, 0, 0x480);
+    MEM_fill(m10BC, 0, 0x480);
     m1550 = 0;
     m1554 = 0;
 }
@@ -200,7 +200,7 @@ int Unk802DC9F8::fn_802DCA6C(int a)
 {
     if (mC == 0) {
         mC = new (0) char[m4->vslot7() * 8];
-        fn_803FFC58(mC, 0, m4->vslot7() * 8);
+        MEM_fill(mC, 0, m4->vslot7() * 8);
     }
     m18 = 0;
     if (a != m14) {

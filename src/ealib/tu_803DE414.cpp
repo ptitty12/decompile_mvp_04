@@ -97,7 +97,7 @@ void GXSetDither(int dither);
 extern "C" {
 float sqrtf(float x);
 void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out);
-void fn_803FFA60(void* dst, const void* src, int n);
+void MEM_copy(void* dst, const void* src, int n);
 void fn_803DE7D0(Mtx4* a, Mtx4* b);
 void fn_803DF4E4(Mtx4* out);
 void fn_803E02E4(Mtx4* dst, Mtx4* other);
@@ -119,7 +119,7 @@ extern const void* lbl_80686830[];
 /* 803DE000 */
 inline void MemCopy(void* d, const void* src, int n)
 {
-    fn_803FFA60(d, src, n);
+    MEM_copy(d, src, n);
 }
 
 /* 803DE000 */
@@ -320,7 +320,7 @@ extern "C" void fn_803DF66C(Mtx4* a, Mtx4* b)
 {
     Mtx4 t;
     fn_803DF1A0(a, b, &t);
-    fn_803FFA60(a, &t, 0x40);
+    MEM_copy(a, &t, 0x40);
 }
 
 extern "C" void fn_803DF6AC(Mtx4* m, float x, float y, float z, float w)
@@ -491,7 +491,7 @@ extern "C" void fn_803DFCB0(Mtx4* dst, float x, float y, float z, float w)
     MtxDiag(&s, x, y, z, w);
     Mtx4 t;
     MtxMul(dst, &s, &t);
-    fn_803FFA60(dst, &t, 0x40);
+    MEM_copy(dst, &t, 0x40);
 }
 
 extern "C" void fn_803DFD40(Mtx4* dst)
@@ -500,7 +500,7 @@ extern "C" void fn_803DFD40(Mtx4* dst)
     fn_803DF4E4(&a);
     Mtx4 b;
     MtxMul(dst, &a, &b);
-    fn_803FFA60(dst, &b, 0x40);
+    MEM_copy(dst, &b, 0x40);
 }
 
 extern "C" void fn_803DFD90(Mtx4* dst, float x, float y, float z)
@@ -509,7 +509,7 @@ extern "C" void fn_803DFD90(Mtx4* dst, float x, float y, float z)
     MtxTrans(&s, x, y, z);
     Mtx4 t;
     MtxMul(dst, &s, &t);
-    fn_803FFA60(dst, &t, 0x40);
+    MEM_copy(dst, &t, 0x40);
 }
 
 extern "C" void fn_803DFE28(Mtx4* dst, Mtx4* other)
@@ -591,7 +591,7 @@ extern "C" void fn_803E02E4(Mtx4* dst, Mtx4* other)
 {
     Mtx4 t;
     fn_803DF1A0(other, dst, &t);
-    fn_803FFA60(dst, &t, 0x40);
+    MEM_copy(dst, &t, 0x40);
 }
 
 extern "C" void fn_803E032C(Unk803E032CObj* self)

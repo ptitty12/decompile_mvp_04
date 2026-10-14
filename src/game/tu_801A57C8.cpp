@@ -12,7 +12,7 @@ void fn_801B2538(Unk8019F8C0_Owner* o);
 void fn_80235AD4(void* p);
 extern "C" void fn_8033E5C4(void* a, int n);
 Unk8019F8C0_Sub* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
-extern "C" void* fn_803FFC58(void* p, int v, int n);
+extern "C" void* MEM_fill(void* p, int v, int n);
 extern "C" void fn_8037893C(void* a, int b, void* c, void* d, int e);
 void fn_801AA038(void* p, int n);
 void fn_801AA248(void* p);
@@ -747,7 +747,7 @@ void fn_801A6ED8(Unk8019F8C0_Owner* o)
 
 void fn_801A6FBC()
 {
-    fn_803FFC58(&lbl_8068BF34, 0, 0x424);
+    MEM_fill(&lbl_8068BF34, 0, 0x424);
     lbl_8068BF34.m310 = 0;
     lbl_8068BF34.m31C = 0;
     lbl_8068BF34.m314 = 0;

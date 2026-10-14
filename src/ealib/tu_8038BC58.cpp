@@ -463,7 +463,7 @@ extern "C" int fn_8038D170(int tex)
 
 extern "C" int fn_803AC11C();
 extern "C" void fn_804005DC();
-extern "C" void* fn_803FFC58(void* p, int v, int n);
+extern "C" void* MEM_fill(void* p, int v, int n);
 extern "C" int fn_803FD964(int a, int b, int c, int d, int e);
 extern "C" int fn_803FDE54(int a, int b);
 extern "C" void fn_803FDD28(int h, int a, int b);
@@ -494,7 +494,7 @@ extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f
     int fl = j;
     if (fn_803AC11C() == 0)
         fl = 1;
-    fn_803FFC58(s, 0, 0x98);
+    MEM_fill(s, 0, 0x98);
     *(int*)(s + 0x18) = i;
     *(int*)(s + 0x20) = 0;
     *(int*)(s + 0x28) = 0;
@@ -978,7 +978,7 @@ struct VdAlloc {
     int padC[3];
 };
 extern "C" void fn_803FDC80(int p);
-extern "C" void fn_803FACFC(VdAlloc* a);
+extern "C" void FILESYS_getopts(VdAlloc* a);
 class VdX2 {
 public:
     VdRes* m0;
@@ -1026,7 +1026,7 @@ VdX2::~VdX2()
     if (p != 0) {
         VdAlloc a;
         a.op = 0x14;
-        fn_803FACFC(&a);
+        FILESYS_getopts(&a);
         a.fn(p);
         m20 = 0;
     }
@@ -1034,7 +1034,7 @@ VdX2::~VdX2()
     if (q != 0) {
         VdAlloc a;
         a.op = 0x14;
-        fn_803FACFC(&a);
+        FILESYS_getopts(&a);
         a.fn(q);
         m28 = 0;
     }

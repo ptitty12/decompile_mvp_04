@@ -17,7 +17,7 @@ extern void* lbl_806EE9DC;
 extern int lbl_8062C76C[];
 
 extern "C" void fn_804006FC(void (*cb)());
-extern "C" void fn_803FFA60(int* a, int* b, int c);
+extern "C" void MEM_copy(int* a, int* b, int c);
 extern "C" void fn_803EB330(void* p);
 extern "C" void fn_803EB560(void);
 extern "C" void fn_80400690(void (*cb)());
@@ -133,7 +133,7 @@ extern "C" void fn_803EB520(Unk803EB2AC_Hooks* h)
 
 extern "C" void fn_803EB528(int* p)
 {
-    fn_803FFA60(lbl_8062C76C, p, *p);
+    MEM_copy(lbl_8062C76C, p, *p);
 }
 
 extern "C" int fn_803EB558(char* p)

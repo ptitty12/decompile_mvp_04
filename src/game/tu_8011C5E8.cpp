@@ -178,7 +178,7 @@ void fn_8011C768(Scr* self);
 void fn_8011C114(Scr* self);
 void fn_8011C15C(Scr* self);
 void fn_8011F0F4(Scr* self);
-void fn_803FFC58(void* p, int c, int n);
+void MEM_fill(void* p, int c, int n);
 void fn_8011C04C(Scr* self);
 void fn_8035682C(void* name);
 void fn_8040B830(void* dst, const char* src, int n);
@@ -273,14 +273,14 @@ void* fn_8011C800(Scr* self, int a, int b, int c, int d, int e, int f, int g, in
     self->m1D8 = -1;
     self->m1DC = 5;
     lbl_8061B3B8 = fn_8011B5A4();
-    fn_803FFC58((char*)self + 0x13C, 0, 0x68);
+    MEM_fill((char*)self + 0x13C, 0, 0x68);
     return self;
 }
 
 void fn_8011D0D0(Scr* self)
 {
     fn_8011C114(self);
-    fn_803FFC58((char*)self + 0x13C, 0, 0x68);
+    MEM_fill((char*)self + 0x13C, 0, 0x68);
     self->m1B4 = 0;
 }
 
@@ -519,7 +519,7 @@ void* fn_8011E5BC(Scr* self, int a, int b, int c, int d, int e, int f, int g, in
     self->m1E0 = 0;
     self->SetVptr(lbl_80658A18);
     *(float*)&self->m1D8 = lbl_805C00F8;
-    fn_803FFC58((char*)self + 0x138, 0, 0x70);
+    MEM_fill((char*)self + 0x138, 0, 0x70);
     self->m1D4 = 0;
     return self;
 }
@@ -548,7 +548,7 @@ void fn_8011F020(Scr* self)
 void fn_8011F070(Scr* self)
 {
     fn_8011C114(self);
-    fn_803FFC58((char*)self + 0x138, 0, 0x70);
+    MEM_fill((char*)self + 0x138, 0, 0x70);
     fn_800AE964(fn_800AB5C8(lbl_80619D10), 0);
 }
 

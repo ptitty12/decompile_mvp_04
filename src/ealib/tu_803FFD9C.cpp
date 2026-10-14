@@ -7,7 +7,7 @@
 
 /* RealCore threading / diagnostics helpers (EA). */
 extern "C" {
-int fn_803FF850(void);
+int InitAlarm(void);
 int OSGetCurrentThread(void);
 int OSCreateThread(int, int, int, int, int, int, int);
 void OSResumeThread(int);
@@ -21,7 +21,7 @@ int OSSendMessage(void*, int, int);
 int OSReceiveMessage(void*, int*, int);
 void OSInitMessageQueue(void*, void*, int);
 void fn_803F9D74x(void);
-void fn_803FF9D4(void);
+void ttDoTimerMsg(void);
 void fn_80400EF8(void);
 }
 extern char lbl_806B8308[];
@@ -45,7 +45,7 @@ extern "C" {
 void exit(int);
 void fn_8040061C(void);
 void fn_803FFF30(long long ticks);
-void fn_803FFA60(void* d, const void* s, int n);
+void MEM_copy(void* d, const void* s, int n);
 void fn_80400870(int idx, int v);
 void fn_80400890(int a, int b);
 void fn_80400948(void);
@@ -146,7 +146,7 @@ extern "C" int fn_803FFD9C(int k)
 
 extern "C" void fn_803FFE14()
 {
-    fn_803FF850();
+    InitAlarm();
     lbl_806EF47C = OSGetCurrentThread();
 }
 
@@ -273,7 +273,7 @@ extern "C" int fn_8040024C()
     while (msg != 2) {
         OSReceiveMessage(lbl_806B8308, &msg, 1);
         if (msg == 0)
-            fn_803FF9D4();
+            ttDoTimerMsg();
         else if (msg == 1)
             fn_80400EF8();
     }
@@ -397,17 +397,17 @@ extern "C" void fn_804006FC(void (*callback)())
     }
 }
 
-extern "C" void fn_803FFC58(void* x, int k, int a);
+extern "C" void MEM_fill(void* x, int k, int a);
 
 extern "C" void fn_8040074C(void* x, int a)
 {
-    fn_803FFC58(x, 0, a);
+    MEM_fill(x, 0, a);
 }
 
 extern "C" void fn_80400774(unsigned char* d, unsigned char* s, unsigned n)
 {
     if (d <= s || d >= s + n) {
-        fn_803FFA60(d, s, n);
+        MEM_copy(d, s, n);
     } else {
         d += n;
         s += n;
@@ -424,7 +424,7 @@ extern "C" int fn_804007D4(int p)
 
 extern "C" void fn_804007FC(void* x)
 {
-    fn_803FFC58(x, 0xDEADBEEF, 4);
+    MEM_fill(x, 0xDEADBEEF, 4);
 }
 
 struct Unk8037E6F4 {

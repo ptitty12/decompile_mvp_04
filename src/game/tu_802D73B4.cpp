@@ -428,8 +428,8 @@ void fn_802D8294(int a)
 /* near-miss: second memset argument moves are scheduled li/li/mr here, mr/li/li in retail (3 slots) */
 void Unk802D73B4_Mgr::s2()
 {
-    fn_803FFC58(m8, 0, 16);
-    fn_803FFC58(m18, 0, 16);
+    MEM_fill(m8, 0, 16);
+    MEM_fill(m18, 0, 16);
     int n = fn_80008540((Unk800085B0**)m8, 4);
     for (int i = 0; i < n; i++) {
         if (m8[i]) {

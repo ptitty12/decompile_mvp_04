@@ -284,7 +284,7 @@ struct Unk801DD660_Rec {
 };
 
 /* 0x60C-byte table (nine records), built by the out-of-line ctor fn_8035B718. */
-extern "C" void* fn_803FFA60(void* d, const void* s, unsigned n); /* memcpy */
+extern "C" void* MEM_copy(void* d, const void* s, unsigned n); /* memcpy */
 struct Unk8035B718 {
     Unk801DD660_Rec m0[9];
 };
@@ -292,7 +292,7 @@ struct Unk8035B718 {
 inline void Unk8035B718_Assign(const Unk8035B718* s, Unk8035B718* d)
 {
     if (d != s)
-        fn_803FFA60(d, s, sizeof(*d));
+        MEM_copy(d, s, sizeof(*d));
 }
 
 /* 0x24-byte block at Unk801DD660::mF8 (set up by fn_801E98C0). */

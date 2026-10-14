@@ -48,22 +48,22 @@ extern "C" void fn_803FB040(RcLNode* n);
 extern "C" int fn_80400828(void*);
 extern "C" int fn_8040084C(void*);
 extern "C" int fn_803FEE14(int, int);
-extern "C" int fn_803FA3B4(int (*)(int, RcReq*), int, int, RcReq*);
+extern "C" int FILESYS_atomic(int (*)(int, RcReq*), int, int, RcReq*);
 extern "C" int fn_803FEBDC(int, int, int, int*);
-extern "C" int fn_803FECF8(int, int);
+extern "C" int FILESYS_sizesync(int, int);
 extern "C" void fn_803FEC9C(int, int);
-extern "C" void fn_803F9A80(int);
+extern "C" void FILESYS_completeop(int);
 extern "C" int fn_803FB978(int, RcReq*);
 extern "C" int fn_803FBA28(int, RcReq*);
 extern "C" int fn_803FBB48(int, RcReq*);
 extern "C" int fn_803FBC94(int, RcReq*);
 extern "C" int fn_803FBDC4(int, RcReq*);
 extern "C" int fn_803FEC4C(int, int, int, int, int);
-extern "C" void fn_803F9884(int);
-extern "C" void fn_803F99E8(int);
+extern "C" void FILESYS_cancelop(int);
+extern "C" void FILESYS_waitop(int);
 extern "C" int fn_803FC300(void*);
 extern "C" int fn_803FC360(void*);
-extern "C" void fn_803FFA60(void*, void*, int);
+extern "C" void MEM_copy(void*, void*, int);
 struct RcBuf14 {
     int m0, m4, m8, mC, m10;
 };
@@ -77,13 +77,13 @@ extern "C" void fn_803FFFA8(int);
 extern void* (*lbl_806ADE90[4])(const char*, int, int);
 extern char lbl_8060E7C8[];
 extern RcLNode* lbl_806EF470;
-extern "C" void fn_803F96B0(int, void (*)(int, int, int));
-extern "C" int fn_803F9CE8(int, int, RcLNode*);
-extern "C" int fn_803F9E90(int, int, RcLNode*);
-extern "C" int fn_803F9D74(int, int, int, int, int, RcLNode*);
+extern "C" void FILESYS_callbackop(int, void (*)(int, int, int));
+extern "C" int FILESYS_close(int, int, RcLNode*);
+extern "C" int FILESYS_size(int, int, RcLNode*);
+extern "C" int FILESYS_read(int, int, int, int, int, RcLNode*);
 extern "C" void fn_803FB0F8(int, int, RcLNode*);
 extern char lbl_8060E7B8[];
-extern "C" int fn_803F9C58(int, int, int, RcLNode*);
+extern "C" int FILESYS_open(int, int, int, RcLNode*);
 extern "C" void fn_803FB2D4(int, int, RcLNode*);
 
 extern "C" void fn_803FAE94(RcLHead* l, RcLNode* n)
@@ -160,19 +160,19 @@ extern "C" void fn_803FB040(RcLNode* n)
 
 extern "C" void fn_803FB0C0(int a, int b, RcLNode* n)
 {
-    fn_803F9A80(n->m1C);
+    FILESYS_completeop(n->m1C);
     fn_803FB040(n);
 }
 
 extern "C" void fn_803FB0F8(int a, int b, RcLNode* n)
 {
-    int v = ((int (*)(int))fn_803F9A80)(n->m1C);
+    int v = ((int (*)(int))FILESYS_completeop)(n->m1C);
     n->m8 += v;
     n->m2C += v;
     if (v <= 0xfffff || n->m10 != 0) {
-        n->m1C = fn_803F9CE8(n->m20, 0x63, n);
+        n->m1C = FILESYS_close(n->m20, 0x63, n);
         if (n->m1C != 0)
-            fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB0C0);
+            FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB0C0);
     } else {
         int rem = n->m28 - v;
         n->m24 += v;
@@ -180,19 +180,19 @@ extern "C" void fn_803FB0F8(int a, int b, RcLNode* n)
         int len = rem;
         if (len > 0x100000)
             len = 0x100000;
-        n->m1C = fn_803F9D74(n->m20, n->m24, n->m2C, len, 0x63, n);
+        n->m1C = FILESYS_read(n->m20, n->m24, n->m2C, len, 0x63, n);
         if (n->m1C != 0)
-            fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB0F8);
+            FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB0F8);
     }
 }
 
 extern "C" void fn_803FB1EC(int a, int b, RcLNode* n)
 {
-    int v = ((int (*)(int))fn_803F9A80)(n->m1C);
+    int v = ((int (*)(int))FILESYS_completeop)(n->m1C);
     if (n->m10 != 0) {
-        n->m1C = fn_803F9CE8(n->m20, 0x63, n);
+        n->m1C = FILESYS_close(n->m20, 0x63, n);
         if (n->m1C != 0)
-            fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB0C0);
+            FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB0C0);
     } else {
         int old = n->m28;
         n->m28 = v;
@@ -202,35 +202,35 @@ extern "C" void fn_803FB1EC(int a, int b, RcLNode* n)
         int len = n->m28;
         if (len > 0x100000)
             len = 0x100000;
-        n->m1C = fn_803F9D74(n->m20, n->m24, (int)mem, len, 0x63, n);
+        n->m1C = FILESYS_read(n->m20, n->m24, (int)mem, len, 0x63, n);
         if (n->m1C != 0)
-            fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB0F8);
+            FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB0F8);
     }
 }
 
 extern "C" void fn_803FB2D4(int a, int b, RcLNode* n)
 {
-    int v = ((int (*)(int))fn_803F9A80)(n->m1C);
+    int v = ((int (*)(int))FILESYS_completeop)(n->m1C);
     n->m20 = v;
     if (v == 0) {
         fn_803FB040(n);
         return;
     }
     if (n->m10 != 0) {
-        n->m1C = fn_803F9CE8(n->m20, 0x63, n);
+        n->m1C = FILESYS_close(n->m20, 0x63, n);
         if (n->m1C != 0)
-            fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB0C0);
+            FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB0C0);
     } else if (n->m14 == 0) {
         int len = n->m28;
         if (len > 0x100000)
             len = 0x100000;
-        n->m1C = fn_803F9D74(n->m20, n->m24, n->m2C, len, 0x63, n);
+        n->m1C = FILESYS_read(n->m20, n->m24, n->m2C, len, 0x63, n);
         if (n->m1C != 0)
-            fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB0F8);
+            FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB0F8);
     } else {
-        n->m1C = fn_803F9E90(n->m20, 0x63, n);
+        n->m1C = FILESYS_size(n->m20, 0x63, n);
         if (n->m1C != 0)
-            fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB1EC);
+            FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB1EC);
     }
 }
 
@@ -305,10 +305,10 @@ extern "C" int fn_803FB59C(int a, int b)
     n->m24 = 0;
     n->m2C = 0;
     n->m28 = b;
-    n->m1C = fn_803F9C58(a, 1, 0x64, n);
+    n->m1C = FILESYS_open(a, 1, 0x64, n);
     if (n->m1C == 0)
         return 0;
-    fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB2D4);
+    FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB2D4);
     return n->m0;
 }
 
@@ -326,10 +326,10 @@ extern "C" int fn_803FB64C(int a, int b, int c)
     n->m24 = 0;
     n->m28 = c;
     n->m2C = b;
-    n->m1C = fn_803F9C58(a, 1, 0x64, n);
+    n->m1C = FILESYS_open(a, 1, 0x64, n);
     if (n->m1C == 0)
         return 0;
-    fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB2D4);
+    FILESYS_callbackop(n->m1C, (void (*)(int, int, int))fn_803FB2D4);
     return n->m0;
 }
 
@@ -361,7 +361,7 @@ extern "C" int fn_803FB764(int id, int* p1, int* p2)
         return -1;
     if (n->m1C != 0) {
         do {
-            fn_803F99E8(n->m1C);
+            FILESYS_waitop(n->m1C);
         } while (n->m1C != 0);
     }
     if (n->m10 != 0) {
@@ -398,7 +398,7 @@ extern "C" int fn_803FB888(int id)
     if (n == 0 || b != 0 || n->m10 == 0)
         return -1;
     if (a != 0)
-        fn_803F9884(a);
+        FILESYS_cancelop(a);
     else if (c == 0)
         fn_803FAFD4(n);
     return 1;
@@ -414,7 +414,7 @@ extern "C" int fn_803FB978(int n, RcReq* p)
     int out;
     if (fn_803FEBDC(p->a0, 1, n, &out) != 0) {
         int m = n - 1;
-        int r = fn_803FECF8(out, m);
+        int r = FILESYS_sizesync(out, m);
         fn_803FEC9C(out, m);
         return r;
     } else
@@ -426,7 +426,7 @@ extern "C" int fn_803FB9E8(int a)
     RcReq q;
     q.a0 = a;
     q.a3 = 1;
-    return fn_803FA3B4(fn_803FB978, 0, lbl_806EEAA0, &q);
+    return FILESYS_atomic(fn_803FB978, 0, lbl_806EEAA0, &q);
 }
 
 /* The allocator callback takes the request flags (p->a4) as a third argument: retail reloads them into r5. */
@@ -438,7 +438,7 @@ extern "C" int fn_803FBA28(int n, RcReq* p)
         mode = 0x41;
     if (fn_803FEBDC(p->a0, mode, n, &out) != 0) {
         int m = n - 1;
-        int len = fn_803FECF8(out, m);
+        int len = FILESYS_sizesync(out, m);
         if (p->a4 & 0x40)
             len = (len + 0x7ff) & ~0x7ff;
         int r = ((int (*)(int, int, int))lbl_806ADE90[0])(p->a0, len, p->a4);
@@ -458,7 +458,7 @@ extern "C" int fn_803FBB04(int a, int b)
     q.a0 = a;
     q.a4 = b;
     q.a3 = 1;
-    return fn_803FA3B4(fn_803FBA28, 0, lbl_806EEAA0, &q);
+    return FILESYS_atomic(fn_803FBA28, 0, lbl_806EEAA0, &q);
 }
 
 /* near-miss: 98.6%; retail copies n-1 from r4 (addi r4,r31,-1; mr r28,r4) and rotates p/m/len0 registers */
@@ -470,7 +470,7 @@ extern "C" int fn_803FBB48(int n, RcReq* p)
         mode = 0x41;
     if (fn_803FEBDC(p->a0, mode, n, &out) != 0) {
         int m = n - 1;
-        int len0 = fn_803FECF8(out, m);
+        int len0 = FILESYS_sizesync(out, m);
         int len;
         if (p->a4 & 0x40)
             len = (len0 + 0x7ff) & ~0x7ff;
@@ -494,7 +494,7 @@ extern "C" int fn_803FBC34(int a, int* out, int c)
     q.a0 = a;
     q.a4 = c;
     q.a3 = 0;
-    int r = fn_803FA3B4(fn_803FBB48, 0, lbl_806EEAA0, &q);
+    int r = FILESYS_atomic(fn_803FBB48, 0, lbl_806EEAA0, &q);
     if (out != 0)
         *out = q.a2;
     return r;
@@ -524,7 +524,7 @@ extern "C" int fn_803FBD28(int a, int b, int c)
     q.a3 = 1;
     q.a1 = b;
     q.a4 = 0;
-    return fn_803FA3B4(fn_803FBC94, 0, lbl_806EEAA0, &q);
+    return FILESYS_atomic(fn_803FBC94, 0, lbl_806EEAA0, &q);
 }
 
 extern "C" int fn_803FBD78(int a, int b, int c)
@@ -535,7 +535,7 @@ extern "C" int fn_803FBD78(int a, int b, int c)
     q.a1 = b;
     q.a3 = 0;
     q.a4 = 0;
-    return fn_803FA3B4(fn_803FBC94, 0, lbl_806EEAA0, &q);
+    return FILESYS_atomic(fn_803FBC94, 0, lbl_806EEAA0, &q);
 }
 
 extern "C" int fn_803FBF10(int a, int b)
@@ -544,5 +544,5 @@ extern "C" int fn_803FBF10(int a, int b)
     q.a0 = a;
     q.a2 = b;
     q.a3 = 1;
-    return fn_803FA3B4(fn_803FBDC4, 0, lbl_806EEAA0, &q);
+    return FILESYS_atomic(fn_803FBDC4, 0, lbl_806EEAA0, &q);
 }

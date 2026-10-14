@@ -28,7 +28,7 @@ int fn_802B9804(const char* path, int a);
 int fn_803FC410(int h, int a, int b, int c, int d);
 int fn_803FC034(int size);
 void fn_803EDA0C(int h);
-int fn_803FAB68(const char* path, int a, int* out);
+int FILESYS_bypassqueuefileinfo(const char* path, int a, int* out);
 }
 
 extern const char* lbl_8061AB80[];
@@ -96,7 +96,7 @@ extern "C" int fn_800C52EC(void* unused, int idx, const char* name)
     int out;
     fn_804089B4(a, "%s.%s", name, "gsh");
     fn_804089B4(b, "%s|%s", lbl_8061AB80[idx], a);
-    int r = fn_803FAB68(b, 1, &out);
+    int r = FILESYS_bypassqueuefileinfo(b, 1, &out);
     return r != 0;
 }
 
