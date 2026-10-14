@@ -2485,6 +2485,7 @@ dolphin/dvd/tu_80425BE4.c:
 	.data       start:0x80634310 end:0x80634380
 	.bss        start:0x806DE218 end:0x806DE288
 	.sdata      start:0x806EF200 end:0x806EF210
+	.sbss       start:0x806EF6C8 end:0x806EF6D8
 
 dolphin/exi/tu_80425E54.c:
 	.text       start:0x80425E54 end:0x80426CD0
