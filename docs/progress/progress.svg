@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="782" viewBox="0 0 960 782" role="img" aria-labelledby="title desc">
 <title id="title">Decompilation progress</title>
-<desc id="desc">52.43% of code matched as of 2026-10-14: 21,141 of 24,158 functions, 3,091,588 of 5,896,176 code bytes, 762 units with code; 6.55% of code built from source (234 of 847 units linked).</desc>
+<desc id="desc">52.43% of code matched as of 2026-10-14: 21,141 of 24,158 functions, 3,091,588 of 5,896,176 code bytes, 762 units with code; 6.55% of code built from source (234 of 849 units linked).</desc>
 <style>
 text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 .surface { fill: #fcfcfb; }
@@ -38,7 +38,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="613.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Built from source</text>
 <text x="598.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">6.5% (234 units)</text>
 <text x="767.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Data matched</text>
-<text x="767.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">12.7 KB / 1.37 MB</text>
+<text x="767.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">12.9 KB / 1.37 MB</text>
 <clipPath id="bar"><rect x="24" y="140" width="912" height="12" rx="6.0"/></clipPath>
 <rect x="24" y="140" width="912" height="12" rx="6.0" class="b0"/>
 <rect x="24" y="140" width="478.2" height="12" class="b5" clip-path="url(#bar)"/>
@@ -321,7 +321,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="614.3" y="497.3" width="22.2" height="19.8" rx="2" class="b2"><title>ealib/tu_803D50E4: 10,060 bytes of code, 36.0% fuzzy match</title></rect>
 <rect x="614.3" y="519.2" width="22.2" height="19.8" rx="2" class="b4"><title>fe/tu_8046F770: 10,060 bytes of code, 87.7% fuzzy match</title></rect>
 <rect x="638.6" y="224.8" width="21.3" height="20.7" rx="2" class="b4"><title>db/tu_80582578: 10,052 bytes of code, 81.0% fuzzy match</title></rect>
-<rect x="661.9" y="224.8" width="21.3" height="20.7" rx="2" class="b3"><title>dolphin/os/tu_804330D0: 10,044 bytes of code, 71.1% fuzzy match</title></rect>
+<rect x="661.9" y="224.8" width="21.3" height="20.7" rx="2" class="b3"><title>dolphin/os/tu_804330D0: 10,044 bytes of code, 71.2% fuzzy match</title></rect>
 <rect x="685.2" y="224.8" width="21.3" height="20.7" rx="2" class="b4"><title>fe/tu_804AECD0: 10,028 bytes of code, 77.2% fuzzy match</title></rect>
 <rect x="708.5" y="224.8" width="21.2" height="20.7" rx="2" class="b3"><title>game/tu_8004E364: 9,988 bytes of code, 63.5% fuzzy match</title></rect>
 <rect x="731.7" y="224.8" width="21.0" height="20.7" rx="2" class="b4"><title>game/tu_80082248: 9,928 bytes of code, 80.9% fuzzy match</title></rect>
