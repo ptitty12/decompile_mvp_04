@@ -85,10 +85,9 @@ extern const float lbl_805D93EC;
 extern const float lbl_805D93F0;
 extern const float lbl_805D93F4;
 extern const float lbl_805D9484;
-/* near-miss (99.5%, 6 slots): retail keeps x in r29 and e in r28; ours has them swapped (callee-saved allocation of two
-   equal-priority parameters); tried single-call, result-variable and else forms */
 float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e);
-void fn_80254784(void* p);
+struct Unk8024EF40_A;
+void fn_80254784(Unk8024EF40_A* p);
 
 extern const float lbl_805D93AC;
 extern const float lbl_805D93B0;
@@ -101,7 +100,8 @@ float fn_80249070(Unk80270BA0_X* x);
 void fn_80249750(Unk80270BA0_X* x);
 extern "C" void fn_80249B40(Unk80270BA0_X* x, Unk80273498_Pos* p, int a, int b, float f);
 void fn_80249D64(Unk80270BA0_X* x, int a);
-float fn_8023C868(Unk80270BA0_X* x);
+struct Unk8023C868_P;
+float fn_8023C868(Unk8023C868_P* x);
 
 inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
 {
@@ -151,7 +151,9 @@ void fn_80247858(Unk80270BA0_X* x)
 }
 
 extern "C" float fn_804028E4(float x);
-extern "C" float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g, Unk80273498_Vec3* h, float dist);
+/* The float parameter is second (tu_801EA36C agrees): its position in the prototype orders the f1 copy among the
+ * int argument moves at sched1, which lengthens the callers' int parameter lives by one (fn_80248370's x/e). */
+extern "C" float fn_8024796C(Unk80270BA0_X* x, float dist, int b, int c, int d, int e, float* f, int g, Unk80273498_Vec3* h);
 extern "C" float atan2f(float y, float x);
 extern "C" float fn_802478A0(void* o, void* p, int a, int b)
 {
@@ -195,9 +197,9 @@ float fn_8024820C(Unk80270BA0_X* x, int h, Unk80273498_Vec3* q, int c, int d, in
     float len = fn_804028E4(Unk8024820C_D2(p, q));
     if (len > 24.0f) {
         float ang = Unk8024820C_Ang(p, q);
-        return fn_8024796C(x, h, c, d, e, &ang, 0, q, len);
+        return fn_8024796C(x, len, h, c, d, e, &ang, 0, q);
     }
-    return fn_8024796C(x, h, c, d, e, 0, 0, q, len);
+    return fn_8024796C(x, len, h, c, d, e, 0, 0, q);
 }
 
 float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e)
@@ -205,9 +207,9 @@ float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, in
     float len = fn_804028E4((p->x - q->x) * (p->x - q->x) + (p->z - q->z) * (p->z - q->z));
     if (len > 24.0f) {
         float ang = atan2f(q->x - p->x, q->z - p->z);
-        return fn_8024796C(x, 0, c, d, e, &ang, 0, q, len);
+        return fn_8024796C(x, len, 0, c, d, e, &ang, 0, q);
     }
-    return fn_8024796C(x, 0, c, d, e, 0, 0, q, len);
+    return fn_8024796C(x, len, 0, c, d, e, 0, 0, q);
 }
 
 extern "C" float fn_80248450(Unk80270BA0_X* x, int a, int b, int c)
@@ -219,7 +221,7 @@ float fn_80248F70(Unk80270BA0_X* x, float f)
 {
     float a = ((Unk8024B99C_V*)x)->m8EC;
     if (((Unk8024B99C_V*)x)->m458 != -1) {
-        float r = fn_8023C868(x);
+        float r = fn_8023C868((Unk8023C868_P*)x);
         a = a * r;
     }
     return a * f;
@@ -302,7 +304,7 @@ void fn_802491D8(Unk80270BA0_X* x)
         if (m != 0) {
             char* row = (char*)c->m6F8->m14 + v->m708 * 0xE64;
             if (m != *(int*)(row + 0x1A0))
-                fn_80254784((char*)x + 0x58C);
+                fn_80254784((Unk8024EF40_A*)((char*)x + 0x58C));
         }
     }
     float f = fn_80249070(x);
@@ -669,11 +671,11 @@ extern "C" void fn_80249B40(Unk80270BA0_X* xx, Unk80273498_Pos* p, int flag, int
 /* near-miss: retail compares s < 1 (cmpwi 1; bltlr); g++ folds s >= 1 into s > 0 (4 forms tried) */
 int fn_80249D44(Unk80270BA0_X* x)
 {
-    int s = ((Unk8024B99C_V*)x)->mB0C;
     int r = 0;
-    if (s <= 6) {
-        if (s >= 1)
-            r = 1;
+    switch (((Unk8024B99C_V*)x)->mB0C) {
+    case 1: case 2: case 3: case 4: case 5: case 6:
+        r = 1;
+        break;
     }
     return r;
 }
