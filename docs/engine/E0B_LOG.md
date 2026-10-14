@@ -9,7 +9,7 @@ A later session resumes from "Next step".
 | # | Item | State | Commit |
 |---|---|---|---|
 | 1 | Skeleton (CMake, presets, doctest, ctest) | Done | see git log |
-| 2 | Disc and DOL | | |
+| 2 | Disc and DOL | Done | see git log |
 | 3 | Decoder and disassembler | | |
 | 4 | Semantics library and reference interpreter | | |
 | 5 | Functions and CFGs | | |
@@ -40,6 +40,7 @@ A later session resumes from "Next step".
 | Path | Contents |
 |---|---|
 | `engine/common/` | Byte order, SHA-1, host file helpers |
+| `engine/vfs/` | Disc image sources (file, memory, CISO), GCM header + FST, DOL, ELF section headers, disc identity check; `mvp-disc` CLI |
 | `engine/third_party/` | Vendored code (`docs/REUSE.md` §6) |
 | `engine/tools/` | Build helpers |
 
@@ -54,6 +55,20 @@ A later session resumes from "Next step".
   marks data-dependent tests as skipped when the data is missing.
 - Exit: `ctest --preset msvc` passes locally (1/1).
 
+### 2. Disc and DOL (done)
+
+- `vfs::open_disc` opens an ISO or CISO, parses the GCM header and FST, reads
+  `main.dol` (sized from its own header) and refuses anything but game id GV4E69,
+  revision 0 and DOL SHA-1 `da6becdb...84dd` (`vfs::kRetailDolSha1`).
+- CISO: unstored blocks read as zero up to a full GameCube disc (1,459,978,240 bytes).
+- `dol_layout_lines` names each DOL slot by the allocated ELF sections of the
+  disc's `/mvp.elf` that fall inside it, in `dol_layout.txt` format.
+- Exit evidence (2026-10-14): `local_disc` passes: retail hash, and the 8 printed
+  lines (7 DOL sections + bss) equal `config/GV4E69/dol_layout.txt`. CI test
+  `test_vfs` (synthetic GCM with FST, DOL and ELF, plain and CISO) passes.
+- `mvp-disc info|ls|sections|dol` prints identity, FST, section table; `dol`
+  extracts `main.dol` (only ever into `build/`).
+
 ## Next step
 
-Item 2: disc and DOL.
+Item 3: decoder and disassembler.

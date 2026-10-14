@@ -48,3 +48,4 @@ function(engine_test name)
 endfunction()
 
 add_subdirectory(common)
+add_subdirectory(vfs)
