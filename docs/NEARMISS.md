@@ -378,3 +378,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `db/tu_80565FD4` `fn_8056746C`: inherited97.07921%; eight ordinary aggregate-copy/lifetime/array/memcpy forms retain record-copy register and second-vptr scheduling differences; source preserved, scratch build/root51/6746C.
 - `db/tu_8056A248` `fn_8056A838`: 98.21429%; eight ordinary table-pointer/offset/load-order forms retain table/index and compare-operand register colors; source preserved, scratch build/root54/A838.
+- 2026-10-13 | fe/tu_8044F550 fn_8044FE0C | Eight bounded source forms; best 217/220 instructions, exact length/branches; only three reset-store order slots remain (+0x14,+0x04,+0x0C). Scratch build/agent-a8/fe-8044fe0c-v8.cpp; source restored.
