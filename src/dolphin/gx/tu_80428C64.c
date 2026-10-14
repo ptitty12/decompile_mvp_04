@@ -22,7 +22,7 @@ OSTime fn_80438628(void);
  * __GXDefaultTlutRegionCallback, fn_80428D84 __GXShutdown. Placeholder callees: fn_8042A544
  * GXSetBreakPtCallback, fn_8042C62C GXSetDrawSyncCallback, fn_8042C6F8 GXSetDrawDoneCallback,
  * PPCSync PPCSync, fn_8042C07C __GXAbort. */
-void fn_8042A544(void* cb);
+GXBreakPtCallback fn_8042A544(GXBreakPtCallback cb);
 void fn_8042C62C(void* cb);
 void fn_8042C6F8(void* cb);
 void PPCSync(void);
