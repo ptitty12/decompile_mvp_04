@@ -533,6 +533,19 @@ def opcode_diff(idx: Index, t: int, c: int, limit: int = 4) -> list[str]:
     return out
 
 
+def ref_line(name: str, idx: Index) -> str | None:
+    """EA's name for a function from config/GV4E69/refnames (tools/match/refnames.py), if any."""
+    try:
+        import refnames  # same directory
+    except Exception:
+        return None
+    units = [idx.keys[i][0] for i in idx.by_name.get(name, [])]
+    try:
+        return refnames.best(refnames.address_of(name), units[0] if units else None)
+    except Exception:
+        return None
+
+
 def near_miss_comment(src_where: str, cache: dict) -> bool:
     """True if the comment just above a matched twin's definition still says near-miss."""
     path, _, line = src_where.rpartition(":")
@@ -554,6 +567,9 @@ def cmd_show(args) -> None:
     for t in targets:
         unit, name = idx.keys[t]
         print(f"== {name}  ({unit}, {idx.size[t]:#x} B, {len(idx.ops[t])} ins, {idx.pct[t]:.1f}% now)")
+        ref = ref_line(name, idx)
+        if ref:
+            print(f"   EA name (reference build, same code): {ref}")
         if not res[t]:
             print("   no twin within 2x length")
         for rank, (_, c, p) in enumerate(res[t], 1):
@@ -576,10 +592,15 @@ def cmd_show(args) -> None:
             for callee in sorted(idx.calls[t]):
                 proto, where, example = callee_info(idx, callee, callers.get(callee, []), cache)
                 n_callers = len(callers.get(callee, []))
+                ref = ref_line(callee, idx)
                 if proto is None and example is None:
                     print(f"   {callee}: no matched source calls it yet")
+                    if ref:
+                        print(f"      EA name: {ref}")
                     continue
                 print(f"   {callee}  [{n_callers} matched callers]")
+                if ref:
+                    print(f"      EA name: {ref}")
                 if proto:
                     print(f"      {proto}   ({where})")
                 if example:

@@ -83,7 +83,7 @@ Roughly ordered by expected payoff for the effort.
      opportunity. Check which libraries (EAGL and others) and versions overlap.
 
    Record each source in DECISIONS.md, as CLAUDE.md requires.
-7. **Symbols from other builds the owner owns.** `needs owner` (owner-held discs; asked 2026-10-12)
+7. **Symbols from other builds the owner owns.** `trying` (2026-10-13: EA reference names imported; UEFA map checked on the owner's disc; MVP's own PS2/Xbox discs still unchecked)
    Source paths read `C:/mvp2004/source/...`, so the code is shared with MVP
    2004. Other platform builds (PS2, Xbox, PSP) of MVP 2004/2005 sometimes
    shipped unstripped executables or map files. Any copy the owner owns that has
@@ -192,6 +192,8 @@ Roughly ordered by expected payoff for the effort.
 - 2026-10-13 | REA session (model test) | rename.py needs the unit with its extension (`game/tu_800D4D0C.cpp`); without it, it reports "no .text range". Overlay units (fe/db) get that message either way, and their extern "C" symbols pair by name | 2 | small, recurring confusion
 
 - 2026-10-13 | REA session | Push race: the twins1 batch passed verify.py 3 times (17:23, 17:29, 17:35) and lost each push to a newer main; it landed on attempt 4 (17:47). The lead saw the same on nm-08. Each lost round is a full build+verify | 19 | about 20 min and 3 full builds per batch at peak
+
+- 2026-10-13 | REA session | Owner's reference discs: UEFA Champions League 2004-2005 (GameCube, GUCP69) ships `fifa_z.map`, EA's full SN linker map with demangled signatures and object paths, plus a symbol-less `fifa_z.elf`. NFS Most Wanted (GOWE69) has only the retail DOL. The FIFA 2005 image is a PlayStation 1 disc. mitsevox/tw2004 (Tiger Woods 2004, complete) is Tiburon's C engine on CodeWarrior with no EA SND/EAGL/AV code, so nothing to port. The public mitsevox/mvp2005 already fingerprinted 15 EA GameCube builds against MVP; its CC0 name tables are now imported (config/GV4E69/refnames) and cover 275 KB of unmatched code (ealib 208 of 236 KB, snd all, dolphin 34 of 35 KB) but almost none of the baseball code | 7 | names and real signatures for the library tail; the game code still needs MVP's own PS2/other-platform maps, if any
 
 ## Tried
 
