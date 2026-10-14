@@ -433,3 +433,4 @@ fn_80316614	DrawLoadingProgress
 fn_802BB29C__FP15Unk802BB1E4_ObjT0	PrepareForDataUsage__FP15Unk802BB1E4_ObjT0
 fn_802BB334__FP15Unk802BB1E4_ObjT0	RestoreOverlay__FP15Unk802BB1E4_ObjT0
 fn_80438724	__init_cpp
+fn_8014D63C	main

@@ -295,7 +295,7 @@ void fn_8014C4E8();
 void fn_8014C540();
 void fn_8014BEB8(int argc, char** argv);
 void fn_8014C5A4(int a, char** b);
-void fn_8014D63C(int a, char** b);
+int main(int a, char** b);
 void fn_8014D81C(int* p);
 void fn_8014D860(Unk8014D860_Obj* p, int a);
 Unk8014D9C4_Obj* fn_8014D9C4(Unk8014D9C4_Obj* p);
@@ -333,7 +333,6 @@ extern void* lbl_8061930C;
 void fn_80072B98(void*);
 void fn_8014C3DC();
 extern Unk8014D5C0_Own* lbl_8068B618;
-void __main();
 void fn_8014C8BC();
 int fn_80148930(void*);
 int fn_8014D1EC();
@@ -671,7 +670,7 @@ void fn_8014C540()
     lbl_8061A32C->mB8 = 1;
 }
 
-/* Game start-up (called from main, fn_8014D63C): runs fn_8014BEB8, registers the exit hook
+/* Game start-up (called from main): runs fn_8014BEB8, registers the exit hook
    fn_8014D6A4, builds two singletons, sets the audio levels from the saved settings and
    prints "Entering game loop." */
 void fn_8014C5A4(int a, char** b)
@@ -831,9 +830,8 @@ void fn_8014D5C0()
     fn_80148438(lbl_8068B618);
 }
 
-void fn_8014D63C(int a, char** b)
+int main(int a, char** b)
 {
-    __main();
     fn_8014C5A4(a, b);
     for (;;) {
         fn_8014C8BC();
