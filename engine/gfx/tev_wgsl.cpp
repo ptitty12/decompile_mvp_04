@@ -356,8 +356,27 @@ std::string generate_wgsl(const PipelineConfig& c) {
     s += str("    %s.a = ao;\n", kRegNames[last_alpha_dest]);
     s += "  }\n";
   }
-  s += str("  let outc = clamp(vec4i(%s.rgb, %s.a), vec4i(0), vec4i(255));\n", kRegNames[last_color_dest],
+  s += str("  var outc = clamp(vec4i(%s.rgb, %s.a), vec4i(0), vec4i(255));\n", kRegNames[last_color_dest],
            kRegNames[last_alpha_dest]);
+  // Fog on the screen depth (24-bit): perspective ze = A / (B magnitude - (z >> B shift)),
+  // orthographic ze = A * z; then fog = clamp(ze - C, 0, 1) through the selected curve.
+  if (c.fog_type >= 2) {
+    if (c.fog_proj)
+      s += "  var ze = u.fog[0].x * in.pos.z;\n";
+    else
+      s += "  let z24 = u32(clamp(in.pos.z, 0.0, 1.0) * 16777215.0);\n"
+           "  var ze = u.fog[0].x / (u.fog[0].y - f32(z24 >> u32(u.fog[0].z)));\n";
+    s += "  var fog = clamp(ze - u.fog[0].w, 0.0, 1.0);\n";
+    switch (c.fog_type) {
+      case 4: s += "  fog = 1.0 - exp2(-8.0 * fog);\n"; break;
+      case 5: s += "  fog = 1.0 - exp2(-8.0 * fog * fog);\n"; break;
+      case 6: s += "  fog = exp2(-8.0 * (1.0 - fog));\n"; break;
+      case 7: s += "  fog = exp2(-8.0 * (1.0 - fog) * (1.0 - fog));\n"; break;
+      default: break;
+    }
+    s += "  let ifog = i32(round(fog * 256.0));\n"
+         "  outc = vec4i((outc.rgb * (256 - ifog) + vec3i(u.fog[1].xyz) * ifog) >> vec3u(8u), outc.a);\n";
+  }
   // Alpha test.
   const bool trivially_passes = (c.alpha_comp0 == 7 && c.alpha_comp1 == 7 && c.alpha_logic <= 1) ||
                                 (c.alpha_logic == 1 && (c.alpha_comp0 == 7 || c.alpha_comp1 == 7));

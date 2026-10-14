@@ -82,7 +82,7 @@ TEST_CASE("swap tables, konst selection, registers, compare modes and the alpha 
   CHECK(has(w, "acmp(1u, outc.a, u.alpha_ref.y)"));
   CHECK(has(w, "if (!(a0 && a1)) { discard; }"));
   // The pixel takes the last stage's destinations.
-  CHECK(has(w, "let outc = clamp(vec4i(prev.rgb, prev.a)"));
+  CHECK(has(w, "var outc = clamp(vec4i(prev.rgb, prev.a)"));
 }
 
 TEST_CASE("logic ops without blending") {
@@ -92,4 +92,20 @@ TEST_CASE("logic ops without blending") {
   CHECK(has(generate_wgsl(c), "vec4i(255) - outc"));
   c.logic_op = 0;
   CHECK(has(generate_wgsl(c), "return vec4f(0.0);"));
+}
+
+TEST_CASE("fog: perspective and orthographic depth, the curves") {
+  PipelineConfig c = blank();
+  c.fog_type = 2;
+  std::string w = generate_wgsl(c);
+  CHECK(has(w, "u.fog[0].x / (u.fog[0].y - f32(z24 >> u32(u.fog[0].z)))"));
+  CHECK(has(w, "clamp(ze - u.fog[0].w, 0.0, 1.0)"));
+  CHECK(!has(w, "exp2"));
+  c.fog_proj = 1;
+  c.fog_type = 5;
+  w = generate_wgsl(c);
+  CHECK(has(w, "var ze = u.fog[0].x * in.pos.z"));
+  CHECK(has(w, "1.0 - exp2(-8.0 * fog * fog)"));
+  c.fog_type = 0;
+  CHECK(!has(generate_wgsl(c), "ifog"));
 }

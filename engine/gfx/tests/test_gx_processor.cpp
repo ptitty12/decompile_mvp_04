@@ -425,3 +425,26 @@ TEST_CASE("scissor and its offset") {
   CHECK(d.scissor[2] == 196);
   CHECK(d.scissor[3] == 98);
 }
+
+TEST_CASE("fog parameters") {
+  Capture cap;
+  GxProcessor p(&cap);
+  Stream s;
+  s.bp(bp::kFog0, 127u << 11 | 0x400u);           // A = 1.5
+  s.bp(bp::kFog1, 0x123456);                       // B magnitude
+  s.bp(bp::kFog2, 9);                              // B shift
+  s.bp(bp::kFog3, 126u << 11 | 1u << 19 | 4u << 21 | 1u << 20);  // C = -0.5, orthographic, exp
+  s.bp(bp::kFogColor, 0x102030);
+  s.run(p);
+  DrawCall d;
+  p.snapshot(d);
+  CHECK(d.cfg.fog_type == 4);
+  CHECK(d.cfg.fog_proj == 1);
+  CHECK(d.u.fog[0] == doctest::Approx(1.5));
+  CHECK(d.u.fog[1] == doctest::Approx(0x123456));
+  CHECK(d.u.fog[2] == doctest::Approx(9));
+  CHECK(d.u.fog[3] == doctest::Approx(-0.5));
+  CHECK(d.u.fog[4] == doctest::Approx(0x10));
+  CHECK(d.u.fog[5] == doctest::Approx(0x20));
+  CHECK(d.u.fog[6] == doctest::Approx(0x30));
+}

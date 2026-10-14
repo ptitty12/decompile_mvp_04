@@ -312,6 +312,8 @@ TEST_CASE("generated TEV shaders compile for many configurations") {
     c.alpha_logic = static_cast<u8>(rng() % 4);
     c.logic_enable = rng() & 1;
     c.logic_op = static_cast<u8>(rng() % 16);
+    c.fog_type = static_cast<u8>(rng() % 8);
+    c.fog_proj = static_cast<u8>(rng() & 1);
     std::string w = generate_wgsl(c);
     gpu().shader(w, "fuzz");
     ++made;

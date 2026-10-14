@@ -54,8 +54,8 @@ struct PipelineConfig {
   u8 z_enable = 0, z_func = 7, z_update = 0;
   u8 cull = 0;          // hardware encoding: 0 none, 1 back, 2 front, 3 all
   u8 pixel_format = 0;  // BP 0x43 bits 0-2
-  u8 fog_type = 0;      // BP 0xF0? (fog function; 0 = off)
-  u8 fog_proj = 0;
+  u8 fog_type = 0;      // BP 0xF1 bits 21-23: 0 off, 2 linear, 4 exp, 5 exp2, 6 backexp, 7 backexp2
+  u8 fog_proj = 0;      // BP 0xF1 bit 20: 1 orthographic
   u8 iref_map[4] = {}, iref_coord[4] = {};  // indirect stage texture map and coordinate
   u8 ind_scale[4] = {};                      // indirect stage coordinate scales (s 0-3, t 4-7)
   u8 pad[2] = {};
@@ -72,7 +72,7 @@ struct DrawUniforms {
   // Indirect matrices 0-2, two rows each: (ma, mc, me, 17 - scale), (mb, md, mf, 17 - scale),
   // elements 11-bit signed (1.0 = 1024), scale the raw 6-bit exponent field.
   std::int32_t ind_mtx[6][4] = {};
-  float fog[8] = {};                  // a, b, c (z), color r g b, unused
+  float fog[8] = {};                  // a, b magnitude, b shift, c; color r g b (0..255), unused
   std::int32_t dst_alpha[4] = {};     // enable, value
 };
 

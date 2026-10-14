@@ -652,6 +652,17 @@ void GxProcessor::snapshot(DrawCall& d) const {
   const u32 cm1 = bp_[bp::kCMode1];
   u.dst_alpha[0] = static_cast<std::int32_t>(bits(cm1, 8, 1));
   u.dst_alpha[1] = static_cast<std::int32_t>(bits(cm1, 0, 8));
+  // Fog: A and C are 20-bit floats (sign, 8-bit exponent, 11-bit mantissa).
+  auto fog_float = [](u32 v) {
+    return std::bit_cast<float>(bits(v, 19, 1) << 31 | bits(v, 11, 8) << 23 | bits(v, 0, 11) << 12);
+  };
+  u.fog[0] = fog_float(bp_[bp::kFog0]);
+  u.fog[1] = static_cast<float>(bits(bp_[bp::kFog1], 0, 24));
+  u.fog[2] = static_cast<float>(bits(bp_[bp::kFog2], 0, 5));
+  u.fog[3] = fog_float(bp_[bp::kFog3]);
+  u.fog[4] = static_cast<float>(bits(bp_[bp::kFogColor], 16, 8));
+  u.fog[5] = static_cast<float>(bits(bp_[bp::kFogColor], 8, 8));
+  u.fog[6] = static_cast<float>(bits(bp_[bp::kFogColor], 0, 8));
   for (int m = 0; m < 3; ++m) {
     u32 r0 = bp_[bp::kIndMtx + 3 * m], r1 = bp_[bp::kIndMtx + 3 * m + 1], r2 = bp_[bp::kIndMtx + 3 * m + 2];
     const std::int32_t shift = 17 - static_cast<std::int32_t>(bits(r0, 22, 2) | bits(r1, 22, 2) << 2 | bits(r2, 22, 2) << 4);
