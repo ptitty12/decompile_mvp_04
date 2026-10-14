@@ -261,9 +261,13 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::printf("clock: %llu instructions, time base %llu (%.3f s of guest time), %llu VI fields\n", ull(m.cpu().ticks),
               ull(hooks.time_base(m.cpu())), static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0,
               ull(hw.vi_fields()));
-  std::printf("threads: %llu switches (%.2f per VI field), %llu unwinds\n", ull(t.thread_switches),
+  std::printf("threads: %llu switches (%.2f per VI field), %llu unwinds (%.3f per switch), %llu in-frame resumes, "
+              "%llu resume entries\n",
+              ull(t.thread_switches),
               hw.vi_fields() ? static_cast<double>(t.thread_switches) / static_cast<double>(hw.vi_fields()) : 0.0,
-              ull(rt::g_unwinds));
+              ull(rt::g_unwinds),
+              t.thread_switches ? static_cast<double>(rt::g_unwinds) / static_cast<double>(t.thread_switches) : 0.0,
+              ull(rt::g_inframe_resumes), ull(rt::g_resume_entries));
   std::printf("interrupts: %llu external, %llu decrementer; idle skips %llu (%llu instructions skipped); "
               "unwinds %llu; interpreted %llu instructions (%.4f%% of those run)\n",
               ull(hooks.external_interrupts), ull(hooks.decrementer_interrupts), ull(hooks.idle_skips),

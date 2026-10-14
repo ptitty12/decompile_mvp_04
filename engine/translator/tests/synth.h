@@ -1,8 +1,9 @@
 // A synthetic guest program for data-free tests of the translator and runtime:
 // recursion, a jump table, a counted loop, calls through CTR and LR, a tail call,
 // a conditional return, a secondary entry point, a function that runs into the
-// next one, a function that returns past its call (forcing an unwind), and
-// floating point. It ends with a store to MMIO, which stops a lockstep run.
+// next one, a function that returns past its call (forcing an unwind), context
+// switches through rfi (E0c), and floating point. It ends with a store to MMIO,
+// which stops a lockstep run.
 // Built from instruction fields (ppc/tests/encode.h); no game bytes.
 #pragma once
 
@@ -20,7 +21,7 @@ struct Program {
 
 Program make();
 
-// Values main stores at results + 4*k, k = 0..13, in a correct run.
+// Values main stores at results + 4*k, k = 0..17, in a correct run.
 std::vector<std::uint32_t> expected_results();
 
 }  // namespace mvp::xlat::synth

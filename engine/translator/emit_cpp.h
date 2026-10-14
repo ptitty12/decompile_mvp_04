@@ -3,6 +3,9 @@
 // code and the reference interpreter share one definition of every instruction.
 // Control flow follows the CFG: local branches are gotos, calls are C++ calls
 // with the return-address check of runtime/native.h, jump tables are switches.
+// Every call's return address and every loop back edge is a resume label: an
+// unwind may continue there in a live frame, and the dispatcher may re-enter the
+// function's body there (runtime/native.h, E0c).
 //
 // The output is derived from the player's disc: it is written under build/ only.
 #pragma once
@@ -24,11 +27,12 @@ struct EmitOptions {
 };
 
 struct EmitStats {
-  std::size_t functions = 0, entries = 0, instructions = 0, bytes = 0, hle_stubs = 0;
+  std::size_t functions = 0, entries = 0, instructions = 0, bytes = 0, hle_stubs = 0, resume_labels = 0;
 };
 
 // Writes <dir>/game_decls.h, <dir>/game_NN.cpp and <dir>/game_table.cpp. The
-// table file defines `void mvp_register_game()`, which fills rt::g_native.
+// table file defines `void mvp_register_game()`, which fills rt::g_native, the
+// safe points, the idle spins, rt::g_resume_labels and the replaced functions.
 bool emit_cpp(const ProgramCfg& p, const std::string& dir, const EmitOptions& opt, EmitStats* stats,
               std::string* error);
 

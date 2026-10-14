@@ -71,8 +71,9 @@ int main(int argc, char** argv) {
       std::fprintf(stderr, "mvp-xlat: %s\n", err.c_str());
       return 1;
     }
-    std::printf("emitted %zu functions (%zu entry points), %zu instructions, %zu bytes of C++ in %d shards\n",
-                st.functions, st.entries, st.instructions, st.bytes, opt.shards);
+    std::printf("emitted %zu functions (%zu entry points, %zu resume labels), %zu instructions, %zu bytes of C++ in "
+                "%d shards\n",
+                st.functions, st.entries, st.resume_labels, st.instructions, st.bytes, opt.shards);
     return 0;
   }
   std::fprintf(stderr, "mvp-xlat: unknown command %s\n", cmd.c_str());

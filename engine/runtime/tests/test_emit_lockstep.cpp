@@ -44,7 +44,8 @@ TEST_CASE("translated synthetic program matches the interpreter in lockstep") {
   mvp_register_game();
   REQUIRE_FALSE(g_native.empty());
 
-  std::uint64_t unwinds = g_unwinds;
+  std::uint64_t unwinds = g_unwinds, inframe = g_inframe_resumes, entries = g_resume_entries,
+                interpreted = g_interpreted;
   g_report = &capture;
   LockstepResult r = run_lockstep(ref, nat, cfg, 1);
   INFO(r.message);
@@ -52,7 +53,19 @@ TEST_CASE("translated synthetic program matches the interpreter in lockstep") {
   CHECK(r.stop.write);
   CHECK(r.stop.addr == 0xCC000000u);
   CHECK(r.events > 20);
-  CHECK(g_unwinds == unwinds + 1);  // jumper's early return unwound main once
+  // Unwinds to the top: b_fn's rfi into a_fn's finished frame, and jumper's
+  // early return (main lands between resume labels).
+  CHECK(g_unwinds == unwinds + 2);
+  // yield_self reloads its own context (the same stack frame), and rec(1) loads
+  // rec(2)'s: both end in a live frame, without reaching the dispatcher.
+  CHECK(g_inframe_resumes == inframe + 2);
+  // The dispatcher re-enters a_fn after b_fn's unwind, then main where a_fn
+  // returns, and main again where leaf returns after jumper's.
+  CHECK(g_resume_entries == entries + 3);
+  // Only main's two instructions after jumper's return (a store, the bl) ran in
+  // the interpreter.
+  CHECK(g_interpreted == interpreted + 2);
+  CHECK_FALSE(g_unwinding);
 
   // OSReport ran through the HLE (runtime/hle.h), formatted from guest varargs.
   CHECK(g_reported.find("x=42") == 0);

@@ -95,7 +95,7 @@ void SystemHooks::deliver(ppc::Cpu& c, u32 vector) {
   u32 lr = g_exception_lr;
   g_exception_lr = c.lr;
   try {
-    run_handler(c, resume, sp);  // returns at `resume`, or throws Unwind for another thread
+    run_handler(c, resume, sp);  // back at `resume`, or another thread with rt::g_unwinding set
   } catch (...) {
     g_exception_depth = depth;
     g_exception_lr = lr;

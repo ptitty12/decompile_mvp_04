@@ -116,11 +116,21 @@ Program make() {
   store_result(a, 9);
   a.bl("runs");
   store_result(a, 10);
+  // Context switches through rfi, as the OS's SelectThread / OSLoadContext do (E0c).
+  a.bl("yield_self");                  // reloads its own context: resumes in its frame
+  store_result(a, 14);
+  a.w(D(14, 3, 0, 2));
+  a.bl("rec");                         // rec(1) reloads rec(2)'s context: rec(2)'s frame resumes
+  store_result(a, 15);
+  a.bl("a_fn");                        // saves a context in a_fn
+  store_result(a, 16);
+  a.bl("b_fn");                        // loads it: a_fn's frame is gone, an unwind to the top
+  store_result(a, 17);                 // ... and a_fn's tail returns here (b_fn's return address)
   a.bl("jumper");                      // returns 8 bytes past its call: unwind
   a.w(D(14, 3, 0, 99));                // skipped
   a.w(D(14, 3, 0, 98));                // skipped
-  store_result(a, 11);
-  a.bl("leaf");                        // from here main runs in the interpreter
+  store_result(a, 11);                 // interpreted: not a resume label
+  a.bl("leaf");                        // main resumes natively at the return
   store_result(a, 12);
   a.w(D(14, 3, 0, 10));
   a.bl("fact");
@@ -241,6 +251,104 @@ Program make() {
   a.w(SPR(467, 11, 8));                // mtlr r11
   a.w(D(14, 3, 0, 0x77));
   a.w(X(19, 20, 0, 0, 16));
+
+  // ---- contexts (E0c): save_ctx / load_ctx(r4 = context) in the manner of
+  // OSSaveContext / OSLoadContext: save r1, LR and MSR (returns 0); load them and
+  // rfi to the saved LR with r3 = 1 ----
+  auto ctx = [&](u32 off) {  // r4 = results + off
+    a.w(D(15, 4, 0, static_cast<s32>(kResults >> 16)));
+    a.w(D(24, 4, 4, static_cast<s32>(off)));
+  };
+  auto enter = [&] {
+    a.w(D(37, 1, 1, -16));             // stwu r1, -16(r1)
+    a.w(SPR(339, 0, 8));               // mflr r0
+    a.w(D(36, 0, 1, 20));              // stw r0, 20(r1)
+  };
+  auto leave = [&] {
+    a.w(D(32, 0, 1, 20));              // lwz r0, 20(r1)
+    a.w(D(14, 1, 1, 16));              // addi r1, r1, 16
+    a.w(SPR(467, 0, 8));               // mtlr r0
+    a.w(X(19, 20, 0, 0, 16));          // blr
+  };
+  a.fn("save_ctx");
+  a.w(D(36, 1, 4, 0));                 // stw r1, 0(r4)
+  a.w(SPR(339, 0, 8));                 // mflr r0
+  a.w(D(36, 0, 4, 4));                 // stw r0, 4(r4)
+  a.w(X(31, 0, 0, 0, 83));             // mfmsr r0
+  a.w(D(36, 0, 4, 8));                 // stw r0, 8(r4)
+  a.w(D(14, 3, 0, 0));                 // li r3, 0
+  a.w(X(19, 20, 0, 0, 16));            // blr
+  a.fn("load_ctx");
+  a.w(D(32, 0, 4, 4));                 // lwz r0, 4(r4)
+  a.w(SPR(467, 0, 26));                // mtsrr0 r0
+  a.w(D(32, 0, 4, 8));                 // lwz r0, 8(r4)
+  a.w(SPR(467, 0, 27));                // mtsrr1 r0
+  a.w(D(32, 1, 4, 0));                 // lwz r1, 0(r4)
+  a.w(D(14, 3, 0, 1));                 // li r3, 1
+  a.w(X(19, 0, 0, 0, 50));             // rfi
+
+  // ---- yield_self: saves its context and loads it again at once (SelectThread
+  // picking the current thread): returns 0x5A ----
+  a.fn("yield_self");
+  enter();
+  ctx(0x400);
+  a.bl("save_ctx");
+  a.w(D(11, 0, 3, 0));                 // cmpwi r3, 0
+  a.bc(4, 2, "ys_resumed");            // bne
+  a.bl("load_ctx");
+  a.w(D(14, 3, 0, 0x13));              // not reached
+  a.L("ys_resumed");
+  a.w(D(14, 3, 0, 0x5A));
+  leave();
+
+  // ---- rec(n): rec(2) saves a context and calls rec(1), which loads it: rec(1)'s
+  // frame has the same function but another stack pointer, so rec(2)'s frame
+  // resumes. Returns 0x44 ----
+  a.fn("rec");
+  enter();
+  a.w(D(36, 31, 1, 12));               // stw r31, 12(r1)
+  a.w(D(11, 0, 3, 2));                 // cmpwi r3, 2
+  a.bc(4, 2, "rec_not2");              // bne
+  ctx(0x410);
+  a.bl("save_ctx");
+  a.w(D(11, 0, 3, 0));                 // cmpwi r3, 0
+  a.bc(4, 2, "rec_resumed");           // bne
+  a.w(D(14, 3, 0, 1));
+  a.bl("rec");
+  a.w(D(14, 3, 0, 0x33));              // not reached
+  a.b("rec_out");
+  a.L("rec_resumed");
+  a.w(D(14, 3, 0, 0x44));
+  a.b("rec_out");
+  a.L("rec_not2");
+  ctx(0x410);
+  a.bl("load_ctx");
+  a.w(D(14, 3, 0, 0x99));              // not reached
+  a.L("rec_out");
+  a.w(D(32, 31, 1, 12));               // lwz r31, 12(r1)
+  leave();
+
+  // ---- a_fn saves a context (returns 0x65); b_fn loads it after a_fn returned,
+  // so a_fn's tail (returns 0x66) runs again with b_fn's frame (same stack slot) ----
+  a.fn("a_fn");
+  enter();
+  ctx(0x420);
+  a.bl("save_ctx");
+  a.w(D(11, 0, 3, 0));                 // cmpwi r3, 0
+  a.bc(12, 2, "a_first");              // beq
+  a.w(D(14, 3, 0, 0x66));
+  a.b("a_out");
+  a.L("a_first");
+  a.w(D(14, 3, 0, 0x65));
+  a.L("a_out");
+  leave();
+  a.fn("b_fn");
+  enter();
+  ctx(0x420);
+  a.bl("load_ctx");
+  a.w(D(14, 3, 0, 0x77));              // not reached
+  leave();
+
   // ---- OSReport: the original does nothing here; the HLE logs ----
   a.fn("OSReport");
   a.w(X(19, 20, 0, 0, 16));
@@ -287,7 +395,7 @@ std::vector<std::uint32_t> expected_results() {
   float q = 30.0f / 9.0f;
   u32 qbits;
   std::memcpy(&qbits, &q, 4);
-  return {120, 12, 55, 7, 7, 30, qbits, 7, 0x11, 0x45, 0x56, 0x77, 7, 3628800};
+  return {120, 12, 55, 7, 7, 30, qbits, 7, 0x11, 0x45, 0x56, 0x77, 7, 3628800, 0x5A, 0x44, 0x65, 0x66};
 }
 
 }  // namespace mvp::xlat::synth
