@@ -78,7 +78,7 @@ void fn_80433814(OSContext* context);
 void fn_8043364C(OSContext* context);
 void fn_80435350(u32 mask);
 void fn_804321CC(void);
-u8* fn_80425508(void);
+DVDDiskID* fn_80425508(void);
 void fn_80426C54(u32 type, u32 location);
 
 void fn_80425E54(void);
@@ -315,7 +315,7 @@ BOOL fn_804263F8(void* addr, u32 length, u32 offset, DVDLowCallback callback) {
             prevOffset = &bss->prev.offset;
             start = *curOffset >> 15;
             prevEnd = (*prevLength - 1 + *prevOffset) >> 15;
-            streaming = fn_80425508()[8] ? TRUE : FALSE;
+            streaming = fn_80425508()->streaming ? TRUE : FALSE;
             gap = streaming ? 5 : 15;
             close = (start > prevEnd - 2) || (start < prevEnd + gap + 3);
             if (!close) {
