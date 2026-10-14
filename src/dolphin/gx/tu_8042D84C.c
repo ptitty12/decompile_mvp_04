@@ -26,7 +26,7 @@ f32 cosf(f32 x);
 
 void fn_8042D84C(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func);
 void GXInitLightPos(GXLightObj* lt_obj, f32 x, f32 y, f32 z);
-void fn_8042D9EC(GXLightObj* lt_obj, GXColor* color);
+void fn_8042D9EC(GXLightObj* lt_obj, GXColor color);
 void fn_8042DA74(GXChannelID chan, GXColor amb_color);
 void fn_8042DB5C(GXChannelID chan, GXColor mat_color);
 void fn_8042DC44(u8 nChans);
@@ -99,10 +99,10 @@ void GXInitLightPos(GXLightObj* lt_obj, f32 x, f32 y, f32 z) {
     obj->lpos[2] = z;
 }
 
-void fn_8042D9EC(GXLightObj* lt_obj, GXColor* color) {
+void fn_8042D9EC(GXLightObj* lt_obj, GXColor color) {
     LightObjInt* obj = (LightObjInt*)lt_obj;
 
-    obj->color = *(u32*)color;
+    obj->color = *(u32*)&color;
 }
 
 void fn_8042DA74(GXChannelID chan, GXColor amb_color) {
