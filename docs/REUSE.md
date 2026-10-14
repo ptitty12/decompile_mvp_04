@@ -155,3 +155,14 @@ pinned to the exact upstream commit it was fetched from.
 |---|---|---|---|---|
 | `engine/third_party/doctest/doctest.h`, `LICENSE.txt` | [doctest/doctest](https://github.com/doctest/doctest) v2.5.3 | MIT | `2d0a9359a60c51affe2a9bebb1be1dca47868151` | Unit-test framework for every data-free engine test |
 | `engine/third_party/pureikyubu/` (`gekko.cpp`, `gekko.h`, `gekkoc.cpp`, `gekkoc.h`, `gekkodec.cpp`, `gekkodec.h`, `gekkodisasm.cpp`, `gekkodisasm.h`, `gqr.h` from `src/`; `pch.h`, `stubs.cpp` from `testing/gekko_bench/`; `LICENSE`) | [emu-russia/pureikyubu](https://github.com/emu-russia/pureikyubu) | CC0-1.0 | `0c29dca5cfa13d9126a137b9ebf95f13821413cb` (the last commit where the benchmark's `pch.h` and the core sources agree) | Test oracle only: `test_ppc_fuzz_pk` runs random integer/branch/CR/XER programs on its interpreter and ours. Not linked into the engine. Changes: `pch.h` includes our `pk_jit_stub.h` when the recompiler is not built; `pk_jit_stub.h` and `CMakeLists.txt` are ours |
+
+### Read, not copied: the renderer (`engine/gfx/`, E1)
+
+Nothing is vendored for the renderer; Dawn and SDL3 are external SDKs (`docs/engine/TOOLCHAIN.md`).
+These were read for hardware facts and design, and no code was copied:
+
+| Source | License | Read for |
+|---|---|---|
+| [encounter/aurora](https://github.com/encounter/aurora) at `51797212b9283e91cc03c273854d63b2421d8490` | MIT | Design of the TEV-to-WGSL generator, pipeline cache and register decoding (`lib/gx/shader.cpp`, `regs.cpp`, `gx.cpp`: BP cull encoding and front face); its texture converter was judged too tied to its own buffers to vendor |
+| Dolphin (VideoCommon) | GPL-2.0+ (read only) | Hardware behaviour: CMPR's 5/8-3/8 interpolation, indirect texturing (formats, bias, matrix scale, wraps), the TEV fixed-point lerp and compare modes, fog and lighting formulas, EFB copy register fields |
+| YAGCD and the Dolphin SDK's GX macros | public documentation | Register layouts and command lengths |

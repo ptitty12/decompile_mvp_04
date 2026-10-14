@@ -17,6 +17,19 @@
 
 namespace mvp::rt {
 
+// What the renderer (engine/gfx, E1) sees of the machine: every command the
+// graphics processor executes, in order and complete with its payload (display
+// lists arrive as the commands inside them, not as the call), and every VI
+// field with the frame buffer address the video interface scans out.
+// Observers only read; nothing they do reaches guest state (determinism).
+class GfxObserver {
+ public:
+  virtual ~GfxObserver() = default;
+  virtual void gx_command(const std::uint8_t* cmd, std::size_t len) = 0;
+  // `xfb` is the physical address of the top field's frame buffer (VI TFBL).
+  virtual void vi_field(std::uint64_t field, std::uint32_t xfb) = 0;
+};
+
 class GxFifo {
  public:
   // What a BP register load reports to the pixel engine.
@@ -36,6 +49,9 @@ class GxFifo {
     mem_ = mem;
     mem_size_ = size;
   }
+
+  // The renderer's view of the stream (null: none).
+  void set_observer(GfxObserver* o) { observer_ = o; }
 
   // Vertex size in bytes for vertex format `fmt` (0-7) from the current state.
   std::uint32_t vertex_size(int fmt) const;
@@ -58,7 +74,7 @@ class GxFifo {
   // Length of the command at p (n bytes available), 0 if more bytes are needed
   // to know it, or ~0 if p[0] starts no command.
   std::size_t command_length(const std::uint8_t* p, std::size_t n) const;
-  void execute(const std::uint8_t* cmd, Effects& fx, bool in_list);
+  void execute(const std::uint8_t* cmd, std::size_t len, Effects& fx, bool in_list);
   void call_list(std::uint32_t addr, std::uint32_t size, Effects& fx);
 
   std::vector<std::uint8_t> pending_;
@@ -67,6 +83,7 @@ class GxFifo {
   std::array<std::uint32_t, 8> vat_a_{}, vat_b_{}, vat_c_{};
   std::uint64_t commands_ = 0, bp_loads_ = 0, primitives_ = 0, vertices_ = 0, display_lists_ = 0;
   std::uint64_t display_list_errors_ = 0;
+  GfxObserver* observer_ = nullptr;
   const std::uint8_t* mem_ = nullptr;
   std::uint32_t mem_size_ = 0;
   bool broken_ = false;

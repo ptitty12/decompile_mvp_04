@@ -86,6 +86,11 @@ class Hardware : public ppc::Io {
   const std::vector<u8>& fifo() const { return fifo_; }  // the first bytes written to the write-gather pipe
   std::uint64_t fifo_bytes() const { return fifo_bytes_; }
   const GxFifo& gx() const { return gx_; }
+  // The renderer (E1): sees every executed GX command and every VI field.
+  void set_gfx_observer(GfxObserver* o) {
+    gfx_ = o;
+    gx_.set_observer(o);
+  }
   std::uint64_t draw_done_count() const { return draw_dones_; }
   std::uint64_t gp_bursts() const { return gp_bursts_; }
   const std::array<u8, 64>& sram() const { return sram_; }
@@ -209,6 +214,7 @@ class Hardware : public ppc::Io {
   // bits 2-3, write 1 to clear) and the last token.
   u16 pe_ctrl_ = 0, pe_token_ = 0;
   GxFifo gx_;
+  GfxObserver* gfx_ = nullptr;
 
   // GX FIFO: the write-gather buffer, and the CP registers (16-bit, kept in
   // regs_; 32-bit values are lo/hi pairs).

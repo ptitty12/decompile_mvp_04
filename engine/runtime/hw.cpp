@@ -621,7 +621,14 @@ void Hardware::advance(std::uint64_t tb) {
       u32 di = reg(a);
       if (di & 0x10000000u) {  // still enabled: raise its interrupt status
         regs_[a] = di | 0x80000000u;
-        if (n < 2) ++vi_fields_;
+        if (n < 2) {
+          ++vi_fields_;
+          if (gfx_) {  // the top field's frame buffer (TFBL: address, or address >> 5 with POFF)
+            u32 tfbl = reg(0xCC00201Cu);
+            u32 xfb = (tfbl & 0x10000000u) ? (tfbl & 0xFFFFFFu) << 5 : tfbl & 0xFFFFFFu;
+            gfx_->vi_field(vi_fields_, xfb);
+          }
+        }
       }
     }
     if (frame_start_tb_ + kFrameTb > tb) break;
