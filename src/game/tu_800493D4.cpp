@@ -163,6 +163,116 @@ void fn_80049C0C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     s->m9F4 = 1;
 }
 
+extern "C" int rand();
+void fn_800143D0(int a, int b);
+void fn_80014914(int a, int b);
+void fn_80015AD0(int a);
+void fn_800171E8(int a);
+void fn_800116BC(int a);
+void fn_80019ECC(int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_80019F60(int a, int b, int c, int d, int e);
+void fn_80019FDC(int a, int b, int c, int d);
+void fn_8004A15C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a);
+extern float lbl_805A9200;
+extern float lbl_805A9204;
+extern float lbl_805A9208;
+extern int* lbl_8061B9C4;
+
+void fn_80049D3C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    Unk8001CE80* g = (Unk8001CE80*)a;
+    if (s->mA84 == 0 && a->m3D0 < *lbl_8061B9C4) {
+        int f = 0;
+        int t = fn_8004FF78(s, s->m9D8, 0x48);
+        if (*(int*)((char*)s + s->m9E0 * 0x48) != 0x2D)
+            f = fn_8004FF78(s, idx, 0x2D) == -1;
+        float v, v1, v2;
+        fn_8018CA5C(a->m130->m44C->m6CC, &v, &v1, &v2);
+        v = v * lbl_805A9200;
+        if (!(v < lbl_805A9204) && !(v > lbl_805A9208) && f != 0) {
+            s->mA84 = 1;
+            fn_800143D0(g->fn_8001D780(), g->fn_8001DA4C());
+            return;
+        }
+        if (s->mA84 == 0) {
+            int w;
+            if (t != -1 && (w = a->m3BC) == 1) {
+                s->mA84 = w;
+                char* b4 = (char*)s + 4;
+                Unk80044C10_A* o = *(Unk80044C10_A**)(b4 + t * 0x48);
+                if ((void*)o == (void*)a->m3B0) {
+                    fn_80015AD0(g->fn_8001DA4C());
+                    return;
+                }
+                if (o->m460 == 1)
+                    fn_800171E8(g->fn_8001DA4C());
+                return;
+            }
+            if (s->mA84 == 0) {
+                if ((unsigned)(*(int*)((char*)a + 0x408) - 4) <= 3) {
+                    if (a->m3E8 == 1) {
+                        fn_8004A15C(s, idx, a);
+                    }
+                    return;
+                }
+                if (a->m444 == 0x10 && a->m3D0 <= 1) {
+                    s->mA84 = 1;
+                    fn_80014914(g->fn_8001D454(), g->fn_8001DA4C());
+                    return;
+                }
+                if (s->mA84 == 0) {
+                    if (a->m448 == 3) {
+                        if (rand() % 100 <= 0x31) {
+                            s->mA84 = 1;
+                            fn_800116BC(g->fn_8001DA4C());
+                        }
+                        return;
+                    }
+                    if (a->m458 == 0) {
+                        fn_8004A15C(s, idx, a);
+                        return;
+                    }
+                }
+            }
+        }
+        int k = a->m458;
+        if (k == 0xA || k == 0xC) {
+            fn_8004A15C(s, idx, a);
+            return;
+        }
+        if ((s->mA84 == 0 && a->m3F0 != 0) || k == 1 || k == 9) {
+            int m = a->m448;
+            if (m == 0 || (m == 4 && a->m3D0 <= 1)) {
+                fn_8004A15C(s, idx, a);
+                return;
+            }
+            if (*(int*)((char*)a + 0x550) != 0 && a->m3DC == 0 && s->mA74 == 0) {
+                if (fn_80050850(s, idx, a) != 0) {
+                    int p = g->fn_8001D780();
+                    int q = g->fn_8001DA28();
+                    int r = g->fn_8001D6CC();
+                    fn_80019F60(p, q, r, 0, g->fn_8001D75C());
+                } else if (a->m418 != 0) {
+                    int p = g->fn_8001DA28();
+                    int q = g->fn_8001D75C();
+                    fn_80019FDC(p, 0, q, g->fn_8001D6CC());
+                } else {
+                    int p = g->fn_8001D780();
+                    int q = g->fn_8001DA28();
+                    int r = g->fn_8001D75C();
+                    int u = g->fn_8001D70C();
+                    int w = g->fn_8001D7D0();
+                    int x = g->fn_8001D6CC();
+                    fn_80019ECC(p, q, 0, r, u, w, x, g->fn_8001DB70());
+                }
+                s->mA74 = 1;
+            }
+            return;
+        }
+        fn_8004A15C(s, idx, a);
+    }
+}
+
 void fn_8004A15C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     if (s->mA84 == 0) {

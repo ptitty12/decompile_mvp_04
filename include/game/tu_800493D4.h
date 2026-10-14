@@ -101,6 +101,7 @@ public:
     int fn_8001D454();
     int fn_8001D42C();
     int fn_8001D780();
+    int fn_8001D75C();
     int fn_8001DA7C();
     void fn_8001CEA8(float* b, float* a);
 };
