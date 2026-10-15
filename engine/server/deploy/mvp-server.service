@@ -1,0 +1,23 @@
+# systemd unit for mvp-server (E5). On the VPS: /etc/systemd/system/mvp-server.service
+[Unit]
+Description=MVP Baseball 2005 engine server (private site, lobby, signaling)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mvp
+Group=mvp
+WorkingDirectory=/opt/mvp/server
+EnvironmentFile=/etc/mvp/server.env
+ExecStart=/usr/bin/node dist/src/main.js
+Restart=on-failure
+RestartSec=2
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadOnlyPaths=/opt/mvp /srv/mvp /etc/mvp
+
+[Install]
+WantedBy=multi-user.target

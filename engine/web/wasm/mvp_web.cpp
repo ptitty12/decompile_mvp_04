@@ -56,6 +56,7 @@
 #include "translator/wasm_emit.h"
 #include "vfs/disc_check.h"
 #include "vfs/source.h"
+#include "net_web.h"
 
 using namespace mvp;
 using namespace mvp::rt;
@@ -190,6 +191,7 @@ void Observer::vi_field(std::uint64_t field, std::uint32_t xfb) {
 void frame_hook(ppc::Cpu&, std::uint64_t frame) {
   g.frames = frame;
   if (frame >= g.stop_frames) throw StopRun{"ran " + std::to_string(frame) + " frames"};
+  if (web::net_active()) web::net_after_poll(frame);  // netplay (E5): state hash, early yield
 }
 
 std::string json_escape(const std::string& s) {
@@ -239,6 +241,7 @@ EMSCRIPTEN_KEEPALIVE int mvp_open_disc(double size) {
   if (!disc) return 0;
   g.file = raw;
   g.disc = std::move(*disc);
+  web::net_set_disc(&*g.disc);  // the netplay handshake's disc identity (E5)
   return 1;
 }
 
@@ -309,7 +312,13 @@ EMSCRIPTEN_KEEPALIVE int mvp_boot(const char* script, int len, double stop_field
     g.error = "not translated";
     return 0;
   }
-  FrameInput boot_input = neutral_input(1);
+  // Netplay (E5): players 1 and 2 on ports 1 and 2, once the handshake is done.
+  const bool net = web::net_active();
+  if (net && !web::net_running()) {
+    g.error = "the netplay session is not running";
+    return 0;
+  }
+  FrameInput boot_input = neutral_input(net ? 0x3 : 1);
   g.input = std::make_unique<InputQueue>(boot_input);
   if (len > 0) {
     auto s = InputScript::parse(std::string(script, static_cast<std::size_t>(len)), &g.error, boot_input);
@@ -336,6 +345,11 @@ EMSCRIPTEN_KEEPALIVE int mvp_boot(const char* script, int len, double stop_field
   g.hooks->reschedule(g.m->cpu());
   g.obs.e = &g;
   g.hw->set_gfx_observer(&g.obs);
+  if (net) {
+    // This side's controller: the script's port for this player, or the live pad (port 1 on the page).
+    InputSource* local = g.script ? static_cast<InputSource*>(g.script.get()) : &g.live;
+    g.input->set_source(web::net_attach(*g.m, *g.hooks, local, g.script ? web::net_player() - 1 : 0));
+  }
   g_input = g.input.get();
   g_frame_hook = &frame_hook;
   attach_renderer();
@@ -381,6 +395,7 @@ EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
   double t0 = now_ms();
   try {
     while (g.hw->vi_fields() < target) {
+      if (web::net_active() && !web::net_may_run()) break;  // netplay: the next frame's input is not here yet
       double f0 = now_ms();
       rt::run(g.m->cpu());
       double dt = now_ms() - f0;

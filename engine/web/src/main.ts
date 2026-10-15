@@ -11,6 +11,7 @@
 // The page publishes its state as `window.mvp` for the browser check.
 
 import { HostInput } from './input.js';
+import { Online, type OnlineState } from './netplay.js';
 import type { FromWorker, Pad, RunOptions, Status, ToWorker } from './protocol.js';
 
 interface PageState {
@@ -25,6 +26,7 @@ interface PageState {
   stopped?: { status: Status; guestLine: string };
   error?: { stage: string; message: string };
   log: string[];
+  net?: OnlineState;  // online play (E5, netplay.ts)
 }
 
 const state: PageState = { pickedAt: 0, phases: {}, log: [] };
@@ -40,6 +42,13 @@ const logEl = $<HTMLElement>('log');
 const errorEl = $<HTMLElement>('error');
 
 const params = new URLSearchParams(location.search);
+// Online play (E5): the lobby panel, when the page comes from the netplay server.
+const onlineEl = document.getElementById('online');
+const online = onlineEl ? new Online(onlineEl, params) : null;
+if (online) {
+  state.net = online.state;
+  online.init().catch(() => {});
+}
 const options: RunOptions = {
   script: params.get('script') ?? '',
   stopFields: Number(params.get('fields') ?? 0) || 0,
@@ -140,6 +149,12 @@ function onWorker(msg: FromWorker): void {
     case 'error':
       showError(msg.stage, msg.message);
       break;
+    case 'net-send':
+      online?.send(msg.data);
+      break;
+    case 'net':
+      online?.engineStatus(msg.status, msg.windows, msg.diagnostic);
+      break;
   }
 }
 
@@ -161,7 +176,14 @@ picker.addEventListener('change', () => {
     canvas.height = height;
     off = canvas.transferControlToOffscreen();
   }
-  send({ type: 'start', file, canvas: off, width, height, options }, off ? [off] : []);
+  // In an online game the Worker boots only after the handshake with the other player.
+  const netplay = online?.netOptions();
+  send({ type: 'start', file, canvas: off, width, height, options: { ...options, netplay } }, off ? [off] : []);
+  if (online && netplay) {
+    online.onDatagram = (data) => send({ type: 'net-recv', data }, [data]);
+    online.whenOpen().then(() => send({ type: 'net-open' })).catch(() => {});
+    window.addEventListener('pagehide', () => send({ type: 'net-quit' }));
+  }
   input.poll();
   new ResizeObserver(() => {
     const w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);

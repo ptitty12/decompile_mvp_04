@@ -1,0 +1,47 @@
+# coturn (TURN relay) for MVP Baseball 2005 netplay (E5). On the VPS:
+# /etc/turnserver.conf. Replace every <...>. Players whose networks allow a direct
+# WebRTC connection never use it; the others relay a few KB/s of controller input.
+#
+# Credentials are time-limited and derived by mvp-server from the shared secret
+# below (coturn's "TURN REST API" mode), so no user accounts exist here.
+# static-auth-secret must be the same value as mvp-server's MVP_TURN_SECRET.
+
+listening-port=3478
+fingerprint
+use-auth-secret
+static-auth-secret=<the long random secret, same as MVP_TURN_SECRET>
+realm=<mvp.example.com>
+server-name=<mvp.example.com>
+
+# Relay ports (open them in the firewall, UDP): a two-player game needs a handful.
+min-port=49160
+max-port=49200
+total-quota=16
+stale-nonce=600
+
+# Only if the VPS sits behind NAT (most VPSes do not): its public address.
+# external-ip=<public IPv4>
+
+# Optional TURN over TLS (port 5349) for networks that block UDP; needs a
+# certificate readable by the turnserver user.
+# tls-listening-port=5349
+# cert=/etc/turn/fullchain.pem
+# pkey=/etc/turn/privkey.pem
+# no-tlsv1
+# no-tlsv1_1
+
+no-cli
+no-multicast-peers
+# Never relay into the VPS itself or private networks.
+denied-peer-ip=0.0.0.0-0.255.255.255
+denied-peer-ip=10.0.0.0-10.255.255.255
+denied-peer-ip=100.64.0.0-100.127.255.255
+denied-peer-ip=127.0.0.0-127.255.255.255
+denied-peer-ip=169.254.0.0-169.254.255.255
+denied-peer-ip=172.16.0.0-172.31.255.255
+denied-peer-ip=192.0.0.0-192.0.0.255
+denied-peer-ip=192.168.0.0-192.168.255.255
+denied-peer-ip=198.18.0.0-198.19.255.255
+denied-peer-ip=::1
+denied-peer-ip=fc00::-fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+denied-peer-ip=fe80::-febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff

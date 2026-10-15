@@ -1,0 +1,7 @@
+# Caddy in front of mvp-server (E5): HTTPS with an automatic Let's Encrypt
+# certificate, compression, and WebSocket proxying (automatic). On the VPS:
+# /etc/caddy/Caddyfile. Replace the domain.
+<mvp.example.com> {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8080
+}

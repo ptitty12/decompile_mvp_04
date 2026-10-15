@@ -191,3 +191,19 @@ Nothing is vendored for audio; SDL3 is the external SDK `engine/gfx/` already us
 |---|---|---|
 | Dolphin (DSPHLE `UCodes/AX.h`, `AX.cpp`, `AXStructs.h`, `AXVoice.h`, master as of 2026-10-14) | GPL-2.0+ (read only) | AX microcode behaviour: command numbers and arguments, the 2004 microcode's mixerCtrl bits, per-millisecond voice processing (SRC, envelope, LPF, mix with ramps), aux send/return and the Dolby Pro Logic II commands 0x13/0x10, output clamping. The DSP ROM's polyphase coefficients were not used: `audio/mixer.cpp` designs its own |
 | The game's own SDK and EA SND code (`config/GV4E69` symbols, dtk assembly of `dolphin/ax` and `snd/`) | the retail binary (read, as for the decomp) | The command list the CPU builds (fn_804181DC), the PB fields it reads back (fn_80419568), the studio/depop ramp (fn_804190A4), the aux buffer rotation (fn_80417F50), EA's mixerCtrl and ramp use (SNDDRV_DSPMixerUpdate) and its aux A callback (SNDDRV_audiocallback) |
+
+### Netplay and the VPS server (`engine/net/`, `engine/server/`, E5)
+
+Nothing is vendored into the repository. The server has one runtime dependency,
+installed by npm from the pinned `engine/server/package-lock.json` and copied into
+the deploy package (`engine/server/tools/package.mjs`) with its own license file:
+
+| Code | License | Used as |
+|---|---|---|
+| [ws](https://github.com/websockets/ws) 8.22.0 | MIT | The WebSocket server for the lobby and signaling (`engine/server/src/server.ts`) |
+| TypeScript 6.0.3, `@types/node` 24.19.2, `@types/ws` 8.18.2 | Apache-2.0 / MIT | Development only (compiling and type-checking the server) |
+
+| Source | License | Read for |
+|---|---|---|
+| xxHash's XXH64 description ([Cyan4973/xxHash](https://github.com/Cyan4973/xxHash), `doc/xxhash_spec.md`) | BSD-2-Clause | `engine/net/state_hash.cpp` implements XXH64 from the published algorithm (no code copied); its reference vectors are in `test_net_protocol` |
+| coturn's documentation ("TURN REST API", `use-auth-secret`) | BSD-3-Clause | The credential format `engine/server/src/turn.ts` derives and the `deploy/turnserver.conf.template` settings |
