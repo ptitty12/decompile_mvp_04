@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MVP Baseball 2005 engine</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <main>
+    <h1>MVP Baseball 2005 <span>browser engine, development build</span></h1>
+    <p class="note">
+      Pick your own disc image of MVP Baseball 2005 for GameCube (USA, GV4E69). The page reads it on this
+      computer and translates the game here; the image is never uploaded, and this server holds no game data.
+    </p>
+    <label class="picker">Disc image (ISO or CISO)
+      <input type="file" id="disc" accept=".iso,.ciso,.gcm">
+    </label>
+    <p id="status" role="status"></p>
+    <p id="error" class="error" role="alert" hidden></p>
+    <canvas id="screen" width="640" height="480" tabindex="0" aria-label="Game screen"></canvas>
+    <pre id="phases"></pre>
+    <pre id="stats"></pre>
+    <details>
+      <summary>Controls</summary>
+      <p>Keyboard: Enter = START, X = A, Z = B, C = X, V = Y, arrows = D-pad, I/J/K/L = stick, Q = L, E = R,
+        Space = Z. A gamepad works too (standard mapping).</p>
+    </details>
+    <details>
+      <summary>Engine log</summary>
+      <div id="log"></div>
+    </details>
+  </main>
+</body>
+</html>

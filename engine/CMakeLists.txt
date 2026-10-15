@@ -71,3 +71,7 @@ add_subdirectory(ppc)
 add_subdirectory(translator)
 add_subdirectory(runtime)
 add_subdirectory(gfx)
+# The browser build (E2): the engine as a Worker module and the web shell.
+if(EMSCRIPTEN)
+  add_subdirectory(web)
+endif()

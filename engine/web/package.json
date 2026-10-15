@@ -1,0 +1,11 @@
+{
+  "name": "mvp-web-shell",
+  "private": true,
+  "description": "MVP Baseball 2005 browser engine: the web shell (TypeScript) and its local test driver. Dev tooling only; nothing here is served except the compiled shell.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "devDependencies": {
+    "playwright": "1.64.0",
+    "typescript": "6.0.3"
+  }
+}
