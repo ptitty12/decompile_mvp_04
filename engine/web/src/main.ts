@@ -137,7 +137,8 @@ function showError(stage: string, message: string): void {
                        `revision 0 only. (${message})`
     : stage === 'server' ? message
     : stage === 'webgpu' ? message
-    : stage === 'packs' ? `The roster packs cannot be used with this disc, so the game did not start: ${message}`
+    : stage === 'packs' ? `The roster packs cannot be used with this disc, so the game did not start: ${message}. ` +
+                          'Reload the page to change the packs.'
     : stage === 'netplay' ? `The online game did not start: ${message.replace(/^cannot play: /, '')}`
     : stage === 'gfx' ? `WebGPU is present, but the game cannot draw: ${message}. Check that hardware acceleration ` +
                         `is on, or try another browser.`
