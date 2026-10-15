@@ -3606,8 +3606,14 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
     im.name("env");
     im.name("memory");
     im.byte(0x02);
-    im.byte(0x00);
-    im.uleb(1);
+    if (opt.shared_memory) {  // P2: the threaded engine's memory (shared, so it declares a maximum)
+      im.byte(0x03);
+      im.uleb(1);
+      im.uleb(65536);
+    } else {
+      im.byte(0x00);
+      im.uleb(1);
+    }
     im.name("env");
     im.name("table");
     im.byte(0x01);

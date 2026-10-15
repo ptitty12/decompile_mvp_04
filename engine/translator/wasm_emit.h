@@ -61,6 +61,9 @@ struct WasmEmitOptions {
   // first of each block, as the C++ emitter does. Off only for tests that compare
   // single instructions with execute_plain(), which has no such check.
   bool fpu_checks = true;
+  // Import the memory as shared, with a maximum of 4 GiB (P2: the threaded
+  // browser engine, whose memory is a SharedArrayBuffer). The code is the same.
+  bool shared_memory = false;
 };
 
 // A guest address and the table slot (relative to the module's table base) of
