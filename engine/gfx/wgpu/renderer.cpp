@@ -124,6 +124,29 @@ fn fetch(xy: vec2i) -> vec4f {
 }
 )";
 
+// The scan-out mix (P1): per pixel, the frame of the last field (a), unless it
+// alternates over the last three fields (a close to c, far from b): then the
+// mean of a and b, as an interlaced display shows field-alternating pictures.
+const char* kScanMixWgsl = R"(
+@group(0) @binding(0) var fa: texture_2d<f32>;
+@group(0) @binding(1) var fb: texture_2d<f32>;
+@group(0) @binding(2) var fc: texture_2d<f32>;
+@vertex fn vs(@builtin(vertex_index) i: u32) -> @builtin(position) vec4f {
+  var q = array<vec2f, 3>(vec2f(-1.0, -1.0), vec2f(3.0, -1.0), vec2f(-1.0, 3.0));
+  return vec4f(q[i], 0.0, 1.0);
+}
+@fragment fn fs(@builtin(position) pos: vec4f) -> @location(0) vec4f {
+  let o = vec2i(pos.xy);
+  let a = textureLoad(fa, o, 0).rgb;
+  let b = textureLoad(fb, o, 0).rgb;
+  let c = textureLoad(fc, o, 0).rgb;
+  let ab = dot(abs(a - b), vec3f(1.0));
+  let ac = dot(abs(a - c), vec3f(1.0));
+  let alt = ab > 6.0 / 255.0 && ac * 4.0 < ab;
+  return vec4f(select(a, (a + b) * 0.5, alt), 1.0);
+}
+)";
+
 }  // namespace
 
 struct Renderer::TexEntry {
@@ -532,6 +555,7 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
     CopyEntry& e = *ci->second;
     if (e.epoch != epoch_) {  // memory written there since the copy means the CPU replaced it
       if (hash_memory(t.addr, e.bytes) != e.mem_hash) {
+        ++stats_.copies_dropped;
         copies_.erase(ci);
         ci = copies_.end();
       } else {
@@ -542,6 +566,7 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
       ++stats_.copy_textures_used;
       return e.view;
     }
+    if (ci != copies_.end()) ++stats_.copy_size_misses;
   }
   if (!texture_format_known(t.format)) {
     ++stats_.unknown_formats;
@@ -950,6 +975,126 @@ std::vector<std::uint8_t> Renderer::read_frame(const Frame& f) {
   auto px = gpu_.read_texture(f.tex, f.width, f.height);
   for (std::size_t i = 3; i < px.size(); i += 4) px[i] = 255;  // the XFB has no alpha
   return px;
+}
+
+void Renderer::scan_field(std::uint32_t addr) {
+  const Frame* f = xfb(addr);
+  if (!f) f = latest_;
+  if (!f) return;
+  ++scan_stats_.fields;
+  // A new size starts the history over.
+  if (!scan_[0].tex || scan_[0].width != f->width || scan_[0].height != f->height) {
+    for (Frame& s : scan_) {
+      wgpu::TextureDescriptor td{};
+      td.size = {f->width, f->height, 1};
+      td.format = wgpu::TextureFormat::RGBA8Unorm;
+      td.usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::CopyDst | wgpu::TextureUsage::CopySrc;
+      td.label = "scanout";
+      s.tex = gpu_.device().CreateTexture(&td);
+      s.view = s.tex.CreateView();
+      s.width = f->width;
+      s.height = f->height;
+    }
+    for (int k = 0; k < 3; ++k) {
+      scan_slot_[k] = -1;
+      scan_serial_[k] = 0;
+    }
+    mixed_key_ = ~0ull;
+  }
+  const bool same = scan_slot_[0] >= 0 && scan_serial_[0] == f->serial;
+  scan_slot_[2] = scan_slot_[1];
+  scan_serial_[2] = scan_serial_[1];
+  scan_slot_[1] = scan_slot_[0];
+  scan_serial_[1] = scan_serial_[0];
+  if (same) return;  // the same frame as at the last field: [0] stays
+  // A slot the two earlier fields do not use.
+  int slot = 0;
+  while (slot == scan_slot_[1] || slot == scan_slot_[2]) ++slot;
+  ++scan_stats_.new_frames;
+  flush();
+  wgpu::CommandEncoder enc = gpu_.device().CreateCommandEncoder();
+  wgpu::TexelCopyTextureInfo src{};
+  src.texture = f->tex;
+  wgpu::TexelCopyTextureInfo dst{};
+  dst.texture = scan_[slot].tex;
+  wgpu::Extent3D ext{f->width, f->height, 1};
+  enc.CopyTextureToTexture(&src, &dst, &ext);
+  wgpu::CommandBuffer cb = enc.Finish();
+  gpu_.queue().Submit(1, &cb);
+  scan_slot_[0] = slot;
+  scan_serial_[0] = f->serial;
+  scan_[slot].serial = f->serial;
+  scan_[slot].addr = f->addr;
+}
+
+const Renderer::Frame* Renderer::scanout() {
+  if (scan_slot_[0] < 0) return nullptr;
+  const Frame& a = scan_[scan_slot_[0]];
+  // Alternation needs three different frames at the last three fields.
+  if (!scan_mix || scan_slot_[1] < 0 || scan_slot_[2] < 0 || scan_serial_[1] == scan_serial_[0] ||
+      scan_serial_[2] == scan_serial_[1])
+    return &a;
+  const std::uint64_t key =
+      scan_serial_[0] * 0x9E3779B97F4A7C15ull ^ scan_serial_[1] * 0xC2B2AE3D27D4EB4Full ^ scan_serial_[2];
+  if (key == mixed_key_) return &mixed_;
+  if (!mix_pipe_) {
+    wgpu::ShaderModule sm = gpu_.shader(kScanMixWgsl, "scanout mix");
+    wgpu::ColorTargetState ct{};
+    ct.format = wgpu::TextureFormat::RGBA8Unorm;
+    wgpu::FragmentState fs{};
+    fs.module = sm;
+    fs.entryPoint = "fs";
+    fs.targetCount = 1;
+    fs.targets = &ct;
+    wgpu::RenderPipelineDescriptor pd{};
+    pd.label = "scanout mix";
+    pd.vertex.module = sm;
+    pd.vertex.entryPoint = "vs";
+    pd.fragment = &fs;
+    mix_pipe_ = gpu_.device().CreateRenderPipeline(&pd);
+  }
+  if (!mixed_.tex || mixed_.width != a.width || mixed_.height != a.height) {
+    wgpu::TextureDescriptor td{};
+    td.size = {a.width, a.height, 1};
+    td.format = wgpu::TextureFormat::RGBA8Unorm;
+    td.usage =
+        wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::RenderAttachment | wgpu::TextureUsage::CopySrc;
+    td.label = "scanout mixed";
+    mixed_.tex = gpu_.device().CreateTexture(&td);
+    mixed_.view = mixed_.tex.CreateView();
+    mixed_.width = a.width;
+    mixed_.height = a.height;
+  }
+  wgpu::BindGroupEntry be[3]{};
+  for (int k = 0; k < 3; ++k) {
+    be[k].binding = static_cast<std::uint32_t>(k);
+    be[k].textureView = scan_[scan_slot_[k]].view;
+  }
+  wgpu::BindGroupDescriptor bgd{};
+  bgd.layout = mix_pipe_.GetBindGroupLayout(0);
+  bgd.entryCount = 3;
+  bgd.entries = be;
+  wgpu::BindGroup bg = gpu_.device().CreateBindGroup(&bgd);
+  wgpu::CommandEncoder enc = gpu_.device().CreateCommandEncoder();
+  wgpu::RenderPassColorAttachment ca{};
+  ca.view = mixed_.view;
+  ca.loadOp = wgpu::LoadOp::Clear;
+  ca.storeOp = wgpu::StoreOp::Store;
+  wgpu::RenderPassDescriptor rp{};
+  rp.colorAttachmentCount = 1;
+  rp.colorAttachments = &ca;
+  wgpu::RenderPassEncoder pass = enc.BeginRenderPass(&rp);
+  pass.SetPipeline(mix_pipe_);
+  pass.SetBindGroup(0, bg);
+  pass.Draw(3);
+  pass.End();
+  wgpu::CommandBuffer cb = enc.Finish();
+  gpu_.queue().Submit(1, &cb);
+  mixed_.serial = a.serial;
+  mixed_.addr = a.addr;
+  mixed_key_ = key;
+  ++scan_stats_.mixed;
+  return &mixed_;
 }
 
 std::vector<std::uint8_t> Renderer::read_efb() {

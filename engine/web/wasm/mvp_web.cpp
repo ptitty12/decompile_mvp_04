@@ -159,6 +159,20 @@ struct LiveInput : InputSource {
 
 struct Engine;
 
+// Presentation trace (P1, development): every VI field's frame buffer address,
+// every XFB copy and what each present showed, as JSON records the Worker
+// collects (mvp_trace_take). The tap sits between the GX processor and the
+// renderer and forwards everything unchanged.
+struct XfbTap : gfx::Backend {
+  gfx::Backend* next = nullptr;
+  bool on = false;
+  std::string log;
+  std::uint64_t copies = 0;  // XFB copies seen
+  void draw(const gfx::DrawCall& d) override { next->draw(d); }
+  void efb_copy(const gfx::EfbCopy& c) override;
+  void invalidate_textures() override { next->invalidate_textures(); }
+};
+
 // The renderer's view of the run, and the field boundary.
 struct Observer : GfxObserver {
   Engine* e = nullptr;
@@ -211,6 +225,9 @@ struct Engine {
   std::string gfx_error;
   std::uint32_t xfb = 0;
   std::uint64_t presents = 0, last_presented = 0;
+  XfbTap tap;
+  std::uint64_t copies_at_present = 0;
+  std::uint64_t resizes = 0;  // canvas size changes the page reported
 
   // Host time spent inside rt::run, for the frame-time numbers.
   double run_ms = 0, last_batch_ms = 0, max_field_ms = 0;
@@ -222,8 +239,31 @@ void Observer::gx_command(const std::uint8_t* cmd, std::size_t len) {
   if (e->proc) e->proc->command(cmd, len);
 }
 
+void XfbTap::efb_copy(const gfx::EfbCopy& c) {
+  if (c.to_xfb) {
+    ++copies;
+    if (on) {
+      char b[200];
+      std::snprintf(b, sizeof b,
+                    "{\"k\":\"c\",\"f\":%llu,\"d\":%u,\"x\":%u,\"y\":%u,\"w\":%u,\"h\":%u,\"ys\":%.4f,\"clr\":%d},",
+                    static_cast<unsigned long long>(g.hw->vi_fields()), c.dest, c.src_x, c.src_y, c.width, c.height,
+                    static_cast<double>(c.y_scale), c.clear ? 1 : 0);
+      log += b;
+    }
+  }
+  next->efb_copy(c);
+}
+
 void Observer::vi_field(std::uint64_t field, std::uint32_t xfb) {
-  if (e->renderer) e->renderer->flush();
+  if (e->renderer) {
+    e->renderer->flush();
+    e->renderer->scan_field(xfb);  // what the VI scans out at this field (P1)
+  }
+  if (e->tap.on && xfb != e->xfb) {
+    char b[80];
+    std::snprintf(b, sizeof b, "{\"k\":\"v\",\"f\":%llu,\"t\":%u},", static_cast<unsigned long long>(field), xfb);
+    e->tap.log += b;
+  }
   e->xfb = xfb;
   if (field >= e->stop_fields) throw StopRun{"ran " + std::to_string(e->stop_fields) + " VI fields"};
   e->hooks->request_yield();  // run() returns after this field's safe point
@@ -268,7 +308,8 @@ void apply_audio() {
 void attach_renderer() {
   if (!g.gpu || !g.window || !g.m || g.renderer) return;
   g.renderer = std::make_unique<gfx::Renderer>(*g.gpu, g.m->mem1(), Machine::kMem1Size);
-  g.proc = std::make_unique<gfx::GxProcessor>(g.renderer.get());
+  g.tap.next = g.renderer.get();
+  g.proc = std::make_unique<gfx::GxProcessor>(&g.tap);
   g.proc->set_memory(g.m->mem1(), Machine::kMem1Size);
 }
 
@@ -406,6 +447,9 @@ EMSCRIPTEN_KEEPALIVE int mvp_translate(const char* text, int len) {
     double t2 = now_ms();
     mvp_js_progress("Translating: emitting WebAssembly", 3, 5);
     xlat::WasmEmitOptions opt;
+#ifdef MVP_WEB_NAMES
+    opt.names = true;  // profiling builds: guest symbols in the browser's profiler
+#endif
     const auto& table = hle_table();
     for (std::size_t k = 0; k < table.size(); ++k)
       opt.hle.push_back({table[k].name, table[k].address, static_cast<int>(k), table[k].kind == HleKind::Before});
@@ -576,6 +620,7 @@ EMSCRIPTEN_KEEPALIVE void mvp_gfx_init(const char* selector, int width, int heig
 }
 
 EMSCRIPTEN_KEEPALIVE void mvp_canvas_resize(int width, int height) {
+  ++g.resizes;
   if (g.window) g.window->resize(width, height);
 }
 
@@ -614,13 +659,42 @@ EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
 // address, else the latest copy). Returns 1 if a frame was drawn.
 EMSCRIPTEN_KEEPALIVE int mvp_present() {
   if (!g.renderer || !g.window) return 0;
-  const gfx::Renderer::Frame* f = g.renderer->xfb(g.xfb);
+  // The picture the VI scanned out at the last fields (P1: field-alternating
+  // pixels mixed, as an interlaced display shows them), else the XFB copy at the
+  // VI's address, else the latest copy.
+  const gfx::Renderer::Frame* f = g.renderer->scanout();
+  const bool mixed = g.renderer->is_mixed(f);
+  const bool fallback = !f && !g.renderer->xfb(g.xfb);
+  if (!f) f = g.renderer->xfb(g.xfb);
   if (!f) f = g.renderer->latest_xfb();
   if (!f) return 0;
+  if (g.tap.on) {
+    char b[200];
+    std::snprintf(b, sizeof b,
+                  "{\"k\":\"p\",\"f\":%llu,\"fr\":%llu,\"t\":%u,\"a\":%u,\"s\":%llu,\"new\":%d,\"fb\":%d,"
+                  "\"n\":%llu,\"w\":%u,\"h\":%u,\"mix\":%d,\"ms\":%.2f},",
+                  static_cast<unsigned long long>(g.hw->vi_fields()), static_cast<unsigned long long>(g_frame_polls),
+                  g.xfb, f->addr, static_cast<unsigned long long>(f->serial), f->serial != g.last_presented ? 1 : 0,
+                  fallback ? 1 : 0, static_cast<unsigned long long>(g.tap.copies - g.copies_at_present), f->width,
+                  f->height, mixed ? 1 : 0, now_ms());
+    g.tap.log += b;
+  }
+  g.copies_at_present = g.tap.copies;
   g.window->present(f->view, f->width, f->height);
   ++g.presents;
   g.last_presented = f->serial;
   return 1;
+}
+
+// Development (P1): the presentation trace on or off, and its records since
+// the last call as a JSON array.
+EMSCRIPTEN_KEEPALIVE void mvp_trace(int on) { g.tap.on = on != 0; }
+EMSCRIPTEN_KEEPALIVE const char* mvp_trace_take() {
+  std::string& l = g.tap.log;
+  if (!l.empty() && l.back() == ',') l.pop_back();
+  g_text = "[" + l + "]";
+  l.clear();
+  return g_text.c_str();
 }
 
 // The host controller state for port `port` (0-3), used from the next frame
@@ -687,16 +761,20 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_status() {
                   static_cast<unsigned long long>(g.audio.dropped()));
     s += b;
   }
+  s += ",\"resizes\":" + std::to_string(g.resizes);
   s += ",\"pad_last\":" + std::to_string(g.live.last_buttons) +
        ",\"pad_polls\":" + std::to_string(g.live.polls_with_buttons);
   if (g.renderer) {
     const auto& rs = g.renderer->stats();
     const auto& ps = g.proc->stats();
     std::snprintf(b, sizeof b,
-                  ",\"draws\":%llu,\"xfb_copies\":%llu,\"pipelines\":%llu,\"textures\":%llu,\"gpu_errors\":%llu",
+                  ",\"draws\":%llu,\"xfb_copies\":%llu,\"pipelines\":%llu,\"textures\":%llu,\"gpu_errors\":%llu,"
+                  "\"copies_dropped\":%llu,\"copy_size_misses\":%llu,\"scan_mixed\":%llu",
                   static_cast<unsigned long long>(rs.draws), static_cast<unsigned long long>(ps.xfb_copies),
                   static_cast<unsigned long long>(rs.pipelines), static_cast<unsigned long long>(rs.textures_decoded),
-                  static_cast<unsigned long long>(g.gpu->errors()));
+                  static_cast<unsigned long long>(g.gpu->errors()), static_cast<unsigned long long>(rs.copies_dropped),
+                  static_cast<unsigned long long>(rs.copy_size_misses),
+                  static_cast<unsigned long long>(g.renderer->scan_stats().mixed));
     s += b;
   }
   if (!g.gfx_error.empty()) s += ",\"gfx_error\":\"" + json_escape(g.gfx_error) + "\"";

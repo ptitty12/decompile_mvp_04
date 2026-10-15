@@ -18,6 +18,8 @@ export interface MvpEngine {
   _mvp_canvas_resize(width: number, height: number): void;
   _mvp_run_fields(n: number): number;
   _mvp_present(): number;
+  _mvp_trace(on: number): void;   // P1: the presentation trace (development)
+  _mvp_trace_take(): number;
   _mvp_set_pad(port: number, connected: number, buttons: number, sx: number, sy: number, cx: number, cy: number,
                tl: number, tr: number): void;
   _mvp_status(): number;

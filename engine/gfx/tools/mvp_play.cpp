@@ -411,6 +411,7 @@ struct Play : GfxObserver {
       return;
     }
     renderer->flush();
+    renderer->scan_field(xfb);  // P1: what the VI scans out (the window shows scanout())
     const gfx::Renderer::Frame* f = renderer->xfb(xfb);
     if (!f) f = renderer->latest_xfb();
     if (window && field % present_every == 0) {
@@ -420,8 +421,10 @@ struct Play : GfxObserver {
       const auto c1 = std::chrono::steady_clock::now();
       if (!window->pump()) throw StopRun{"window closed"};
       if (host_input) host_input->host = keyboard_pad();
-      if (f) {
-        window->present(f->view, f->width, f->height);
+      const gfx::Renderer::Frame* shown = renderer->scanout();
+      if (!shown) shown = f;
+      if (shown) {
+        window->present(shown->view, shown->width, shown->height);
         const auto c2 = std::chrono::steady_clock::now();
         if (field >= pacing_from) {
           wait_s += std::chrono::duration<double>(c1 - c0).count();
@@ -873,11 +876,12 @@ int main(int argc, char** argv) {
               "%llu pipelines, %llu textures decoded, %llu hits, "
               "%llu EFB-copy textures used, %llu texture copies, %llu clears; %llu unknown formats, "
               "%llu indirect draws, %llu fog draws; %llu with the previous draw's state; %llu preloaded textures; uploaded %.1f MB of vertices, "
-              "%.1f MB of indices\n",
+              "%.1f MB of indices; EFB-copy textures dropped %llu, size misses %llu\n",
               ull(rs.draws), ull(rs.skipped), ull(rs.merged), ull(rs.encoded), ull(rs.passes), ull(rs.pipelines),
               ull(rs.textures_decoded), ull(rs.texture_hits), ull(rs.copy_textures_used), ull(rs.tex_copies),
               ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws), ull(rs.same_state), ull(rs.tmem_textures),
-              static_cast<double>(rs.vertex_bytes) / 1e6, static_cast<double>(rs.index_bytes) / 1e6);
+              static_cast<double>(rs.vertex_bytes) / 1e6, static_cast<double>(rs.index_bytes) / 1e6,
+              ull(rs.copies_dropped), ull(rs.copy_size_misses));
   if (!play.present_ms.empty()) {
     std::vector<double> v = play.present_ms;
     std::sort(v.begin(), v.end());

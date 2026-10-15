@@ -80,6 +80,8 @@ const options: RunOptions = {
   audio: params.get('audio') !== '0',
   cache: params.get('cache') !== '0',
   traceDisc: params.get('traceDisc') === '1',
+  tracePresent: params.get('tracePresent') === '1',
+  fastUntil: Number(params.get('fastUntil') ?? 0) || 0,
   discCache: {
     blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
     maxRun: Number(params.get('discRun') ?? 0) || undefined,

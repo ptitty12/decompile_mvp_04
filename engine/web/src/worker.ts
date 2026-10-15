@@ -360,6 +360,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
     return;
   }
   booted = true;
+  if (options.tracePresent) M._mvp_trace(1);
   enableAudio();
   phase('boot', t);
 
@@ -372,7 +373,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   pacedStart = performance.now();
   pacedFields = 0;
   winWall = performance.now();
-  if (options.fast) setTimeout(fastLoop, 0);
+  if (options.fast || options.fastUntil) setTimeout(fastLoop, 0);
   else if (scope.requestAnimationFrame) scope.requestAnimationFrame(frame);
   // else: the page sends 'tick' messages from its own animation frames.
 }
@@ -393,7 +394,8 @@ function afterRun(ran: number, ms: number): boolean {
   }
   const now = performance.now();
   if (now - winWall >= 500) {
-    post({ type: 'stats', status: status(), window: { fields: winFields, ms: winMs, wallMs: now - winWall } });
+    const trace = opts?.tracePresent ? JSON.parse(cstr(M!._mvp_trace_take())) as unknown[] : undefined;
+    post({ type: 'stats', status: status(), window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace } });
     winFields = 0;
     winMs = 0;
     winWall = now;
@@ -450,7 +452,15 @@ function fastLoop(): void {
     ran += r;
     if (net && r === 0) break;  // waiting for the other player: let datagrams in
   }
-  if (afterRun(ran, performance.now() - t0)) setTimeout(fastLoop, 0);
+  if (!afterRun(ran, performance.now() - t0)) return;
+  if (!opts?.fast && opts?.fastUntil && status().fields >= opts.fastUntil) {
+    // Development (fastUntil): from here on paced, as a player runs it.
+    pacedStart = performance.now();
+    pacedFields = 0;
+    if (scope.requestAnimationFrame) scope.requestAnimationFrame(frame);
+    return;
+  }
+  setTimeout(fastLoop, 0);
 }
 
 scope.onmessage = (ev: MessageEvent<ToWorker>) => {
@@ -465,7 +475,7 @@ scope.onmessage = (ev: MessageEvent<ToWorker>) => {
       break;
     case 'tick':
       // Only without the Worker's own animation frames; this Worker's clock, not the page's.
-      if (opts && !opts.fast && !scope.requestAnimationFrame) runPaced(performance.now());
+      if (opts && !opts.fast && !opts.fastUntil && !scope.requestAnimationFrame) runPaced(performance.now());
       break;
     case 'resize':
       M?._mvp_canvas_resize(msg.width, msg.height);
