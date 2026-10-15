@@ -34,7 +34,12 @@ session's 10 s timeout.
   power-on: menus, intro and all.
 - **Ports.** Player 1 drives controller port 1, player 2 port 2; ports 3 and 4 are
   empty. Both player ports are connected from power-on (the boot input is
-  `neutral_input(0x3)` on both sides).
+  `neutral_input(0x3)` on both sides). Each browser's own controller (or keyboard)
+  drives *its* player's port: the page sends one pad, as its port 0, and the engine's
+  session puts it on port 1 or 2 by the room role; the page's other ports are held
+  disconnected online (`docs/engine/Q3_LOG.md` section 5). The lobby shows whether
+  your controller is ready and, over the data channel as small text messages the
+  engine never sees, whether the other player's is.
 - **Input delay D.** The local pad sampled when the game reaches frame F becomes
   the input of frame F + D. Frames 0 .. D-1 have neutral input on both ports. Each
   player proposes D (2, 3 or 4 in the lobby; the creator's choice is shown to the

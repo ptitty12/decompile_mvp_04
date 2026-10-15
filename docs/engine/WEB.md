@@ -6,7 +6,7 @@ owner's image from behind the server's login once and keeps it: P1), translates
 the game to WebAssembly inside the browser
 (or loads the translation it cached on an earlier visit), draws the frames on a
 canvas through WebGPU, plays the sound through an AudioWorklet, and reads the
-keyboard and a gamepad. Nothing game-derived is ever sent from the browser.
+keyboard and controllers (`docs/engine/Q3_LOG.md`). Nothing game-derived is ever sent from the browser.
 Working logs and evidence: `docs/engine/E2_LOG.md` (E2: browser boot) and
 `docs/engine/E2C_LOG.md` (E2c: sound, gamepad, the disc from the server, caching,
 polish) and `docs/engine/P1_LOG.md` (P1: the disc downloaded once into the browser;
@@ -36,8 +36,8 @@ Everything below is run by agents; the owner never runs commands.
 
    | File | What |
    |---|---|
-   | `index.html`, `style.css` | the page (`engine/web/static/`) |
-   | `main.js`, `worker.js`, `protocol.js`, `input.js`, `gamepad.js`, `gamepad-ui.js`, `audio.js`, `audio-worklet.js`, `resampler.js`, `disc.js`, `disc-store.js`, `disc-download.js`, `module-cache.js`, `packs.js`, `packs-core.js` | the shell, compiled from `engine/web/src/*.ts` by `tsc` |
+   | `index.html`, `style.css`, `controls.css` | the page (`engine/web/static/`) |
+   | `main.js`, `worker.js`, `protocol.js`, `input.js`, `gamepad.js`, `gamepad-profiles.js`, `pad-manager.js`, `controls.js`, `controls-keys.js`, `controls-rebind.js`, `controls-store.js`, `audio.js`, `audio-worklet.js`, `resampler.js`, `disc.js`, `disc-store.js`, `disc-download.js`, `module-cache.js`, `packs.js`, `packs-core.js` | the shell, compiled from `engine/web/src/*.ts` by `tsc` |
    | `mvp-packs.js`, `mvp-packs.wasm` (0.6 MB) | the roster-pack checker for the page's panel (E6): `engine/mods` alone, loaded only when packs are picked |
    | `mvp-web.js`, `mvp-web.wasm` (0.6 MB) | the engine: translator, runtime, interpreter, renderer, mixer (`engine/web/wasm/`) |
    | `mvp-web-mt.js`, `mvp-web-mt.wasm` | the threaded engine (P2): the same sources for wasm threads, the renderer on its own thread (section 2); loaded where the page is cross-origin isolated |
@@ -91,10 +91,18 @@ Everything below is run by agents; the owner never runs commands.
    (default `build/engine/web-check`; screenshots are game-derived and stay under
    `build/`). It lists every request the page made. Chrome and Edge run with
    `--mute-audio` and Firefox with its volume at 0 unless `--audible`.
+   **Controllers** (Q3): `node engine/web/tools/pad_check.mjs --browser chrome|msedge|firefox`
+   drives the Controls panel with fake gamepads (`tools/fake_pads.mjs`: standard and
+   non-standard pads, hot-plug, a made-up GameCube adapter that needs the guided setup,
+   two players, the lobby line with a scripted lobby server) and needs no game data;
+   `node engine/web/tools/pad_game_check.mjs --disc PATH [--net]` plays the real game's intro
+   and menus on fake pads, has the engine report the inputs the guest consumed (`inputLog=1`),
+   replays that log with no gamepad and requires the same guest line, and with `--net` runs two
+   pages through E5's server with player 2 on a pad (`docs/engine/Q3_LOG.md` section 4).
 6. **Unit tests** (data-free, in `ctest --preset emscripten`): `test_web_shell`
    runs `node --test` on `engine/web/tests/*.test.mjs` against the compiled
-   shell (the gamepad mapping, the audio resampler, the disc's server
-   contract, the one-time download's manifest check); `test_web_cache` tests the server image's block cache and the
+   shell (the gamepad mapping and the Controls layers, the audio resampler, the
+   disc's server contract, the one-time download's manifest check); `test_web_cache` tests the server image's block cache and the
    translation cache's blob. `mvp-web-cache-sim TRACE` (development) replays a
    `--trace-disc` trace through the block cache over a modelled network.
 
@@ -184,24 +192,62 @@ Everything below is run by agents; the owner never runs commands.
   suspends the AudioContext; on return the pacing clock restarts from the field
   it stopped at. Only the host loop stops: the guest sees no wall time, so a run
   with a pause gives the same guest line as one without.
-- **Input.** Keyboard (Enter = START, X = A, Z = B, C = X, V = Y, arrows = D-pad,
-  I/J/K/L = stick, Q/E = L/R, Space = Z) and the first connected gamepad merge
-  into port 1 on the main thread (the Gamepad API is not available in Workers)
-  and go to the Worker when they change. The engine applies them at the game's
-  next frame poll (E0c's input queue); a button pressed since the previous poll
-  counts as pressed at that poll even if already released, because the game
-  polls once per frame of its own, which can be several fields apart. Per-frame
-  inputs are the only host input that reaches the guest.
-- **Gamepad** (`src/gamepad.ts`, `src/gamepad-ui.ts`). The default mapping is for
-  the Gamepad API's standard layout: bottom face button = A, right = B, left = X,
-  top = Y, right or left bumper = Z, triggers = L/R (analog 0-255, the digital
-  L/R click at 90 % of the travel; a trigger's `value` counts, not the browser's
-  early `pressed`), Start = START, D-pad, left stick = main stick, right stick =
-  C-stick (radial dead zone 15 %, scaled to +-100, clamped to the circle, up
-  positive). The Controls panel shows the pad found and rebinds any control by
-  pressing the wanted button or moving the wanted axis (a pad with a
-  non-standard layout is bound this way); the mapping is stored per browser in
-  `localStorage["mvp.gamepad.mapping.v1"]`, checked field by field when read.
+- **Input.** The keyboard and every connected controller are read on the main
+  thread (the Gamepad API is not available in Workers), at every animation frame
+  and whenever a key changes (`src/input.ts`, `src/pad-manager.ts`), into one
+  GameCube pad per port: players 1 and 2 offline; online only this page's player,
+  as the page's port 0, which the engine puts on the player's own port
+  (NETPLAY.md section 1). A port's pad is the keyboard (if the keyboard is set to
+  drive that port) merged with the controller assigned to it. The pads go to the
+  Worker when they change; the engine applies them at the game's next frame poll
+  (E0c's input queue); a button pressed since the previous poll counts as pressed
+  at that poll even if already released, because the game polls once per frame of
+  its own, which can be several fields apart. Per-frame inputs are the only host
+  input that reaches the guest: with `inputLog=1` the engine reports exactly what
+  the guest consumed as an `mvp-input` script, and replaying that script with no
+  gamepad gives the same guest line (`tools/pad_game_check.mjs`).
+- **Controllers and the Controls panel** (Q3; layers in `src/gamepad.ts`,
+  `gamepad-profiles.ts`, `controls-store.ts`, `pad-manager.ts`, `controls-keys.ts`,
+  `controls-rebind.ts`; the panel is `src/controls.ts`). The default mapping is for
+  the Gamepad API's standard layout (Xbox, PlayStation, most pads in Chrome and Edge):
+  bottom face button = A, right = B, left = X, top = Y, either bumper = Z,
+  triggers = L/R (analog 0-255, the digital L/R click at 90 % of the travel, a
+  trigger's `value` counts, not the browser's early `pressed`), Start = START,
+  D-pad, left stick = main stick, right stick = C-stick. Sticks: a radial dead zone
+  (15 %, adjustable) with the rest scaled to +-100, and the GameCube's octagonal
+  gate (the four directions and the four diagonals reach the full distance, 92 %
+  between them; a switch turns it off). Nintendo-named pads (vendor 057e, standard
+  layout) get A/B and X/Y swapped to their labels; an Xbox pad without the standard
+  mapping gets the Linux joystick order; any other pad starts from a guess (A B X Y
+  on buttons 0-3, a D-pad on buttons 12-15 or on a hat axis) and the panel offers the
+  guided setup, which asks for each of the sixteen controls in turn (press the button,
+  or move the stick or trigger; a D-pad reported as one "hat" axis, triggers on axes
+  resting at -1 and the analog axis of a GameCube pad's trigger are recognised).
+  GameCube adapters are recognised by name and vendor (Mayflash 0079:1843 and 1844,
+  Nintendo 057e:0337) and always offered the guided setup: their raw layouts differ
+  between firmware, mode, OS and browser. **Which pad plays which port:** a pad that
+  has been *used* (a button pressed or a stick moved: browsers list idle pads, and a
+  GameCube adapter lists its four sockets whether or not a controller is in them)
+  takes the next free port set to Auto, and keeps it while it stays connected; each
+  port can instead be set to a model of pad (the n-th one of that model) or to none;
+  the keyboard drives player 1 unless set to player 2 or nobody. Online, the panel
+  shows one row, "You (player N)", and the pad of whichever port has one plays.
+  Pads can be plugged and unplugged at any time (Chrome shows a pad only after its
+  first press and only to the page that has the focus: the panel says so). **The
+  panel** (under "Controls", and a "Controller: ..." chip in the toolbar that opens
+  it, which also opens by itself for a pad whose layout it does not know): the pads
+  found with their layout and port; who plays; a live picture and numbers of what
+  the game will get from the pad or keyboard being tested; the binding of every
+  control with a Set button ("press the button for A": the press never reaches the
+  game, Esc cancels) and Set up this controller (all sixteen in turn, Skip, Back,
+  Cancel); the dead zone, the octagon and the trigger click; the keyboard's keys the
+  same way (a key another control uses swaps with it; F, M, P, Esc and the
+  browser's keys are refused); a vibration test (`vibrationActuator`; the game's own
+  rumble calls are not exposed yet, `Q3_LOG.md` section 7). Everything is stored per
+  browser in `localStorage["mvp.controls.v2"]`, per controller *model* (vendor and
+  product id, else its name), checked field by field when read; the E2c mapping
+  (`mvp.gamepad.mapping.v1`) is read once for pads without their own. "Press A to
+  play" starts the game from the deployment's Play button.
 - **Sound** (`src/audio.ts`, `src/audio-worklet.ts`, `src/resampler.ts`, engine
   `wasm/web_audio.h`). The AX mixer of E3b observes the DSP's frames in the
   Worker exactly as natively (read-only: E3b-MIX1). Browsers start audio only
@@ -529,8 +575,12 @@ both match sessions (P2_LOG.md section 3).
   (DECISIONS 2026-10-14 allows it) and read locally; the game never waits on the
   network. The first visit waits for the download (about 1.4 GB: 112 s at 100
   Mbit/s). Reading over the network remains only as the fallback.
-- **Gamepads** were tested with unit tests and a fake `getGamepads()`, not yet
-  with a real controller.
+- **Gamepads** were tested with unit tests, fake `getGamepads()` objects in
+  Chrome, Edge and Firefox (the panel, hot-plug, ports, the guided setup) and
+  the real game on fake pads (replay-equal, online too), not yet with a real
+  controller: the profiles for non-standard pads (`Q3_LOG.md` section 2) are the
+  documented layouts, not hardware-tested, and GameCube adapters need their
+  guided setup once.
 - **The real server** (E5, `engine/server/`) was tested locally (Chrome: login,
   the disc from `/config.json`, sound, the cache; and an online game of two
   pages that both read the server's image, in lockstep with no desync), not yet
