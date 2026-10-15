@@ -66,3 +66,19 @@ details { margin: 0.5rem 0; }
   border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--fg); }
 .online-status { margin: 0.4rem 0 0; color: var(--muted); }
 .online-status.err { color: var(--error-fg); }
+/* Roster packs (E6, src/packs.ts) */
+.packs { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 0.8rem;
+  margin: 0.75rem 0; }
+.packs h2 { font-size: 1rem; margin: 0 0 0.4rem; }
+.packs .note { margin: 0 0 0.5rem; font-size: 0.9rem; }
+.packs-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.packs-row .picker { padding: 0.3rem 0.6rem; font-size: 0.9rem; }
+.packs-list { margin: 0.5rem 0; padding-left: 1.5rem; }
+.packs-list li { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: baseline; margin: 0.2rem 0; }
+.packs-list button { padding: 0.05rem 0.5rem; font-size: 0.85rem; }
+.packs-meta { color: var(--muted); font: 0.85rem ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+.packs-summary { margin: 0.3rem 0; color: var(--muted); overflow-wrap: anywhere; }
+.packs-summary.err, .packs-issues .err { color: var(--error-fg); }
+.packs-issues { margin: 0.2rem 0 0; padding-left: 1.2rem; font-size: 0.85rem; max-height: 12rem; overflow: auto;
+  overflow-wrap: anywhere; }
+.packs-issues .warn { color: var(--muted); }

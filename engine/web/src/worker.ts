@@ -15,6 +15,7 @@
 import createMvpEngine, { type MvpEngine } from './mvp-web.js';
 import { probeDiscUrl } from './disc.js';
 import { cacheKey, clearCache, readCached, writeCached } from './module-cache.js';
+import { feedPacks, readReport, summarize } from './packs-core.js';
 import type {
   CacheReport, DiscSource, FromWorker, NetOptions, NetStatus, Pad, RunOptions, Status, ToWorker, WorkletIn,
 } from './protocol.js';
@@ -294,6 +295,22 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   const info = JSON.parse(cstr(M._mvp_disc_info())) as { dol_sha1: string; game: string; revision: number;
                                                          title: string; image: string };
   post({ type: 'disc', info });
+
+  // Roster packs (E6): checked, applied to this disc's tables and mounted on the
+  // virtual disc before anything boots. The handshake below carries their set hash.
+  if (options.packs?.length) {
+    t = performance.now();
+    post({ type: 'progress', text: 'Applying the roster packs to your disc', step: 0, steps: 0 });
+    feedPacks(M, options.packs);
+    const ok = M._mvp_packs_mount();
+    const report = readReport(M);
+    post({ type: 'packs', report });
+    if (!ok) {
+      post({ type: 'error', stage: 'packs', message: summarize(report) });
+      return;
+    }
+    phase('packs', t, { files: report.files, bytes: report.bytes });
+  }
 
   // The translation: this browser's cache, else the translator.
   const fetchSymbols = async () => new Uint8Array(await (await fetch(new URL('symbols.txt', import.meta.url))).arrayBuffer());

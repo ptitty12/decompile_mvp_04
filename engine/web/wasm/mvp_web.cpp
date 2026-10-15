@@ -26,6 +26,8 @@
 // translated module's cache (mvp_keep_module, mvp_module_blob,
 // mvp_translate_cached: module_cache.h), audio (mvp_audio_*: web_audio.h) and
 // read-ahead for the server's image (mvp_disc_want / mvp_disc_insert).
+// E6 adds roster packs (packs_web.h: mvp_pack_*, mvp_packs_mount), mounted on the
+// virtual disc between mvp_open_disc and mvp_boot.
 //
 // Determinism: guest state depends only on the disc and the per-frame inputs.
 // Wall time never reaches it: the shell decides *how many* fields to run per
@@ -66,6 +68,7 @@
 #include "web/wasm/web_audio.h"
 #include "web/wasm/web_disc.h"
 #include "web/wasm/net_web.h"
+#include "web/wasm/packs_web.h"
 
 using namespace mvp;
 using namespace mvp::rt;
@@ -296,7 +299,8 @@ bool open_image(std::unique_ptr<vfs::Source> src) {
   auto disc = vfs::open_disc(std::move(image), true, &g.error);
   if (!disc) return false;
   g.disc = std::move(*disc);
-  web::net_set_disc(&*g.disc);  // the netplay handshake's disc identity (E5)
+  web::net_set_disc(&*g.disc);    // the netplay handshake's disc identity (E5), before any pack is mounted
+  web::packs_set_disc(&*g.disc);  // roster packs are mounted on it (E6, mvp_packs_mount)
   return true;
 }
 

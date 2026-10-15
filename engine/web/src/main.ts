@@ -24,6 +24,7 @@ import { findDiscPage, findServerDisc } from './disc.js';
 import { GamepadPanel } from './gamepad-ui.js';
 import { HostInput } from './input.js';
 import { Online, type OnlineState } from './netplay.js';
+import { PackPanel, type PacksState } from './packs.js';
 import type { CacheReport, DiscSource, FromWorker, Pad, RunOptions, Status, ToWorker } from './protocol.js';
 
 interface PageState {
@@ -48,6 +49,7 @@ interface PageState {
   log: string[];
   audioProbe: () => { rms: number; peak: number } | null;
   net?: OnlineState;  // online play (E5, netplay.ts)
+  packs?: PacksState; // roster packs (E6, packs.ts)
 }
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -93,6 +95,11 @@ const state: PageState = {
 };
 (window as unknown as { mvp: PageState }).mvp = state;
 
+// Roster packs (E6): picked before the game starts, applied by the engine to the disc.
+const packsEl = document.getElementById('packs');
+const packPanel = packsEl ? new PackPanel(packsEl) : null;
+if (packPanel) state.packs = packPanel.state;
+
 // Online play (E5): the lobby panel, when the page comes from the netplay server.
 const onlineEl = document.getElementById('online');
 const online = onlineEl ? new Online(onlineEl, params) : null;
@@ -130,6 +137,8 @@ function showError(stage: string, message: string): void {
                        `revision 0 only. (${message})`
     : stage === 'server' ? message
     : stage === 'webgpu' ? message
+    : stage === 'packs' ? `The roster packs cannot be used with this disc, so the game did not start: ${message}`
+    : stage === 'netplay' ? `The online game did not start: ${message.replace(/^cannot play: /, '')}`
     : stage === 'gfx' ? `WebGPU is present, but the game cannot draw: ${message}. Check that hardware acceleration ` +
                         `is on, or try another browser.`
     : `The engine stopped (${stage}): ${message}`;
@@ -217,6 +226,12 @@ function onWorker(msg: FromWorker): void {
       if (msg.name === 'translate') state.translate = msg.detail;
       showPhases();
       break;
+    case 'packs':
+      packPanel?.showMounted(msg.report);
+      log(`roster packs: set ${msg.report.set_hash}` + (msg.report.ok
+        ? `, result ${msg.report.result_hash ?? ''} (${(msg.report.files ?? []).join(', ') || 'nothing patched'})`
+        : ', not applied'), !msg.report.ok);
+      break;
     case 'disc':
       state.disc = msg.info;
       log(`disc: ${msg.info.title} (${msg.info.game} rev ${msg.info.revision}, ${msg.info.image}), main.dol ${msg.info.dol_sha1}`);
@@ -295,7 +310,12 @@ function startEngine(disc: DiscSource): void {
   }
   // In an online game (E5) the Worker boots only after the handshake with the other player.
   const netplay = online?.netOptions();
-  send({ type: 'start', disc, canvas: off, width, height, options: { ...options, netplay } }, off ? [off] : []);
+  // The roster packs (E6), in the panel's order; the set can no longer change.
+  const packs = packPanel?.current() ?? [];
+  packPanel?.lock();
+  const transfer: Transferable[] = packs.flatMap((p) => p.files.map((f) => f.data));
+  if (off) transfer.unshift(off);
+  send({ type: 'start', disc, canvas: off, width, height, options: { ...options, netplay, packs } }, transfer);
   if (pendingAudioPort) {
     send({ type: 'audio-port', port: pendingAudioPort }, [pendingAudioPort]);
     pendingAudioPort = null;

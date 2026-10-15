@@ -18,6 +18,8 @@
 //   --out      where screenshots and the summary go (default build/engine/web-check);
 //              keep it under build/: screenshots are game-derived, never committed
 //   --script   an mvp-input script file (runtime/input.h) for the run
+//   --packs    roster packs (E6), comma-separated pack folders or .zip files, in set
+//              order: given to the page's Roster packs panel before the disc
 //   --fields / --frames   stop there and print the guest line (MEM1 SHA-1)
 //   --fast     unpaced (as fast as possible); default paced to 59.94 fields/s
 //   --shots    VI fields at which to screenshot the canvas (approximately: the
@@ -54,7 +56,7 @@
 
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, firefox, webkit } from 'playwright';
@@ -97,6 +99,7 @@ const discParams = opt('--disc-cache', '');  // e.g. discBlock=256&discRun=8&dis
 const label = tag ? `${browserName}-${tag}` : browserName;
 const chromiumArgs = ['--enable-unsafe-webgpu', ...(audible ? [] : ['--mute-audio']),
                       ...(jsFlags ? [`--js-flags=${jsFlags}`] : [])];
+const packPaths = opt('--packs', '').split(',').filter(Boolean).map((p) => resolve(p));
 const shots = opt('--shots', '').split(',').filter(Boolean).map(Number).sort((a, b) => a - b);
 const keys = opt('--keys', '').split(',').filter(Boolean).map((k) => {
   const [f, key] = k.split(':');
@@ -223,6 +226,15 @@ async function runOnce(context, run) {
   summary.webgpu = await page.evaluate(() => 'gpu' in navigator);
   // The user gesture that starts audio: a real click on the page.
   if (audio) await page.mouse.click(5, 5);
+  // Roster packs (E6): through the panel's inputs, as a player picks them, before the disc.
+  for (const [i, p] of packPaths.entries()) {
+    await page.setInputFiles(statSync(p).isDirectory() ? '#packs-folder' : '#packs-zip', p);
+    await page.waitForFunction((n) => window.mvp.packs?.count === n && window.mvp.packs.report, i + 1, { timeout: 30000 });
+  }
+  if (packPaths.length) {
+    summary.packsPanel = await page.evaluate(() => window.mvp.packs.report);
+    console.log(`packs: set ${summary.packsPanel.set_hash}, ${summary.packsPanel.issues.length} issue(s) before the disc`);
+  }
   if (!serverDisc) await page.setInputFiles('#disc', disc);
   else {
     // With the lobby on the page (E5), the server's disc waits for Play (or a room).
@@ -237,7 +249,8 @@ async function runOnce(context, run) {
     return { source: s.source, phases: s.phases, translate: s.translate, disc: s.disc, gfx: s.gfx,
              firstFrameMs: s.firstFrameMs, firstFrameField: s.firstFrameField, stats: s.stats, stopped: s.stopped,
              error: s.error, cache: s.cache, audio: s.audio, audioAttachedAtField: s.audioAttachedAtField,
-             paused: s.paused, pad: s.pad, probe: s.audioProbe(), discTrace: s.discTrace };
+             paused: s.paused, pad: s.pad, probe: s.audioProbe(), discTrace: s.discTrace,
+             packs: s.packs?.mounted ?? null };
   });
   const windows = [];
   const audioSamples = { n: 0, nonsilent: 0, maxRms: 0, maxPeak: 0, firstNonsilentField: null };
@@ -319,6 +332,7 @@ async function runOnce(context, run) {
     source: state.source, phases: state.phases, translate: state.translate, disc: state.disc, gfx: state.gfx,
     firstFrameMs: state.firstFrameMs, firstFrameField: state.firstFrameField, cache: state.cache,
     windows, final: state.stopped?.status ?? state.stats?.status ?? null, guestLine: state.stopped?.guestLine ?? null,
+    packs: state.packs,
     error: state.error ?? null, consoleErrors: consoleErrors.slice(0, 20), hidden,
     audio: { page: state.audio, attachedAtField: state.audioAttachedAtField, samples: audioSamples },
   });

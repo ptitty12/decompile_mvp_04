@@ -52,6 +52,14 @@ export interface MvpEngine {
   _mvp_net_windows(): number;
   _mvp_net_diagnostic(): number;
 
+  // Roster packs (E6, wasm/packs_web.cpp; the same exports as mvp-packs.js).
+  _mvp_packs_reset(): void;
+  _mvp_pack_begin(label: number, len: number, kind: number): void;
+  _mvp_pack_file(path: number, len: number, data: number, n: number): void;
+  _mvp_pack_end(): void;
+  _mvp_packs_json(): number;
+  _mvp_packs_mount(): number;
+
   // Set by the Worker before the calls that use them.
   mvpDisc?: File;
   mvpDiscUrl?: string;

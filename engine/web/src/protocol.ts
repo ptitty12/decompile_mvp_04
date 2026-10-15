@@ -57,8 +57,41 @@ export interface NetStatus {
   desync: boolean;
 }
 
+// Roster packs (E6, docs/MODDING.md): what the player picked on the page, in set
+// order. A picked folder is its files (paths inside the folder, '/'-separated); a
+// zip is one file. The engine reads them (engine/mods); they never leave the browser.
+export interface PackFile {
+  path: string;
+  data: ArrayBuffer;
+}
+export interface PackInput {
+  label: string;             // the folder's or the zip's name, for messages
+  kind: 'files' | 'zip';
+  files: PackFile[];
+}
+export interface PackIssue {
+  severity: 'error' | 'warning';
+  code: string;              // E-... / W-... (MODDING.md §7.4)
+  where: string;
+  message: string;
+}
+// The engine's report on a pack set (mods::set_json): before the disc, the static
+// checks and hashes; after mounting, also the result of applying it.
+export interface PackSetReport {
+  ok: boolean;
+  set_hash: string;          // the netplay handshake's pack-set field
+  packs: { label: string; id: string | null; name: string; version: string; hash: string | null }[];
+  issues: PackIssue[];
+  fatal?: string;
+  result_hash?: string;      // covers the patched tables and text (MODDING.md §10)
+  changed_tables?: string[];
+  files?: string[];          // disc paths now served from memory
+  bytes?: number;
+}
+
 export interface RunOptions {
   netplay?: NetOptions;  // an online game: boot only after the handshake
+  packs?: PackInput[];   // roster packs to apply to the disc before the boot (E6)
   script: string;      // an mvp-input script (tests); empty: live keyboard/gamepad input
   stopFields: number;  // stop after this many VI fields (0: never)
   stopFrames: number;  // stop at the poll of this frame (0: never)
@@ -129,6 +162,7 @@ export type FromWorker =
   | { type: 'progress'; text: string; step: number; steps: number }
   | { type: 'error'; stage: string; message: string; login?: boolean }
   | { type: 'disc'; info: { game: string; revision: number; title: string; dol_sha1: string; image: string } }
+  | { type: 'packs'; report: PackSetReport }  // the pack set applied to the disc (or why not)
   | { type: 'gfx'; ok: boolean; message: string }
   | { type: 'first-frame'; fields: number }
   | { type: 'cache'; report: CacheReport }

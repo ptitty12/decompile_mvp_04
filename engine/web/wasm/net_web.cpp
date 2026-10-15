@@ -8,6 +8,8 @@
 //   mvp_net_quit()               says goodbye to the peer
 #include "net_web.h"
 
+#include <array>
+
 #include <emscripten.h>
 
 #include <cstdio>
@@ -22,6 +24,7 @@
 #include "runtime/boot.h"
 #include "runtime/hw.h"
 #include "runtime/sys_hooks.h"
+#include "web/wasm/packs_web.h"
 
 using namespace mvp;
 
@@ -48,6 +51,7 @@ class ChannelTransport final : public net::Transport {
 
 struct Net {
   const vfs::Disc* disc = nullptr;
+  std::array<std::uint8_t, 20> disc_id{};  // computed when the disc is checked, before packs are mounted
   ChannelTransport channel;
   std::unique_ptr<net::Session> session;
   std::unique_ptr<net::NetplayDriver> driver;
@@ -61,7 +65,10 @@ Net n;
 
 namespace mvp::web {
 
-void net_set_disc(const vfs::Disc* disc) { n.disc = disc; }
+void net_set_disc(const vfs::Disc* disc) {
+  n.disc = disc;
+  if (disc) n.disc_id = net::disc_identity(*disc);
+}
 bool net_active() { return n.session != nullptr; }
 bool net_running() { return n.session && n.session->running(); }
 int net_player() { return n.session ? n.session->config().player : 0; }
@@ -96,6 +103,10 @@ EMSCRIPTEN_KEEPALIVE int mvp_net_begin(int player, int delay, int hash_every, co
   // The same configuration mvp_boot() uses (defaults), with both player ports.
   cfg.id = net::make_identity(std::string(build, static_cast<std::size_t>(build_len)), *n.disc, rt::HardwareConfig{},
                               rt::BootConfig{}, rt::ClockConfig{}, net::kNetplayPorts);
+  // The disc as the player's image has it (mounting roster packs rewrites the FST),
+  // and the packs by their ordered set hash (E6, MODDING.md §10).
+  cfg.id.disc = n.disc_id;
+  cfg.id.packset = web::packs_set_hash();
   n.session = std::make_unique<net::Session>(n.channel, cfg, [](std::uint64_t f) {
     if (!n.local) return net::Session::neutral_pad();
     return n.local->input_for(f).pad[static_cast<std::size_t>(n.local_port)];
