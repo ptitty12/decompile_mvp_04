@@ -125,7 +125,7 @@ struct Pair {
 };
 
 void render_task_cb(void*);
-void mark(u32 addr, u32 size);
+void mark(u32 addr, u32 size, gfx::ReadKind kind);
 
 struct Shared {
   gfx::RenderRing ring{kRingBytes};
@@ -156,11 +156,14 @@ struct Shared {
   // Emulation thread only.
   // The memory each command reads (gfx/gp_reads.h), marked in ppc::g_gp_pages
   // with the ring position after the command (+1); the pages marked so far.
-  gfx::GpReads reads{[](u32 addr, u32 size) { mark(addr, size); }};
+  gfx::GpReads reads{[](u32 addr, u32 size, gfx::ReadKind kind) { mark(addr, size, kind); }};
   u32 mark_pos = 0;
   std::vector<u32> marked;
+  std::vector<u8> kinds = std::vector<u8>(ppc::kGpEntries);  // what each entry was last marked for (statistics)
   u64 write_waits = 0, write_checks = 0;
   double write_wait_ms = 0;
+  u64 kind_waits[gfx::kReadKinds] = {};  // the write waits by what they waited for, and their time
+  double kind_ms[gfx::kReadKinds] = {};
   u32 synced = 0;           // ring position of the last fence
   u32 present_pos[2] = {};  // ring positions after the last two presents
   u64 fences = 0, fence_waits = 0, lag_waits = 0, big = 0, resizes = 0;
@@ -172,13 +175,14 @@ struct Shared {
 Shared* S = nullptr;
 
 // Emulation thread: the command being appended reads [addr, addr + size).
-void mark(u32 addr, u32 size) {
+void mark(u32 addr, u32 size, gfx::ReadKind kind) {
   const u32 first = addr >> ppc::kGpShift, last = (addr + size - 1) >> ppc::kGpShift;
   for (u32 p = first; p <= last; ++p) {
     const u32 i = p & (ppc::kGpEntries - 1);
     std::uint32_t& e = ppc::g_gp_pages[i];
     if (!e) S->marked.push_back(i);
     e = S->mark_pos + 1;
+    S->kinds[i] = static_cast<u8>(kind);
   }
 }
 
@@ -188,14 +192,18 @@ void mark(u32 addr, u32 size) {
 void gp_wait(u32 first, u32 last) {
   ++S->write_checks;
   for (u32 p = first >> ppc::kGpShift; p <= (last >> ppc::kGpShift); ++p) {
-    std::uint32_t& e = ppc::g_gp_pages[p & (ppc::kGpEntries - 1)];
+    const u32 i = p & (ppc::kGpEntries - 1);
+    std::uint32_t& e = ppc::g_gp_pages[i];
     if (!e) continue;
     const u32 pos = e - 1;
     if (!S->ring.finished(pos)) {
       if (S->idle.load() == 1 && S->idle.exchange(0) == 1)
         emscripten_proxy_async(emscripten_proxy_get_system_queue(), S->tid, render_task_cb, nullptr);
-      S->write_wait_ms += S->ring.wait_read(pos, kFenceSpinUs);
+      const double ms = S->ring.wait_read(pos, kFenceSpinUs);
+      S->write_wait_ms += ms;
       ++S->write_waits;
+      ++S->kind_waits[S->kinds[i] % gfx::kReadKinds];
+      S->kind_ms[S->kinds[i] % gfx::kReadKinds] += ms;
     }
     e = 0;
   }
@@ -406,8 +414,11 @@ void render_task() {
   S->idle.store(0, std::memory_order_seq_cst);
   double busy_from = emscripten_get_now();  // the thread's working time (statistics), between waits
   auto rest = [&] { S->busy_ms += emscripten_get_now() - busy_from; };
+  unsigned records = 0;
   for (;;) {
-    if (may_show()) {
+    // A due frame: the refresh count (a call into JavaScript) is read every 32
+    // records, and whenever the ring is empty.
+    if (S->frame_due && ((++records & 31) == 0 || !S->ring.has_data()) && may_show()) {
       show();
       rest();
       mvp_js_render_soon();
@@ -619,13 +630,23 @@ std::string render_status_json() {
     std::lock_guard<std::mutex> lock(S->mu);
     s = S->status;
   }
+  // Write waits by what they waited for: vertex arrays, XF loads, palettes, preloads, EFB copies, textures.
+  std::string kinds = "[";
+  for (int k = 1; k < gfx::kReadKinds; ++k) {
+    char kb[48];
+    std::snprintf(kb, sizeof kb, "%s[%llu,%.1f]", k > 1 ? "," : "", static_cast<unsigned long long>(S->kind_waits[k]),
+                  S->kind_ms[k]);
+    kinds += kb;
+  }
+  kinds += "]";
   char b[1024];
   std::snprintf(b, sizeof b,
                 ",\"resizes\":%llu,\"thread\":{\"fences\":%llu,\"fence_waits\":%llu,\"fence_ms\":%.1f,"
                 "\"fence_hist\":[%llu,%llu,%llu,%llu],\"fence_hist_ms\":[%.0f,%.0f,%.0f,%.0f],"
                 "\"fence_behind_kb\":[%.0f,%.0f,%.0f,%.0f],\"write_checks\":%llu,\"write_waits\":%llu,"
                 "\"write_wait_ms\":%.1f,\"pending_pages\":%zu,\"read_ranges\":%llu,\"lag_waits\":%llu,"
-                "\"lag_ms\":%.1f,\"records\":%llu,\"ring_mb\":%.1f,\"full_waits\":%llu,\"big\":%llu}",
+                "\"lag_ms\":%.1f,\"records\":%llu,\"ring_mb\":%.1f,\"full_waits\":%llu,\"big\":%llu,"
+                "\"wait_kinds\":%s}",
                 static_cast<unsigned long long>(S->resizes), static_cast<unsigned long long>(S->fences),
                 static_cast<unsigned long long>(S->fence_waits), S->fence_ms,
                 static_cast<unsigned long long>(S->fence_hist[0]), static_cast<unsigned long long>(S->fence_hist[1]),
@@ -636,7 +657,8 @@ std::string render_status_json() {
                 S->write_wait_ms, S->marked.size(), static_cast<unsigned long long>(S->reads.stats().ranges),
                 static_cast<unsigned long long>(S->lag_waits), S->lag_ms,
                 static_cast<unsigned long long>(S->ring.records()), static_cast<double>(S->ring.bytes()) / (1 << 20),
-                static_cast<unsigned long long>(S->ring.full_waits()), static_cast<unsigned long long>(S->big));
+                static_cast<unsigned long long>(S->ring.full_waits()), static_cast<unsigned long long>(S->big),
+                kinds.c_str());
   return s + b;
 }
 

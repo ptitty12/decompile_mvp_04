@@ -106,7 +106,8 @@ class RenderRing {
   alignas(64) std::atomic<std::uint32_t> pub_{0};        // published write position
   alignas(64) std::atomic<std::uint32_t> rd_{0};         // finished position (the consumer's)
   alignas(64) std::atomic<std::uint32_t> cons_wait_{0};  // the consumer sleeps on pub_
-  alignas(64) std::atomic<std::uint32_t> prod_wait_{0};  // the producer sleeps on rd_
+  alignas(64) std::atomic<std::uint32_t> prod_wait_{0};  // the producer sleeps on rd_ until it reaches prod_target_
+  std::atomic<std::uint32_t> prod_target_{0};
 
   // Producer-local.
   alignas(64) std::uint32_t wpos_ = 0, pub_local_ = 0, rd_cached_ = 0, open_ = 0;

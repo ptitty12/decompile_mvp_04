@@ -23,10 +23,14 @@
 
 namespace mvp::gfx {
 
+// What a range is (statistics: which reads guest writes wait for).
+enum class ReadKind : u8 { kVertex = 1, kXf, kTlut, kPreload, kCopy, kTexture };
+constexpr int kReadKinds = 7;  // 0 unused
+
 class GpReads {
  public:
   // Called with each range [addr, addr + size) (physical) a command reads.
-  using Mark = std::function<void(u32 addr, u32 size)>;
+  using Mark = std::function<void(u32 addr, u32 size, ReadKind kind)>;
   explicit GpReads(Mark mark) : mark_(std::move(mark)) {}
 
   void command(const u8* c, std::size_t len);
@@ -41,7 +45,7 @@ class GpReads {
   void load_bp(u32 value);
   void primitive(u8 op, const u8* data, u32 count);
   void textures();
-  void range(u32 addr, u32 size);
+  void range(u32 addr, u32 size, ReadKind kind);
 
   Mark mark_;
   u32 vcd_lo_ = 0, vcd_hi_ = 0;

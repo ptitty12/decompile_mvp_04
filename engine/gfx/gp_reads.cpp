@@ -24,10 +24,10 @@ constexpr int kTexVat[8][2] = {{0, 21}, {1, 0}, {1, 9}, {1, 18}, {1, 27}, {2, 5}
 
 }  // namespace
 
-void GpReads::range(u32 addr, u32 size) {
+void GpReads::range(u32 addr, u32 size, ReadKind kind) {
   if (!size) return;
   ++stats_.ranges;
-  mark_(addr & 0x01FFFFFFu, size);
+  mark_(addr & 0x01FFFFFFu, size, kind);
 }
 
 void GpReads::command(const u8* c, std::size_t len) {
@@ -40,7 +40,7 @@ void GpReads::command(const u8* c, std::size_t len) {
       if (len < 5) return;
       const int array = 12 + ((op - cmd::kLoadIndxA) >> 3);
       const u32 v = be32_at(c + 1);
-      range(array_base_[array] + (v >> 16) * array_stride_[array], 4 * (bits(v, 12, 4) + 1));
+      range(array_base_[array] + (v >> 16) * array_stride_[array], 4 * (bits(v, 12, 4) + 1), ReadKind::kXf);
       return;
     }
     case cmd::kLoadBp:
@@ -73,7 +73,10 @@ void GpReads::load_bp(u32 value) {
   v = (bp_[reg] & ~bp_mask_) | (v & bp_mask_);
   bp_mask_ = 0xFFFFFF;
   bp_[reg] = v;
-  tex_dirty_ = true;
+  // What textures() reads: the stage counts, the stages' and the indirect
+  // stages' maps, the maps' registers (and seen_, below).
+  if (reg == bp::kGenMode || (reg >= bp::kIref && reg <= bp::kTref + 7) || (reg >= bp::kTexMode0 && reg < 0xC0))
+    tex_dirty_ = true;
   switch (reg) {
     case bp::kTriggerCopy: {
       if (bits(v, 14, 1)) return;  // to the XFB: the renderer keeps no hash of that memory
@@ -86,18 +89,22 @@ void GpReads::load_bp(u32 value) {
       const u32 fmt = bits(v, 3, 4);
       const u8 tex_format = static_cast<u8>((fmt >> 1) | ((fmt & 1) << 3));
       const u8 sample = tex_format <= 6 ? tex_format : 1;  // kTexI8
-      range((bp_[bp::kXfbAddr] & 0xFFFFFF) << 5, texture_level_size(sample, w, h));
+      range((bp_[bp::kXfbAddr] & 0xFFFFFF) << 5, texture_level_size(sample, w, h), ReadKind::kCopy);
       return;
     }
     case bp::kLoadTlut1:
-      range((bp_[bp::kLoadTlut0] & 0x1FFFFF) << 5, bits(v, 10, 11) * 32);
+      range((bp_[bp::kLoadTlut0] & 0x1FFFFF) << 5, bits(v, 10, 11) * 32, ReadKind::kTlut);
       seen_.clear();  // the palette is part of the renderer's texture key
+      tex_dirty_ = true;
       return;
     case bp::kPreloadMode:
-      if (v) range((bp_[bp::kPreloadAddr] & 0xFFFFFF) << 5, bits(v, 0, 15) * (bits(v, 15, 2) == 3 ? 64u : 32u));
+      if (v)
+        range((bp_[bp::kPreloadAddr] & 0xFFFFFF) << 5, bits(v, 0, 15) * (bits(v, 15, 2) == 3 ? 64u : 32u),
+              ReadKind::kPreload);
       return;
     case bp::kTexInvalidate:
       seen_.clear();
+      tex_dirty_ = true;
       return;
     default:
       return;
@@ -149,23 +156,32 @@ void GpReads::primitive(u8 op, const u8* data, u32 count) {
   }
   if (!nix) return;
   ++stats_.indexed;
-  const u32 vsize = at;
-  for (u32 v = 0; v < count; ++v) {
-    const u8* p = data + static_cast<std::size_t>(v) * vsize;
-    for (int k = 0; k < nix; ++k) {
-      Indexed& x = ix[k];
-      for (u32 j = 0; j < x.n; ++j) {
-        const u8* q = p + x.at + j * x.isize;
-        const u32 i = x.isize == 1 ? q[0] : u32(q[0]) << 8 | q[1];
-        x.lo = std::min(x.lo, i);
-        x.hi = std::max(x.hi, i);
+  const std::size_t vsize = at;
+  for (int k = 0; k < nix; ++k) {  // each index of each vertex (attribute by attribute: the loops stay simple)
+    Indexed& x = ix[k];
+    u32 lo = x.lo, hi = x.hi;
+    for (u32 j = 0; j < x.n; ++j) {
+      const u8* q = data + x.at + j * x.isize;
+      if (x.isize == 1) {
+        for (u32 v = 0; v < count; ++v, q += vsize) {
+          lo = std::min<u32>(lo, q[0]);
+          hi = std::max<u32>(hi, q[0]);
+        }
+      } else {
+        for (u32 v = 0; v < count; ++v, q += vsize) {
+          const u32 i = u32(q[0]) << 8 | q[1];
+          lo = std::min(lo, i);
+          hi = std::max(hi, i);
+        }
       }
     }
+    x.lo = lo;
+    x.hi = hi;
   }
   for (int k = 0; k < nix; ++k) {
     const Indexed& x = ix[k];
     const u32 base = array_base_[x.array], stride = array_stride_[x.array];
-    range(base + x.lo * stride, (x.hi - x.lo) * stride + x.elem);
+    range(base + x.lo * stride, (x.hi - x.lo) * stride + x.elem, ReadKind::kVertex);
   }
 }
 
@@ -203,7 +219,7 @@ void GpReads::textures() {
                               (std::uint64_t(tlut & 0xFFF) << 40);
     if (!seen_.insert(key).second) continue;
     ++stats_.textures;
-    range(addr, texture_size(static_cast<u8>(format), w, h, levels));
+    range(addr, texture_size(static_cast<u8>(format), w, h, levels), ReadKind::kTexture);
   }
 }
 

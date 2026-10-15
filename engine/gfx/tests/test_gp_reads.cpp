@@ -20,13 +20,18 @@ namespace {
 
 struct Recorder {
   std::vector<std::pair<u32, u32>> ranges;
-  GpReads reads{[this](u32 a, u32 n) { ranges.emplace_back(a, n); }};
+  std::vector<ReadKind> kinds;
+  GpReads reads{[this](u32 a, u32 n, ReadKind k) {
+    ranges.emplace_back(a, n);
+    kinds.push_back(k);
+  }};
   void run(const Stream& s) {
     for (const auto& c : s.cmds) reads.command(c.data(), c.size());
   }
   std::vector<std::pair<u32, u32>> take() {
     auto r = std::move(ranges);
     ranges.clear();
+    kinds.clear();
     return r;
   }
 };
@@ -47,6 +52,8 @@ TEST_CASE("indexed attributes: the elements the indices select") {
   // Three vertices: (pnmtx, pos index hi lo, color index).
   s.prim(cmd::kTriangles, 3, {0, 0x01, 0x00, 7, 0, 0x00, 0x10, 2, 0, 0x00, 0x20, 5});
   r.run(s);
+  REQUIRE(r.kinds.size() == 2);
+  CHECK(r.kinds[0] == ReadKind::kVertex);
   auto got = r.take();
   REQUIRE(got.size() == 2);
   CHECK(got[0] == std::pair<u32, u32>(0x100000 + 0x10 * 6, (0x100 - 0x10) * 6 + 6));
@@ -80,6 +87,7 @@ TEST_CASE("XF indexed loads, TLUT loads, preloads, EFB copies to textures") {
   s.bp(bp::kTriggerCopy, ((6u & 7) << 1 | 6u >> 3) << 3);  // RGBA8, to a texture
   s.bp(bp::kTriggerCopy, 1u << 14);                        // to the XFB: no hash, nothing read
   r.run(s);
+  CHECK(r.kinds == std::vector<ReadKind>{ReadKind::kXf, ReadKind::kTlut, ReadKind::kPreload, ReadKind::kCopy});
   auto got = r.take();
   REQUIRE(got.size() == 4);
   CHECK(got[0] == std::pair<u32, u32>(0x400000 + 5 * 48, 48));

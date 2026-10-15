@@ -65,6 +65,7 @@ std::uint8_t* RenderRing::reserve(std::uint32_t type, std::uint32_t len) {
       for (;;) {
         rd_cached_ = rd_.load(std::memory_order_acquire);
         if (room() >= need) break;
+        prod_target_.store(wpos_ + need - cap_, std::memory_order_seq_cst);  // rd_ there: room() >= need
         prod_wait_.store(1, std::memory_order_seq_cst);
         const std::uint32_t seen = rd_.load(std::memory_order_seq_cst);
         rd_cached_ = seen;
@@ -113,6 +114,7 @@ double RenderRing::wait_read(std::uint32_t pos, double spin_us) {
   const double spin_ms = spin_us / 1000.0;
   for (unsigned n = 1; !finished(pos); ++n) {
     if (n % 64 || ms_since(t0) < spin_ms) continue;  // the consumer is usually in the middle of a record
+    prod_target_.store(pos, std::memory_order_seq_cst);  // woken when the consumer gets there, not at every record
     prod_wait_.store(1, std::memory_order_seq_cst);
     const std::uint32_t seen = rd_.load(std::memory_order_seq_cst);
     if (static_cast<std::int32_t>(seen - pos) >= 0) break;
@@ -149,7 +151,9 @@ bool RenderRing::next(Record* r) {
 void RenderRing::done() {
   cpos_ = cnext_;
   rd_.store(cpos_, std::memory_order_seq_cst);
-  if (prod_wait_.load(std::memory_order_seq_cst)) ring_wake(rd_);
+  if (prod_wait_.load(std::memory_order_seq_cst) &&
+      static_cast<std::int32_t>(cpos_ - prod_target_.load(std::memory_order_seq_cst)) >= 0)
+    ring_wake(rd_);
 }
 
 bool RenderRing::wait_data(double max_ms) {
