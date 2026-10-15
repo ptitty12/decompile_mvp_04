@@ -15,6 +15,7 @@
 #pragma once
 
 #include <array>
+#include <bit>
 #include <cstdint>
 #include <vector>
 
@@ -31,6 +32,23 @@ struct InVertex {
   float nrm[3] = {}, bin[3] = {}, tan[3] = {};
   float color[2][4] = {};
   float tex[8][2] = {};
+};
+
+// A vertex format (VCD + one VAT) unpacked once per primitive (E3c): where each
+// attribute is, its component format, count and fixed-point scale.
+struct VertexFormat {
+  struct Attr {
+    u8 type = 0;   // 0 none, 1 direct, 2 8-bit index, 3 16-bit index
+    u8 fmt = 0;    // component format (colors: color format)
+    u8 cnt = 0;    // components
+    u8 size = 0;   // bytes of the attribute's data (one vector for NBT with three indices)
+    float scale = 1.0f;
+  };
+  bool pnmtx = false;
+  u8 texmtx = 0;  // bit k: texture matrix index k is in the vertex
+  Attr pos, nrm, color[2], tex[8];
+  bool nbt = false, nbt3 = false;  // normal, binormal, tangent; with three indices
+  u8 default_pnmtx = 0, default_texmtx[8] = {};
 };
 
 // What the transform unit reads from XF registers and memory for one primitive,
@@ -52,6 +70,7 @@ struct XformSetup {
   Light lights[8];
   u32 ngen = 0;
   bool dual = false;
+  bool lit = false;  // some channel uses lighting: the normal is transformed
   u32 texgen[8] = {}, post[8] = {};
   float postmtx[8][12] = {};
   // Matrices by 6-bit index: position/texture (3x4 at index * 4) and normal (3x3).
@@ -79,8 +98,12 @@ class GxProcessor {
   u32 bp(u8 reg) const { return bp_[reg]; }
   u32 cp_vcd_lo() const { return vcd_lo_; }
   u32 cp_vcd_hi() const { return vcd_hi_; }
-  u32 xf_word(u32 addr) const;
-  float xf_float(u32 addr) const;
+  u32 xf_word(u32 addr) const {
+    if (addr < xf::kMemSize) return xf_mem_[addr];
+    if (addr >= xf::kRegBase && addr < xf::kRegBase + xf::kRegCount) return xf_regs_[addr - xf::kRegBase];
+    return 0;
+  }
+  float xf_float(u32 addr) const { return std::bit_cast<float>(xf_word(addr)); }
   const u8* tlut_memory() const { return tlut_.data(); }
   const u8* tmem() const { return tmem_.data(); }
 
@@ -88,6 +111,9 @@ class GxProcessor {
   u32 vertex_size(int fmt) const;
   // Decodes one vertex of format `fmt` from `p` (vertex_size bytes).
   InVertex load_vertex(int fmt, const u8* p) const;
+  // The same with the format unpacked once (vertex_format()).
+  VertexFormat vertex_format(int fmt) const;
+  void load_vertex(const VertexFormat& f, const u8* p, InVertex& v) const;
   // The transform unit for one vertex.
   OutVertex transform(const InVertex& v) const;
   // The same with the state unpacked once per primitive.
@@ -126,7 +152,11 @@ class GxProcessor {
   void efb_copy();
   void load_tlut();
   void preload();
-  const u8* phys(u32 addr, u32 len) const;  // null if outside memory
+  const u8* phys(u32 addr, u32 len) const {  // null if outside memory
+    addr &= 0x01FFFFFFu;
+    if (!mem_ || addr > mem_size_ || len > mem_size_ - addr) return nullptr;
+    return mem_ + addr;
+  }
 
   Backend* backend_;
   const u8* mem_ = nullptr;
@@ -148,6 +178,10 @@ class GxProcessor {
   Stats stats_;
   PrimInfo prim_info_;
   bool keep_prim_info_ = false;
+  // Vertex formats 0-7 unpacked, and their sizes, valid until a VCD or VAT write (E3c).
+  VertexFormat fmt_cache_[8];
+  u32 fmt_size_[8] = {};
+  u8 fmt_valid_ = 0;
   // Bumped by every write that snapshot() depends on (BP registers, TLUT loads);
   // a draw with the serial of the last snapshot reuses it (E3c).
   std::uint64_t state_serial_ = 1, snap_serial_ = 0;

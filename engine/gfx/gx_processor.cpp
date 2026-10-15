@@ -11,12 +11,12 @@ namespace mvp::gfx {
 
 namespace {
 
-u32 be32_at(const u8* p) { return u32(p[0]) << 24 | u32(p[1]) << 16 | u32(p[2]) << 8 | p[3]; }
-u16 be16_at(const u8* p) { return static_cast<u16>(p[0] << 8 | p[1]); }
+inline u32 be32_at(const u8* p) { return u32(p[0]) << 24 | u32(p[1]) << 16 | u32(p[2]) << 8 | p[3]; }
+inline u16 be16_at(const u8* p) { return static_cast<u16>(p[0] << 8 | p[1]); }
 
-std::int32_t sext11(u32 v) { return static_cast<std::int32_t>(v << 21) >> 21; }
+inline std::int32_t sext11(u32 v) { return static_cast<std::int32_t>(v << 21) >> 21; }
 
-u32 comp_size(u32 fmt) {
+inline u32 comp_size(u32 fmt) {
   switch (fmt) {
     case kU8: case kS8: return 1;
     case kU16: case kS16: return 2;
@@ -24,7 +24,7 @@ u32 comp_size(u32 fmt) {
   }
 }
 
-u32 color_size(u32 fmt) {
+inline u32 color_size(u32 fmt) {
   switch (fmt) {
     case kRgb565: case kRgba4444: return 2;
     case kRgb888: case kRgba6666: return 3;
@@ -32,9 +32,9 @@ u32 color_size(u32 fmt) {
   }
 }
 
-u32 index_size(u32 type) { return type == 2 ? 1u : type == 3 ? 2u : 0u; }
+inline u32 index_size(u32 type) { return type == 2 ? 1u : type == 3 ? 2u : 0u; }
 
-float read_comp(const u8* p, u32 fmt, float scale) {
+inline float read_comp(const u8* p, u32 fmt, float scale) {
   switch (fmt) {
     case kU8: return static_cast<float>(p[0]) * scale;
     case kS8: return static_cast<float>(static_cast<std::int8_t>(p[0])) * scale;
@@ -44,7 +44,7 @@ float read_comp(const u8* p, u32 fmt, float scale) {
   }
 }
 
-void read_color(const u8* p, u32 fmt, float out[4]) {
+inline void read_color(const u8* p, u32 fmt, float out[4]) {
   u32 r = 0, g = 0, b = 0, a = 255;
   switch (fmt) {
     case kRgb565: {
@@ -77,7 +77,7 @@ void read_color(const u8* p, u32 fmt, float out[4]) {
   out[3] = static_cast<float>(a) / 255.0f;
 }
 
-void unpack_rgba8(u32 v, float out[4]) {
+inline void unpack_rgba8(u32 v, float out[4]) {
   out[0] = static_cast<float>(v >> 24) / 255.0f;
   out[1] = static_cast<float>((v >> 16) & 0xFF) / 255.0f;
   out[2] = static_cast<float>((v >> 8) & 0xFF) / 255.0f;
@@ -90,9 +90,9 @@ struct TexVatField {
 };
 constexpr TexVatField kTexVat[8] = {{0, 21}, {1, 0}, {1, 9}, {1, 18}, {1, 27}, {2, 5}, {2, 14}, {2, 23}};
 
-float dot3(const float* a, const float* b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+inline float dot3(const float* a, const float* b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
 
-void normalize3(float* v) {
+inline void normalize3(float* v) {
   float l = std::sqrt(dot3(v, v));
   if (l > 0) {
     v[0] /= l;
@@ -119,6 +119,7 @@ void GxProcessor::reset() {
   std::memset(konst_, 0, sizeof konst_);
   tlut_.assign(512 * 1024, 0);
   tmem_.assign(kTmemSize, 0);
+  fmt_valid_ = 0;
   stats_ = {};
   ++state_serial_;
   // Power-on state that matters before the game's GXInit: one TEV stage,
@@ -127,20 +128,6 @@ void GxProcessor::reset() {
   bp_[bp::kScissorTL] = 342u | 342u << 12;
   bp_[bp::kScissorOffset] = 171u | 171u << 10;
   bp_[bp::kAlphaCompare] = 7u << 16 | 7u << 19;
-}
-
-u32 GxProcessor::xf_word(u32 addr) const {
-  if (addr < xf::kMemSize) return xf_mem_[addr];
-  if (addr >= xf::kRegBase && addr < xf::kRegBase + xf::kRegCount) return xf_regs_[addr - xf::kRegBase];
-  return 0;
-}
-
-float GxProcessor::xf_float(u32 addr) const { return std::bit_cast<float>(xf_word(addr)); }
-
-const u8* GxProcessor::phys(u32 addr, u32 len) const {
-  addr &= 0x01FFFFFFu;
-  if (!mem_ || addr > mem_size_ || len > mem_size_ - addr) return nullptr;
-  return mem_ + addr;
 }
 
 void GxProcessor::command(const u8* c, std::size_t len) {
@@ -179,6 +166,9 @@ void GxProcessor::command(const u8* c, std::size_t len) {
 }
 
 void GxProcessor::load_cp(u8 reg, u32 v) {
+  if (reg == cp::kVcdLo || reg == cp::kVcdHi || (reg & 0xF8) == cp::kVatA || (reg & 0xF8) == cp::kVatB ||
+      (reg & 0xF8) == cp::kVatC)
+    fmt_valid_ = 0;  // the unpacked vertex formats
   if (reg == cp::kMatIndexA) matidx_a_ = v;
   else if (reg == cp::kMatIndexB) matidx_b_ = v;
   else if (reg == cp::kVcdLo) vcd_lo_ = v;
@@ -354,17 +344,62 @@ u32 GxProcessor::vertex_size(int fmt) const {
   return size;
 }
 
-InVertex GxProcessor::load_vertex(int fmt, const u8* p) const {
+VertexFormat GxProcessor::vertex_format(int fmt) const {
   const u32 a = vat_a_[fmt], b = vat_b_[fmt], c = vat_c_[fmt];
-  InVertex v;
-  v.pnmtx = static_cast<u8>(bits(matidx_a_, 0, 6));
+  VertexFormat f;
+  f.default_pnmtx = static_cast<u8>(bits(matidx_a_, 0, 6));
   for (int k = 0; k < 8; ++k) {
     u32 src = k < 4 ? matidx_a_ : matidx_b_;
-    v.texmtx[k] = static_cast<u8>(bits(src, k < 4 ? 6 + 6 * k : 6 * (k - 4), 6));
+    f.default_texmtx[k] = static_cast<u8>(bits(src, k < 4 ? 6 + 6 * k : 6 * (k - 4), 6));
   }
-  if (bits(vcd_lo_, 0, 1)) v.pnmtx = *p++ & 0x3F;
+  f.pnmtx = bits(vcd_lo_, 0, 1) != 0;
   for (int k = 0; k < 8; ++k)
-    if (bits(vcd_lo_, 1 + k, 1)) v.texmtx[k] = *p++ & 0x3F;
+    if (bits(vcd_lo_, 1 + k, 1)) f.texmtx |= static_cast<u8>(1u << k);
+  // Position.
+  f.pos.type = static_cast<u8>(bits(vcd_lo_, 9, 2));
+  f.pos.cnt = static_cast<u8>(bits(a, 0, 1) ? 3 : 2);
+  f.pos.fmt = static_cast<u8>(bits(a, 1, 3));
+  f.pos.scale = 1.0f / static_cast<float>(1u << bits(a, 4, 5));
+  f.pos.size = static_cast<u8>(f.pos.cnt * comp_size(f.pos.fmt));
+  // Normal, binormal, tangent.
+  f.nrm.type = static_cast<u8>(bits(vcd_lo_, 11, 2));
+  f.nbt = bits(a, 9, 1) != 0;
+  f.nbt3 = f.nrm.type != 1 && f.nbt && bits(a, 31, 1);
+  f.nrm.fmt = static_cast<u8>(bits(a, 10, 3));
+  f.nrm.scale = f.nrm.fmt == kU8 ? 1.0f / 128 : f.nrm.fmt == kS8 ? 1.0f / 64 : f.nrm.fmt == kU16 ? 1.0f / 32768 : 1.0f / 16384;
+  f.nrm.size = static_cast<u8>(3 * comp_size(f.nrm.fmt) * (f.nbt && !f.nbt3 ? 3 : 1));
+  // Colors.
+  for (int k = 0; k < 2; ++k) {
+    f.color[k].type = static_cast<u8>(bits(vcd_lo_, 13 + 2 * k, 2));
+    f.color[k].fmt = static_cast<u8>(bits(a, 14 + 4 * k, 3));
+    f.color[k].size = static_cast<u8>(color_size(f.color[k].fmt));
+  }
+  // Texture coordinates.
+  for (int k = 0; k < 8; ++k) {
+    VertexFormat::Attr& t = f.tex[k];
+    t.type = static_cast<u8>(bits(vcd_hi_, 2 * k, 2));
+    const u32 reg = kTexVat[k].reg == 0 ? a : kTexVat[k].reg == 1 ? b : c;
+    const int at = kTexVat[k].at;
+    t.cnt = static_cast<u8>(bits(reg, at, 1) ? 2 : 1);
+    t.fmt = static_cast<u8>(bits(reg, at + 1, 3));
+    t.scale = 1.0f / static_cast<float>(1u << bits(reg, at + 4, 5));
+    t.size = static_cast<u8>(t.cnt * comp_size(t.fmt));
+  }
+  return f;
+}
+
+InVertex GxProcessor::load_vertex(int fmt, const u8* p) const {
+  InVertex v;
+  load_vertex(vertex_format(fmt), p, v);
+  return v;
+}
+
+void GxProcessor::load_vertex(const VertexFormat& f, const u8* p, InVertex& v) const {
+  v.pnmtx = f.default_pnmtx;
+  std::memcpy(v.texmtx, f.default_texmtx, sizeof v.texmtx);
+  if (f.pnmtx) v.pnmtx = *p++ & 0x3F;
+  for (int k = 0; k < 8; ++k)
+    if (f.texmtx & (1u << k)) v.texmtx[k] = *p++ & 0x3F;
 
   // Where an attribute's data is: inline, or in its array.
   auto source = [&](u32 type, int array, u32 inline_size) -> const u8* {
@@ -383,56 +418,47 @@ InVertex GxProcessor::load_vertex(int fmt, const u8* p) const {
   };
 
   // Position.
-  u32 t = bits(vcd_lo_, 9, 2);
-  if (t) {
-    u32 cnt = bits(a, 0, 1) ? 3 : 2, f = bits(a, 1, 3);
-    float scale = 1.0f / static_cast<float>(1u << bits(a, 4, 5));
-    const u8* q = source(t, 0, cnt * comp_size(f));
-    if (q)
-      for (u32 k = 0; k < cnt; ++k) v.pos[k] = read_comp(q + k * comp_size(f), f, scale);
+  if (f.pos.type) {
+    const u8* q = source(f.pos.type, 0, f.pos.size);
+    if (q) {
+      const u32 cs = comp_size(f.pos.fmt);
+      for (u32 k = 0; k < f.pos.cnt; ++k) v.pos[k] = read_comp(q + k * cs, f.pos.fmt, f.pos.scale);
+    }
   }
   // Normal, binormal, tangent.
-  t = bits(vcd_lo_, 11, 2);
-  if (t) {
-    bool nbt = bits(a, 9, 1);
-    u32 f = bits(a, 10, 3);
-    float scale = f == kU8 ? 1.0f / 128 : f == kS8 ? 1.0f / 64 : f == kU16 ? 1.0f / 32768 : 1.0f / 16384;
-    u32 vec = 3 * comp_size(f);
+  if (f.nrm.type) {
+    const u32 cs = comp_size(f.nrm.fmt);
+    const u32 vec = 3 * cs;
     float* dst[3] = {v.nrm, v.bin, v.tan};
-    if (t != 1 && nbt && bits(a, 31, 1)) {  // three indices, one per vector
+    if (f.nbt3) {  // three indices, one per vector
       for (int n = 0; n < 3; ++n) {
-        const u8* q = source(t, 1, vec);
+        const u8* q = source(f.nrm.type, 1, vec);
         if (q)
-          for (u32 k = 0; k < 3; ++k) dst[n][k] = read_comp(q + k * comp_size(f), f, scale);
+          for (u32 k = 0; k < 3; ++k) dst[n][k] = read_comp(q + k * cs, f.nrm.fmt, f.nrm.scale);
       }
     } else {
-      const u8* q = source(t, 1, (nbt ? 3 : 1) * vec);
+      const u8* q = source(f.nrm.type, 1, f.nrm.size);
       if (q)
-        for (int n = 0; n < (nbt ? 3 : 1); ++n)
-          for (u32 k = 0; k < 3; ++k) dst[n][k] = read_comp(q + n * vec + k * comp_size(f), f, scale);
+        for (int n = 0; n < (f.nbt ? 3 : 1); ++n)
+          for (u32 k = 0; k < 3; ++k) dst[n][k] = read_comp(q + n * vec + k * cs, f.nrm.fmt, f.nrm.scale);
     }
   }
   // Colors.
   for (int k = 0; k < 2; ++k) {
-    t = bits(vcd_lo_, 13 + 2 * k, 2);
-    if (!t) continue;
-    u32 f = bits(a, 14 + 4 * k, 3);
-    const u8* q = source(t, 2 + k, color_size(f));
-    if (q) read_color(q, f, v.color[k]);
+    if (!f.color[k].type) continue;
+    const u8* q = source(f.color[k].type, 2 + k, f.color[k].size);
+    if (q) read_color(q, f.color[k].fmt, v.color[k]);
   }
   // Texture coordinates.
   for (int k = 0; k < 8; ++k) {
-    t = bits(vcd_hi_, 2 * k, 2);
-    if (!t) continue;
-    u32 reg = kTexVat[k].reg == 0 ? a : kTexVat[k].reg == 1 ? b : c;
-    int at = kTexVat[k].at;
-    u32 cnt = bits(reg, at, 1) ? 2 : 1, f = bits(reg, at + 1, 3);
-    float scale = 1.0f / static_cast<float>(1u << bits(reg, at + 4, 5));
-    const u8* q = source(t, 4 + k, cnt * comp_size(f));
-    if (q)
-      for (u32 n = 0; n < cnt; ++n) v.tex[k][n] = read_comp(q + n * comp_size(f), f, scale);
+    const VertexFormat::Attr& t = f.tex[k];
+    if (!t.type) continue;
+    const u8* q = source(t.type, 4 + k, t.size);
+    if (q) {
+      const u32 cs = comp_size(t.fmt);
+      for (u32 n = 0; n < t.cnt; ++n) v.tex[k][n] = read_comp(q + n * cs, t.fmt, t.scale);
+    }
   }
-  return v;
 }
 
 void GxProcessor::setup_transform(XformSetup& x) const {
@@ -479,6 +505,9 @@ void GxProcessor::setup_transform(XformSetup& x) const {
     }
   }
   x.have_pos = x.have_nrm = 0;
+  x.lit = false;
+  for (u32 ch = 0; ch < 2 && ch < x.nchan; ++ch)
+    x.lit = x.lit || bits(x.chan[ch][0].ctl, 1, 1) || bits(x.chan[ch][1].ctl, 1, 1);
 }
 
 OutVertex GxProcessor::transform(const InVertex& v) const {
@@ -530,9 +559,7 @@ OutVertex GxProcessor::transform(const InVertex& v, XformSetup& x) const {
 
   // Normal (3x3 at 0x400 + (index & 31) * 3), only when lighting needs it.
   float n[3] = {v.nrm[0], v.nrm[1], v.nrm[2]};
-  bool lit = false;
-  for (u32 ch = 0; ch < 2 && ch < x.nchan; ++ch) lit = lit || bits(x.chan[ch][0].ctl, 1, 1) || bits(x.chan[ch][1].ctl, 1, 1);
-  if (lit) {
+  if (x.lit) {
     const u32 ni = v.pnmtx & 31u;
     if (!(x.have_nrm >> ni & 1)) {
       const u32 nm = xf::kNrmMtx + ni * 3u;
@@ -818,17 +845,31 @@ void GxProcessor::snapshot(DrawCall& d) const {
 void GxProcessor::primitive(u8 op, const u8* data, u32 count) {
   const int fmt = op & 7;
   const u8 kind = op & 0xF8;
-  const u32 vsize = vertex_size(fmt);
+  if (!(fmt_valid_ & (1u << fmt))) {
+    fmt_cache_[fmt] = vertex_format(fmt);
+    fmt_size_[fmt] = vertex_size(fmt);
+    fmt_valid_ |= static_cast<u8>(1u << fmt);
+  }
+  VertexFormat& vf = fmt_cache_[fmt];
+  // The default matrix indices come from CP registers written between draws.
+  vf.default_pnmtx = static_cast<u8>(bits(matidx_a_, 0, 6));
+  for (int k = 0; k < 8; ++k) {
+    u32 src = k < 4 ? matidx_a_ : matidx_b_;
+    vf.default_texmtx[k] = static_cast<u8>(bits(src, k < 4 ? 6 + 6 * k : 6 * (k - 4), 6));
+  }
+  const u32 vsize = fmt_size_[fmt];
   stats_.vertices += count;
   if (count == 0) return;
   DrawCall& d = draw_;
   // Each vertex is loaded and transformed once; assembly below only indexes them.
   std::vector<OutVertex>& vs = d.verts;
-  vs.clear();
-  vs.reserve(count);
+  vs.resize(count);
   setup_transform(xs_);
-  for (u32 k = 0; k < count; ++k)
-    vs.push_back(transform(load_vertex(fmt, data + static_cast<std::size_t>(k) * vsize), xs_));
+  for (u32 k = 0; k < count; ++k) {
+    InVertex in;
+    load_vertex(vf, data + static_cast<std::size_t>(k) * vsize, in);
+    vs[k] = transform(in, xs_);
+  }
 
   if (keep_prim_info_) {
     prim_info_.op = op;
