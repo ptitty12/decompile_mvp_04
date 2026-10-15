@@ -546,8 +546,11 @@ function afterRun(ran: number, ms: number): boolean {
 // its present, back to back, and the clock never waits for more than two
 // fields of debt: the game runs evenly in slow motion, every frame shown, and
 // the sound stretches to match (resampler.ts). Under 90 % it chases again.
-// Guest state is the same either way (wall time decides only how many fields
-// run per batch).
+// Threaded engine only: there the render thread presents, so a present per
+// field costs the emulation nothing; the single-threaded engine presents
+// inline (measured: a present per field cost it 10 % of its speed on this
+// PC), so it keeps chasing with two-field batches. Guest state is the same
+// either way (wall time decides only how many fields run per batch).
 const CHASE_FIELDS = 2;
 const SATURATED_ON = 1.0, SATURATED_OFF = 0.9, SATURATED_S = 1.0;
 let fieldCost = 0;          // smoothed host ms per field, as a share of a field
@@ -564,13 +567,14 @@ chase.port1.onmessage = () => {
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
   let due = Math.floor((now - pacedStart) / FIELD_MS) - pacedFields;
-  if (due > (saturated ? 2 : MAX_FIELDS_PER_FRAME * 2)) {
+  const slowMotion = saturated && mt;  // the threaded engine: presenting costs the emulation nothing
+  if (due > (slowMotion ? 2 : MAX_FIELDS_PER_FRAME * 2)) {
     // Too far behind (a slow stretch, a background tab, a slow machine): drop the debt.
     pacedStart = now - pacedFields * FIELD_MS;
     due = 1;
   }
   const rafOnly = opts?.pacing === 'raf';
-  due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : saturated ? 1 : due >= 3 ? CHASE_FIELDS : 1);
+  due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : slowMotion ? 1 : due >= 3 ? CHASE_FIELDS : 1);
   if (due <= 0) return;
   const t0 = performance.now();
   const ran = M._mvp_run_fields(due);
