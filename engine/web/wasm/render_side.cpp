@@ -40,20 +40,25 @@ void XfbTap::efb_copy(const gfx::EfbCopy& c) {
 void RenderSide::set_memory(const std::uint8_t* mem, std::uint32_t size) {
   mem_ = mem;
   mem_size_ = size;
+  gp_.attach(mem, size);
   attach();
 }
 
 void RenderSide::attach() {
   if (!gpu || !window || !mem_ || renderer_) return;
-  renderer_ = std::make_unique<gfx::Renderer>(*gpu, mem_, mem_size_);
+  renderer_ = std::make_unique<gfx::Renderer>(*gpu, mem_, mem_size_, static_cast<std::uint32_t>(scale_));
+  renderer_->set_gp_memory(&gp_);
   tap_.next = renderer_.get();
   digest_.next = &tap_;
   digest_.set_memory(mem_, mem_size_);
+  digest_.set_gp_memory(&gp_);
   proc_ = std::make_unique<gfx::GxProcessor>(&digest_);
   proc_->set_memory(mem_, mem_size_);
+  proc_->set_gp_memory(&gp_);
 }
 
 void RenderSide::vi_field(std::uint64_t field, std::uint32_t xfb) {
+  gp_.field();  // Q1: snapshots of the game's cache write-backs expire
   if (renderer_) {
     renderer_->flush();
     renderer_->scan_field(xfb);  // what the VI scans out at this field (P1)
@@ -114,6 +119,11 @@ bool RenderSide::present(std::uint64_t frame_polls, double now_ms) {
   return true;
 }
 
+void RenderSide::set_scale(int s) {
+  scale_ = s < 1 ? 1 : s > static_cast<int>(gfx::Renderer::kMaxScale) ? static_cast<int>(gfx::Renderer::kMaxScale) : s;
+  if (renderer_) renderer_->set_scale(static_cast<std::uint32_t>(scale_));
+}
+
 void RenderSide::resize(int width, int height) {
   ++resizes_;
   if (window) window->resize(width, height);
@@ -145,12 +155,18 @@ std::string RenderSide::status_json() const {
     char b[512];
     std::snprintf(b, sizeof b,
                   ",\"draws\":%llu,\"xfb_copies\":%llu,\"pipelines\":%llu,\"textures\":%llu,\"gpu_errors\":%llu,"
-                  "\"copies_dropped\":%llu,\"copy_size_misses\":%llu,\"copy_tall\":%llu,\"scan_mixed\":%llu",
+                  "\"copies_dropped\":%llu,\"copy_size_misses\":%llu,\"copy_tall\":%llu,\"scan_mixed\":%llu,\"scale\":%u",
                   static_cast<unsigned long long>(rs.draws), static_cast<unsigned long long>(ps.xfb_copies),
                   static_cast<unsigned long long>(rs.pipelines), static_cast<unsigned long long>(rs.textures_decoded),
                   static_cast<unsigned long long>(gpu->errors()), static_cast<unsigned long long>(rs.copies_dropped),
                   static_cast<unsigned long long>(rs.copy_size_misses), static_cast<unsigned long long>(rs.copy_tall),
-                  static_cast<unsigned long long>(renderer_->scan_stats().mixed));
+                  static_cast<unsigned long long>(renderer_->scan_stats().mixed), renderer_->scale());
+    s += b;
+    const auto& gs = gp_.stats();  // Q1: the GP's view of memory
+    std::snprintf(b, sizeof b, ",\"gp_memory\":{\"flushes\":%llu,\"flushed_mb\":%.1f,\"overlays\":%llu,\"lines\":%llu,\"drops\":%llu}",
+                  static_cast<unsigned long long>(gs.flushes), static_cast<double>(gs.flushed_bytes) / 1e6,
+                  static_cast<unsigned long long>(gs.overlays), static_cast<unsigned long long>(gs.overlaid_lines),
+                  static_cast<unsigned long long>(gs.drops));
     s += b;
   }
   if (!error.empty()) {

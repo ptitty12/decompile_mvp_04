@@ -49,10 +49,22 @@ class Window {
   // (The browser's page handles its own events: always true there.)
   bool pump();
 
-  // Shows `src` (a 2D texture with TextureBinding usage) scaled to the window,
-  // keeping its aspect ratio, then presents. In the browser the frame goes to
-  // the canvas when the current task returns to the event loop.
+  // Shows `src` (a 2D texture with TextureBinding usage) scaled to the window
+  // at the display's aspect ratio (below), centered on black, then presents. In
+  // the browser the frame goes to the canvas when the current task returns to
+  // the event loop.
+  //
+  // Q1: the scaling. Larger than the window (2x and 3x internal resolution, or
+  // a small window): an area filter (each pixel the mean of the source over its
+  // footprint), so nothing shimmers. Smaller: sharp bilinear (each source pixel
+  // a block of whole window pixels, blended only along the block edges), so a
+  // 1x picture stays crisp at any size without uneven pixels.
   void present(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height);
+
+  // Q1: the picture's aspect ratio on screen. The game draws a 640 x 448 frame
+  // for a 4:3 television (its 3D cameras use a 4:3 aspect), so 4:3 by default;
+  // 0 shows the frame's own pixel shape (square pixels, as before).
+  void set_display_aspect(float a) { display_aspect_ = a; }
 
   // Configures the surface again (P2: a canvas whose picture was taken as an
   // ImageBitmap may have lost its configuration).
@@ -76,6 +88,7 @@ class Window {
   wgpu::Sampler sampler_;
   wgpu::Buffer params_;
   int width_ = 0, height_ = 0;
+  float display_aspect_ = 4.0f / 3.0f;
   bool configured_ = false;
   bool want_mailbox_ = false, have_mailbox_ = false;
   wgpu::PresentMode mode_ = wgpu::PresentMode::Fifo;

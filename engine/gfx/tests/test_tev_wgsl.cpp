@@ -40,7 +40,7 @@ TEST_CASE("one textured stage modulated by the rasterized color") {
   c.stages[0].texcoord = 2;
   c.stages[0].ras_chan = 0;
   std::string w = generate_wgsl(c);
-  CHECK(has(w, "let tex = to8(textureSample(tex3, samp3, tc(in.t2, 2u, 3u))).rgba"));
+  CHECK(has(w, "let tex = to8(textureSampleBias(tex3, samp3, tc(in.t2, 2u, 3u), u.lod_bias[0][3])).rgba"));  // Q1: with the map's LOD bias
   CHECK(has(w, "let ras = to8(in.c0).rgba"));
   CHECK(has(w, "let cb = tex.rgb & vec3i(255)"));
   CHECK(has(w, "let cc = ras.rgb & vec3i(255)"));

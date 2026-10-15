@@ -31,6 +31,8 @@
 //   audioRing=0     the sound goes to the worklet as messages even where the page could share memory (Q2)
 //   hostSlow=N, hostSlowFrom=F   a machine N times slower, simulated from VI field F on (Q2: the engine's
 //                   threads spin N - 1 times their working time; host timing only)
+//   gpview=0        the renderer reads guest memory as it is, without the data-cache model (Q1 comparisons)
+//   scale=1|2|3     the internal resolution, instead of the Picture setting (Q1)
 // The page publishes its state as `window.mvp` for the browser check.
 
 import { AudioOut, type AudioState } from './audio.js';
@@ -101,6 +103,7 @@ const errorEl = $<HTMLElement>('error');
 const fullscreenBtn = $<HTMLButtonElement>('fullscreen');
 const soundBtn = $<HTMLButtonElement>('sound');
 const pauseBtn = $<HTMLButtonElement>('pause');
+const pictureSel = document.getElementById('picture') as HTMLSelectElement | null;
 const startBox = $<HTMLElement>('start-box');
 const streamBox = $<HTMLElement>('stream-box');
 const playBtn = $<HTMLButtonElement>('play');
@@ -128,6 +131,7 @@ const options: RunOptions = {
   audioRing: params.get('audioRing') !== '0',
   hostSlow: Number(params.get('hostSlow') ?? 0) || undefined,
   hostSlowFrom: Number(params.get('hostSlowFrom') ?? 0) || 0,
+  gpView: params.get('gpview') !== '0',
   discCache: {
     blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
     maxRun: Number(params.get('discRun') ?? 0) || undefined,
@@ -338,6 +342,7 @@ function onWorker(msg: FromWorker): void {
         `field ${s.fields}, frame ${s.frames}, guest ${s.guest_s.toFixed(1)} s | ` +
         `${w.fields} fields in ${(w.wallMs / 1000).toFixed(2)} s (${(w.fields / (w.wallMs / 1000)).toFixed(1)}/s), ` +
         `${perField.toFixed(2)} ms per field | draws ${s.draws ?? 0}, GPU errors ${s.gpu_errors ?? 0}` +
+        (s.scale ? `, picture ${s.scale}x` : '') +
         (a ? ` | sound ${(a.fill / a.inRate * 1000).toFixed(0)} ms buffered, ${a.underruns} underruns` : '') +
         (s.net ? ` | server reads ${s.net.requests} (+${s.net.prefetched} ahead), waited ${s.net.blocked_ms.toFixed(0)} ms` : '') +
         (s.io ? ` | disc reads ${s.io.reads}, ${s.io.ms.toFixed(0)} ms in all, longest ${s.io.max_ms.toFixed(0)} ms` : '');
@@ -411,6 +416,8 @@ function startEngine(disc: DiscSource): void {
   const transfer: Transferable[] = packs.flatMap((p) => p.files.map((f) => f.data));
   if (off) transfer.unshift(off);
   if (frames) transfer.unshift(frames);
+  options.scale = pictureScale();
+  sentScale = options.scale;
   send({ type: 'start', disc, canvas: off, width, height, options: { ...options, netplay, packs },
          vsync: vsync ? (vsync.buffer as SharedArrayBuffer) : undefined, frames }, transfer);
   if (pendingAudioPort) {
@@ -426,6 +433,7 @@ function startEngine(disc: DiscSource): void {
   new ResizeObserver(() => {
     const w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
     if (w > 0 && h > 0) send({ type: 'resize', width: w, height: h });
+    applyPicture();  // Auto follows the picture's size (fullscreen)
   }).observe(canvas);
   updateHint();
 }
@@ -434,6 +442,65 @@ picker.addEventListener('change', () => {
   const file = picker.files?.[0];
   if (file) startEngine({ kind: 'file', file });
 });
+
+// ---- the picture (Q1): the internal resolution ----
+//
+// The renderer draws at 1x, 2x or 3x the console's 640 x 448 pixels and scales
+// the result to the canvas (an area filter when larger, sharp bilinear when
+// smaller). Auto draws at least as many pixels as the canvas shows, up to 3x;
+// a software adapter stays at 1x. The choice is kept in this browser.
+const PICTURE_KEY = 'mvp.picture.v1';
+let sentScale = 0;
+let softwareAdapter = false;
+void (async () => {
+  try {
+    const gpu = (navigator as unknown as { gpu?: { requestAdapter(o?: object): Promise<unknown> } }).gpu;
+    const a = await gpu?.requestAdapter({ powerPreference: 'high-performance' });
+    const info = (a as unknown as { info?: { isFallbackAdapter?: boolean } } | null)?.info;
+    softwareAdapter = !!(info?.isFallbackAdapter ?? (a as unknown as { isFallbackAdapter?: boolean } | null)?.isFallbackAdapter);
+    if (softwareAdapter) applyPicture();
+  } catch {
+    // no WebGPU: nothing to choose
+  }
+})();
+function pictureSetting(): string {
+  const fromUrl = params.get('scale');
+  if (fromUrl && ['1', '2', '3'].includes(fromUrl)) return fromUrl;
+  try {
+    const v = window.localStorage.getItem(PICTURE_KEY);
+    if (v && ['auto', '1', '2', '3'].includes(v)) return v;
+  } catch {
+    // storage blocked: the default
+  }
+  return 'auto';
+}
+function pictureScale(): number {
+  const v = pictureSetting();
+  if (v !== 'auto') return Number(v);
+  if (softwareAdapter) return 1;
+  const dprNow = Math.min(window.devicePixelRatio || 1, 2);
+  const h = canvas.clientHeight * dprNow;  // the picture's height on screen, in device pixels
+  return Math.min(3, Math.max(1, Math.ceil(h / 448 - 0.1)));
+}
+function applyPicture(): void {
+  const s = pictureScale();
+  if (!worker || s === sentScale) return;
+  sentScale = s;
+  send({ type: 'scale', scale: s });
+}
+if (pictureSel) {
+  pictureSel.value = pictureSetting();
+  if (params.get('scale')) pictureSel.disabled = true;
+  pictureSel.addEventListener('change', () => {
+    try {
+      window.localStorage.setItem(PICTURE_KEY, pictureSel.value);
+    } catch {
+      // storage blocked: this visit only
+    }
+    applyPicture();
+    canvas.focus();
+  });
+}
 
 // ---- pause, fullscreen, sound ----
 

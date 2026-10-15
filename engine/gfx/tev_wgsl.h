@@ -29,7 +29,7 @@ u32 vertex_attrs(const PipelineConfig& c);
 u32 vertex_stride(u32 attrs);
 
 // Size of DrawUniforms as WGSL lays out `U` (the buffer slot is rounded up to 256).
-constexpr std::size_t kUniformSize = 416;
+constexpr std::size_t kUniformSize = 448;
 static_assert(sizeof(DrawUniforms) == kUniformSize);
 
 }  // namespace mvp::gfx

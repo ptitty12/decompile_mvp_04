@@ -114,6 +114,8 @@ export interface RunOptions {
   audioRing?: boolean; // Q2: false = the frames go to the worklet as messages even where memory can be shared
   hostSlow?: number;   // development (Q2): simulate a machine this many times slower (mvp_host_slow) ...
   hostSlowFrom?: number;  // ... from this VI field on
+  gpView?: boolean;    // development (Q1): false = the renderer reads guest memory as it is (gfx/gp_memory.h)
+  scale?: number;      // Q1: the internal resolution, 1-3 times the console's (the Picture setting)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }
 
@@ -129,6 +131,7 @@ export type ToWorker =
   | { type: 'pad'; port: number; pad: Pad }
   | { type: 'tick'; now: number }  // the page's animation frame, when the Worker has no requestAnimationFrame
   | { type: 'resize'; width: number; height: number }
+  | { type: 'scale'; scale: number }  // Q1: the internal resolution (the Picture setting)
   | { type: 'pause'; paused: boolean }
   | { type: 'audio-port'; port: MessagePort }  // the AudioWorklet's channel (after the first user gesture)
   | { type: 'net-open' }                    // the data channel to the other player is open
@@ -154,6 +157,7 @@ export interface Status {
   textures?: number;
   gpu_errors?: number;
   gfx_error?: string;
+  scale?: number;  // Q1: the renderer's internal resolution
   disc_reads?: number;
   disc_bytes?: number;
   heap_mb?: number;  // the engine's WebAssembly memory

@@ -19,6 +19,9 @@
 //                     the browser does (runtime/host_yield.h); the guest must run
 //                     the same (compare the "guest:" line with a run without it)
 //   --present-every N show every Nth VI field (default 1)
+//   --scale N         (Q1) internal resolution, N = 1-3 times the console's (captures too)
+//   --gp-live         (Q1, comparisons) the renderer reads guest memory as it is, not as
+//                     the GP sees it after the data cache's write-backs (gfx/gp_memory.h)
 //   --capture DIR     write the scanned-out frame as DIR/field_N_frame_F.png (VI field N,
 //                     game frame poll F, the number input scripts use) every
 //                     --capture-every N fields (default 60) and at the --capture-at
@@ -363,6 +366,7 @@ struct Play : GfxObserver {
   std::uint64_t hash_every = 0;  // --hash-every
   const std::uint8_t* mem1 = nullptr;
   std::uint32_t mem1_size = 0;
+  gfx::GpMemory* gp_memory = nullptr;  // Q1: what the GP reads (null: --gp-live)
   std::uint64_t capture_every = 60, capture_from = 0;
   std::set<std::uint64_t> capture_at;
   std::uint64_t last_capture_serial = 0, captures = 0, fields = 0, presents = 0;
@@ -464,8 +468,13 @@ struct Play : GfxObserver {
     std::fflush(stdout);
   }
 
+  void gp_write_through(std::uint32_t addr, std::uint32_t len) override {
+    if (gp_memory) gp_memory->write_through(addr, len);
+  }
+
   void vi_field(std::uint64_t field, std::uint32_t xfb) override {
     fields = field;
+    if (gp_memory) gp_memory->field();
     perf(field);
     if (threads_at.count(field)) dump_threads(field);
     if (yield_hooks) yield_hooks->request_yield();
@@ -656,7 +665,8 @@ int main(int argc, char** argv) {
   };
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
-  bool headless = false, no_render = false, yield = false;
+  bool headless = false, no_render = false, yield = false, gp_live = false;
+  std::uint32_t scale = 1;
   int profile_top = 0, host_profile_top = 0;
   std::uint64_t profile_from = 0;
   std::string trace_entry, trace_file;
@@ -673,6 +683,8 @@ int main(int argc, char** argv) {
     else if (a == "--headless") headless = true;
     else if (a == "--no-render") no_render = headless = true;
     else if (a == "--yield") yield = true;
+    else if (a == "--gp-live") gp_live = true;
+    else if (a == "--scale") scale = static_cast<std::uint32_t>(std::strtoul(next().c_str(), nullptr, 10));
     else if (a == "--present-every") play.present_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
     else if (a == "--capture") play.capture_dir = next();
     else if (a == "--capture-every") play.capture_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
@@ -831,8 +843,17 @@ int main(int argc, char** argv) {
   mvp_register_game();
 
   std::unique_ptr<gfx::Renderer> renderer_owner;
-  if (gpu) renderer_owner = std::make_unique<gfx::Renderer>(*gpu, m.mem1(), Machine::kMem1Size);
+  if (gpu) renderer_owner = std::make_unique<gfx::Renderer>(*gpu, m.mem1(), Machine::kMem1Size, scale);
   gfx::Renderer* renderer = renderer_owner.get();
+  // Q1: the renderer reads memory as the GP sees it (gfx/gp_memory.h): the game's
+  // cache write-backs (rt::g_dc_flush_hook), DMA and the write-gather pipe.
+  static gfx::GpMemory gp_memory;
+  if (renderer && !gp_live) {
+    gp_memory.attach(m.mem1(), Machine::kMem1Size);
+    renderer->set_gp_memory(&gp_memory);
+    play.gp_memory = &gp_memory;
+    rt::g_dc_flush_hook = [](std::uint32_t ea, std::uint32_t len) { gp_memory.flush(ea, len); };
+  }
   DrawLog draw_log;
   draw_log.next = renderer;
   draw_log.field = &play.fields;
@@ -849,6 +870,7 @@ int main(int argc, char** argv) {
   draw_log.proc = &proc;
   proc.set_keep_primitive_info(draw_log.f != nullptr);
   proc.set_memory(m.mem1(), Machine::kMem1Size);
+  proc.set_gp_memory(play.gp_memory);
   play.proc = &proc;
   play.renderer = renderer;
   play.window = window.get();
@@ -927,6 +949,7 @@ int main(int argc, char** argv) {
   hw.set_ax_observer(nullptr);
   rt::g_input = nullptr;
   rt::g_frame_hook = nullptr;
+  rt::g_dc_flush_hook = nullptr;
   rt::g_entry_hook = nullptr;
   if (g_trace.f && g_trace.f != stdout) std::fclose(g_trace.f);
   if (renderer) {
@@ -990,6 +1013,12 @@ int main(int argc, char** argv) {
               ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws), ull(rs.same_state), ull(rs.tmem_textures),
               static_cast<double>(rs.vertex_bytes) / 1e6, static_cast<double>(rs.index_bytes) / 1e6,
               ull(rs.copies_dropped), ull(rs.copy_size_misses));
+  if (play.gp_memory) {
+    const auto& gs = play.gp_memory->stats();
+    std::printf("gp memory: %llu cache write-backs (%.1f MB), %llu reads with lines from them (%llu lines), %llu ended by DMA\n",
+                ull(gs.flushes), static_cast<double>(gs.flushed_bytes) / 1e6, ull(gs.overlays), ull(gs.overlaid_lines),
+                ull(gs.drops));
+  }
   if (!play.present_ms.empty()) {
     std::vector<double> v = play.present_ms;
     std::sort(v.begin(), v.end());

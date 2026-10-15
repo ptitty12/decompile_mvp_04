@@ -16,10 +16,14 @@ namespace mvp::gfx {
 
 namespace {
 
-// A full-window triangle that samples the source rectangle `rect` (x0, y0,
-// x1, y1 in normalized window coordinates) and shows black outside it.
+// A full-window triangle that shows the source in the rectangle `rect` (x0,
+// y0, x1, y1 in normalized window coordinates) and black outside it. `size`:
+// the source's texels (xy) and the rectangle's window pixels (zw). Larger
+// source: an area filter, a box over each window pixel's footprint from a grid
+// of bilinear taps. Smaller: sharp bilinear (an integer nearest prescale, then
+// bilinear from that).
 const char* kBlitWgsl = R"(
-struct Params { rect: vec4f };
+struct Params { rect: vec4f, size: vec4f };
 @group(0) @binding(0) var src: texture_2d<f32>;
 @group(0) @binding(1) var samp: sampler;
 @group(0) @binding(2) var<uniform> params: Params;
@@ -37,9 +41,32 @@ struct VsOut { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
 @fragment fn fs(in: VsOut) -> @location(0) vec4f {
   let r = params.rect;
   let uv = (in.uv - r.xy) / (r.zw - r.xy);
-  let c = textureSampleLevel(src, samp, uv, 0.0);
+  let ts = params.size.xy;
+  let ds = max(params.size.zw, vec2f(1.0));
+  let ratio = ts / ds;  // source texels per window pixel
+  var c = vec3f(0.0);
+  if (ratio.x > 1.001 || ratio.y > 1.001) {
+    // Area: n x n bilinear taps spread over the pixel's footprint.
+    let n = clamp(ceil(max(ratio.x, ratio.y)) + 1.0, 2.0, 5.0);
+    let step = ratio / n / ts;
+    let start = uv - ratio * 0.5 / ts + step * 0.5;
+    for (var j = 0.0; j < n; j += 1.0) {
+      for (var i = 0.0; i < n; i += 1.0) {
+        c += textureSampleLevel(src, samp, start + vec2f(i, j) * step, 0.0).rgb;
+      }
+    }
+    c /= n * n;
+  } else {
+    // Sharp bilinear.
+    let prescale = max(floor(ds / ts), vec2f(1.0));
+    let t = uv * ts;
+    let f = fract(t) - 0.5;
+    let range = 0.5 - 0.5 / prescale;
+    let g = (f - clamp(f, -range, range)) * prescale + 0.5;
+    c = textureSampleLevel(src, samp, (floor(t) + g) / ts, 0.0).rgb;
+  }
   if (any(uv < vec2f(0.0)) || any(uv > vec2f(1.0))) { return vec4f(0.0, 0.0, 0.0, 1.0); }
-  return vec4f(c.rgb, 1.0);
+  return vec4f(c, 1.0);
 }
 )";
 
@@ -157,7 +184,7 @@ bool Window::attach(Gpu& gpu, std::string* err) {
   samp.minFilter = wgpu::FilterMode::Linear;
   sampler_ = gpu.device().CreateSampler(&samp);
   wgpu::BufferDescriptor bd{};
-  bd.size = 16;
+  bd.size = 32;
   bd.usage = wgpu::BufferUsage::Uniform | wgpu::BufferUsage::CopyDst;
   params_ = gpu.device().CreateBuffer(&bd);
   configure();
@@ -212,14 +239,15 @@ void Window::present(const wgpu::TextureView& src, std::uint32_t src_width, std:
     configure();
     return;
   }
-  // Fit the source into the window, centered, keeping its aspect ratio (4:3
-  // for the 640-wide frame buffer).
-  float sw = static_cast<float>(src_width), sh = static_cast<float>(src_height);
-  float ww = static_cast<float>(width_), wh = static_cast<float>(height_);
-  float scale = std::min(ww / sw, wh / sh);
-  float x0 = (ww - sw * scale) * 0.5f / ww, y0 = (wh - sh * scale) * 0.5f / wh;
-  float rect[4] = {x0, y0, 1.0f - x0, 1.0f - y0};
-  gpu_->queue().WriteBuffer(params_, 0, rect, sizeof rect);
+  // Fit the picture into the window, centered, at the display's aspect ratio
+  // (4:3; or the frame's own with display_aspect_ 0).
+  const float sw = static_cast<float>(src_width), sh = static_cast<float>(src_height);
+  const float ww = static_cast<float>(width_), wh = static_cast<float>(height_);
+  const float aspect = display_aspect_ > 0 ? display_aspect_ : sw / sh;
+  const float pw = std::min(ww, wh * aspect), ph = std::min(wh, ww / aspect);
+  const float x0 = (ww - pw) * 0.5f / ww, y0 = (wh - ph) * 0.5f / wh;
+  const float params[8] = {x0, y0, 1.0f - x0, 1.0f - y0, sw, sh, pw, ph};
+  gpu_->queue().WriteBuffer(params_, 0, params, sizeof params);
 
   wgpu::BindGroupEntry entries[3]{};
   entries[0].binding = 0;
@@ -228,7 +256,7 @@ void Window::present(const wgpu::TextureView& src, std::uint32_t src_width, std:
   entries[1].sampler = sampler_;
   entries[2].binding = 2;
   entries[2].buffer = params_;
-  entries[2].size = 16;
+  entries[2].size = 32;
   wgpu::BindGroupDescriptor bgd{};
   bgd.layout = blit_.GetBindGroupLayout(0);
   bgd.entryCount = 3;

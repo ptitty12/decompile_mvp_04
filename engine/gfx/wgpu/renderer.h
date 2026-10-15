@@ -7,6 +7,13 @@
 // Draws are recorded into one render pass on the EFB until something needs
 // the result (an EFB copy, a read-back, the end of a frame): flush() uploads
 // the pass's vertices and uniforms and submits.
+//
+// Internal resolution (Q1): the EFB, its copies to the XFB and to textures can
+// be kept at 2x or 3x the console's pixels in each direction. Everything the
+// GX state machine hands over stays in console pixels (scissors, copy
+// rectangles, texture sizes); only the GPU-side textures grow, and draws that
+// sample an EFB copy sample it by normalized coordinates, so they see the same
+// picture in more detail. Guest memory is never written either way.
 #pragma once
 
 #include <webgpu/webgpu_cpp.h>
@@ -20,6 +27,7 @@
 #include <vector>
 
 #include "gfx/draw.h"
+#include "gfx/gp_memory.h"
 
 namespace mvp::gfx {
 
@@ -27,17 +35,28 @@ class Gpu;
 
 class Renderer : public Backend {
  public:
-  Renderer(Gpu& gpu, const std::uint8_t* mem, std::uint32_t mem_size);
+  Renderer(Gpu& gpu, const std::uint8_t* mem, std::uint32_t mem_size, std::uint32_t scale = 1);
   ~Renderer() override;
 
   void draw(const DrawCall& d) override;
   void efb_copy(const EfbCopy& c) override;
   void invalidate_textures() override { ++epoch_; }
 
+  // Q1: read guest memory as the GP sees it (gfx/gp_memory.h). Null: directly.
+  void set_gp_memory(GpMemory* g) { gpm_ = g; }
+
+  // Q1: the internal resolution, 1-3 times the console's in each direction. A
+  // change applies at the next XFB copy that clears the EFB (the game clears it
+  // with every frame's copy), so no frame is drawn at two scales.
+  void set_scale(std::uint32_t s) { want_scale_ = s < 1 ? 1 : s > kMaxScale ? kMaxScale : s; }
+  std::uint32_t scale() const { return scale_; }
+  static constexpr std::uint32_t kMaxScale = 3;
+
   // Ends the open render pass (if any) and submits it.
   void flush();
 
   // An XFB copy: the frame the video interface shows when it scans `addr`.
+  // `width` and `height` are the texture's (console pixels times the scale).
   struct Frame {
     wgpu::Texture tex;
     wgpu::TextureView view;
@@ -70,7 +89,7 @@ class Renderer : public Backend {
     std::uint64_t fields = 0, new_frames = 0, mixed = 0;  // fields seen, new XFB frames, presents composed
   };
   const ScanStats& scan_stats() const { return scan_stats_; }
-  // Reads the EFB color back (640 x 528 RGBA8).
+  // Reads the EFB color back (640 x 528 RGBA8, times the scale).
   std::vector<std::uint8_t> read_efb();
 
   struct Stats {
@@ -100,6 +119,7 @@ class Renderer : public Backend {
   };
 
   void begin_pass();
+  void create_efb();  // the EFB's textures at scale_
   void emit_pending();
   const Pipeline& pipeline(const PipelineConfig& c);
   wgpu::TextureView texture(const TextureDesc& t, std::uint32_t* w, std::uint32_t* h);
@@ -108,11 +128,15 @@ class Renderer : public Backend {
   wgpu::TextureView tall_copy(CopyEntry& e, const TextureDesc& t);
   void clear_efb(const EfbCopy& c);
   void copy_to_texture(const EfbCopy& c);
-  std::uint64_t hash_memory(std::uint32_t addr, std::uint32_t size) const;
+  std::uint64_t hash_memory(std::uint32_t addr, std::uint32_t size);
+  // [addr, addr + size) of guest memory as the GP sees it, null if outside.
+  const std::uint8_t* guest(std::uint32_t addr, std::uint32_t size);
 
   Gpu& gpu_;
   const std::uint8_t* mem_;
   std::uint32_t mem_size_;
+  GpMemory* gpm_ = nullptr;
+  std::uint32_t scale_ = 1, want_scale_ = 1;
 
   wgpu::Texture efb_color_, efb_depth_;
   wgpu::TextureView efb_color_view_, efb_depth_view_;

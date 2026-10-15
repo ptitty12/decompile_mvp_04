@@ -9,9 +9,11 @@
 
 #include <atomic>
 #include <cstdio>
+#include <algorithm>
 #include <cstring>
 #include <memory>
 #include <mutex>
+#include <vector>
 
 #include "gfx/gp_reads.h"
 #include "gfx/render_ring.h"
@@ -96,6 +98,10 @@ enum : u32 {
   kTrace,       // {on}
   kDigest,      // {on}
   kFlush,
+  kGpActivate,  // Q1: {addr, len}: the game wrote these lines back from the cache (gfx/gp_memory.h)
+  kGpLines,     // Q1: {first line, lines} + their contents as written back (lines that changed)
+  kGpDrop,      // Q1: {addr, len}: memory written without the cache
+  kScale,       // Q1: {internal resolution}
 };
 
 constexpr u32 kRingBytes = 16u << 20;
@@ -165,6 +171,14 @@ struct Shared {
   double write_wait_ms = 0;
   u64 kind_waits[gfx::kReadKinds] = {};  // the write waits by what they waited for, and their time
   double kind_ms[gfx::kReadKinds] = {};
+  // Q1: the render thread's view of what the GP sees (gfx/gp_memory.h), mirrored
+  // here: which lines a cache write-back made the GP read from its snapshot this
+  // field, and what each line's snapshot holds there (only changed lines travel).
+  const u8* gp_live = nullptr;
+  u32 gp_lines = 0, gp_gen = 2;
+  std::vector<u8> gp_sent;
+  std::vector<u32> gp_gen_of, gp_page_gen;
+  u64 gp_flushes = 0, gp_sent_bytes = 0, gp_flushed_bytes = 0, gp_unmarked = 0;
   u32 synced = 0;           // ring position of the last fence
   u32 present_pos[2] = {};  // ring positions after the last two presents
   u64 fences = 0, fence_waits = 0, lag_waits = 0, big = 0, resizes = 0;
@@ -176,10 +190,18 @@ struct Shared {
 Shared* S = nullptr;
 
 // Emulation thread: the command being appended reads [addr, addr + size).
+bool gp_snapshot_entry(u32 i);
 void mark(u32 addr, u32 size, gfx::ReadKind kind) {
   const u32 first = addr >> ppc::kGpShift, last = (addr + size - 1) >> ppc::kGpShift;
   for (u32 p = first; p <= last; ++p) {
     const u32 i = p & (ppc::kGpEntries - 1);
+    // Q1: lines a cache write-back snapshot covers this field are read from the
+    // snapshot (it came through the ring), not from memory: guest writes there
+    // need not wait.
+    if (gp_snapshot_entry(i)) {
+      ++S->gp_unmarked;
+      continue;
+    }
     std::uint32_t& e = ppc::g_gp_pages[i];
     if (!e) S->marked.push_back(i);
     e = S->mark_pos + 1;
@@ -219,6 +241,46 @@ void sweep() {
     if (e) S->marked[n++] = p;
   }
   S->marked.resize(n);
+}
+
+// ---- Q1: the GP's view of memory (gfx/gp_memory.h), the emulation side ----
+
+constexpr u32 kLine = 32, kLineShift = 5, kLinesPerPage = 128;  // 32-byte lines, 4 KiB pages
+
+bool gp_line_active(u32 line) { return line < S->gp_lines && S->gp_gen_of[line] == S->gp_gen; }
+
+// A 2^kGpShift (64) byte entry of ppc::g_gp_pages whose lines are all snapshot this field.
+bool gp_snapshot_entry(u32 i) {
+  if (!S->gp_lines) return false;
+  const u32 l0 = (i << ppc::kGpShift) >> kLineShift, l1 = (((i + 1) << ppc::kGpShift) >> kLineShift) - 1;
+  if (l1 >= S->gp_lines || S->gp_page_gen[l0 / kLinesPerPage] != S->gp_gen) return false;
+  for (u32 l = l0; l <= l1; ++l)
+    if (!gp_line_active(l)) return false;
+  return true;
+}
+
+void gp_attach(const u8* mem, u32 size) {
+  S->gp_live = mem;
+  S->gp_lines = size >> kLineShift;
+  S->gp_sent.assign(static_cast<std::size_t>(S->gp_lines) * kLine, 0);  // the render side's snapshots start as zeros too
+  S->gp_gen_of.assign(S->gp_lines, 0);
+  S->gp_page_gen.assign(S->gp_lines / kLinesPerPage + 1, 0);
+}
+
+// Sends lines [first, first + n) (their contents now) to the render thread.
+void gp_send_lines(u32 first, u32 n) {
+  const u32 max_lines = 16384;  // 512 KiB per record
+  while (n) {
+    const u32 k = std::min(n, max_lines);
+    u8* d = S->ring.reserve(kGpLines, 8 + k * kLine);
+    std::memcpy(d, &first, 4);
+    std::memcpy(d + 4, &k, 4);
+    std::memcpy(d + 8, S->gp_live + static_cast<std::size_t>(first) * kLine, static_cast<std::size_t>(k) * kLine);
+    S->ring.commit();
+    S->gp_sent_bytes += static_cast<u64>(k) * kLine;
+    first += k;
+    n -= k;
+  }
 }
 
 template <class T>
@@ -385,6 +447,30 @@ void handle(const gfx::RenderRing::Record& r) {
       S->side.flush();
       snapshot();
       return;
+    case kGpActivate: {
+      Pair v;
+      std::memcpy(&v, r.data, sizeof v);
+      S->side.gp_activate(v.a, v.b);
+      return;
+    }
+    case kGpLines: {
+      Pair v;
+      std::memcpy(&v, r.data, sizeof v);
+      S->side.gp_set_lines(v.a, v.b, r.data + sizeof v);
+      return;
+    }
+    case kScale: {
+      u32 v;
+      std::memcpy(&v, r.data, sizeof v);
+      S->side.set_scale(static_cast<int>(v));
+      return;
+    }
+    case kGpDrop: {
+      Pair v;
+      std::memcpy(&v, r.data, sizeof v);
+      S->side.gp_write_through(v.a, v.b);
+      return;
+    }
     default:
       return;
   }
@@ -520,8 +606,60 @@ void render_host_slow(double factor) { g_host_slow.store(factor > 1 ? factor : 1
 double render_waited_ms() { return S ? S->write_wait_ms + S->lag_ms + S->fence_ms : 0; }
 
 void render_memory(const std::uint8_t* mem, std::uint32_t size) {
+  gp_attach(mem, size);
   put(kMemory, Ref{mem, size});
   publish_and_kick();
+}
+
+// Q1: the game wrote the cache's lines over [ea, ea + len) back. The render
+// thread gets the range and the contents of the lines that differ from what
+// their snapshots hold there (in the front end most of a flushed array is
+// unchanged from one flush to the next).
+void render_gp_flush(std::uint32_t ea, std::uint32_t len) {
+  if (disabled() || !S->gp_lines || !len) return;
+  const u32 addr = ea & 0x01FFFFFFu;
+  if (addr >= S->gp_lines * kLine) return;
+  const u32 first = addr >> kLineShift, last = std::min((addr + len - 1) >> kLineShift, S->gp_lines - 1);
+  u32 run = 0, run_n = 0;
+  for (u32 l = first; l <= last; ++l) {
+    u8* sent = S->gp_sent.data() + static_cast<std::size_t>(l) * kLine;
+    const u8* now = S->gp_live + static_cast<std::size_t>(l) * kLine;
+    if (std::memcmp(sent, now, kLine) != 0) {
+      std::memcpy(sent, now, kLine);
+      if (!run_n) run = l;
+      ++run_n;
+      continue;
+    }
+    if (run_n) gp_send_lines(run, run_n);
+    run_n = 0;
+  }
+  if (run_n) gp_send_lines(run, run_n);
+  for (u32 l = first; l <= last; ++l) S->gp_gen_of[l] = S->gp_gen;
+  for (u32 p = first / kLinesPerPage; p <= last / kLinesPerPage; ++p) S->gp_page_gen[p] = S->gp_gen;
+  put(kGpActivate, Pair{first * kLine, (last - first + 1) * kLine});
+  ++S->gp_flushes;
+  S->gp_flushed_bytes += static_cast<u64>(last - first + 1) * kLine;
+  S->ring.publish_if(kPublishBytes);
+}
+
+// Q1: memory over [addr, addr + len) was written without the cache: snapshots
+// there end (a record only when there are some).
+void render_gp_write_through(std::uint32_t addr, std::uint32_t len) {
+  if (disabled() || !S->gp_lines || !len) return;
+  addr &= 0x01FFFFFFu;
+  if (addr >= S->gp_lines * kLine) return;
+  const u32 first = addr >> kLineShift, last = std::min((addr + len - 1) >> kLineShift, S->gp_lines - 1);
+  bool any = false;
+  for (u32 p = first / kLinesPerPage; p <= last / kLinesPerPage; ++p) {
+    if (S->gp_page_gen[p] != S->gp_gen) continue;
+    const u32 l0 = std::max(first, p * kLinesPerPage), l1 = std::min(last, p * kLinesPerPage + kLinesPerPage - 1);
+    for (u32 l = l0; l <= l1; ++l)
+      if (S->gp_gen_of[l] == S->gp_gen) {
+        S->gp_gen_of[l] = 0;
+        any = true;
+      }
+  }
+  if (any) put(kGpDrop, Pair{addr, len});
 }
 
 void render_gx(const std::uint8_t* cmd, std::size_t len) {
@@ -548,6 +686,7 @@ void render_gx(const std::uint8_t* cmd, std::size_t len) {
 
 void render_field(std::uint64_t field, std::uint32_t xfb) {
   if (disabled()) return;
+  ++S->gp_gen;  // Q1: as the render side's GpMemory::field() at this record
   put(kField, Field{field, xfb, 0});
   S->ring.publish();
   sweep();
@@ -606,6 +745,11 @@ void render_resize(int width, int height) {
   publish_and_kick();
 }
 
+void render_scale(int scale) {
+  put(kScale, static_cast<u32>(scale));
+  publish_and_kick();
+}
+
 void render_trace(bool on) {
   put(kTrace, u32{on ? 1u : 0u});
   publish_and_kick();
@@ -658,7 +802,7 @@ std::string render_status_json() {
                 "\"fence_behind_kb\":[%.0f,%.0f,%.0f,%.0f],\"write_checks\":%llu,\"write_waits\":%llu,"
                 "\"write_wait_ms\":%.1f,\"pending_pages\":%zu,\"read_ranges\":%llu,\"lag_waits\":%llu,"
                 "\"lag_ms\":%.1f,\"records\":%llu,\"ring_mb\":%.1f,\"full_waits\":%llu,\"big\":%llu,"
-                "\"wait_kinds\":%s}",
+                "\"wait_kinds\":%s,\"gp_flushes\":%llu,\"gp_flushed_mb\":%.1f,\"gp_sent_mb\":%.2f,\"gp_unmarked\":%llu}",
                 static_cast<unsigned long long>(S->resizes), static_cast<unsigned long long>(S->fences),
                 static_cast<unsigned long long>(S->fence_waits), S->fence_ms,
                 static_cast<unsigned long long>(S->fence_hist[0]), static_cast<unsigned long long>(S->fence_hist[1]),
@@ -670,7 +814,8 @@ std::string render_status_json() {
                 static_cast<unsigned long long>(S->lag_waits), S->lag_ms,
                 static_cast<unsigned long long>(S->ring.records()), static_cast<double>(S->ring.bytes()) / (1 << 20),
                 static_cast<unsigned long long>(S->ring.full_waits()), static_cast<unsigned long long>(S->big),
-                kinds.c_str());
+                kinds.c_str(), static_cast<unsigned long long>(S->gp_flushes), static_cast<double>(S->gp_flushed_bytes) / 1e6,
+                static_cast<double>(S->gp_sent_bytes) / 1e6, static_cast<unsigned long long>(S->gp_unmarked));
   return s + b;
 }
 

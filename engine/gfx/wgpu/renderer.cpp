@@ -160,7 +160,8 @@ struct Renderer::TexEntry {
 struct Renderer::CopyEntry {
   wgpu::Texture tex;
   wgpu::TextureView view;
-  std::uint32_t w = 0, h = 0;
+  std::uint32_t w = 0, h = 0;    // console pixels (what a texture of this address must measure)
+  std::uint32_t pw = 0, ph = 0;  // the texture's (times the scale at the copy)
   std::uint32_t bytes = 0;
   std::uint64_t mem_hash = 0, epoch = 0;
   std::uint64_t serial = 0;  // bumped by every copy to it
@@ -168,7 +169,7 @@ struct Renderer::CopyEntry {
   struct Tall {
     wgpu::Texture tex;
     wgpu::TextureView view;
-    std::uint32_t h = 0;
+    std::uint32_t h = 0, scale = 1;
     std::uint8_t format = 0xFF;
     std::uint64_t copy_serial = 0, tail_hash = 0, pass = 0, epoch = 0;
   };
@@ -179,21 +180,13 @@ std::size_t Renderer::CfgHash::operator()(const PipelineConfig& c) const {
   return static_cast<std::size_t>(hash_bytes(reinterpret_cast<const std::uint8_t*>(&c), sizeof c));
 }
 
-Renderer::Renderer(Gpu& gpu, const std::uint8_t* mem, std::uint32_t mem_size)
+Renderer::Renderer(Gpu& gpu, const std::uint8_t* mem, std::uint32_t mem_size, std::uint32_t scale)
     : gpu_(gpu), mem_(mem), mem_size_(mem_size) {
   const wgpu::Device& dev = gpu.device();
+  set_scale(scale);
+  scale_ = want_scale_;
+  create_efb();
   wgpu::TextureDescriptor td{};
-  td.size = {kEfbWidth, kEfbHeight, 1};
-  td.format = wgpu::TextureFormat::RGBA8Unorm;
-  td.usage = wgpu::TextureUsage::RenderAttachment | wgpu::TextureUsage::CopySrc | wgpu::TextureUsage::TextureBinding;
-  td.label = "efb color";
-  efb_color_ = dev.CreateTexture(&td);
-  efb_color_view_ = efb_color_.CreateView();
-  td.format = wgpu::TextureFormat::Depth32Float;
-  td.usage = wgpu::TextureUsage::RenderAttachment | wgpu::TextureUsage::TextureBinding;
-  td.label = "efb depth";
-  efb_depth_ = dev.CreateTexture(&td);
-  efb_depth_view_ = efb_depth_.CreateView();
 
   // Uniforms: one slot per draw, dynamic offset.
   wgpu::BindGroupLayoutEntry ue{};
@@ -360,6 +353,21 @@ Renderer::Renderer(Gpu& gpu, const std::uint8_t* mem, std::uint32_t mem_size)
 
 Renderer::~Renderer() = default;
 
+void Renderer::create_efb() {
+  wgpu::TextureDescriptor td{};
+  td.size = {kEfbWidth * scale_, kEfbHeight * scale_, 1};
+  td.format = wgpu::TextureFormat::RGBA8Unorm;
+  td.usage = wgpu::TextureUsage::RenderAttachment | wgpu::TextureUsage::CopySrc | wgpu::TextureUsage::TextureBinding;
+  td.label = "efb color";
+  efb_color_ = gpu_.device().CreateTexture(&td);
+  efb_color_view_ = efb_color_.CreateView();
+  td.format = wgpu::TextureFormat::Depth32Float;
+  td.usage = wgpu::TextureUsage::RenderAttachment | wgpu::TextureUsage::TextureBinding;
+  td.label = "efb depth";
+  efb_depth_ = gpu_.device().CreateTexture(&td);
+  efb_depth_view_ = efb_depth_.CreateView();
+}
+
 void Renderer::begin_pass() {
   if (pass_open_) return;
   encoder_ = gpu_.device().CreateCommandEncoder();
@@ -413,8 +421,9 @@ void Renderer::emit_pending() {
     bound_ibuf_ = true;
   }
   if (std::memcmp(bound_scissor_, pending_.scissor, sizeof bound_scissor_) != 0) {
-    pass_.SetScissorRect(pending_.scissor[0], pending_.scissor[1], pending_.scissor[2] - pending_.scissor[0],
-                         pending_.scissor[3] - pending_.scissor[1]);
+    const std::uint32_t s = scale_;  // Q1: the scissor in console pixels, the EFB at the scale
+    pass_.SetScissorRect(pending_.scissor[0] * s, pending_.scissor[1] * s, (pending_.scissor[2] - pending_.scissor[0]) * s,
+                         (pending_.scissor[3] - pending_.scissor[1]) * s);
     std::memcpy(bound_scissor_, pending_.scissor, sizeof bound_scissor_);
   }
   pass_.DrawIndexed(pending_.index_count, 1, pending_.first_index, static_cast<std::int32_t>(pending_.base), 0);
@@ -528,10 +537,16 @@ const Renderer::Pipeline& Renderer::pipeline(const PipelineConfig& c) {
   return pipelines_.emplace(c, std::move(info)).first->second;
 }
 
-std::uint64_t Renderer::hash_memory(std::uint32_t addr, std::uint32_t size) const {
+const std::uint8_t* Renderer::guest(std::uint32_t addr, std::uint32_t size) {
+  if (gpm_) return gpm_->view(addr, size, 1);
   addr &= 0x01FFFFFFu;
-  if (!mem_ || addr > mem_size_ || size > mem_size_ - addr) return 0;
-  return hash_bytes(mem_ + addr, size);
+  if (!mem_ || addr > mem_size_ || size > mem_size_ - addr) return nullptr;
+  return mem_ + addr;
+}
+
+std::uint64_t Renderer::hash_memory(std::uint32_t addr, std::uint32_t size) {
+  const std::uint8_t* p = guest(addr, size);
+  return p ? hash_bytes(p, size) : 0;
 }
 
 wgpu::Sampler Renderer::sampler(const TextureDesc& t) {
@@ -602,15 +617,15 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
     slot->pass = pass_open_ ? pass_serial_ : pass_serial_ + 1;
     return slot->view;
   }
-  const std::uint64_t mh = hash_memory(t.addr, bytes);
+  const std::uint8_t* src = guest(t.addr, bytes);  // Q1: memory as the GP sees it
+  const std::uint64_t mh = src ? hash_bytes(src, bytes) : 0;
   if (slot && slot->mem_hash == mh) {
     slot->epoch = epoch_;
     slot->pass = pass_open_ ? pass_serial_ : pass_serial_ + 1;
     ++stats_.texture_hits;
     return slot->view;
   }
-  const std::uint32_t a = t.addr & 0x01FFFFFFu;
-  if (!mem_ || a > mem_size_ || bytes > mem_size_ - a) return dummy_view_;
+  if (!src) return dummy_view_;
   // The open pass may already sample this texture's old contents: submit it
   // before the upload replaces them.
   if (slot && pass_open_ && slot->pass == pass_serial_) flush();
@@ -631,7 +646,7 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
   std::vector<std::uint8_t> rgba;
   for (std::uint32_t l = 0; l < t.levels; ++l) {
     rgba.resize(static_cast<std::size_t>(lw) * lh * 4);
-    decode_texture(t.format, lw, lh, mem_ + a + off, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
+    decode_texture(t.format, lw, lh, src + off, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
     wgpu::TexelCopyTextureInfo dst{};
     dst.texture = slot->tex;
     dst.mipLevel = l;
@@ -657,28 +672,30 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
 // rows below start right after them). Rebuilt when the copy is copied again or
 // that memory changes. Null if the texture lies outside memory.
 wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
-  const std::uint32_t a = t.addr & 0x01FFFFFFu;
   const std::uint32_t bytes = texture_level_size(t.format, t.width, t.height);
   const std::uint32_t covered = std::min(texture_level_size(t.format, t.width, e.h), bytes);
-  if (!mem_ || a > mem_size_ || bytes > mem_size_ - a) return nullptr;
+  const std::uint8_t* src = guest(t.addr, bytes);  // Q1: memory as the GP sees it
+  if (!src) return nullptr;
+  const std::uint32_t s = e.w ? e.pw / e.w : 1;    // Q1: the copy's internal resolution
   std::unique_ptr<CopyEntry::Tall>& c = e.tall;
-  const bool fresh = !c || c->h != t.height;
+  const bool fresh = !c || c->h != t.height || c->scale != s;
   if (fresh) {
     c = std::make_unique<CopyEntry::Tall>();
     wgpu::TextureDescriptor td{};
-    td.size = {t.width, t.height, 1};
+    td.size = {t.width * s, t.height * s, 1};
     td.format = wgpu::TextureFormat::RGBA8Unorm;
     td.usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::CopyDst;
     td.label = "efb copy (tall)";
     c->tex = gpu_.device().CreateTexture(&td);
     c->view = c->tex.CreateView();
     c->h = t.height;
+    c->scale = s;
   }
   // The memory below the copy is read once per texture cache epoch, as every
   // texture's is (the threaded engine relies on it: gfx/gp_reads.h).
   std::uint64_t tail = c->tail_hash;
   if (fresh || c->epoch != epoch_ || c->format != t.format) {
-    tail = hash_bytes(mem_ + a + covered, bytes - covered, t.format + 1u);
+    tail = hash_bytes(src + covered, bytes - covered, t.format + 1u);
     c->epoch = epoch_;
   }
   const bool new_tail = fresh || c->tail_hash != tail || c->format != t.format;
@@ -687,27 +704,34 @@ wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
     if (!fresh && pass_open_ && c->pass == pass_serial_) flush();
     if (new_tail) {
       std::vector<std::uint8_t> rgba(static_cast<std::size_t>(t.width) * t.height * 4);
-      decode_texture(t.format, t.width, t.height, mem_ + a, rgba.data(), nullptr, 0, 0);
+      decode_texture(t.format, t.width, t.height, src, rgba.data(), nullptr, 0, 0);
       const std::uint32_t rows = t.height - e.h;
+      // Memory's rows at the copy's scale (each texel s x s).
+      const std::uint32_t pw = t.width * s, prows = rows * s;
+      std::vector<std::uint8_t> up(static_cast<std::size_t>(pw) * prows * 4);
+      for (std::uint32_t y = 0; y < prows; ++y) {
+        const std::uint8_t* row = rgba.data() + (static_cast<std::size_t>(e.h + y / s) * t.width) * 4;
+        std::uint8_t* out = up.data() + static_cast<std::size_t>(y) * pw * 4;
+        for (std::uint32_t x = 0; x < pw; ++x) std::memcpy(out + x * 4, row + (x / s) * 4, 4);
+      }
       wgpu::TexelCopyTextureInfo dst{};
       dst.texture = c->tex;
-      dst.origin = {0, e.h, 0};
+      dst.origin = {0, e.h * s, 0};
       wgpu::TexelCopyBufferLayout lay{};
-      lay.bytesPerRow = t.width * 4;
-      lay.rowsPerImage = rows;
-      wgpu::Extent3D ext{t.width, rows, 1};
-      gpu_.queue().WriteTexture(&dst, rgba.data() + static_cast<std::size_t>(e.h) * t.width * 4,
-                                static_cast<std::size_t>(rows) * t.width * 4, &lay, &ext);
+      lay.bytesPerRow = pw * 4;
+      lay.rowsPerImage = prows;
+      wgpu::Extent3D ext{pw, prows, 1};
+      gpu_.queue().WriteTexture(&dst, up.data(), up.size(), &lay, &ext);
       c->tail_hash = tail;
       c->format = t.format;
     }
     wgpu::CommandEncoder enc = gpu_.device().CreateCommandEncoder();
-    wgpu::TexelCopyTextureInfo src{};
-    src.texture = e.tex;
-    wgpu::TexelCopyTextureInfo dst{};
-    dst.texture = c->tex;
-    wgpu::Extent3D ext{e.w, e.h, 1};
-    enc.CopyTextureToTexture(&src, &dst, &ext);
+    wgpu::TexelCopyTextureInfo csrc{};
+    csrc.texture = e.tex;
+    wgpu::TexelCopyTextureInfo cdst{};
+    cdst.texture = c->tex;
+    wgpu::Extent3D ext{e.pw, e.ph, 1};
+    enc.CopyTextureToTexture(&csrc, &cdst, &ext);
     wgpu::CommandBuffer cb = enc.Finish();
     gpu_.queue().Submit(1, &cb);
     c->copy_serial = e.serial;
@@ -941,7 +965,7 @@ void Renderer::clear_efb(const EfbCopy& c) {
   std::uint32_t x0 = std::min(c.src_x, kEfbWidth), y0 = std::min(c.src_y, kEfbHeight);
   std::uint32_t x1 = std::min(c.src_x + c.width, kEfbWidth), y1 = std::min(c.src_y + c.height, kEfbHeight);
   if (x1 <= x0 || y1 <= y0) return;
-  pass_.SetScissorRect(x0, y0, x1 - x0, y1 - y0);
+  pass_.SetScissorRect(x0 * scale_, y0 * scale_, (x1 - x0) * scale_, (y1 - y0) * scale_);
   pass_.Draw(3);
   // The clear must land before the next clear rewrites its buffer.
   flush();
@@ -953,10 +977,10 @@ void Renderer::copy_to_texture(const EfbCopy& c) {
   const std::uint32_t h = c.half_scale ? std::max(1u, c.height / 2) : c.height;
   const std::uint32_t addr = c.dest & 0x01FFFFFFu;
   std::unique_ptr<CopyEntry>& e = copies_[addr];
-  if (!e || e->w != w || e->h != h) {
+  if (!e || e->w != w || e->h != h || e->pw != w * scale_ || e->ph != h * scale_) {
     e = std::make_unique<CopyEntry>();
     wgpu::TextureDescriptor td{};
-    td.size = {w, h, 1};
+    td.size = {w * scale_, h * scale_, 1};
     td.format = wgpu::TextureFormat::RGBA8Unorm;
     td.usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::RenderAttachment | wgpu::TextureUsage::CopySrc;
     td.label = "efb copy";
@@ -964,6 +988,8 @@ void Renderer::copy_to_texture(const EfbCopy& c) {
     e->view = e->tex.CreateView();
     e->w = w;
     e->h = h;
+    e->pw = w * scale_;
+    e->ph = h * scale_;
   }
   // What a texture of this format and size covers in memory; the copy stays
   // valid while those bytes are unchanged.
@@ -973,7 +999,7 @@ void Renderer::copy_to_texture(const EfbCopy& c) {
   e->epoch = epoch_;
   e->serial = ++copy_serial_;
 
-  std::int32_t params[8] = {static_cast<std::int32_t>(c.src_x), static_cast<std::int32_t>(c.src_y),
+  std::int32_t params[8] = {static_cast<std::int32_t>(c.src_x * scale_), static_cast<std::int32_t>(c.src_y * scale_),
                             c.half_scale ? 1 : 0, c.pixel_format == 3 ? 1 : 0,
                             static_cast<std::int32_t>(c.tex_format), c.intensity ? 1 : 0, 0, 0};
   gpu_.queue().WriteBuffer(convert_buf_, 0, params, sizeof params);
@@ -1015,16 +1041,17 @@ void Renderer::efb_copy(const EfbCopy& c) {
     if (c.to_xfb) {
       ++stats_.xfb_copies;
       Frame& f = frames_[c.dest & 0x01FFFFFFu];
-      if (!f.tex || f.width != w || f.height != h) {
+      const std::uint32_t pw = w * scale_, ph = h * scale_;  // Q1: the frame at the internal resolution
+      if (!f.tex || f.width != pw || f.height != ph) {
         wgpu::TextureDescriptor td{};
-        td.size = {w, h, 1};
+        td.size = {pw, ph, 1};
         td.format = wgpu::TextureFormat::RGBA8Unorm;
         td.usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::CopyDst | wgpu::TextureUsage::CopySrc;
         td.label = "xfb";
         f.tex = gpu_.device().CreateTexture(&td);
         f.view = f.tex.CreateView();
-        f.width = w;
-        f.height = h;
+        f.width = pw;
+        f.height = ph;
       }
       f.addr = c.dest & 0x01FFFFFFu;
       f.serial = ++serial_;
@@ -1032,10 +1059,10 @@ void Renderer::efb_copy(const EfbCopy& c) {
       wgpu::CommandEncoder enc = gpu_.device().CreateCommandEncoder();
       wgpu::TexelCopyTextureInfo src{};
       src.texture = efb_color_;
-      src.origin = {x0, y0, 0};
+      src.origin = {x0 * scale_, y0 * scale_, 0};
       wgpu::TexelCopyTextureInfo dst{};
       dst.texture = f.tex;
-      wgpu::Extent3D ext{w, h, 1};
+      wgpu::Extent3D ext{pw, ph, 1};
       enc.CopyTextureToTexture(&src, &dst, &ext);
       wgpu::CommandBuffer cb = enc.Finish();
       gpu_.queue().Submit(1, &cb);
@@ -1049,6 +1076,20 @@ void Renderer::efb_copy(const EfbCopy& c) {
     }
   }
   if (c.clear) clear_efb(c);
+  // Q1: a new internal resolution starts with a frame: after an XFB copy that
+  // clears (the game's end of frame). The new EFB starts all cleared with that
+  // copy's clear values.
+  if (want_scale_ != scale_ && c.to_xfb && c.clear) {
+    flush();
+    scale_ = want_scale_;
+    create_efb();
+    EfbCopy all = c;
+    all.src_x = all.src_y = 0;
+    all.width = kEfbWidth;
+    all.height = kEfbHeight;
+    all.clear_color = all.clear_alpha = all.clear_depth = true;
+    clear_efb(all);
+  }
 }
 
 const Renderer::Frame* Renderer::xfb(std::uint32_t addr) const {
@@ -1185,7 +1226,7 @@ const Renderer::Frame* Renderer::scanout() {
 
 std::vector<std::uint8_t> Renderer::read_efb() {
   flush();
-  return gpu_.read_texture(efb_color_, kEfbWidth, kEfbHeight);
+  return gpu_.read_texture(efb_color_, kEfbWidth * scale_, kEfbHeight * scale_);
 }
 
 }  // namespace mvp::gfx

@@ -136,6 +136,10 @@ void Hardware::exi_transfer(int ch) {
   u32 rw = (e.cr >> 2) & 3;  // 0 read, 1 write, 2 read-write
   if (e.cr & 2) {  // DMA
     u32 pa = e.mar & 0x01FFFFE0u;
+    if (rw == 0 && pa < mem1_size_) {
+      ppc::gp_check(pa, std::min(e.len, mem1_size_ - pa));  // P2: memory the render thread still reads
+      if (gfx_) gfx_->gp_write_through(pa, std::min(e.len, mem1_size_ - pa));  // Q1: memory written without the cache
+    }
     for (u32 k = 0; k < e.len && pa + k < mem1_size_; ++k) {
       if (rw == 0) mem1_[pa + k] = ipl ? ipl_read_byte(e) : 0;
       else if (ipl) ipl_write_byte(e, mem1_[pa + k]);
@@ -251,6 +255,7 @@ void Hardware::wgp_burst() {
   if (pa + 32 > mem1_size_) throw StopRun{"GX FIFO burst outside MEM1"};
   ppc::gp_check(pa, 32);  // P2: memory the render thread still reads (a redirected pipe writes anywhere)
   std::memcpy(mem1_ + pa, gather, 32);
+  if (gfx_) gfx_->gp_write_through(pa, 32);  // Q1: the pipe writes memory without the cache
   ++gp_bursts_;
   pa += 32;
   if (pa > end) {
@@ -382,6 +387,7 @@ void Hardware::di_complete() {
     u32 pa = di_mar_ & 0x01FFFFE0u, n = di_len_;
     if (pa + n > mem1_size_) throw StopRun{"DI DMA outside MEM1"};
     ppc::gp_check(pa, n);  // P2: memory the render thread still reads
+    if (gfx_) gfx_->gp_write_through(pa, n);  // Q1: DMA writes memory without the cache
     if (cmd == 0xA8) {
       std::uint64_t off = std::uint64_t(di_cmd_[1]) << 2;
       if (!disc_ || !disc_->read(off, mem1_ + pa, n)) {
@@ -411,6 +417,7 @@ void Hardware::dsp_aram_dma() {
   u32 mm = ar_mm_ & 0x01FFFFE0u, ar = ar_ar_ & 0x00FFFFE0u, n = ar_cnt_ & 0x7FFFFFE0u;
   bool to_mem = (ar_cnt_ & 0x80000000u) != 0;
   if (to_mem) ppc::gp_check(mm, n);  // P2: memory the render thread still reads
+  if (to_mem && gfx_) gfx_->gp_write_through(mm, n);  // Q1: DMA writes memory without the cache
   for (u32 k = 0; k < n; ++k) {
     if (mm + k >= mem1_size_ || ar + k >= aram_.size()) break;
     if (to_mem) mem1_[mm + k] = aram_[ar + k];
