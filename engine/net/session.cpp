@@ -85,7 +85,8 @@ void Session::send_input(u64 now_ms) {
 void Session::send_bye(ByeReason r, const std::string& text) {
   Bye b;
   b.reason = r;
-  b.frame = static_cast<u32>(next_take_);
+  // Desync: the window that differed; otherwise the next frame this side would run.
+  b.frame = r == ByeReason::Desync && mismatch_ ? mismatch_->frame : static_cast<u32>(next_take_);
   b.text = text.substr(0, kMaxReason);
   const std::vector<u8> d = encode(b);
   for (int k = 0; k < kByeRepeats; ++k) send_raw(d);  // unreliable: a few copies
@@ -232,10 +233,15 @@ void Session::on_input(const Input& m, u64 now_ms) {
 
 void Session::on_bye(const Bye& b) {
   const std::string text = b.text.empty() ? "" : ": " + b.text;
+  if (b.reason != ByeReason::Desync) peer_cur_frame_ = std::max(peer_cur_frame_, b.frame);  // where the peer stopped
   switch (b.reason) {
     case ByeReason::Desync:
-      if (!mismatch_) mismatch_ = Mismatch{b.frame, 0, 0};
-      stop(State::Desynced, "the other player detected a desync at frame " + std::to_string(b.frame) + text,
+      if (!mismatch_) {
+        // The window the peer found different; our hash of it, if we have it.
+        auto it = local_hashes_.find(b.frame);
+        mismatch_ = Mismatch{b.frame, it != local_hashes_.end() ? it->second : 0, 0};
+      }
+      stop(State::Desynced, "the other player detected a desync in the window ending at frame " + std::to_string(b.frame) + text,
            ByeReason::Desync, false);
       break;
     case ByeReason::Rejected:

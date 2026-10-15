@@ -222,6 +222,8 @@ TEST_CASE("desync: a wrong state hash stops both peers at that window") {
   CHECK(sim.b.s.state() == State::Desynced);
   REQUIRE(sim.a.s.mismatch());
   CHECK(sim.a.s.mismatch()->frame == 299);
+  REQUIRE(sim.b.s.mismatch());
+  CHECK(sim.b.s.mismatch()->frame == 299);
   CHECK(sim.a.s.mismatch()->local != sim.a.s.mismatch()->remote);
   // Both stop close to the bad window (a few frames for the hash to travel).
   CHECK(sim.a.frame < 299 + 40);

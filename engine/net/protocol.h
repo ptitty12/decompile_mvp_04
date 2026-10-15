@@ -100,7 +100,7 @@ enum class ByeReason : u8 { Quit = 0, Desync = 1, Rejected = 2, Timeout = 3, Err
 
 struct Bye {
   ByeReason reason = ByeReason::Quit;
-  u32 frame = 0;
+  u32 frame = 0;     // Desync: the window that differed; otherwise the sender's next frame
   std::string text;  // short reason for the other player (at most kMaxReason bytes)
   bool operator==(const Bye&) const = default;
 };
