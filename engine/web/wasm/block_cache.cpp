@@ -10,7 +10,7 @@ BlockCacheSource::BlockCacheSource(std::unique_ptr<RangeFetcher> fetcher, std::u
   opt_.block = std::max<std::uint32_t>(opt_.block, 4096);
   opt_.max_run = std::max<std::uint32_t>(opt_.max_run, 1);
   // A whole run, plus the block being read, must fit.
-  opt_.max_blocks = std::max(opt_.max_blocks, opt_.max_run + opt_.ahead + 2);
+  opt_.max_blocks = std::max(opt_.max_blocks, std::max(opt_.max_run, kMaxReadRun) + opt_.ahead + 2);
 }
 
 std::uint32_t BlockCacheSource::block_len(std::uint64_t b) const {
@@ -42,7 +42,7 @@ void BlockCacheSource::put(std::uint64_t b, std::vector<std::uint8_t> bytes, boo
   blk.ahead = ahead;
 }
 
-const BlockCacheSource::Block* BlockCacheSource::get(std::uint64_t b) {
+const BlockCacheSource::Block* BlockCacheSource::get(std::uint64_t b, std::uint64_t last) {
   if (b != last_read_) {
     seq_ = (last_read_ != ~0ull && b == last_read_ + 1) ? seq_ + 1 : 0;
     last_read_ = b;
@@ -60,8 +60,11 @@ const BlockCacheSource::Block* BlockCacheSource::get(std::uint64_t b) {
   ++st_.misses;
   // Sequential misses fetch longer runs (1, 2, 4, ... max_run blocks).
   run_ = (last_miss_ != ~0ull && b == last_miss_) ? std::min(run_ * 2, opt_.max_run) : 1;
+  // A large read takes all its missing blocks in one request.
+  const std::uint32_t want = static_cast<std::uint32_t>(
+      std::max<std::uint64_t>(run_, std::min<std::uint64_t>(last - b + 1, kMaxReadRun)));
   std::uint32_t count = 1;
-  while (count < run_ && b + count < blocks() && !blocks_.count(b + count) && !in_flight_.count(b + count)) ++count;
+  while (count < want && b + count < blocks() && !blocks_.count(b + count) && !in_flight_.count(b + count)) ++count;
   const std::uint64_t start = b * opt_.block;
   const std::uint64_t end = std::min<std::uint64_t>(size_, (b + count) * opt_.block);
   std::vector<std::uint8_t> buf(static_cast<std::size_t>(end - start));
@@ -92,7 +95,7 @@ bool BlockCacheSource::read(std::uint64_t off, void* dst, std::size_t n) {
     const std::uint64_t b = off / opt_.block;
     const std::uint32_t bo = static_cast<std::uint32_t>(off % opt_.block);
     const std::size_t take = std::min<std::size_t>(n, block_len(b) - bo);
-    const Block* blk = get(b);
+    const Block* blk = get(b, (off + n - 1) / opt_.block);
     if (!blk) return false;
     std::memcpy(out, blk->bytes.data() + bo, take);
     out += take;

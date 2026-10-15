@@ -86,7 +86,10 @@ class BlockCacheSource final : public vfs::Source {
     bool ahead = false;  // inserted by read-ahead and not read yet
   };
   std::uint32_t block_len(std::uint64_t b) const;
-  const Block* get(std::uint64_t b);  // fetches on a miss
+  // Fetches on a miss: at least the blocks up to `last` (the rest of the read
+  // that asked), at most kMaxReadRun of them.
+  const Block* get(std::uint64_t b, std::uint64_t last);
+  static constexpr std::uint32_t kMaxReadRun = 32;
   void put(std::uint64_t b, std::vector<std::uint8_t> bytes, bool ahead);
   void touch(Block& blk, std::uint64_t b);
 

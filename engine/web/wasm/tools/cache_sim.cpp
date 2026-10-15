@@ -88,11 +88,14 @@ int main(int argc, char** argv) {
   std::uint64_t ahead_requests = 0, ahead_bytes = 0, reads = 0;
   double max_stall = 0;
   std::uint64_t stalls_50 = 0, stalls_200 = 0;
+  std::vector<double> by_field(64, 0);  // waited, per 300 VI fields
+  double field_now = 0;
   std::string line;
   while (std::getline(in, line)) {
     if (line.empty()) continue;
     if (line[0] == 'F') {
       const double field = std::atof(line.c_str() + 2);
+      field_now = field;
       g_now = std::max(g_now, field * field_ms);
       for (auto it = flights.begin(); it != flights.end();) {
         if (it->done <= g_now) {
@@ -123,6 +126,7 @@ int main(int argc, char** argv) {
     src.read(off, buf.data(), n);
     ++reads;
     const double stall = g_now - t0;
+    by_field[std::min<std::size_t>(63, static_cast<std::size_t>(field_now / 300))] += stall;
     if (stall > max_stall) max_stall = stall;
     if (stall > 50) ++stalls_50;
     if (stall > 200) ++stalls_200;
@@ -138,5 +142,11 @@ int main(int argc, char** argv) {
               static_cast<unsigned long long>(s.prefetch_used), static_cast<unsigned long long>(s.prefetch_wasted),
               s.blocked_ms, max_stall, static_cast<unsigned long long>(stalls_50),
               static_cast<unsigned long long>(stalls_200));
+  std::printf("waited per 300 fields:");
+  std::size_t last = 0;
+  for (std::size_t k = 0; k < by_field.size(); ++k)
+    if (by_field[k] > 0) last = k;
+  for (std::size_t k = 0; k <= last; ++k) std::printf(" %zu:%.0f", k * 300, by_field[k]);
+  std::putchar('\n');
   return 0;
 }
