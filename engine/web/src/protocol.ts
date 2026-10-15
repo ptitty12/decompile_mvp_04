@@ -101,11 +101,14 @@ export interface RunOptions {
   audio: boolean;      // false: never mix (the guest is the same either way)
   cache: boolean;      // use and fill the browser's cache of the translated module
   traceDisc?: boolean; // development: record the picked image's reads (offsets and sizes)
+  ioLog?: boolean;     // development: log every guest DVD read with its host timing (P1)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }
 
-// The disc image: a file the player picked, or the server's image (disc.ts).
-export type DiscSource = { kind: 'file'; file: File } | { kind: 'url'; url: string };
+// The disc image: a file the player picked, the server's image kept in this
+// browser (`stored`: disc-store.ts, read like a picked file), or the server's
+// image read over the network (disc.ts).
+export type DiscSource = { kind: 'file'; file: File; stored?: boolean } | { kind: 'url'; url: string };
 
 export type ToWorker =
   | { type: 'start'; disc: DiscSource; canvas: OffscreenCanvas | null; width: number; height: number; options: RunOptions }
@@ -140,6 +143,9 @@ export interface Status {
   disc_reads?: number;
   disc_bytes?: number;
   heap_mb?: number;  // the engine's WebAssembly memory
+  // The guest's DVD reads as the host served them (P1): host ms in reads, the longest, and how many took
+  // longer than a field (16.7 ms), 50 ms and 100 ms.
+  io?: { reads: number; bytes: number; ms: number; max_ms: number; over16: number; over50: number; over100: number };
   net?: { requests: number; fetched: number; hits: number; misses: number; prefetched: number; prefetch_used: number;
           prefetch_wasted: number; blocked_ms: number };  // the server's image (block cache)
   audio?: { frames: number; rate: number; voice_ms: number; aux_returns: number; nonsilent: number; peak: number;
@@ -169,7 +175,7 @@ export type FromWorker =
   | { type: 'cache'; report: CacheReport }
   | { type: 'audio'; attachedAtField: number }
   | { type: 'stats'; status: Status; window: { fields: number; ms: number; wallMs: number } }
-  | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string }
+  | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string; ioLog?: string }
   | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
   | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string };
 

@@ -11,7 +11,8 @@
 //        [--js-flags FLAGS] [--tag NAME]
 //        [--server-disc [--login] [--latency MS] [--rate MBPS]] [--audio | --no-audio] [--audible]
 //        [--audio-latency MS] [--pad F:button:I,F:axis:I:V,...] [--runs N] [--clear-cache] [--no-cache]
-//        [--hide F:MS] [--trace-disc] [--disc-cache PARAMS] [--hold MS] [--real-server MAIN_JS]
+//        [--hide F:MS] [--trace-disc] [--disc-cache PARAMS] [--hold MS] [--real-server MAIN_JS [--disc-dir DIR]]
+//        [--throttle RTT_MS,MBIT] [--io-log] [--clear-disc] [--store-off] [--profile DIR]
 //
 //   --disc     the image (default: $MVP_DISC). It goes to the page's file input
 //              locally (or, with --server-disc, to the mock server on 127.0.0.1)
@@ -35,6 +36,24 @@
 //   --real-server  E5's server (engine/server, built: dist/src/main.js) instead of
 //              the mock, with a throwaway password (the check logs in through its
 //              form) and the disc configured
+//   --disc-dir with --real-server: the server's disc directory (MVP_DISC_DIR, as the
+//              Docker deployment: DIR/GV4E69.img is the uploaded image) instead of
+//              MVP_DISC_IMAGE
+//   --throttle Chrome's network conditions (CDP) on the page and its Workers: a round
+//              trip of RTT_MS and MBIT Mbit/s each way, e.g. 60,100 (Chromium browsers)
+//   --site     the site directory to serve (default build/engine/emscripten/web/site)
+//   --clear-disc  run 1 starts without the server image kept in the browser (P1)
+//   --store-off   the page reads the server's image over the network (store=0) instead
+//              of downloading it once into the browser's storage
+//   --interrupt-download PCT  reload the page once when the download reaches PCT %
+//              (it must resume: the summary's download.resumedFrom)
+//   --fallback after a download error, press "Play without keeping the game data"
+//   --params Q more page parameters (e.g. storeSpare=100000000 for the quota error)
+//   --profile  a browser profile directory on disk (persistent: what a player's
+//              browser keeps between visits, and its real storage quota) instead of a
+//              fresh in-memory context
+//   --io-log   log every guest DVD read with its host timing (ioLog=1) into
+//              OUT/io-*.txt and summarize the waits in the summary
 //   --audio    click the page first (the user gesture that starts audio), then
 //              sample the worklet's output through the page's AnalyserNode tap.
 //              The browser's output is muted (--audible: not muted)
@@ -96,6 +115,15 @@ const clearCache = flag('--clear-cache');
 const noCache = flag('--no-cache');
 const traceDisc = flag('--trace-disc');
 const discParams = opt('--disc-cache', '');  // e.g. discBlock=256&discRun=8&discAhead=8
+const discDir = opt('--disc-dir', '');
+const throttle = opt('--throttle', '') ? opt('--throttle', '').split(',').map(Number) : null;
+const ioLog = flag('--io-log');
+const clearDisc = flag('--clear-disc');
+const storeOff = flag('--store-off');
+const profile = opt('--profile', '');
+const interruptAt = Number(opt('--interrupt-download', '0'));
+const fallback = flag('--fallback');
+const pageParams = opt('--params', '');
 const label = tag ? `${browserName}-${tag}` : browserName;
 const chromiumArgs = ['--enable-unsafe-webgpu', ...(audible ? [] : ['--mute-audio']),
                       ...(jsFlags ? [`--js-flags=${jsFlags}`] : [])];
@@ -121,17 +149,17 @@ mkdirSync(out, { recursive: true });
 // The server, on a free port: serve.mjs (with --server-disc its mock of the
 // deployment), or with --real-server E5's server (engine/server, built) with a
 // throwaway password and the disc configured.
-const site = resolve(repo, 'build', 'engine', 'emscripten', 'web', 'site');
+const site = resolve(opt('--site', join(repo, 'build', 'engine', 'emscripten', 'web', 'site')));
 const password = randomBytes(18).toString('base64url');
 let server;
 if (realServer) {
   server = spawn(process.execPath, [realServer], {
     env: { ...process.env, MVP_PASSWORD: password, MVP_SITE: site, MVP_PORT: '0', MVP_HOST: '127.0.0.1',
-           MVP_DISC_IMAGE: disc },
+           ...(discDir ? { MVP_DISC_DIR: resolve(discDir) } : { MVP_DISC_IMAGE: disc }) },
     stdio: ['ignore', 'pipe', 'inherit'],
   });
 } else {
-  const serverArgs = [join(here, 'serve.mjs'), '--port', '0'];
+  const serverArgs = [join(here, 'serve.mjs'), '--port', '0', '--root', site];
   if (serverDisc) {
     serverArgs.push('--disc', disc);
     if (login) serverArgs.push('--login');
@@ -185,6 +213,23 @@ function setHidden(hidden) {
   document.dispatchEvent(new Event('visibilitychange'));
 }
 
+// The guest's DVD reads (--io-log): "field at_ms offset size ms" lines. Totals, and the
+// reads that kept a field waiting (> 16.7 ms), > 50 ms and > 100 ms, before and after
+// the first frame, with the longest ones.
+function summarizeIo(text, firstFrameField) {
+  const rows = text.trim().split(/\r?\n/).filter(Boolean).map((l) => l.split(' ').map(Number));
+  const part = (rs) => ({
+    reads: rs.length, mb: +(rs.reduce((n, r) => n + r[3], 0) / 1048576).toFixed(1),
+    waitMs: +rs.reduce((n, r) => n + r[4], 0).toFixed(0), maxMs: +Math.max(0, ...rs.map((r) => r[4])).toFixed(1),
+    over16: rs.filter((r) => r[4] > 1000 / 59.94).length, over50: rs.filter((r) => r[4] > 50).length,
+    over100: rs.filter((r) => r[4] > 100).length,
+  });
+  const longest = [...rows].sort((a, b) => b[4] - a[4]).slice(0, 10)
+    .map((r) => ({ field: r[0], offset: r[2], size: r[3], ms: r[4] }));
+  return { all: part(rows), beforeFirstFrame: part(rows.filter((r) => r[0] < firstFrameField)),
+           afterFirstFrame: part(rows.filter((r) => r[0] >= firstFrameField)), longest };
+}
+
 async function runOnce(context, run) {
   const summary = { run };
   const page = await context.newPage();
@@ -198,6 +243,14 @@ async function runOnce(context, run) {
   const requests = [];
   page.on('request', (r) => requests.push(r.url()));
   if (pads.length) await page.addInitScript(fakeGamepad);
+  if (throttle) {
+    // Page-level conditions also slow the page's dedicated Workers' requests (Chrome 155, checked).
+    const cdp = await context.newCDPSession(page);
+    const bytesPerS = (throttle[1] * 1e6) / 8;
+    await cdp.send('Network.enable');
+    await cdp.send('Network.emulateNetworkConditions',
+                   { offline: false, latency: throttle[0], downloadThroughput: bytesPerS, uploadThroughput: bytesPerS });
+  }
 
   const q = new URLSearchParams();
   if (scriptFile) q.set('script', readFileSync(scriptFile, 'utf8'));
@@ -209,20 +262,27 @@ async function runOnce(context, run) {
   if (noCache) q.set('cache', '0');
   if (audioLatency) q.set('audioLatency', audioLatency);
   if (traceDisc) q.set('traceDisc', '1');
+  if (ioLog) q.set('ioLog', '1');
   for (const [k, v] of new URLSearchParams(discParams)) q.set(k, v);
-  if (realServer && run === 1) {  // log in through the form, as a player would
-    await page.goto(base);
+  for (const [k, v] of new URLSearchParams(pageParams)) q.set(k, v);
+  if (storeOff) q.set('store', '0');
+  // Log in through the form, as a player would (to a page that starts nothing), and empty the
+  // browser's caches before the game page loads.
+  if (realServer && run === 1) {
+    await page.goto(`${base}login?next=%2Fhealthz`);
     await page.fill('input[name=password]', password);
-    await Promise.all([page.waitForURL(base), page.click('button[type=submit]')]);
+    await Promise.all([page.waitForURL(`${base}healthz`), page.click('button[type=submit]')]);
+  }
+  if (run === 1 && (clearCache || clearDisc)) {
+    if (!realServer) await page.goto(`${base}style.css`);
+    await page.evaluate(async ([translation, disc]) => {
+      const root = await navigator.storage.getDirectory();
+      if (translation) await root.removeEntry('mvp-translated', { recursive: true }).catch(() => undefined);
+      if (disc) await root.removeEntry('mvp-disc', { recursive: true }).catch(() => undefined);
+    }, [clearCache, clearDisc]);
   }
   const t0 = Date.now();
   await page.goto(`${base}?${q}`);
-  if (run === 1 && clearCache) {
-    await page.evaluate(async () => {
-      const root = await navigator.storage.getDirectory();
-      await root.removeEntry('mvp-translated', { recursive: true }).catch(() => undefined);
-    });
-  }
   summary.webgpu = await page.evaluate(() => 'gpu' in navigator);
   // The user gesture that starts audio: a real click on the page.
   if (audio) await page.mouse.click(5, 5);
@@ -238,8 +298,41 @@ async function runOnce(context, run) {
   if (!serverDisc) await page.setInputFiles('#disc', disc);
   else {
     // With the lobby on the page (E5), the server's disc waits for Play (or a room).
-    await page.waitForFunction(() => window.mvp.source || window.mvp.error ||
-                                     !document.getElementById('start-box')?.hidden, null, { timeout: 30000 });
+    // P1: the first visit downloads the image into the browser first (a progress bar).
+    let lastPct = -1, interrupted = false;
+    for (;;) {
+      const s = await page.evaluate(() => ({ source: window.mvp.source, error: window.mvp.error, download: window.mvp.download,
+                                             ready: !document.getElementById('start-box')?.hidden,
+                                             stream: !document.getElementById('stream-box')?.hidden }));
+      if (s.error && fallback && s.stream && !summary.downloadError) {
+        summary.downloadError = { ...s.error, download: s.download };
+        console.log(`download error shown: ${s.error.message}`);
+        await page.click('#stream');
+        continue;
+      }
+      if (s.source || s.error || s.ready || Date.now() > t0 + timeoutS * 1000) {
+        summary.download = s.download ?? null;
+        summary.readyMs = Date.now() - t0;
+        break;
+      }
+      const d = s.download;
+      if (d?.state === 'downloading' && d.total) {
+        const pct = Math.floor((100 * d.done) / d.total);
+        if (interruptAt && !interrupted && pct >= interruptAt) {
+          interrupted = true;
+          summary.interruptedAt = d.done;
+          console.log(`reloading the page at ${pct}% of the download`);
+          await page.reload();
+          continue;
+        }
+        if (pct >= lastPct + 10) {
+          lastPct = pct;
+          console.log(`download ${pct}% (${(d.done / 1048576).toFixed(0)} MB, ${(d.bytesPerS / 1048576).toFixed(1)} MB/s)`);
+        }
+      }
+      await page.waitForTimeout(250);
+    }
+    if (summary.download) console.log(`disc in the browser: ${JSON.stringify(summary.download)}, ready ${summary.readyMs} ms after load`);
     if (await page.locator('#play').isVisible()) await page.click('#play');
   }
 
@@ -250,7 +343,7 @@ async function runOnce(context, run) {
              firstFrameMs: s.firstFrameMs, firstFrameField: s.firstFrameField, stats: s.stats, stopped: s.stopped,
              error: s.error, cache: s.cache, audio: s.audio, audioAttachedAtField: s.audioAttachedAtField,
              paused: s.paused, pad: s.pad, probe: s.audioProbe(), discTrace: s.discTrace,
-             packs: s.packs?.mounted ?? null };
+             packs: s.packs?.mounted ?? null, ioLog: s.ioLog };
   });
   const windows = [];
   const audioSamples = { n: 0, nonsilent: 0, maxRms: 0, maxPeak: 0, firstNonsilentField: null };
@@ -324,6 +417,11 @@ async function runOnce(context, run) {
   }
   if (state.discTrace) writeFileSync(join(out, `disc-trace-${label}-r${run}.txt`), state.discTrace);
   delete state.discTrace;
+  if (state.ioLog) {
+    writeFileSync(join(out, `io-${label}-r${run}.txt`), state.ioLog);
+    summary.io = summarizeIo(state.ioLog, state.firstFrameField ?? 0);
+  }
+  delete state.ioLog;
   if (state.stopped || state.firstFrameMs !== undefined) {
     const path = join(out, `${label}-r${run}-final.png`);
     await page.locator('#screen').screenshot({ path }).catch(() => undefined);
@@ -351,9 +449,20 @@ const all = { browser: browserName, tag: tag || null, jsFlags: jsFlags || null, 
 let rc = 1;
 let browser;
 try {
-  browser = await launchers[browserName]();
-  all.version = browser.version();
-  const context = await browser.newContext({ viewport: { width: 1100, height: 1100 } });
+  let context;
+  if (profile) {
+    // A profile on disk: what the browser keeps between visits, with its real storage quota.
+    if (!['chrome', 'msedge', 'chromium'].includes(browserName)) throw new Error('--profile: Chromium browsers only');
+    context = await chromium.launchPersistentContext(resolve(profile), {
+      channel: browserName === 'chromium' ? undefined : browserName, headless: !headed, args: chromiumArgs,
+      viewport: { width: 1100, height: 1100 } });
+    browser = { close: () => context.close() };
+    all.version = context.browser()?.version() ?? null;
+  } else {
+    browser = await launchers[browserName]();
+    all.version = browser.version();
+    context = await browser.newContext({ viewport: { width: 1100, height: 1100 } });
+  }
   for (let run = 1; run <= runs; ++run) {
     const s = await runOnce(context, run);
     all.runs.push(s);

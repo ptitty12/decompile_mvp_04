@@ -11,8 +11,6 @@
 <body>
   <main>
     <h1>MVP Baseball 2005 <span>browser engine, development build</span></h1>
-    <p id="server-disc" class="note" hidden><a id="server-disc-link" href="/disc">Server disc</a>: upload or replace the
-      disc image on this server.</p>
     <section id="online" class="online" hidden></section>
     <section id="packs" class="packs"></section>
     <div id="picker" hidden>
@@ -25,6 +23,8 @@
       </label>
     </div>
     <p id="start-box" hidden><button type="button" id="play">Play</button></p>
+    <p id="stream-box" hidden><button type="button" id="stream">Play without keeping the game data</button>
+      <span class="note">The game then reads the disc from the server while you play, and pauses while it loads.</span></p>
     <p id="status" role="status"></p>
     <progress id="progress" max="1" hidden></progress>
     <p id="error" class="error" role="alert" hidden></p>
@@ -52,6 +52,7 @@
       <summary>Engine log</summary>
       <div id="log"></div>
     </details>
+    <p id="operator" class="operator" hidden><a id="server-disc-link" href="/disc">Server disc</a> (site operator)</p>
   </main>
 </body>
 </html>

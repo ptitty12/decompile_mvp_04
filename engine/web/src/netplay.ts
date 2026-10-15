@@ -108,7 +108,7 @@ export class Online {
     }
     this.state.available = true;
     this.el.hidden = false;
-    this.say('Create a game and send the link, or open the link you got. Then pick your disc.');
+    this.say('Create a game and send the link, or open the link you got.');
     const room = this.params.get('room');
     if (room) this.connect({ t: 'join', room });
     else if (this.params.get('online') === 'create') this.create();
@@ -220,7 +220,7 @@ export class Online {
         this.delayEl.value = String(m.delay);
         this.delayEl.disabled = true;
         this.say(m.peer ? 'The other player is here. Connecting...' :
-                 'Game created. Send the invite link to the other player, then pick your disc.');
+                 'Game created. Send the invite link to the other player.');
         if (m.peer) this.startPeer();
         break;
       case 'peer':
