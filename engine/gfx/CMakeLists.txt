@@ -9,9 +9,15 @@
 # in docs/engine/TOOLCHAIN.md; without them the backend is skipped and the rest
 # of the engine builds as before.
 
-add_library(engine_gfx STATIC png.cpp gx_processor.cpp texture_decode.cpp tev_wgsl.cpp)
+add_library(engine_gfx STATIC png.cpp gx_processor.cpp texture_decode.cpp tev_wgsl.cpp render_ring.cpp)
 target_link_libraries(engine_gfx PUBLIC engine_common)
 target_compile_options(engine_gfx PRIVATE ${ENGINE_WARN})
+# P2: the render thread's command ring (render_ring.h), with a producer and a
+# consumer thread (native; the browser build without threads has none).
+if(NOT EMSCRIPTEN)
+  find_package(Threads REQUIRED)
+  engine_test(test_render_ring SOURCES tests/test_render_ring.cpp LIBS engine_gfx Threads::Threads)
+endif()
 
 engine_test(test_gfx_png SOURCES tests/test_png.cpp LIBS engine_gfx)
 engine_test(test_tev_wgsl SOURCES tests/test_tev_wgsl.cpp LIBS engine_gfx)

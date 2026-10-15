@@ -3,9 +3,25 @@
 #include <cstdio>
 #include <cstring>
 
+#ifdef __EMSCRIPTEN_PTHREADS__
+#include <emscripten/console.h>
+#endif
+
 namespace mvp::gfx {
 
 namespace {
+
+// Error messages. On a pthread (P2: the render thread) stdio is proxied
+// synchronously to the main thread, which may be waiting for this one; the
+// console is not.
+template <class... A>
+void report(const char* fmt, A... a) {
+#ifdef __EMSCRIPTEN_PTHREADS__
+  emscripten_errf(fmt, a...);
+#else
+  std::fprintf(stderr, fmt, a...);
+#endif
+}
 
 std::string to_string(wgpu::StringView s) {
   if (!s.data) return {};
@@ -27,14 +43,14 @@ void Gpu::set_device_callbacks(wgpu::DeviceDescriptor* ddesc) {
   ddesc->SetUncapturedErrorCallback(
       [](const wgpu::Device&, wgpu::ErrorType type, wgpu::StringView message, std::uint64_t* errors) {
         ++*errors;
-        std::fprintf(stderr, "gfx: WebGPU error %d: %s\n", static_cast<int>(type), to_string(message).c_str());
+        report("gfx: WebGPU error %d: %s\n", static_cast<int>(type), to_string(message).c_str());
       },
       errors_.get());
   ddesc->SetDeviceLostCallback(wgpu::CallbackMode::AllowSpontaneous,
                                [](const wgpu::Device&, wgpu::DeviceLostReason reason, wgpu::StringView message) {
                                  if (reason == wgpu::DeviceLostReason::Destroyed) return;
-                                 std::fprintf(stderr, "gfx: WebGPU device lost (%d): %s\n", static_cast<int>(reason),
-                                              to_string(message).c_str());
+                                 report("gfx: WebGPU device lost (%d): %s\n", static_cast<int>(reason),
+                                        to_string(message).c_str());
                                });
 }
 
