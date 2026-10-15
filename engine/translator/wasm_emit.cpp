@@ -323,6 +323,8 @@ class FuncGen {
   std::vector<u32> resume_labels_;
   bool has_resume_ = false, dispatch_ = false;
   int loop_level_ = -1, pre_level_ = -1;
+  int self_loop_ = -1;               // the current segment's own loop, if any
+  std::vector<bool> self_loops_;     // per segment: it branches back to its own start
   int cur_seg_ = 0;
   s64 p_ = 0;  // instructions started since the ticks local was last updated
   RegSet used_ = 0;
@@ -338,12 +340,27 @@ bool falls_through(const InsnInfo& x) {
 }
 
 // rt::on_entry, the entry safe point, and the return-path check of a function
-// entry (runtime/native.h), on the in-memory state. `miss` runs when an
-// interrupt at the entry safe point moved the guest elsewhere.
+// entry (runtime/native.h), on the in-memory state. `miss` runs when the entry
+// hook or an interrupt at the entry safe point moved the guest elsewhere. The
+// fast path (no hook, no event due) is one test (E2d): the check is needed only
+// after the hook or the safe point ran, since a function is never entered while
+// unwinding and nothing else changes c.pc there.
 void emit_prologue(Fn& b, u32 e, const std::function<void()>& miss) {
+  auto event_due = [&] {
+    b.get(0);
+    b.mem(op::i64_load, 3, kTicks);
+    b.get(0);
+    b.mem(op::i64_load, 3, kNextEvent);
+    b.op(op::i64_ge_u);
+  };
   b.get(0);
   b.i32c(e);
   b.mem(op::i32_store, 2, kPc);
+  b.global(gHook);
+  b.mem(op::i32_load, 2, 0);
+  event_due();
+  b.op(op::i32_or);
+  b.if_();
   b.global(gHook);
   b.mem(op::i32_load, 2, 0);
   b.if_();
@@ -351,11 +368,7 @@ void emit_prologue(Fn& b, u32 e, const std::function<void()>& miss) {
   b.i32c(e);
   b.call(iOnEntry);
   b.end();
-  b.get(0);
-  b.mem(op::i64_load, 3, kTicks);
-  b.get(0);
-  b.mem(op::i64_load, 3, kNextEvent);
-  b.op(op::i64_ge_u);
+  event_due();
   b.if_();
   b.get(0);
   b.call(iSafepoint);
@@ -369,6 +382,7 @@ void emit_prologue(Fn& b, u32 e, const std::function<void()>& miss) {
   b.op(op::i32_or);
   b.if_();
   miss();
+  b.end();
   b.end();
 }
 
@@ -589,6 +603,8 @@ void FuncGen::check(u32 expect) {
 void FuncGen::jump(int seg) {
   if (seg > cur_seg_) {
     body_->br(level_[static_cast<std::size_t>(seg)]);
+  } else if (seg == cur_seg_ && self_loop_ >= 0) {
+    body_->br(self_loop_);  // back to the start of this segment: its own loop (E2d)
   } else {
     body_->i32c(seg);
     body_->set(L_label);
@@ -2126,6 +2142,8 @@ void FuncGen::emit_node(std::size_t k) {
       cond_expr(x);
       if (t > cur_seg_) {
         b.br_if(level_[static_cast<std::size_t>(t)]);
+      } else if (t == cur_seg_ && self_loop_ >= 0) {
+        b.br_if(self_loop_);
       } else {
         b.if_();
         jump(t);
@@ -2290,11 +2308,20 @@ bool FuncGen::run(Fn& body, std::string* error) {
     while (l + 1 < labels.size() && labels[l + 1] <= a) ++l;
     seg_at_[k] = first + static_cast<int>(l);
   }
+  // Segments with a branch back to their own start (self loops), and whether
+  // any other backward branch needs the dispatcher.
+  self_loops_.assign(seg_start_.size(), false);
+  for (std::size_t k = 0; k < n; ++k) {
+    if (!f_.reachable[k]) continue;
+    const Node& N = nodes_[k];
+    if ((N.kind == kJump || N.kind == kCJump) && seg_at_[static_cast<std::size_t>(N.s0)] == seg_at_[k])
+      self_loops_[static_cast<std::size_t>(seg_at_[k])] = true;
+  }
   dispatch_ = has_resume_ || mode_ == Mode::Body || !f_.tables.empty();
   for (std::size_t k = 0; k < n && !dispatch_; ++k) {
     if (!f_.reachable[k]) continue;
     const Node& N = nodes_[k];
-    if ((N.kind == kJump || N.kind == kCJump) && seg_at_[static_cast<std::size_t>(N.s0)] <= seg_at_[k]) dispatch_ = true;
+    if ((N.kind == kJump || N.kind == kCJump) && seg_at_[static_cast<std::size_t>(N.s0)] < seg_at_[k]) dispatch_ = true;
   }
   if (dispatch_) ++ctx_.out->stats.dispatch_functions;
   for (u32 a : resume_labels_) resume_out_.push_back({a, static_cast<u32>(seg_at_[(a - f_.start) / 4])});
@@ -2381,6 +2408,10 @@ bool FuncGen::run(Fn& body, std::string* error) {
     p_ = 0;
     std::size_t k = (seg_start_[static_cast<std::size_t>(s)] - f_.start) / 4;
     std::size_t end = s + 1 < nseg ? (seg_start_[static_cast<std::size_t>(s) + 1] - f_.start) / 4 : n;
+    // A segment that branches back to its own start (a loop without inner
+    // labels) is wrapped in a wasm loop: those branches are direct, not through
+    // the dispatcher (E2d). Its start stays a dispatcher target (resume entries).
+    self_loop_ = self_loops_[static_cast<std::size_t>(s)] ? body.loop() : -1;
     bool falls = false;
     std::size_t last = k;
     for (; k < end; ++k) {
@@ -2393,6 +2424,8 @@ bool FuncGen::run(Fn& body, std::string* error) {
       if (last + 1 >= n) emit_fall();
       else materialize();
     }
+    if (self_loop_ >= 0) body.end();
+    self_loop_ = -1;
   };
   if (dispatch_) {
     loop_level_ = body.loop();
