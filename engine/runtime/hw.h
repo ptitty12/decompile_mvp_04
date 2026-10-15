@@ -82,8 +82,9 @@ class Hardware : public ppc::Io {
   void write(u32 addr, u32 value, int size) override;
 
   const std::vector<MmioAccess>& log() const { return log_; }
-  const std::map<u32, std::uint64_t>& read_counts() const { return reads_; }
-  const std::map<u32, std::uint64_t>& write_counts() const { return writes_; }
+  // Accesses per register address (byte address; only the ones accessed).
+  std::map<u32, std::uint64_t> read_counts() const { return counts(reads_); }
+  std::map<u32, std::uint64_t> write_counts() const { return counts(writes_); }
   const std::vector<u8>& fifo() const { return fifo_; }  // the first bytes written to the write-gather pipe
   std::uint64_t fifo_bytes() const { return fifo_bytes_; }
   const GxFifo& gx() const { return gx_; }
@@ -252,9 +253,19 @@ class Hardware : public ppc::Io {
   u8* mem1_;
   u32 mem1_size_;
   HardwareConfig cfg_;
-  std::map<u32, u32> regs_;
+  // The hardware blocks' registers, 0xCC000000-0xCC008FFF, as 32-bit words
+  // (flat arrays: every GX FIFO burst reads and writes several of them).
+  static constexpr u32 kRegBase = 0xCC000000u, kRegBytes = 0x9000u;
+  std::vector<u32> regs_ = std::vector<u32>(kRegBytes / 4, 0);
   std::vector<MmioAccess> log_;
-  std::map<u32, std::uint64_t> reads_, writes_;
+  std::vector<std::uint64_t> reads_ = std::vector<std::uint64_t>(kRegBytes, 0),
+                             writes_ = std::vector<std::uint64_t>(kRegBytes, 0);
+  static std::map<u32, std::uint64_t> counts(const std::vector<std::uint64_t>& v) {
+    std::map<u32, std::uint64_t> m;
+    for (u32 k = 0; k < kRegBytes; ++k)
+      if (v[k]) m[kRegBase + k] = v[k];
+    return m;
+  }
   std::vector<u8> fifo_;
   u32 last_read_ = 0;
   std::uint64_t same_reads_ = 0;
