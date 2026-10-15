@@ -11,22 +11,37 @@
 <body>
   <main>
     <h1>MVP Baseball 2005 <span>browser engine, development build</span></h1>
-    <p class="note">
-      Pick your own disc image of MVP Baseball 2005 for GameCube (USA, GV4E69). The page reads it on this
-      computer and translates the game here; the image is never uploaded, and this server holds no game data.
-    </p>
-    <label class="picker">Disc image (ISO or CISO)
-      <input type="file" id="disc" accept=".iso,.ciso,.gcm">
-    </label>
+    <div id="picker" hidden>
+      <p class="note">
+        Pick your own disc image of MVP Baseball 2005 for GameCube (USA, GV4E69). The page reads it on this
+        computer and translates the game here; the image is never uploaded.
+      </p>
+      <label class="picker">Disc image (ISO or CISO)
+        <input type="file" id="disc" accept=".iso,.ciso,.gcm">
+      </label>
+    </div>
     <p id="status" role="status"></p>
+    <progress id="progress" max="1" hidden></progress>
     <p id="error" class="error" role="alert" hidden></p>
-    <canvas id="screen" width="640" height="480" tabindex="0" aria-label="Game screen"></canvas>
+    <div id="stage">
+      <canvas id="screen" width="640" height="480" tabindex="0" aria-label="Game screen"></canvas>
+    </div>
+    <div class="toolbar">
+      <button type="button" id="fullscreen" title="Fullscreen (F, or double-click the game)">Fullscreen</button>
+      <button type="button" id="sound" title="Turn the sound on or off (M)">Sound: off</button>
+      <button type="button" id="pause" title="Pause or resume (P); hiding the tab pauses too">Pause</button>
+      <span id="hint" class="hint" hidden></span>
+    </div>
     <pre id="phases"></pre>
     <pre id="stats"></pre>
     <details>
       <summary>Controls</summary>
       <p>Keyboard: Enter = START, X = A, Z = B, C = X, V = Y, arrows = D-pad, I/J/K/L = stick, Q = L, E = R,
-        Space = Z. A gamepad works too (standard mapping).</p>
+        Space = Z. F = fullscreen, M = sound on/off, P = pause.</p>
+      <p>Gamepad (standard layout): A/Cross = A, B/Circle = B, X/Square = X, Y/Triangle = Y, RB or LB = Z,
+        LT/RT = L/R (analog; a full press clicks), Start = START, D-pad, left stick = main stick, right stick =
+        C-stick. Change it below.</p>
+      <div id="gamepad"></div>
     </details>
     <details>
       <summary>Engine log</summary>
