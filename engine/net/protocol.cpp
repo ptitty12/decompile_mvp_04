@@ -271,7 +271,9 @@ std::string incompatibility(const Hello& a, const Hello& b) {
   if (a.id.disc != b.id.disc)
     return "different disc identities (" + hex(a.id.disc.data(), 20) + " vs " + hex(b.id.disc.data(), 20) + ")";
   if (a.id.packset != b.id.packset)
-    return "different pack sets (" + hex(a.id.packset.data(), 32) + " vs " + hex(b.id.packset.data(), 32) + ")";
+    return "the players chose different roster packs (pack set " + hex(a.id.packset.data(), 32).substr(0, 16) +
+           " here, " + hex(b.id.packset.data(), 32).substr(0, 16) +
+           " for the other player); both must pick the same packs in the same order";
   if (a.id.cpi != b.id.cpi || a.id.di_latency_tb != b.id.di_latency_tb || a.id.di_tb_per_kib != b.id.di_tb_per_kib)
     return "different engine timing constants (CLK1/DVD1)";
   if (a.id.settings != b.id.settings) return "different settings (" + a.id.settings + " vs " + b.id.settings + ")";

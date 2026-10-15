@@ -173,8 +173,11 @@ TEST_CASE("handshake compatibility") {
   c.id.disc[0] ^= 1;
   CHECK(incompatibility(a, c).find("disc") != std::string::npos);
   c = sample_hello(2);
-  c.id.packset[31] ^= 1;
-  CHECK(incompatibility(a, c).find("pack sets") != std::string::npos);
+  c.id.packset[0] ^= 1;
+  // E6: in words a player understands, with both set hashes' prefixes.
+  CHECK(incompatibility(a, c).find("different roster packs") != std::string::npos);
+  CHECK(incompatibility(a, c).find("same packs in the same order") != std::string::npos);
+  CHECK(incompatibility(a, c).find(hex(c.id.packset.data(), 32).substr(0, 16)) != std::string::npos);
   c = sample_hello(2);
   c.id.cpi = 3;
   CHECK(incompatibility(a, c).find("CLK1/DVD1") != std::string::npos);
