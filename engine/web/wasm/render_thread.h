@@ -6,13 +6,23 @@
 // device and the OffscreenCanvas and runs the GX processor and the renderer on
 // them (render_side.h), so the emulation does not wait for them.
 //
-// The emulation waits for the render thread only at the guest's GPU sync points
-// (runtime/gx_fifo.h, GfxObserver::gp_sync: draw done, PE tokens, reads of the
-// CP status, read pointer or distance, a CP breakpoint): before the guest can
-// learn that the graphics processor consumed its commands, the render thread
-// has finished them, so it has read every vertex array, matrix, palette and
-// texture they point at before the guest may rewrite them. The renderer only
-// reads guest memory, so guest state is the same as with the inline renderer.
+// The emulation waits for the render thread only where the guest is about to
+// write memory the render thread has still to read. As each GX command is
+// appended, gfx::GpReads works out what the renderer will read for it (the
+// array elements its indices select, indexed XF loads, palettes, TMEM preloads,
+// what an EFB copy's texture covers, a texture the first time a draw samples
+// it) and marks those bytes in ppc::g_gp_pages (per 2^ppc::kGpShift = 64 bytes:
+// the ring position after the command). Every guest write path (the
+// interpreter's and the translated module's stores, the write-gather pipe's
+// bursts, DI and ARAM DMA) checks the table and, where the render thread has
+// not yet passed that position, waits for it (RenderRing::wait_read). A
+// primitive too large for the ring is read in place, behind a fence. The
+// guest's GPU sync points (runtime/gx_fifo.h, GfxObserver::gp_sync: draw done,
+// PE tokens, CP status reads, a CP breakpoint) can be fences as well
+// (render_tune's `sync_fences`; off: the write checks cover what they cover).
+// The renderer only reads guest memory, so guest state is the same as with the
+// inline renderer, and so is everything it draws (gfx/digest_tap.h: the
+// per-field digests of both agree).
 //
 // The render thread waits for records in place (Atomics.wait) while the
 // emulation runs a batch, so a fence is answered at once; between batches it

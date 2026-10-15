@@ -22,6 +22,10 @@
 //   ioLog=1         log every guest DVD read with its host timing (P1 measurements)
 //   store=0         read the server's image over the network instead of keeping it in this browser
 //   storeSpare=MB   free space the download must leave (tests of the storage-quota error)
+//   threads=0       the single-threaded engine even where the page is cross-origin isolated (P2)
+//   bitmaps=0       threaded: the render thread draws into the page's canvas instead of sending ImageBitmaps
+//   digest=1        a renderer digest per VI field (window.mvp.digest; digestDetail=F1-F2: per draw)
+//   rtTune=US,MS,KIB,SYNC   the render thread's waiting (fence poll, record poll, publish step, sync fences)
 // The page publishes its state as `window.mvp` for the browser check.
 
 import { AudioOut, type AudioState } from './audio.js';
@@ -348,7 +352,7 @@ function startEngine(disc: DiscSource): void {
   const width = Math.round(canvas.clientWidth * dpr), height = Math.round(canvas.clientHeight * dpr);
   let off: OffscreenCanvas | null = null;
   let frames: MessagePort | undefined;
-  if (vsync && options.render && options.threads !== false && params.get('frames') !== '0') {
+  if (vsync && options.render && options.threads !== false && params.get('bitmaps') !== '0') {
     // P2, cross-origin isolated (the threaded engine): the page keeps the canvas
     // and shows each frame the render thread sends as an ImageBitmap. A Worker
     // started by a Worker cannot keep an OffscreenCanvas of the page on screen
