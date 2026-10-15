@@ -382,8 +382,8 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
               ull(hw.fifo_bytes()), ull(gx.commands()), ull(gx.bp_loads()), ull(gx.primitives()), ull(gx.vertices()),
               ull(gx.display_lists()), ull(gx.display_list_errors()), ull(hw.draw_done_count()), gx.broken() ? "; PARSE LOST" : "");
   if (gx.broken())
-    std::printf("GX: byte 0x%02X at stream offset %llu starts no command\n", gx.broken_opcode(),
-                ull(gx.broken_offset()));
+    std::printf("GX: byte 0x%02X at stream offset %llu starts no command; the commands before it:\n%s",
+                gx.broken_opcode(), ull(gx.broken_offset()), gx.broken_context().c_str());
   std::size_t shown = 0;
   for (const auto& a : hw.log()) {
     if (shown++ >= mmio_lines) break;

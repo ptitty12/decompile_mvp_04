@@ -13,6 +13,7 @@
 
 #include <array>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 namespace mvp::rt {
@@ -69,6 +70,9 @@ class GxFifo {
   bool broken() const { return broken_; }
   std::uint8_t broken_opcode() const { return broken_opcode_; }
   std::uint64_t broken_offset() const { return broken_offset_; }
+  // For the report when the parse is lost: the last commands before it (stream
+  // offset, length, first bytes) and the bytes from the lost position on.
+  std::string broken_context() const;
 
  private:
   // Length of the command at p (n bytes available), 0 if more bytes are needed
@@ -89,6 +93,14 @@ class GxFifo {
   bool broken_ = false;
   std::uint8_t broken_opcode_ = 0;
   std::uint64_t broken_offset_ = 0;
+  struct Recent {
+    std::uint64_t offset = 0;
+    std::uint32_t len = 0;
+    std::array<std::uint8_t, 24> head{};
+  };
+  std::array<Recent, 24> recent_{};
+  std::uint64_t recent_n_ = 0;
+  std::vector<std::uint8_t> broken_tail_;
 };
 
 }  // namespace mvp::rt

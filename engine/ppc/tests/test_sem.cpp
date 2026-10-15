@@ -449,6 +449,12 @@ TEST_CASE("special registers") {
   m.hooks.dec = 99;
   m.run(SPR(339, 8, 22));  // mfdec
   CHECK(c.gpr[8] == 99);
+  c.gpr[3] = 0x0C008000;
+  m.run(SPR(467, 3, 921));  // mtspr WPAR: the write-gather pipe restarts empty
+  CHECK(c.spr[spr::WPAR] == 0x0C008000);
+  CHECK(m.hooks.pipe_resets == 1);
+  m.run(SPR(339, 8, 921));  // mfspr WPAR: the buffer reads empty (BNE clear)
+  CHECK(c.gpr[8] == 0x0C008000);
   c.msr = 0x2032;
   c.gpr[3] = 0xA032;
   m.run(X(31, 3, 0, 0, 146));  // mtmsr

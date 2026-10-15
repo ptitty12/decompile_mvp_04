@@ -100,6 +100,10 @@ void SystemHooks::deliver(ppc::Cpu& c, u32 vector) {
   g_exception_lr = lr;
 }
 
+void SystemHooks::write_pipe_reset(ppc::Cpu&) {
+  if (hw_) hw_->wgp_reset();
+}
+
 void SystemHooks::exception(ppc::Cpu& c, u32 vector) {
   if (vector == 0x800) ++fp_unavailable;
   deliver(c, vector);

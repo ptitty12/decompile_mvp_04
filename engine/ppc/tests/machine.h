@@ -24,6 +24,8 @@ struct RecordingHooks : Hooks {
   void msr_changed(Cpu&, u32 old) override { last_old_msr = old; }
   void icbi(Cpu&, u32 ea) override { icbis.push_back(ea); }
   void system_call(Cpu&) override { ++syscalls; }
+  int pipe_resets = 0;
+  void write_pipe_reset(Cpu&) override { ++pipe_resets; }
 };
 
 // Ops executed by any Machine in this test binary (for the coverage check).

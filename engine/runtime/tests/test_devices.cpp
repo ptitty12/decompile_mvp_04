@@ -177,6 +177,35 @@ TEST_CASE("GX FIFO: bursts to memory, the GP follows, and stops at a breakpoint"
   CHECK(g.cp32r(0x38) == kBase);
 }
 
+TEST_CASE("GX FIFO: a redirected write-gather pipe writes memory, not commands") {
+  // GXRedirectWriteGatherPipe: the GP unlinked, the PI FIFO set to base 0, end
+  // 0x04000000 (the top of the physical space) and the write pointer at the
+  // destination. The data (here not GX commands at all) lands in memory.
+  Rig g;
+  constexpr u32 kFifo = 0x00100000, kDest = 0x00200000;
+  g.cp32(0x20, kFifo);
+  g.cp32(0x24, kFifo + 0xFFC);
+  g.cp32(0x34, kFifo);
+  g.cp32(0x38, kFifo);
+  g.w(0xCC000002, 0x01, 2);  // reads enabled, not linked
+  // A partial burst left in the pipe (24 bytes of commands): writing WPAR, as the
+  // redirect does, drops it (Hardware::wgp_reset), so the data starts at kDest.
+  g.wgp(std::vector<u8>(24, 0x61));
+  g.hw.wgp_reset();
+  CHECK(g.hw.wgp_resets_dropping() == 1);
+  g.w(0xCC00300C, 0);
+  g.w(0xCC003010, 0x04000000);
+  g.w(0xCC003014, kDest);
+  std::vector<u8> pixels;
+  for (int k = 0; k < 64; ++k) pixels.push_back(static_cast<u8>(k % 4 == 3 ? 0xFF : 0x53 + k));
+  g.wgp(pixels);
+  CHECK(std::memcmp(&g.mem[kDest], pixels.data(), pixels.size()) == 0);
+  CHECK(g.r(0xCC003014) == kDest + 64);
+  CHECK(g.cp32r(0x38) == kFifo);  // the GP read nothing
+  CHECK_FALSE(g.hw.gx().broken());
+  CHECK(g.hw.gx().commands() == 0);
+}
+
 TEST_CASE("DI: a disc read completes after its latency and transfer time") {
   Rig g;
   std::vector<u8> disc(0x10000);

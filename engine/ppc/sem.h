@@ -291,6 +291,10 @@ inline void write_spr(Cpu& c, u32 n, u32 v) {
       c.hooks->set_time_base(c, (tb & 0xFFFFFFFFull) | (static_cast<u64>(v) << 32));
       return;
     }
+    case spr::WPAR:  // the write-gather pipe restarts empty (Hooks::write_pipe_reset)
+      c.spr[spr::WPAR] = v;
+      c.hooks->write_pipe_reset(c);
+      return;
     default: c.spr[n & 1023] = v; return;
   }
 }

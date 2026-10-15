@@ -47,6 +47,8 @@ class SystemHooks : public ppc::Hooks {
   // The OS's system call only flushes write buffers (HID0[ABE] toggle, rfi):
   // nothing to do here.
   void system_call(ppc::Cpu&) override { ++syscalls; }
+  // mtspr WPAR: the write-gather pipe restarts empty (Hardware::wgp_reset).
+  void write_pipe_reset(ppc::Cpu&) override;
   // Runs due events, delivers a pending interrupt, applies the idle skip, and
   // stops the run (StopRun) once `tick_limit` instructions have run.
   void safepoint(ppc::Cpu& c) override;

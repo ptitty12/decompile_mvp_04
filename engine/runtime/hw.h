@@ -93,6 +93,13 @@ class Hardware : public ppc::Io {
   }
   std::uint64_t draw_done_count() const { return draw_dones_; }
   std::uint64_t gp_bursts() const { return gp_bursts_; }
+  // mtspr WPAR: the write-gather pipe restarts empty; bytes of a partial burst are
+  // dropped (GXRedirectWriteGatherPipe / GXRestoreWriteGatherPipe, E3a).
+  void wgp_reset() {
+    if (gather_n_) ++wgp_dropped_;
+    gather_n_ = 0;
+  }
+  std::uint64_t wgp_resets_dropping() const { return wgp_dropped_; }
   const std::array<u8, 64>& sram() const { return sram_; }
 
   // ---- time and interrupts (E0b items 9 and 10) ----
@@ -230,6 +237,7 @@ class Hardware : public ppc::Io {
   bool gp_at_breakpoint() const;
   u8 gather_[32] = {};
   u32 gather_n_ = 0;
+  std::uint64_t wgp_dropped_ = 0;
   std::uint64_t gp_bursts_ = 0;
   std::uint64_t fifo_bytes_ = 0, draw_dones_ = 0;
   static constexpr std::size_t kFifoKeep = 1u << 20;

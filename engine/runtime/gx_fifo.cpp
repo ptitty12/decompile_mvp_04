@@ -1,5 +1,8 @@
 #include "runtime/gx_fifo.h"
 
+#include <algorithm>
+#include <cstdio>
+
 namespace mvp::rt {
 
 namespace {
@@ -150,6 +153,28 @@ void GxFifo::execute(const std::uint8_t* cmd, std::size_t len, Effects& fx, bool
   }
 }
 
+std::string GxFifo::broken_context() const {
+  std::string out;
+  char b[64];
+  const std::uint64_t n = recent_n_ < recent_.size() ? recent_n_ : recent_.size();
+  for (std::uint64_t k = recent_n_ - n; k < recent_n_; ++k) {
+    const Recent& r = recent_[k % recent_.size()];
+    std::snprintf(b, sizeof b, "  @%llu len %u:", static_cast<unsigned long long>(r.offset), r.len);
+    out += b;
+    for (std::size_t i = 0; i < r.head.size() && i < r.len; ++i) {
+      std::snprintf(b, sizeof b, " %02X", r.head[i]);
+      out += b;
+    }
+    out += r.len > r.head.size() ? " ...\n" : "\n";
+  }
+  out += "  lost at:";
+  for (std::uint8_t v : broken_tail_) {
+    std::snprintf(b, sizeof b, " %02X", v);
+    out += b;
+  }
+  return out + "\n";
+}
+
 GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
   Effects fx;
   if (broken_) return fx;
@@ -161,10 +186,16 @@ GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
       broken_ = true;
       broken_opcode_ = pending_[at];
       broken_offset_ = consumed_;
+      broken_tail_.assign(pending_.begin() + static_cast<std::ptrdiff_t>(at),
+                          pending_.begin() + static_cast<std::ptrdiff_t>(std::min(pending_.size(), at + 64)));
       pending_.clear();
       return fx;
     }
     if (len == 0 || len > pending_.size() - at) break;  // the rest of the command is still to come
+    Recent& r = recent_[recent_n_++ % recent_.size()];
+    r.offset = consumed_;
+    r.len = static_cast<std::uint32_t>(len);
+    for (std::size_t k = 0; k < r.head.size(); ++k) r.head[k] = k < len ? pending_[at + k] : 0;
     execute(pending_.data() + at, len, fx, false);
     consumed_ += len;
     at += len;

@@ -226,7 +226,11 @@ void Hardware::wgp_write(u32 value, int size) {
 
 void Hardware::wgp_burst() {
   gather_n_ = 0;
-  u32 base = reg(0xCC00300Cu) & 0x03FFFFE0u, end = reg(0xCC003010u) & 0x03FFFFFFu;
+  // The FIFO end may be 0x04000000, the top of the 64 MiB physical space: that is
+  // how GXRedirectWriteGatherPipe turns the pipe into a plain memory writer (base
+  // 0, end 0x04000000, write pointer at the destination, the GP unlinked). Bit 26
+  // counts there; masking it off once sent that data to the GP as commands.
+  u32 base = reg(0xCC00300Cu) & 0x03FFFFE0u, end = reg(0xCC003010u) & 0x07FFFFFFu;
   u32 wp = reg(0xCC003014u);
   if (end == 0) {  // no CPU FIFO set up yet: straight to the GP
     gp_consume(gather_, 32);

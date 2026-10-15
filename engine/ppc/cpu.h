@@ -90,6 +90,10 @@ class Hooks {
   // runs the handler to its rfi instead (runtime/sys_hooks.h), so translated code
   // continues where it was.
   virtual void exception(Cpu& c, u32 vector);
+  // mtspr WPAR (the write-gather pipe's address): the pipe restarts empty, so
+  // bytes of a partial 32-byte burst are dropped. GXRedirectWriteGatherPipe and
+  // GXRestoreWriteGatherPipe rely on it (E3a).
+  virtual void write_pipe_reset(Cpu&) {}
 };
 
 struct Cpu {
