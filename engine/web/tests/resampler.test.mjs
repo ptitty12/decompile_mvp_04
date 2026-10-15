@@ -146,13 +146,13 @@ test('Q2: at full speed nothing is stretched (the input plays as is)', () => {
   assert.ok(Math.abs(rs.stats.speed - 1) < 0.01, `speed ${rs.stats.speed}`);
 });
 
-test('Q2: an emulation at 0.97x, 0.8x and 0.6x plays on, stretched, at the same pitch', () => {
-  for (const k of [0.97, 0.8, 0.6]) {
+test('Q2: an emulation at 0.97x, 0.8x, 0.6x and 0.35x plays on, stretched, at the same pitch', () => {
+  for (const k of [0.97, 0.8, 0.6, 0.35]) {
     const rs = new DriftResampler(OUT, IN, 0.06 * IN);
     const out = simulate(rs, 30, { inHz: IN * k, burstFields: 2 });
-    // (Dropping to 0.6x at once can empty the 60 ms buffer a few times before the speed has settled.)
+    // (Dropping to 0.6x or below at once can empty the 60 ms buffer a few times before the speed has settled.)
     assert.ok(rs.stats.underruns <= (k < 0.7 ? 3 : 0), `${k}x: ${rs.stats.underruns} underruns`);
-    if (k < 0.7) assert.ok(rs.stats.gapMs < 50, `${k}x: ${rs.stats.gapMs} ms of silence`);
+    if (k < 0.7) assert.ok(rs.stats.gapMs < (k < 0.5 ? 200 : 50), `${k}x: ${rs.stats.gapMs} ms of silence`);
     assert.ok(Math.abs(rs.stats.stretch - k) < 0.03, `${k}x: stretch ${rs.stats.stretch}`);
     assert.ok(rs.stats.splices > 0);
     const f = frequency(out, 10 * OUT, 30 * OUT);

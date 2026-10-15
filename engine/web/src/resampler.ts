@@ -19,14 +19,15 @@
 //   used to run dry over and over (the sound went on, off, on, off). Now the
 //   input is time-stretched instead, with its pitch kept (a WSOLA-style splice):
 //   once the buffer falls well under the target the reader plays the input
-//   slower (down to half speed), at a speed steered by the fill (proportional
+//   slower (down to a quarter speed), at a speed steered by the fill (proportional
 //   and integral: it settles at the emulation's own speed with the buffer at
-//   the target) until the input keeps up again. It plays
-//   contiguous stretches of the input; where its position runs more than 4 ms
-//   ahead of the speed's ideal track it jumps back to the point near the ideal
-//   position that best matches what would have played next, cross-faded over
-//   8 ms, so the sound slows down rather than stopping. At full speed the input
-//   plays as is.
+//   the target) until the input keeps up again. It plays contiguous
+//   stretches of the input; where its position runs more than 4 ms (less on a
+//   low buffer) ahead of the speed's ideal track it jumps back to the point
+//   near the ideal position that best matches what would have played next
+//   (both channels compared, the nearest of equal matches), cross-faded over
+//   4 ms, so the sound slows down rather than stopping. At full speed the
+//   input plays as is.
 // - Underrun: run dry (the producer stalled), it fades out and plays again
 //   once half the base target is buffered (30 ms by default: the stretch
 //   then rebuilds the rest while it plays, so the silence is the stall and not
@@ -80,11 +81,11 @@ const HOP = 64;               // a splice is considered every HOP input frames (
 const XF = 128;               // ... and cross-fades over XF frames (4 ms)
 const SEEK = 128;             // how far a splice point may be from the ideal position (4 ms)
 const CORR = 64;              // frames compared to find a splice point
-const FAST_S = 0.05;           // the stretch's own fill estimate's time constant, seconds
+const FAST_S = 0.05;          // the stretch's own fill estimate's time constant, seconds
 const STRETCH_ON = -0.4;      // the buffer this far under the target (relative): stretch
 const KP = 0.5;               // the speed: 1 + KP * relative fill error + its integral (KI per second)
 const KI = 2.0;
-const MIN_SPEED = 0.5;
+const MIN_SPEED = 0.25;
 // The adaptive target.
 const GROW_MS = 20;
 const MAX_TARGET_MS = 200;
@@ -416,7 +417,7 @@ export class DriftResampler {
           this.fadeL = a;
           this.fadeR = b;
           this.fadeLeft = FADE;
-          // At its slowest the stretch could not keep up (an emulation under half speed): more buffer would
+          // At its slowest the stretch could not keep up (an emulation under a quarter speed): more buffer would
           // not help. Otherwise (a stall) hold more from now on.
           if (!(this.stretching && st.stretch <= MIN_SPEED))
             this.target = Math.min(Math.round((MAX_TARGET_MS / 1000) * this.inRate),
