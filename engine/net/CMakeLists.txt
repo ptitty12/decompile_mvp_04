@@ -6,6 +6,7 @@ target_compile_options(engine_net PRIVATE ${ENGINE_WARN})
 
 engine_test(test_net_protocol SOURCES tests/test_protocol.cpp LIBS engine_net)
 engine_test(test_net_session SOURCES tests/test_session.cpp LIBS engine_net)
+engine_test(test_net_driver SOURCES tests/test_driver.cpp LIBS engine_net)
 
 # Native transports (UDP, impairment on the real clock): not in the browser,
 # where the transport is a WebRTC data channel (engine/web).
