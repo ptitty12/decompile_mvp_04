@@ -44,6 +44,10 @@
 //                     script (with a window: the keyboard merged in; Enter START,
 //                     X A, Z B, C X, V Y, arrows, I/J/K/L stick, Q L, E R, Space Z)
 //   --pacing-from N   (E3c) frame pacing statistics (window) from VI field N on
+//   --pace            (E3c, window) show each VI field at its own time (59.94 Hz) and
+//                     present without waiting for the display (mailbox) when it can
+//   --cpi N           (E3c, experiments) CPU cycles charged per guest instruction instead of
+//                     E0b-CLK1's 2: changes guest timing (not the netplay default)
 //   --audio-wav FILE  (E3b) the AX mix as a 16-bit stereo WAV, exactly as virtual
 //                     time produced it (keep it under build/; never commit it)
 //   --no-audio        no playback (default: SDL3 playback when a window is open)
@@ -288,6 +292,63 @@ struct Play : GfxObserver {
   // Frame pacing (window mode): host time between presents.
   std::vector<double> present_ms;
   std::uint64_t pacing_from = 0;  // --pacing-from
+  double wait_s = 0, present_s = 0;  // host time waiting for the schedule, and in window events + present
+  // --pace (window): each VI field is shown at its own time, 1001/60000 s apart
+  // (59.94 Hz), measured from the first field shown; a field that is late runs
+  // at once, and one more than 100 ms late restarts the schedule. Host only.
+  bool pace = false;
+  bool paced = false;
+  std::uint64_t pace_field0 = 0, late_fields = 0, restarts = 0, overslept = 0;
+  double overslept_s = 0;
+  std::chrono::steady_clock::time_point pace_t0;
+#ifdef _WIN32
+  HANDLE timer = nullptr;
+#endif
+  void pace_field(std::uint64_t field) {
+    using clock = std::chrono::steady_clock;
+    const auto now = clock::now();
+    if (!paced) {
+      paced = true;
+      pace_field0 = field;
+      pace_t0 = now;
+      return;
+    }
+    const auto due = pace_t0 + std::chrono::nanoseconds((field - pace_field0) * 1001000000000ull / 60000ull);
+    if (now > due + std::chrono::milliseconds(100)) {
+      ++restarts;
+      pace_field0 = field;
+      pace_t0 = now;
+      return;
+    }
+    if (now > due) {
+      ++late_fields;
+      return;
+    }
+    // Sleep to about a millisecond before, then spin. On Windows a
+    // high-resolution waitable timer: Windows 11 ignores timeBeginPeriod for a
+    // window that is occluded, and a plain sleep then oversleeps by up to 15 ms.
+    const auto wake = due - std::chrono::microseconds(1500);
+    if (now < wake) {
+#ifdef _WIN32
+      if (!timer) timer = CreateWaitableTimerExW(nullptr, nullptr, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+      if (timer) {
+        LARGE_INTEGER rel;
+        rel.QuadPart = -std::chrono::duration_cast<std::chrono::nanoseconds>(wake - now).count() / 100;
+        if (SetWaitableTimer(timer, &rel, 0, nullptr, nullptr, FALSE)) WaitForSingleObject(timer, INFINITE);
+      } else {
+        std::this_thread::sleep_until(wake);
+      }
+#else
+      std::this_thread::sleep_until(wake);
+#endif
+      const auto woke = clock::now();
+      if (woke > due) {
+        ++overslept;
+        overslept_s += std::chrono::duration<double>(woke - due).count();
+      }
+    }
+    while (clock::now() < due) std::this_thread::yield();
+  }
   std::chrono::steady_clock::time_point last_present;
   std::uint64_t hash_every = 0;  // --hash-every
   const std::uint8_t* mem1 = nullptr;
@@ -354,10 +415,18 @@ struct Play : GfxObserver {
     if (!f) f = renderer->latest_xfb();
     if (window && field % present_every == 0) {
       if (audio_out) audio_out->throttle();  // keep the host near real time (host pacing only)
+      const auto c0 = std::chrono::steady_clock::now();
+      if (pace) pace_field(field);
+      const auto c1 = std::chrono::steady_clock::now();
       if (!window->pump()) throw StopRun{"window closed"};
       if (host_input) host_input->host = keyboard_pad();
       if (f) {
         window->present(f->view, f->width, f->height);
+        const auto c2 = std::chrono::steady_clock::now();
+        if (field >= pacing_from) {
+          wait_s += std::chrono::duration<double>(c1 - c0).count();
+          present_s += std::chrono::duration<double>(c2 - c1).count();
+        }
         ++presents;
         const auto now = std::chrono::steady_clock::now();
         if (presents > 1 && field >= pacing_from)
@@ -499,6 +568,7 @@ int main(int argc, char** argv) {
   std::string dump_dir, audio_wav, record_input;
   bool no_audio = false;
   std::uint32_t audio_latency = 100;
+  std::uint32_t cpi = 0;  // --cpi (0: the default, E0b-CLK1)
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
   bool headless = false, no_render = false, yield = false;
@@ -526,6 +596,8 @@ int main(int argc, char** argv) {
     else if (a == "--stop-file") play.stop_file = next();
     else if (a == "--record-input") record_input = next();
     else if (a == "--pacing-from") play.pacing_from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--cpi") cpi = static_cast<std::uint32_t>(std::strtoul(next().c_str(), nullptr, 10));
+    else if (a == "--pace") play.pace = true;
     else if (a == "--gx-log") play.gx_log = std::fopen(next().c_str(), "w");
     else if (a == "--gx-log-from") play.gx_log_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--gx-log-to") play.gx_log_to = std::strtoull(next().c_str(), nullptr, 10);
@@ -551,7 +623,7 @@ int main(int argc, char** argv) {
     else if (a == "--pack") packs.push_back(next());
     else {
       std::fprintf(stderr,
-                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--stop-file F] [--hash-every N] [--record-input F] [--pacing-from N] [--max-ticks N] "
+                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--stop-file F] [--hash-every N] [--record-input F] [--pacing-from N] [--pace] [--cpi N] [--max-ticks N] "
                    "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-from N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
                    "[--perf-every N] [--profile N] [--host-profile N] [--profile-from F] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
@@ -629,6 +701,7 @@ int main(int argc, char** argv) {
     }
     std::printf("gpu: %s\n", gpu->adapter_name().c_str());
   }
+  if (window) window->prefer_mailbox(play.pace);
   if (window && !window->attach(*gpu, &err)) {
     std::fprintf(stderr, "mvp-play: %s\n", err.c_str());
     return 1;
@@ -639,7 +712,9 @@ int main(int argc, char** argv) {
   setup_boot_environment(m, in->disc);
   Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size);
   hw.set_disc(in->disc.image.get());
-  YieldingHooks hooks(&m, &hw);
+  ClockConfig clock;
+  if (cpi) clock.cpi = cpi;
+  YieldingHooks hooks(&m, &hw, clock);
   m.memory().io = &hw;
   m.cpu().hooks = &hooks;
   hooks.tick_limit = max_ticks;
@@ -814,9 +889,22 @@ int main(int argc, char** argv) {
     std::size_t late = 0;
     for (double x : v) late += x > 25.0 ? 1 : 0;
     std::printf("pacing: %zu present intervals: mean %.3f ms (%.2f per second), sd %.3f ms, p1 %.2f, p50 %.2f, p99 %.2f, "
-                "max %.2f ms; %zu over 25 ms\n",
+                "max %.2f ms; %zu over 25 ms; present mode %s%s\n",
                 v.size(), mean, mean > 0 ? 1000.0 / mean : 0.0, std::sqrt(sq / static_cast<double>(v.size())), pct(0.01),
-                pct(0.5), pct(0.99), v.back(), late);
+                pct(0.5), pct(0.99), v.back(), late, window ? window->present_mode_name() : "-",
+                play.pace ? "" : " (not paced: --pace)");
+    std::printf("pacing: %.1f s waiting for the field schedule, %.1f s in window events and present\n", play.wait_s,
+                play.present_s);
+    if (play.pace)
+      std::printf("pacing: %llu fields shown late, %llu schedule restarts; %llu sleeps woke after the field's time "
+                  "(%.1f s in all)%s\n",
+                  ull(play.late_fields), ull(play.restarts), ull(play.overslept), play.overslept_s,
+#ifdef _WIN32
+                  play.timer ? "" : " (no high-resolution timer)"
+#else
+                  ""
+#endif
+      );
   }
   std::printf("display: %llu presents, %llu captures%s%s; WebGPU errors %llu\n", ull(play.presents), ull(play.captures),
               play.capture_dir.empty() ? "" : " in ", play.capture_dir.c_str(), ull(gpu->errors()));

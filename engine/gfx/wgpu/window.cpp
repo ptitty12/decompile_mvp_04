@@ -130,6 +130,8 @@ bool Window::attach(Gpu& gpu, std::string* err) {
     if (err) *err = "the surface supports no format on this adapter";
     return false;
   }
+  for (std::size_t i = 0; i < caps.presentModeCount; ++i)
+    if (caps.presentModes[i] == wgpu::PresentMode::Mailbox) have_mailbox_ = true;
   format_ = caps.formats[0];
   for (std::size_t i = 0; i < caps.formatCount; ++i)
     if (caps.formats[i] == wgpu::TextureFormat::BGRA8Unorm) format_ = caps.formats[i];
@@ -178,11 +180,14 @@ void Window::configure() {
   cfg.usage = wgpu::TextureUsage::RenderAttachment;
   cfg.width = static_cast<std::uint32_t>(w);
   cfg.height = static_cast<std::uint32_t>(h);
-  cfg.presentMode = wgpu::PresentMode::Fifo;
+  mode_ = want_mailbox_ && have_mailbox_ ? wgpu::PresentMode::Mailbox : wgpu::PresentMode::Fifo;
+  cfg.presentMode = mode_;
   cfg.alphaMode = wgpu::CompositeAlphaMode::Opaque;
   surface_.Configure(&cfg);
   configured_ = true;
 }
+
+const char* Window::present_mode_name() const { return mode_ == wgpu::PresentMode::Mailbox ? "mailbox" : "fifo"; }
 
 bool Window::pump() {
 #ifndef __EMSCRIPTEN__
