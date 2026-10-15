@@ -321,7 +321,7 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
   - **E6-M1:** `engine/mods` stays byte-compatible with `tools/rosters/pack.py`, enforced by `mods_crosscheck` (65 scenarios, 0 differences).
   - **E6-V1:** a virtual-disc overlay layout with end padding.
   - **E6-N1:** the netplay disc identity is taken from the unpatched disc. The pack-set hash is a separate handshake field, and a mismatch refuses the game on both sides.
-  - **Known bug (not packs):** netplay stops with a gate miss when the match starts loading (about frame 3,300); a fix is in progress.
+  - **Known bug (not packs):** netplay stopped with a gate miss when the match started loading. **Fixed by E5c (2026-10-15).**
 
   | | merge of engine/e6
 
@@ -333,6 +333,13 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
   - **Open engine decision CLK2:** at 2 cycles per instruction (CLK1) the game renders about 38 fps in play (logic stays 60 Hz). Lowering it would change guest timing and the netplay handshake. Decide with evidence about the console's in-game frame rate.
 
   | | merge of engine/e3c
+
+- 2026-10-15 | **E5c: netplay into the match** (lead, under the owner's delegation; docs/engine/E5_LOG.md).
+  - **E5-N4:** input-source Before hooks may stop the run (`InputSource::before_poll`). When a frame's input is missing, the run stops before the poll consumes anything, the translated function unwinds, and the same poll repeats once the input arrives. The guest never runs while waiting; the wire protocol stays v1.
+  - Cause: during match loading, frames run without rendering and no hardware event falls between two polls, so no safe-point yield happened.
+  - Evidence: a native two-player game for 60,000 frames; Chrome ×2 to the first at-bat, equal to native (also over simulated loss and latency) and with packs on both pages. 0 desyncs, 0 gate misses; solo runs unchanged.
+
+  | | merge of engine/e5c
 
 ## Open questions for owner
 
