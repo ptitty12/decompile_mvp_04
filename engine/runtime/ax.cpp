@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <vector>
 
 namespace mvp::rt::ax {
 
@@ -140,7 +141,7 @@ AdvanceResult advance(Voice& v, const SampleMemory& m, u32 out_samples, const Sa
   return r;
 }
 
-FrameStats process_frame(u8* mem1, u32 mem1_size, const SampleMemory& aram, u32 cmdlist) {
+FrameStats process_frame(u8* mem1, u32 mem1_size, const SampleMemory& aram, u32 cmdlist, FrameObserver* observer) {
   FrameStats st;
   char b[128];
   auto at = [&](u32 addr, u32 len) -> u8* {
@@ -170,6 +171,13 @@ FrameStats process_frame(u8* mem1, u32 mem1_size, const SampleMemory& aram, u32 
     }
     p += 6;
   }
+  if (observer) observer->frame_begin(mem1, mem1_size, cmdlist);
+  // The observer's copy of a PB at the start of a millisecond, and the input
+  // samples the voice consumes in it.
+  u8 before[kPbSize];
+  std::vector<s16> in;
+  SampleSink sink;
+  if (observer) sink = [&in](s16 s) { in.push_back(s); };
   for (u32 addr = head; addr; ++st.voices) {
     u8* pbp = at(addr, kPbSize);
     if (!pbp || st.voices == kMaxVoices) {
@@ -177,27 +185,45 @@ FrameStats process_frame(u8* mem1, u32 mem1_size, const SampleMemory& aram, u32 
       st.error = b;
       return st;
     }
+    const u32 this_pb = addr;
     addr = rd32(pbp + pb::kNextHi);
     if (rd16(pbp + pb::kState) != kStateRun) continue;
     ++st.running;
     u16 upd[5];
-    u32 nupd = 0;
-    for (int k = 0; k < 5; ++k) nupd += upd[k] = rd16(pbp + pb::kUpdNum + 2 * k);
+    for (int k = 0; k < 5; ++k) upd[k] = rd16(pbp + pb::kUpdNum + 2 * k);
     u32 data = rd32(pbp + pb::kUpdDataHi);
     AdvanceResult r;
-    // Per millisecond: that millisecond's updates, then its 32 samples. Without
-    // updates, one pass over the frame (the same result).
-    for (int ms = 0; ms < (nupd ? 5 : 1); ++ms) {
-      for (u32 k = 0; nupd && k < upd[ms]; ++k, data += 4) {
+    // Per millisecond: that millisecond's updates, then its 32 samples if the
+    // voice is running at its start (AX2).
+    for (u32 ms = 0; ms < 5; ++ms) {
+      for (u32 k = 0; k < upd[ms]; ++k, data += 4) {
         const u8* u = at(data, 4);
         if (!u) break;
         u32 off = 2u * rd16(u);
         if (off + 2 <= kPbSize) wr16(pbp + off, rd16(u + 2));
         ++st.updates;
       }
+      if (rd16(pbp + pb::kState) != kStateRun) continue;
+      if (observer) {
+        std::copy(pbp, pbp + kPbSize, before);
+        in.clear();
+      }
       Voice v = Voice::load(pbp);
-      AdvanceResult part = advance(v, aram, nupd ? kSamplesPerMs : kSamplesPerFrame);
+      AdvanceResult part = advance(v, aram, kSamplesPerMs, sink);
       v.store(pbp);
+      // The volume envelope: +delta per output sample, 16-bit (AX2).
+      if (u16 delta = rd16(pbp + pb::kVeDelta))
+        wr16(pbp + pb::kVeVolume, static_cast<u16>(rd16(pbp + pb::kVeVolume) + kSamplesPerMs * delta));
+      if (observer) {
+        VoiceMs vm;
+        vm.pb_addr = this_pb;
+        vm.ms = ms;
+        vm.pb = before;
+        vm.in = in.data();
+        vm.n_in = static_cast<u32>(in.size());
+        vm.ended = part.ended;
+        observer->voice_ms(vm);
+      }
       r.samples += part.samples;
       r.looped |= part.looped;
       r.ended |= part.ended;
@@ -206,6 +232,7 @@ FrameStats process_frame(u8* mem1, u32 mem1_size, const SampleMemory& aram, u32 
     st.looped += r.looped ? 1 : 0;
     st.ended += r.ended ? 1 : 0;
   }
+  if (observer) observer->frame_end();
   return st;
 }
 
