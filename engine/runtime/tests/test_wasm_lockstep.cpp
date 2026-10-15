@@ -160,7 +160,7 @@ FpProgram make_fp_program() {
                 X(63, 4, 0, 1, 136),     // fnabs f4, f1
                 D(54, 4, 4, 24),         // stfd f4, 24(r4)
                 X(4, 5, 1, 2, 592),      // ps_merge10 f5, f1, f2
-                PSQ(60, 5, 4, 32, 0, 0), // psq_st f5, 32(r4), 0, qr0 (through the runtime)
+                PSQ(60, 5, 4, 32, 0, 0), // psq_st f5, 32(r4), 0, qr0
                 D(14, 3, 3, 16),         // addi r3, r3, 16
                 D(14, 4, 4, 48)})        // addi r4, r4, 48
     w.push_back(x);
@@ -199,7 +199,7 @@ TEST_CASE("wasm-emitted floating-point moves and conversions match the interpret
   xlat::WasmModule mod;
   std::string err;
   REQUIRE_MESSAGE(xlat::emit_wasm(cfg, opt, &mod, &err), err);
-  CHECK(mod.stats.helper_insns == 1);  // only psq_st goes through the runtime
+  CHECK(mod.stats.helper_insns == 0);  // psq_st too is inline since E2d
 
   Machine ref, nat;
   FixedHooks hr, hn;

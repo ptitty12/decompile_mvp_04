@@ -30,8 +30,19 @@ inline constexpr u8 unreachable = 0x00, block = 0x02, loop = 0x03, if_ = 0x04, e
                     i32_shl = 0x74, i32_shr_s = 0x75, i32_shr_u = 0x76, i32_rotl = 0x77, i32_rotr = 0x78,
                     i64_eqz = 0x50, i64_add = 0x7C, i64_mul = 0x7E, i64_and = 0x83, i64_or = 0x84, i64_xor = 0x85,
                     i64_shl = 0x86, i64_shr_u = 0x88, i32_wrap_i64 = 0xA7, i64_extend_i32_s = 0xAC,
-                    i64_extend_i32_u = 0xAD, i32_extend8_s = 0xC0, i32_extend16_s = 0xC1;
+                    i64_extend_i32_u = 0xAD, i32_extend8_s = 0xC0, i32_extend16_s = 0xC1,
+                    // E2d: floating point. An f64 on the stack only ever holds exact bit patterns or the
+                    // result of an IEEE operation whose result the emitter checks (wasm_emit.cpp, "FP").
+                    f64_load = 0x2B, f64_store = 0x39, f64_const = 0x44, i32_ge_u = 0x4F, i64_eq = 0x51,
+                    i64_ne = 0x52, i64_lt_u = 0x54, i64_sub = 0x7D, i64_ctz = 0x7A, f64_eq = 0x61, f64_ne = 0x62, f64_lt = 0x63, f64_gt = 0x64,
+                    f64_le = 0x65, f64_ge = 0x66, f64_abs = 0x99, f64_neg = 0x9A, f64_nearest = 0x9E,
+                    f64_sqrt = 0x9F, f64_add = 0xA0, f64_sub = 0xA1, f64_mul = 0xA2, f64_div = 0xA3,
+                    f64_copysign = 0xA6, f32_demote_f64 = 0xB6, f64_convert_i32_s = 0xB7, f64_promote_f32 = 0xBB,
+                    i64_reinterpret_f64 = 0xBD, f32_reinterpret_i32 = 0xBE, f64_reinterpret_i64 = 0xBF, prefix_fc = 0xFC;
+// 0xFC-prefixed opcodes: the saturating float-to-integer conversions.
+inline constexpr u32 fc_i32_trunc_sat_f64_s = 2;
 }  // namespace op
+inline constexpr u8 kF64 = 0x7C;
 
 struct Buf {
   std::vector<u8> b;
@@ -99,6 +110,16 @@ struct Fn : Buf {
     byte(kI64);
     return depth++;
   }
+  int if_f64() {
+    byte(op::if_);
+    byte(kF64);
+    return depth++;
+  }
+  int block_i32() {
+    byte(op::block);
+    byte(kI32);
+    return depth++;
+  }
   void else_() { byte(op::else_); }
   void end() {
     byte(op::end);
@@ -142,6 +163,14 @@ struct Fn : Buf {
   void i64c(s64 v) {
     byte(op::i64_const);
     sleb(v);
+  }
+  void f64c_bits(u64 bits) {  // f64.const with an exact bit pattern (never a NaN)
+    byte(op::f64_const);
+    for (int k = 0; k < 8; ++k) byte(static_cast<u8>(bits >> (8 * k)));
+  }
+  void fc(u32 sub) {  // a 0xFC-prefixed opcode
+    byte(op::prefix_fc);
+    uleb(sub);
   }
   void mem(u8 opcode, u32 align_log2, u32 offset) {
     byte(opcode);

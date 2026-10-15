@@ -31,6 +31,9 @@ if(EMSCRIPTEN)
   # it: all three cases fail on exactly that (reference pc 0x800, SRR0 at the FPU
   # instruction). Re-enable when E2d gives the emitter the E3a semantics.
   set_tests_properties(test_wasm_lockstep PROPERTIES DISABLED TRUE)
+  # E2d: the semantics digest and the inline floating point through translated
+  # code, against the interpreter (data-free).
+  engine_test(test_wasm_digest SOURCES tests/test_wasm_digest.cpp LIBS engine_wasm_host)
 endif()
 
 # Data-free emitter test: the synthetic program is translated at build time.
