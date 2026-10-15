@@ -308,11 +308,12 @@ int run(const xlat::Inputs& in, const Args& a) {
                 s.rtt_avg());
     say("input latency: avg %.1f ms, max %llu ms (from sampling the pad to the frame that uses it)\n",
         s.latency_avg(), static_cast<ull>(s.latency_max));
-    say("lockstep: %llu stalls, %llu ms stalled (longest %llu), %llu early yields, %llu gate misses; "
-                "%llu yields\n",
+    say("lockstep: %llu stalls, %llu ms stalled (longest %llu), %llu early yields, %llu poll stops, "
+                "%llu gate misses; %llu yields\n",
                 static_cast<ull>(driver->stalls), static_cast<ull>(driver->stall_ms),
                 static_cast<ull>(driver->longest_stall_ms), static_cast<ull>(driver->early_yields),
-                static_cast<ull>(driver->gate_misses), static_cast<ull>(hooks.yields));
+                static_cast<ull>(driver->poll_stops), static_cast<ull>(driver->gate_misses),
+                static_cast<ull>(hooks.yields));
     if (impaired)
       say("impaired: %llu dropped, %llu delayed\n", static_cast<ull>(impaired->dropped),
                   static_cast<ull>(impaired->delayed));
