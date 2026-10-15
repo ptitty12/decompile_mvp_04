@@ -23,6 +23,13 @@ engine_test(test_mods SOURCES tests/test_mods.cpp LIBS engine_mods_host
 # (standard library); skipped (77) without it. Native builds only: under
 # Emscripten mvp-pack runs through Node, which the harness does not drive.
 if(NOT EMSCRIPTEN)
+  # Local only (the player's disc; skipped, 77, without it): the example pack mounted on
+  # the virtual disc, every file read back, and MODDING.md §12's result hash.
+  add_test(NAME local_mods_example
+           COMMAND mvp-pack mount-check --disc "${MVP_DISC_PATH}"
+                   --expect-result 181b6977c6fa8893c3a06968e8d719d260e769e417eb7403cfbaf6ba9cea973f
+                   ${MVP_REPO_ROOT}/docs/examples/packs/fictional-league)
+  set_tests_properties(local_mods_example PROPERTIES SKIP_RETURN_CODE 77 LABELS local)
   find_package(Python3 COMPONENTS Interpreter QUIET)
   if(Python3_Interpreter_FOUND)
     add_test(NAME mods_crosscheck

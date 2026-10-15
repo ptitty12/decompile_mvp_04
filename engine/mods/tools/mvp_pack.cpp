@@ -5,7 +5,7 @@
 //   mvp-pack validate [--disc DISC] [--json] PACK...
 //   mvp-pack apply --disc DISC --out DIR [--json] PACK...
 //   mvp-pack hash PACK...
-//   mvp-pack mount-check --disc IMAGE PACK...
+//   mvp-pack mount-check --disc IMAGE [--expect-result HASH] PACK...
 //
 // DISC is an ISO/CISO image or a directory holding an extracted disc (data/...,
 // sys/main.dol). PACK is a pack directory or .zip. `apply` writes the changed files
@@ -13,7 +13,8 @@
 // repository or under its ignored build/ directory (patched game files are never
 // committed). `mount-check` mounts the packs on the image's virtual disc and reads
 // every file back through it: replaced files must equal the outputs, every other
-// file the original.
+// file the original; with --expect-result the result hash must be HASH. Without the
+// disc mount-check exits 77 (skipped), so ctest runs it only where the disc is.
 //
 // Tests on synthetic discs: --slot-sha1 HEX and --slot-count N stand in for the
 // retail main.dol's SHA-1 and its 124 team slots (as pack.py's tests patch them).
@@ -79,7 +80,7 @@ Json bool_json(bool v) {
 int main(int argc, char** argv) {
   if (argc < 2) return usage();
   const std::string cmd = argv[1];
-  std::string disc_path, out_dir;
+  std::string disc_path, out_dir, expect_result;
   bool as_json = false;
   SlotConfig slots;
   std::vector<std::string> specs;
@@ -89,12 +90,17 @@ int main(int argc, char** argv) {
     if (a == "--disc") disc_path = next();
     else if (a == "--out") out_dir = next();
     else if (a == "--json") as_json = true;
+    else if (a == "--expect-result") expect_result = next();
     else if (a == "--slot-sha1") slots.dol_sha1 = next();
     else if (a == "--slot-count") slots.count = static_cast<std::uint32_t>(std::stoul(next()));
     else if (a.rfind("--", 0) == 0) return usage();
     else specs.push_back(a);
   }
   if (specs.empty() || (cmd != "validate" && cmd != "apply" && cmd != "hash" && cmd != "mount-check")) return usage();
+  if (cmd == "mount-check" && (disc_path.empty() || !fs::exists(host(disc_path)))) {
+    std::printf("mount-check: no disc image; skipped\n");
+    return 77;
+  }
   if ((cmd == "apply" || cmd == "mount-check") && disc_path.empty()) return usage();
   if (cmd == "apply" && out_dir.empty()) return usage();
   if (cmd == "apply" && !safe_out(out_dir)) {
@@ -169,6 +175,10 @@ int main(int argc, char** argv) {
     }
     std::printf("mount-check: %zu files, %zu replaced (%llu bytes), %d mismatches; result hash %s\n", before.size(),
                 r.files.size(), static_cast<unsigned long long>(r.bytes), bad, r.result_hash.c_str());
+    if (!expect_result.empty() && r.result_hash != expect_result) {
+      std::printf("result hash differs from the expected %s\n", expect_result.c_str());
+      return 1;
+    }
     return bad ? 1 : 0;
   }
 
