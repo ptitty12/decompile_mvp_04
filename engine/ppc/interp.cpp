@@ -6,6 +6,9 @@
 
 namespace mvp::ppc {
 
+std::uint32_t g_gp_pages[8192] = {};  // P2: see mem_access.h
+void (*g_gp_wait_hook)(u32 first, u32 last) = nullptr;
+
 namespace {
 
 [[noreturn]] void fault(Cpu& c, const char* what, u32 word) {

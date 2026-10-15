@@ -54,6 +54,9 @@
 #include "runtime/boot.h"
 #include "runtime/hle.h"
 #include "runtime/hw.h"
+#ifdef MVP_BOOT_WASM
+#include "runtime/wasm_host.h"
+#endif
 #include "runtime/input.h"
 #include "runtime/lockstep.h"
 #include "runtime/sdk_names.h"
@@ -293,6 +296,9 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::printf("boot: FST at 0x%08X (%u bytes), BI2 at 0x%08X, arena hi 0x%08X\n", L.fst, L.fst_size, L.bi2,
               L.arena_hi);
   Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size, hw_cfg);
+#ifdef MVP_BOOT_WASM
+  hw.set_wgp_state(wasm_wgp_state());  // P2: the translated code appends to the write-gather pipe itself
+#endif
   hw.set_disc(in.disc.image.get());
   SystemHooks hooks(&m, &hw);
   m.memory().io = &hw;

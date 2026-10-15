@@ -96,6 +96,16 @@ struct WasmModule {
 // Import names, in import order ("rt" module). The host must provide each one.
 const std::vector<std::string>& wasm_import_names();
 
+// P2: the write-gather pipe's state the module's store helpers append to
+// directly (env.wgp, the address of runtime/hw.h's WgpState): a store of 1, 2
+// or 4 bytes to 0xCC008000 that leaves fewer than 32 bytes gathered, while
+// `fast` is set, is appended big-endian at buf + n without calling the runtime,
+// which then counts it (fast_stores) and ends the poll detector's run
+// (last_read = 0), as Hardware::write would. Offsets (the runtime checks them):
+struct WasmWgpLayout {
+  static constexpr std::uint32_t kBuf = 0, kN = 32, kFast = 36, kLastRead = 40, kFastStores = 48;
+};
+
 // Trap codes passed to rt.trap.
 enum class WasmTrap : std::uint32_t {
   InvalidInstruction = 0,

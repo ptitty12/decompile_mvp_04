@@ -69,6 +69,21 @@ struct HardwareConfig {
   bool ax_voices = true;
 };
 
+// The write-gather pipe's 32-byte buffer (P2), where translated code may append
+// to it without calling the runtime (wasm_emit's store helpers, for stores to
+// 0xCC008000 that do not complete a burst), and what Hardware::write does for
+// such a store besides appending: end a run of reads of one register (the poll
+// detector) and count the access. Hardware keeps its own; the browser's runtime
+// points it at the one its translated module knows (set_wgp_state).
+struct WgpState {
+  std::uint8_t buf[32] = {};
+  std::uint32_t n = 0;            // bytes gathered (0-31)
+  std::uint32_t fast = 0;         // 1: translated code may append (no access log is being kept)
+  std::uint32_t last_read = 0;    // the last register read (0 after a write): the poll detector
+  std::uint32_t pad = 0;
+  std::uint64_t fast_stores = 0;  // stores the translated code appended (accesses to 0xCC008000)
+};
+
 // What the AX voice model did (runtime/ax.h), summed over all frames.
 struct AxStats {
   std::uint64_t voice_frames = 0, samples = 0, ended = 0, looped = 0, updates = 0, max_running = 0;
@@ -84,7 +99,17 @@ class Hardware : public ppc::Io {
   const std::vector<MmioAccess>& log() const { return log_; }
   // Accesses per register address (byte address; only the ones accessed).
   std::map<u32, std::uint64_t> read_counts() const { return counts(reads_); }
-  std::map<u32, std::uint64_t> write_counts() const { return counts(writes_); }
+  std::map<u32, std::uint64_t> write_counts() const {
+    auto m = counts(writes_);
+    if (wgp_->fast_stores) m[0xCC008000u] += wgp_->fast_stores;  // P2: stores appended by translated code
+    return m;
+  }
+  // P2: use `s` for the write-gather pipe's buffer from now on (its state moves there).
+  void set_wgp_state(WgpState* s) {
+    if (s == wgp_) return;
+    *s = *wgp_;
+    wgp_ = s;
+  }
   const std::vector<u8>& fifo() const { return fifo_; }  // the first bytes written to the write-gather pipe
   std::uint64_t fifo_bytes() const { return fifo_bytes_; }
   const GxFifo& gx() const { return gx_; }
@@ -98,8 +123,8 @@ class Hardware : public ppc::Io {
   // mtspr WPAR: the write-gather pipe restarts empty; bytes of a partial burst are
   // dropped (GXRedirectWriteGatherPipe / GXRestoreWriteGatherPipe, E3a).
   void wgp_reset() {
-    if (gather_n_) ++wgp_dropped_;
-    gather_n_ = 0;
+    if (wgp_->n) ++wgp_dropped_;
+    wgp_->n = 0;
   }
   std::uint64_t wgp_resets_dropping() const { return wgp_dropped_; }
   const std::array<u8, 64>& sram() const { return sram_; }
@@ -242,8 +267,8 @@ class Hardware : public ppc::Io {
   u32 cp_status() const;
   u32 gp_distance() const;
   bool gp_at_breakpoint() const;
-  u8 gather_[32] = {};
-  u32 gather_n_ = 0;
+  WgpState own_wgp_;            // the write-gather buffer (P2: or the runtime's, set_wgp_state)
+  WgpState* wgp_ = &own_wgp_;
   std::uint64_t wgp_dropped_ = 0;
   std::uint64_t gp_bursts_ = 0;
   std::uint64_t fifo_bytes_ = 0, draw_dones_ = 0;
@@ -267,8 +292,7 @@ class Hardware : public ppc::Io {
     return m;
   }
   std::vector<u8> fifo_;
-  u32 last_read_ = 0;
-  std::uint64_t same_reads_ = 0;
+  std::uint64_t same_reads_ = 0;  // with wgp_->last_read: the poll detector
 
   ExiChannel exi_[3];
   std::array<u8, 64> sram_{};

@@ -66,11 +66,11 @@ u32 reg_offset(int r) {
 enum Ty : u32 { tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, tL_I, tI_L, tV_IIIIIL, kTypes };
 enum Imp : u32 {
   iOnEntry, iSafepoint, iRead8, iRead16, iRead32, iWrite8, iWrite16, iWrite32, iExec, iCallIndirect,
-  iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, iFpUnavailable, kImports
+  iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, iFpUnavailable, iGpWait, kImports
 };
 constexpr Ty kImportType[kImports] = {tV_II,   tV_I,  tI_IIIL, tI_IIIL, tI_IIIL, tV_IIIIL, tV_IIIIL, tV_IIIIL, tV_IIIL,
                                       tV_II,   tV_II, tI_III,  tV_III,  tV_II,   tV_III,   tV_I,     tV_I,     tV_III,
-                                      tV_II};
+                                      tV_II,   tV_III};
 // Helpers defined in every module, after the imports.
 enum Hlp : u32 {
   hRd8 = kImports, hRd16, hRd32, hWr8, hWr16, hWr32, hCmps, hCmpu, hDivw, hDivwu, hS2D, hD2S,
@@ -83,7 +83,7 @@ constexpr Ty kHelperType[kHelperCount] = {tI_IIIL,  tI_IIIL,  tI_IIIL,   tV_IIII
 constexpr const char* kHelperName[kHelperCount] = {"rd8",  "rd16", "rd32", "wr8",   "wr16", "wr32", "cmps", "cmpu",
                                                    "divw", "divwu", "s2d", "d2s",   "lmw",  "stmw", "psq_l", "psq_st"};
 // Imported globals (immutable i32): the table base and three runtime addresses.
-enum Glb : u32 { gTableBase, gUnwinding, gResume, gHook, kGlobals };
+enum Glb : u32 { gTableBase, gUnwinding, gResume, gHook, gWgp, gGpPages, kGlobals };
 
 // ---- per-instruction classification ----
 enum Kind : u8 {
@@ -2552,6 +2552,35 @@ void swap32_from_local(Fn& h, u32 local) {  // stack: x (also in `local`) -> bsw
   h.op(op::i32_or);
 }
 
+// P2: before a store to guest memory, whether the render thread has still to
+// read any of it (env.gp_pages, ppc::g_gp_pages: per 4 KiB of physical memory,
+// nonzero while an issued GX command reads it); if so rt.gp_wait(cpu, first,
+// last) waits for it. `first` and `last` push the first and the last byte's
+// address.
+void gp_check(Fn& h, const std::function<void()>& first, const std::function<void()>& last) {
+  auto entry = [&](const std::function<void()>& addr) {
+    h.global(gGpPages);
+    addr();
+    h.i32c(12);
+    h.op(op::i32_shr_u);
+    h.i32c(0x1FFF);
+    h.op(op::i32_and);
+    h.i32c(2);
+    h.op(op::i32_shl);
+    h.op(op::i32_add);
+    h.mem(op::i32_load, 2, 0);
+  };
+  entry(first);
+  entry(last);
+  h.op(op::i32_or);
+  h.if_();
+  h.get(0);
+  first();
+  last();
+  h.call(iGpWait);
+  h.end();
+}
+
 // The host pointer of the 64 KiB page holding `ea` (param 1), teed into `p_local`.
 void page_ptr(Fn& h, u32 p_local) {
   h.get(0);
@@ -2628,12 +2657,14 @@ Fn helper_read(int bytes, u32 slow) {
   return h;
 }
 
-// (cpu, ea, value, pc, ticks), as helper_read.
+// (cpu, ea, value, pc, ticks), as helper_read. P2: a store to the write-gather
+// pipe that does not complete a burst is appended to the runtime's buffer
+// directly (WasmWgpLayout), as Hardware::write would append it.
 Fn helper_write(int bytes, u32 slow) {
   Fn h;
   h.uleb(1);
-  h.uleb(1);
-  h.byte(kI32);  // local 5: the page pointer
+  h.uleb(3);
+  h.byte(kI32);  // local 5: the page pointer; 6, 7: the write-gather state and its count
   page_ptr(h, 5);
   h.if_();
   if (bytes != 1) {
@@ -2644,6 +2675,13 @@ Fn helper_write(int bytes, u32 slow) {
     h.op(op::i32_le_u);
     h.if_();
   }
+  gp_check(h, [&] { h.get(1); }, [&] {
+    h.get(1);
+    if (bytes > 1) {
+      h.i32c(static_cast<u32>(bytes - 1));
+      h.op(op::i32_add);
+    }
+  });
   host_addr(h, 5);
   if (bytes == 1) {
     h.get(2);
@@ -2666,6 +2704,62 @@ Fn helper_write(int bytes, u32 slow) {
   }
   h.op(op::return_);
   if (bytes != 1) h.end();
+  h.end();
+  // The write-gather pipe (an unmapped page, so the runtime's path otherwise).
+  using L = WasmWgpLayout;
+  h.get(1);
+  h.i32c(0xCC008000u);
+  h.op(op::i32_eq);
+  h.if_();
+  h.global(gWgp);
+  h.tee(6);
+  h.mem(op::i32_load, 2, L::kFast);
+  h.if_();
+  h.get(6);
+  h.mem(op::i32_load, 2, L::kN);
+  h.tee(7);
+  h.i32c(static_cast<u32>(32 - bytes));
+  h.op(op::i32_lt_u);
+  h.if_();
+  h.get(6);
+  h.get(7);
+  h.op(op::i32_add);
+  if (bytes == 1) {
+    h.get(2);
+    h.mem(op::i32_store8, 0, L::kBuf);
+  } else if (bytes == 2) {
+    h.get(2);
+    h.i32c(8);
+    h.op(op::i32_shl);
+    h.get(2);
+    h.i32c(8);
+    h.op(op::i32_shr_u);
+    h.i32c(0xFF);
+    h.op(op::i32_and);
+    h.op(op::i32_or);
+    h.mem(op::i32_store16, 0, L::kBuf);
+  } else {
+    h.get(2);
+    swap32_from_local(h, 2);
+    h.mem(op::i32_store, 0, L::kBuf);
+  }
+  h.get(6);
+  h.get(7);
+  h.i32c(static_cast<u32>(bytes));
+  h.op(op::i32_add);
+  h.mem(op::i32_store, 2, L::kN);
+  h.get(6);
+  h.i32c(0);
+  h.mem(op::i32_store, 2, L::kLastRead);
+  h.get(6);
+  h.get(6);
+  h.mem(op::i64_load, 3, L::kFastStores);
+  h.i64c(1);
+  h.op(op::i64_add);
+  h.mem(op::i64_store, 3, L::kFastStores);
+  h.op(op::return_);
+  h.end();
+  h.end();
   h.end();
   h.get(0);
   h.get(1);
@@ -2864,6 +2958,16 @@ Fn helper_multiple(bool store) {
   h.i32c(0x10000);
   h.op(op::i32_le_u);
   h.if_();
+  if (store)  // the words [ea, ea + 4 * (32 - first))
+    gp_check(h, [&] { h.get(1); }, [&] {
+      h.get(1);
+      h.i32c(127);
+      h.op(op::i32_add);
+      h.get(2);
+      h.i32c(2);
+      h.op(op::i32_shl);
+      h.op(op::i32_sub);
+    });
   host_addr(h, 5);
   h.set(6);
   h.get(2);
@@ -3207,6 +3311,11 @@ Fn helper_psq_store() {
   h.i32c(0x10000);
   h.op(op::i32_le_u);
   h.if_();
+  gp_check(h, [&] { h.get(1); }, [&] {  // the 1 to 8 bytes written (the last of the 8 a pair can cover)
+    h.get(1);
+    h.i32c(7);
+    h.op(op::i32_add);
+  });
   host_addr(h, 7);
   h.set(11);
   h.end();
@@ -3408,7 +3517,7 @@ const std::vector<std::string>& wasm_import_names() {
   static const std::vector<std::string> names = {
       "on_entry", "safepoint", "read8",    "read16",     "read32", "write8", "write16",     "write32", "exec",
       "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap",   "rfi",    "system_call", "tw",
-      "fp_unavailable"};
+      "fp_unavailable", "gp_wait"};
   return names;
 }
 
@@ -3620,7 +3729,7 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
     im.byte(kFuncRef);
     im.byte(0x00);
     im.uleb(1);
-    for (const char* g : {"table_base", "unwinding", "resume", "entry_hook"}) {
+    for (const char* g : {"table_base", "unwinding", "resume", "entry_hook", "wgp", "gp_pages"}) {
       im.name("env");
       im.name(g);
       im.byte(0x03);
