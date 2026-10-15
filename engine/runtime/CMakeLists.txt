@@ -86,7 +86,7 @@ if(MVP_DISC_PATH AND EXISTS "${MVP_DISC_PATH}")
   endif()
 
   add_executable(mvp-boot tools/mvp_boot.cpp)
-  target_link_libraries(mvp-boot PRIVATE mvp_game_native engine_lockstep)
+  target_link_libraries(mvp-boot PRIVATE mvp_game_native engine_lockstep engine_audio)  # engine_audio: audio/ (E3b)
   target_compile_options(mvp-boot PRIVATE ${ENGINE_WARN})
   if(MSVC)
     target_link_options(mvp-boot PRIVATE /STACK:67108864)

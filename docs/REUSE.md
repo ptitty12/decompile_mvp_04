@@ -166,3 +166,13 @@ These were read for hardware facts and design, and no code was copied:
 | [encounter/aurora](https://github.com/encounter/aurora) at `51797212b9283e91cc03c273854d63b2421d8490` | MIT | Design of the TEV-to-WGSL generator, pipeline cache and register decoding (`lib/gx/shader.cpp`, `regs.cpp`, `gx.cpp`: BP cull encoding and front face); its texture converter was judged too tied to its own buffers to vendor |
 | Dolphin (VideoCommon) | GPL-2.0+ (read only) | Hardware behaviour: CMPR's 5/8-3/8 interpolation, indirect texturing (formats, bias, matrix scale, wraps), the TEV fixed-point lerp and compare modes, fog and lighting formulas, EFB copy register fields |
 | YAGCD and the Dolphin SDK's GX macros | public documentation | Register layouts and command lengths |
+
+### Read, not copied: audio (`engine/audio/`, E3b)
+
+Nothing is vendored for audio; SDL3 is the external SDK `engine/gfx/` already uses
+(`docs/engine/TOOLCHAIN.md`). These were read for behaviour, and no code or data was copied:
+
+| Source | License | Read for |
+|---|---|---|
+| Dolphin (DSPHLE `UCodes/AX.h`, `AX.cpp`, `AXStructs.h`, `AXVoice.h`, master as of 2026-10-14) | GPL-2.0+ (read only) | AX microcode behaviour: command numbers and arguments, the 2004 microcode's mixerCtrl bits, per-millisecond voice processing (SRC, envelope, LPF, mix with ramps), aux send/return and the Dolby Pro Logic II commands 0x13/0x10, output clamping. The DSP ROM's polyphase coefficients were not used: `audio/mixer.cpp` designs its own |
+| The game's own SDK and EA SND code (`config/GV4E69` symbols, dtk assembly of `dolphin/ax` and `snd/`) | the retail binary (read, as for the decomp) | The command list the CPU builds (fn_804181DC), the PB fields it reads back (fn_80419568), the studio/depop ramp (fn_804190A4), the aux buffer rotation (fn_80417F50), EA's mixerCtrl and ramp use (SNDDRV_DSPMixerUpdate) and its aux A callback (SNDDRV_audiocallback) |

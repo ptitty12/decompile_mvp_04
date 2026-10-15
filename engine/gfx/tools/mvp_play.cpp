@@ -20,9 +20,14 @@
 //                     --draw-log-from N (default 0) to --draw-log-to N
 //   --dump-textures DIR at VI field --dump-field N: every texture each draw
 //                     samples, decoded from guest memory, as DIR/tex_F_D_M.png
+//   --audio-wav FILE  (E3b) the AX mix as a 16-bit stereo WAV, exactly as virtual
+//                     time produced it (keep it under build/; never commit it)
+//   --no-audio        no playback (default: SDL3 playback when a window is open)
+//   --audio-latency MS buffering between the mixer and the device (default 100)
 //
-// Determinism: the renderer only reads guest state, and window events never
-// reach the guest; with the same input script, the guest runs exactly as under
+// Determinism: the renderer and the mixer only read guest state, audio and
+// window events never reach the guest (playback throttles the host, not the
+// guest); with the same input script, the guest runs exactly as under
 // mvp-boot. The report's "guest:" line (instructions, time base, SHA-1 of MEM1)
 // is the same with and without --no-render (local test local_play_determinism).
 // Captures are game-derived: they belong under build/ and are never committed.
@@ -35,6 +40,9 @@
 #include <set>
 #include <string>
 
+#include "audio/mixer.h"
+#include "audio/sdl_out.h"
+#include "audio/wav.h"
 #include "common/file.h"
 #include "common/sha1.h"
 #include "gfx/gx_processor.h"
@@ -151,6 +159,7 @@ struct Play : GfxObserver {
   gfx::GxProcessor* proc = nullptr;
   gfx::Renderer* renderer = nullptr;
   gfx::Window* window = nullptr;
+  audio::SdlAudioOut* audio_out = nullptr;
   std::uint64_t present_every = 1, max_fields = ~0ull;
   std::string capture_dir;
   std::uint64_t capture_every = 60;
@@ -173,6 +182,7 @@ struct Play : GfxObserver {
     const gfx::Renderer::Frame* f = renderer->xfb(xfb);
     if (!f) f = renderer->latest_xfb();
     if (window && field % present_every == 0) {
+      if (audio_out) audio_out->throttle();  // keep the host near real time (host pacing only)
       if (!window->pump()) throw StopRun{"window closed"};
       if (f) {
         window->present(f->view, f->width, f->height);
@@ -204,7 +214,9 @@ int main(int argc, char** argv) {
   std::setvbuf(stdout, nullptr, _IOLBF, 1 << 16);
   std::string input_path, capture_at, draw_log_path;
   std::uint64_t draw_log_from = 0, draw_log_to = ~0ull, dump_field = ~0ull;
-  std::string dump_dir;
+  std::string dump_dir, audio_wav;
+  bool no_audio = false;
+  std::uint32_t audio_latency = 100;
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
   bool headless = false, no_render = false;
@@ -228,11 +240,15 @@ int main(int argc, char** argv) {
     else if (a == "--draw-log-to") draw_log_to = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--dump-textures") dump_dir = next();
     else if (a == "--dump-field") dump_field = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--audio-wav") audio_wav = next();
+    else if (a == "--no-audio") no_audio = true;
+    else if (a == "--audio-latency") audio_latency = static_cast<std::uint32_t>(std::strtoul(next().c_str(), nullptr, 10));
     else {
       std::fprintf(stderr,
                    "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
                    "[--headless] [--no-render] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
-                   "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N]\n");
+                   "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N] "
+                   "[--audio-wav FILE] [--no-audio] [--audio-latency MS]\n");
       return 2;
     }
   }
@@ -325,6 +341,38 @@ int main(int argc, char** argv) {
   if (!renderer) play.proc = nullptr;
   hw.set_gfx_observer(&play);
   g_play = &play;
+
+  // Audio (E3b): the mixer observes the DSP's frames; it feeds a WAV, a level
+  // meter and, with a window, SDL3 playback.
+  audio::AxMixer mixer;
+  audio::TeeSink tee;
+  audio::WavWriter wav;
+  audio::LevelMeter levels;
+  std::unique_ptr<audio::SdlAudioOut> audio_out;
+  if (!audio_wav.empty()) {
+    if (!wav.open(audio_wav)) {
+      std::fprintf(stderr, "mvp-play: cannot write %s\n", audio_wav.c_str());
+      return 2;
+    }
+    tee.add(&wav);
+  }
+  if (window && !no_audio) {
+    audio_out = audio::SdlAudioOut::open(audio::kDspRate, audio_latency, &err);
+    if (audio_out) {
+      std::printf("audio: SDL %s, device \"%s\" at %u Hz, %u ms buffer\n", audio_out->driver().c_str(),
+                  audio_out->device().c_str(), audio_out->device_rate(), audio_latency);
+      tee.add(audio_out.get());
+      play.audio_out = audio_out.get();
+    } else {
+      std::fprintf(stderr, "mvp-play: no audio: %s\n", err.c_str());
+    }
+  }
+  if (!audio_wav.empty() || audio_out) {
+    tee.add(&levels);
+    mixer.set_sink(&tee);
+    mixer.set_rate([&hw] { return hw.ai_dsp_rate(); });
+    hw.set_ax_observer(&mixer);
+  }
   rt::g_input = &input;
   rt::g_frame_hook = &frame_hook;
 
@@ -341,6 +389,7 @@ int main(int argc, char** argv) {
   }
   const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
   hw.set_gfx_observer(nullptr);
+  hw.set_ax_observer(nullptr);
   rt::g_input = nullptr;
   rt::g_frame_hook = nullptr;
   if (renderer) {
@@ -360,6 +409,22 @@ int main(int argc, char** argv) {
   }
   std::printf("time: %.3f s of guest time in %.1f s (%.2fx real time); %llu VI fields, %llu frame polls\n", guest, secs,
               secs > 0 ? guest / secs : 0.0, ull(hw.vi_fields()), ull(play.frames));
+  if (!audio_wav.empty() || audio_out) {
+    const audio::MixerStats& ms = mixer.stats();
+    std::printf("audio: %llu frames mixed (%u Hz), %llu voice-ms, at most %u voices, aux A returns in %llu frames; %s\n",
+                ull(ms.frames), hw.ai_dsp_rate(), ull(ms.voice_ms), ms.max_voices, ull(ms.aux_return_frames[0]),
+                levels.summary().c_str());
+    if (!audio_wav.empty()) std::printf("audio: WAV %s%s\n", audio_wav.c_str(), wav.close() ? "" : " (WRITE FAILED)");
+    if (audio_out) {
+      audio_out->close();
+      const audio::SdlAudioOut::Stats as = audio_out->stats();
+      std::printf("audio: played %llu frames (%llu non-silent, peak %d), %llu silent, %llu underruns, %llu skipped, "
+                  "%llu dropped (ring full), ratio %.4f..%.4f, throttled %llu ms\n",
+                  ull(as.drift.out_frames), ull(as.played_nonsilent), as.played_peak, ull(as.drift.silent_frames),
+                  ull(as.drift.underruns), ull(as.drift.skipped_frames), ull(as.ring_full), as.drift.min_ratio,
+                  as.drift.max_ratio, ull(as.throttle_waits));
+    }
+  }
   if (!renderer) return rc;
   const auto& ps = proc.stats();
   std::printf("gx: %llu commands, %llu draws, %llu vertices, %llu triangles, %llu EFB copies (%llu to the XFB), "
