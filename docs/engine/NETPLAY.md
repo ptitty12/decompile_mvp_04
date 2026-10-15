@@ -293,13 +293,21 @@ hands each page credentials derived from the shared secret (username
 `<expiry>:mvp`, password base64 HMAC-SHA1), valid for 24 hours. No accounts are
 stored, and leaked credentials expire.
 
-Tests: `npm test` in `engine/server` (47 tests: the gate, sessions and limits, the
+Tests: `npm test` in `engine/server` (61 tests, `test/disc.test.ts` for the disc upload and the Docker settings: the gate, sessions and limits, the
 static site, the disc route, the lobby, signaling, TURN credentials, and first-run
 setup: setup mode redirects, form validation and CSRF, the stored hash and its file,
 the window, restarts, the environment override, limits), also run by ctest as
 `server_node_tests`.
 
 ## 6. Deploying on a VPS
+
+**Docker / Dokploy (current):** `deploy/Dockerfile` and `deploy/docker-compose.yml`
+(services `mvp` and `coturn`, volume `mvp-data`); the owner's UI-only guide is
+`docs/engine/DEPLOY_DOKPLOY.md`. There the disc image is uploaded on the logged-in
+Server disc page (`/disc`: chunked, resumable, GV4E69 rev 0 checked server-side by
+the DOL's SHA-1, atomic replace), the TURN secret is generated on the first start,
+and `RESET_PASSWORD` reopens setup once without a shell. The install script below
+is the older SSH path.
 
 **Package.** `node engine/server/tools/package.mjs` (after building `mvp-web` and
 `npm ci && npm run build` in `engine/server`) writes

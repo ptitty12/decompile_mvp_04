@@ -9,6 +9,11 @@
 //   3. neither: "setup" mode for `setupHours` after the server first started
 //      without a password (the window is kept in the state file, so restarts do
 //      not extend it), then "closed" until an operator deletes the state file.
+//
+// Resetting without a shell (the Docker deployment): MVP_RESET_PASSWORD set to a
+// value the server has not seen before removes the stored password at start and
+// opens a fresh setup window, once; the state file keeps the value's SHA-256, so
+// later restarts with the same value change nothing.
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 import { LOGIN_CSS, escapeHtml, passwordMatches } from './auth.js';
@@ -157,6 +162,8 @@ export interface GateOptions {
   stateFile: string;
   /** How long setup stays open after the server first started without a password. */
   windowMs: number;
+  /** MVP_RESET_PASSWORD: a value not seen before reopens setup once (see above); '' does nothing. */
+  resetRequest?: string;
   now: () => number;
   log: (message: string) => void;
 }
@@ -169,11 +176,21 @@ export class PasswordGate {
   private openedAt = 0;
   private claiming = false;
   private closedLogged = false;
+  private resetToken: string | undefined;
   private readonly kdf = new KdfQueue();
 
   constructor(private readonly o: GateOptions) {
     if (o.envPassword) return;  // first-run setup is off and the state file is not touched
-    const st = loadState(o.stateFile, o.now());
+    let st = loadState(o.stateFile, o.now());
+    if (o.resetRequest) {
+      const token = createHash('sha256').update(o.resetRequest).digest('hex');
+      if (token !== st.resetToken) {
+        st = { version: 1, setupOpenedAt: o.now(), resetToken: token };
+        writeState(o.stateFile, st);
+        o.log('password: reset by a new MVP_RESET_PASSWORD value; the stored password is gone and setup is open again');
+      }
+    }
+    this.resetToken = st.resetToken;
     this.openedAt = st.setupOpenedAt;
     this.stored = st.password ?? null;
     if (this.stored) {
@@ -241,6 +258,7 @@ export class PasswordGate {
       if (after === 'closed') return 'closed';
       if (after !== 'setup') return 'done';
       const next: StateFile = { version: 1, setupOpenedAt: this.openedAt, password: { ...rec, setAt: this.o.now() } };
+      if (this.resetToken) next.resetToken = this.resetToken;
       writeState(this.o.stateFile, next);
       this.stored = next.password!;
       this.o.log(`setup: the site password was created (scrypt N=${rec.N} r=${rec.r} p=${rec.p}); setup is closed for good`);

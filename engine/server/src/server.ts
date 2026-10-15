@@ -4,8 +4,10 @@
 //   GET/POST /setup                          first-run password setup (src/setup.ts): open only
 //                                            while the server has no password; 404 once it has one
 //   GET  /healthz                            "ok" (no login; for monitoring)
-//   GET  /config.json                        {"disc":"/api/disc/image"} or {}
+//   GET  /config.json                        {"disc":"/api/disc/image"} or {}; "discPage" with uploads
 //   GET/HEAD /api/disc/image                 the owner's disc image (src/files.ts)
+//   GET  /disc, /api/disc, /api/disc/uploads  the Server disc page and its chunked upload (deploy:
+//                                            src/disc_page.ts, src/disc_store.ts), with uploads on
 //   GET  /api/rooms                          open rooms (src/lobby.ts)
 //   WS   /ws                                 lobby and WebRTC signaling
 //   GET  anything else                       the engine site (static files)
@@ -13,6 +15,7 @@
 // Everything except /login and /healthz needs the session cookie: a page load
 // without it is sent to the login form, anything else gets 401. While the
 // server has no password (setup mode) every page load is sent to /setup instead.
+import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { WebSocketServer } from 'ws';
@@ -31,6 +34,8 @@ import {
   sessionCookie,
 } from './auth.js';
 import type { ServerConfig } from './config.js';
+import { DISC_PAGE_CSP, discPage } from './disc_page.js';
+import { DiscStore, type Answer } from './disc_store.js';
 import { serveDisc, serveStatic } from './files.js';
 import { Lobby } from './lobby.js';
 import {
@@ -122,6 +127,7 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
     envPassword: cfg.password,
     stateFile: cfg.stateFile,
     windowMs: cfg.setupHours * 3600_000,
+    resetRequest: cfg.resetPassword,
     now,
     log,
   });
@@ -131,12 +137,22 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
   const setupPostsGlobal = new HitLimiter(SETUP_LIMITS.submissionsGlobal, SETUP_LIMITS.windowMs, now);
   const sessions = new Sessions(cfg.sessionHours, now);
   const limiter = new LoginLimiter(cfg.loginAttempts);
-  let baseUrl = cfg.publicUrl;
   const lobby = new Lobby({
-    invite: (room) => `${baseUrl}/?room=${room}`,
-    ice: () => iceServers(cfg, Date.now()),
+    invite: (room, origin) => `${origin}/?room=${room}`,
+    ice: (host) => iceServers(cfg, Date.now(), host),
     idleMinutes: cfg.roomIdleMinutes,
   });
+  // The uploaded disc (deploy): only when a disc directory is configured.
+  const store = cfg.discDir ? await DiscStore.open({ dir: cfg.discDir, expect: cfg.expectDisc, maxBytes: cfg.maxDiscBytes, now, log }) : null;
+  /** The image the disc route serves and its URL: an uploaded one, else the configured file. */
+  const servedDisc = (): { path: string; url: string; version: string } | null => {
+    const up = store?.current();
+    if (up) return { path: up.path, url: `/api/disc/image?v=${up.version}`, version: up.version };
+    return cfg.disc ? { path: cfg.disc, url: '/api/disc/image', version: '' } : null;
+  };
+  // CSRF tokens of the Server disc page: bound to the session (a page elsewhere can neither read nor forge one).
+  const discKey = randomBytes(32);
+  const discToken = (session: string) => createHmac('sha256', discKey).update(`disc:${session}`).digest('base64url');
   const wss = new WebSocketServer({ noServer: true, maxPayload: 64 * 1024 });
 
   const loggedIn = (req: IncomingMessage) => sessions.valid(parseCookies(req.headers.cookie).get(COOKIE));
@@ -237,6 +253,68 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
     }
   };
 
+  const sendJson = (res: ServerResponse, a: Answer) =>
+    res.writeHead(a.status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(JSON.stringify(a.body));
+
+  /**
+   * The Server disc page's upload API (logged in already; src/disc_store.ts):
+   *   POST   /api/disc/uploads                {size, name, fingerprint}: a new upload (201)
+   *   PUT    /api/disc/uploads/<id>?offset=N  one chunk (application/octet-stream, at most CHUNK_MAX bytes)
+   *   POST   /api/disc/uploads/<id>/finish    check the complete file and make it the server's disc
+   *   DELETE /api/disc/uploads/<id>           abandon it
+   * Each request must come from the page itself: the X-MVP-CSRF header holds the session's token,
+   * Sec-Fetch-Site (when sent) says same-origin and Origin (when sent) is this site.
+   */
+  const handleUpload = async (req: IncomingMessage, res: ServerResponse, method: string, path: string, url: URL): Promise<void> => {
+    const session = parseCookies(req.headers.cookie).get(COOKIE)!;
+    const got = String(req.headers['x-mvp-csrf'] ?? '');
+    const want = discToken(session);
+    const tokenOk = got.length === want.length && timingSafeEqual(Buffer.from(got), Buffer.from(want));
+    if (!tokenOk || !sameOriginPost(req, cfg)) {
+      sendJson(res, { status: 403, body: { error: 'This request must come from the Server disc page of this site.' } });
+      return;
+    }
+    const parts = path.split('/').slice(4);  // after ['', 'api', 'disc', 'uploads']
+    const id = parts[0] ?? '';
+    if (parts.length === 0 && method === 'POST') {
+      if (!(req.headers['content-type'] ?? '').startsWith('application/json')) {
+        sendJson(res, { status: 415, body: { error: 'Expected JSON.' } });
+        return;
+      }
+      const body = await readBody(req, 4096);
+      let input: unknown = null;
+      try {
+        input = body === null ? null : JSON.parse(body);
+      } catch {
+        input = null;
+      }
+      sendJson(res, input === null ? { status: 400, body: { error: 'Bad upload request.' } } : await store!.create(input));
+      return;
+    }
+    if (!DiscStore.validId(id)) {
+      sendJson(res, { status: 404, body: { error: 'No such upload.' } });
+      return;
+    }
+    if (parts.length === 1 && method === 'PUT') {
+      const offset = Number(url.searchParams.get('offset') ?? NaN);
+      if (!Number.isSafeInteger(offset) || offset < 0 || req.headers['content-length'] === undefined) {
+        sendJson(res, { status: 411, body: { error: 'A chunk needs ?offset= and a Content-Length.' } });
+        return;
+      }
+      sendJson(res, await store!.write(id, offset, Number(req.headers['content-length']), req));
+      return;
+    }
+    if (parts.length === 2 && parts[1] === 'finish' && method === 'POST') {
+      sendJson(res, await store!.finish(id));
+      return;
+    }
+    if (parts.length === 1 && method === 'DELETE') {
+      sendJson(res, await store!.cancel(id));
+      return;
+    }
+    sendJson(res, { status: 405, body: { error: 'Method not allowed.' } });
+  };
+
   const handle = async (req: IncomingMessage, res: ServerResponse): Promise<void> => {
     for (const [k, v] of Object.entries(COMMON_HEADERS)) res.setHeader(k, v);
     let url: URL;
@@ -334,22 +412,43 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
       }
       return;
     }
+    if (store && path.startsWith('/api/disc/uploads')) {
+      await handleUpload(req, res, method, path, url);
+      return;
+    }
     if (method !== 'GET' && method !== 'HEAD') {
       res.writeHead(405, { Allow: 'GET, HEAD' }).end();
       return;
     }
     if (path === '/config.json') {
-      res
-        .writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' })
-        .end(cfg.disc ? JSON.stringify({ disc: '/api/disc/image' }) : '{}');
+      const d = servedDisc();
+      const body: Record<string, string> = d ? { disc: d.url } : {};
+      if (store) body.discPage = '/disc';
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' }).end(JSON.stringify(body));
       return;
     }
     if (path === '/api/disc/image') {
-      if (!cfg.disc) {
-        res.writeHead(404, { 'Cache-Control': 'private, no-store' }).end();
+      const d = servedDisc();
+      const v = url.searchParams.get('v');
+      if (!d || (v !== null && v !== d.version)) {
+        // No image, or the one this page started with was replaced: the page must reload.
+        res
+          .writeHead(404, { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' })
+          .end(d ? '{"error":"the disc image changed; reload the page"}' : '{"error":"no disc image"}');
         return;
       }
-      await serveDisc(cfg.disc, req, res);
+      await serveDisc(d.path, req, res);
+      return;
+    }
+    if (store && path === '/disc') {
+      const token = discToken(parseCookies(req.headers.cookie).get(COOKIE)!);
+      res
+        .writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': DISC_PAGE_CSP })
+        .end(method === 'HEAD' ? undefined : discPage(token));
+      return;
+    }
+    if (store && path === '/api/disc') {
+      sendJson(res, { status: 200, body: store.status() });
       return;
     }
     if (path === '/api/rooms') {
@@ -378,8 +477,10 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
       socket.destroy();
       return;
     }
+    // Invite links and the ICE servers' host follow the address the page used (or the configured public URL).
+    const origin = cfg.publicUrl ? new URL(cfg.publicUrl).origin : String(req.headers.origin);
     wss.handleUpgrade(req, socket, head, (ws) => {
-      const client = lobby.connect(ws);
+      const client = lobby.connect(ws, origin);
       let alive = true;
       ws.on('pong', () => (alive = true));
       const ping = setInterval(() => {
@@ -404,7 +505,6 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
   await new Promise<void>((resolve) => server.listen(cfg.port, cfg.host, resolve));
   const addr = server.address() as AddressInfo;
   const local = `http://${addr.address.includes(':') ? `[${addr.address}]` : addr.address}:${addr.port}`;
-  if (!baseUrl) baseUrl = local;
   return {
     server,
     lobby,

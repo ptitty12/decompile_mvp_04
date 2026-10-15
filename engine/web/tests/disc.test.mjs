@@ -101,3 +101,14 @@ test('probe: 401 is the login error; a server without Range support is refused',
   const r4 = await probeDiscUrl(IMG, async () => { throw new TypeError('Failed to fetch'); });
   assert.equal(r4.ok, false);
 });
+
+test('the Server disc page link: same-origin only, absent anywhere else', async () => {
+  const { findDiscPage } = await load('disc.js');
+  const cfg = (v) => fakeFetch({ 'https://mvp.example.test/config.json': () => json(v) });
+  assert.equal(await findDiscPage(BASE, cfg({ disc: '/api/disc/image?v=1', discPage: '/disc' })), 'https://mvp.example.test/disc');
+  assert.equal(await findDiscPage(BASE, cfg({ discPage: '/disc' })), 'https://mvp.example.test/disc');
+  assert.equal(await findDiscPage(BASE, cfg({ disc: '/api/disc/image' })), null);
+  assert.equal(await findDiscPage(BASE, cfg({ discPage: 'https://elsewhere.test/disc' })), null);
+  assert.equal(await findDiscPage(BASE, fakeFetch({})), null);
+  assert.equal(await findDiscPage(BASE, async () => { throw new TypeError('Failed to fetch'); }), null);
+});

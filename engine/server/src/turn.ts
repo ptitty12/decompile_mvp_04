@@ -13,10 +13,14 @@ export function turnCredentials(secret: string, ttlSeconds: number, nowMs: numbe
   return { username, credential };
 }
 
-/** The ICE servers handed to a page: STUN, plus TURN with fresh credentials. */
-export function iceServers(cfg: Pick<ServerConfig, 'stun' | 'turn'>, nowMs: number): IceServer[] {
+/**
+ * The ICE servers handed to a page: STUN, plus TURN with fresh credentials. "{host}" in a URL
+ * becomes `host`, the page's host name (the Docker deployment runs coturn on the site's host).
+ */
+export function iceServers(cfg: Pick<ServerConfig, 'stun' | 'turn'>, nowMs: number, host = ''): IceServer[] {
+  const fill = (urls: string[]) => urls.map((u) => u.replaceAll('{host}', host));
   const out: IceServer[] = [];
-  if (cfg.stun.length) out.push({ urls: [...cfg.stun] });
-  if (cfg.turn) out.push({ urls: [...cfg.turn.urls], ...turnCredentials(cfg.turn.secret, cfg.turn.ttlSeconds, nowMs) });
+  if (cfg.stun.length) out.push({ urls: fill(cfg.stun) });
+  if (cfg.turn) out.push({ urls: fill(cfg.turn.urls), ...turnCredentials(cfg.turn.secret, cfg.turn.ttlSeconds, nowMs) });
   return out;
 }
