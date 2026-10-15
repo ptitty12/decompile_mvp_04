@@ -1,0 +1,28 @@
+# Build context of deploy/Dockerfile (the Dokploy deployment: docs/engine/DEPLOY_DOKPLOY.md).
+# An allowlist: the image is built from the engine sources and the symbol map only.
+# Game data never enters the context (orig/, build/, disc images, DOLs, extracted
+# files), and deploy/check-context.mjs fails the build if anything disc-like gets in.
+*
+!engine/
+!config/GV4E69/symbols.txt
+!deploy/check-context.mjs
+
+# Never, not even inside engine/: local installs and outputs, secrets, game data.
+**/node_modules
+**/dist
+**/.env
+**/*.iso
+**/*.ciso
+**/*.gcm
+**/*.rvz
+**/*.wia
+**/*.wbfs
+**/*.gcz
+**/*.nfs
+**/*.tgc
+**/*.dol
+**/*.elf
+**/*.rel
+**/*.big
+**/*.map
+**/*.png
