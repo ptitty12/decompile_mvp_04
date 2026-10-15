@@ -2,23 +2,33 @@
 # Installs the MVP Baseball 2005 netplay deployment on a fresh Debian 12 or
 # Ubuntu 24.04 VPS (E5). Run as root from the unpacked package directory:
 #
-#   MVP_PASSWORD='the site password' ./deploy/install.sh mvp.example.com
+#   ./deploy/install.sh mvp.example.com
 #
 # - DOMAIN must already resolve to this VPS (Caddy gets its certificate for it).
-# - MVP_PASSWORD: the site password the players type (at least 8 characters).
-#   Without it, a random one is generated and printed once.
+# - There is no site password to give the script (E5b): a fresh install starts
+#   in setup mode with no password, and the owner creates it in the browser on
+#   the first visit (https://DOMAIN/ goes to /setup). The password is stored
+#   as a scrypt hash in /var/lib/mvp/state.json; nobody else ever handles it.
+#   Setup stays open for 48 hours after the server first starts without a
+#   password (setupHours in /etc/mvp/server.json), so make the first visit
+#   right after installing. To reopen setup later: stop mvp-server, delete
+#   /var/lib/mvp/state.json, start it (docs/engine/NETPLAY.md).
 # - The disc image is not part of the package: copy it to /srv/mvp/disc/ and
 #   set "disc" in /etc/mvp/server.json (the script does this when
 #   /srv/mvp/disc/GV4E69.ciso or GV4E69.iso exists).
 #
 # Idempotent: running it again updates the engine and the server, keeps the
-# password and the TURN secret.
+# password (the state file) and the TURN secret.
 set -eu
 
-DOMAIN=${1:?usage: MVP_PASSWORD=... install.sh DOMAIN}
+DOMAIN=${1:?usage: install.sh DOMAIN}
 NODE_VERSION=24.18.0
 HERE=$(cd "$(dirname "$0")/.." && pwd)
 
+if [ -n "${MVP_PASSWORD:-}" ]; then
+  echo "install.sh: MVP_PASSWORD is no longer accepted here: the owner creates the site password in the browser on the first visit" >&2
+  exit 1
+fi
 if [ "$(id -u)" -ne 0 ]; then echo "install.sh: run as root" >&2; exit 1; fi
 
 echo "== packages (Caddy, coturn)"
@@ -50,18 +60,10 @@ mv /opt/mvp/site.new /opt/mvp/site
 mv /opt/mvp/server.new /opt/mvp/server
 chown -R root:root /opt/mvp/site /opt/mvp/server
 
-echo "== secrets"
-if [ ! -s /etc/mvp/password ]; then
-  if [ -n "${MVP_PASSWORD:-}" ]; then
-    printf '%s' "$MVP_PASSWORD" > /etc/mvp/password
-  else
-    head -c 18 /dev/urandom | base64 | tr -d '/+=' > /etc/mvp/password
-    echo "   generated site password: $(cat /etc/mvp/password)"
-  fi
-fi
+echo "== secrets (the TURN secret; the site password is created in the browser, not here)"
 [ -s /etc/mvp/turn-secret ] || head -c 32 /dev/urandom | base64 | tr -d '/+=' > /etc/mvp/turn-secret
-chown root:mvp /etc/mvp/password /etc/mvp/turn-secret
-chmod 0640 /etc/mvp/password /etc/mvp/turn-secret
+chown root:mvp /etc/mvp/turn-secret
+chmod 0640 /etc/mvp/turn-secret
 
 echo "== configuration"
 DISC=""
@@ -69,6 +71,14 @@ for f in /srv/mvp/disc/GV4E69.ciso /srv/mvp/disc/GV4E69.iso; do [ -f "$f" ] && D
 [ -n "$DISC" ] && chown root:mvp "$DISC" && chmod 0640 "$DISC"
 sed -e "s#mvp.example.com#$DOMAIN#g" -e "s#/srv/mvp/disc/GV4E69.ciso#$DISC#" "$HERE/deploy/server.json.example" > /etc/mvp/server.json
 cp "$HERE/deploy/server.env.example" /etc/mvp/server.env
+# An install made before first-run setup has its password in /etc/mvp/password: keep using it (it wins over
+# the stored one) rather than silently opening setup on an already protected site.
+if [ -s /etc/mvp/password ]; then
+  chown root:mvp /etc/mvp/password
+  chmod 0640 /etc/mvp/password
+  printf 'MVP_PASSWORD_FILE=/etc/mvp/password\n' >> /etc/mvp/server.env
+  echo "   keeping the existing /etc/mvp/password (set before first-run setup existed)"
+fi
 chown root:mvp /etc/mvp/server.json /etc/mvp/server.env
 chmod 0640 /etc/mvp/server.json /etc/mvp/server.env
 sed -e "s#<mvp.example.com>#$DOMAIN#g" "$HERE/deploy/Caddyfile.template" > /etc/caddy/Caddyfile
@@ -93,4 +103,12 @@ fi
 
 sleep 2
 curl -fsS http://127.0.0.1:8080/healthz && echo " <- mvp-server"
-echo "== done: https://$DOMAIN/ (password in /etc/mvp/password)"
+echo "== done: https://$DOMAIN/"
+# What the first visit will find: the setup form (200), a stored or configured password (404), or a closed window (403).
+SETUP=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/setup || true)
+case "$SETUP" in
+  200) echo "   first visit: open https://$DOMAIN/ and create the site password (setup is open for 48 hours from the server's first start; do it now)." ;;
+  404) echo "   a site password already exists (the stored one, or /etc/mvp/password); setup is closed." ;;
+  403) echo "   the setup window has closed and no password exists: stop mvp-server, delete /var/lib/mvp/state.json, start it, then make the first visit." ;;
+  *)   echo "   could not read the setup state (HTTP $SETUP): see: journalctl -u mvp-server" ;;
+esac

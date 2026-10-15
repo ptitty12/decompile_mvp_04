@@ -3,6 +3,8 @@
   "port": 8080,
   "site": "/opt/mvp/site",
   "disc": "/srv/mvp/disc/GV4E69.ciso",
+  "stateFile": "/var/lib/mvp/state.json",
+  "setupHours": 48,
   "secureCookies": true,
   "trustProxy": true,
   "publicUrl": "https://mvp.example.com",

@@ -14,6 +14,10 @@ ExecStart=/usr/bin/node dist/src/main.js
 Restart=on-failure
 RestartSec=2
 NoNewPrivileges=true
+# /var/lib/mvp: the state file (the setup window and the password hash), owner-only; the only writable path.
+StateDirectory=mvp
+StateDirectoryMode=0700
+UMask=0077
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true

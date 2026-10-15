@@ -2,8 +2,13 @@
 // (MVP_SERVER_CONFIG) and environment variables; secrets come only from the
 // environment (or files named by it), never from the repository:
 //
-//   MVP_PASSWORD / MVP_PASSWORD_FILE        the site password (required)
+//   MVP_PASSWORD / MVP_PASSWORD_FILE        the site password (optional: tests and CI;
+//                                           it wins over the stored one, E5b)
 //   MVP_TURN_SECRET / MVP_TURN_SECRET_FILE  coturn's static-auth-secret (optional)
+//
+// Without MVP_PASSWORD the owner creates the password in the browser on first
+// run (src/setup.ts); the hash is kept in the state file (MVP_STATE_FILE,
+// "stateFile"), which is then required.
 //
 // docs/engine/NETPLAY.md ("Deploying on a VPS") has a complete example.
 import { readFileSync } from 'node:fs';
@@ -25,7 +30,12 @@ export interface ServerConfig {
   site: string;
   /** The owner's disc image (ISO or CISO), served only behind the login; empty: none. */
   disc: string;
+  /** The password from the environment (MVP_PASSWORD), or '' to use the stored one (first-run setup). */
   password: string;
+  /** The state file (the setup window and the stored password hash); required when `password` is empty. */
+  stateFile: string;
+  /** How long first-run setup stays open after the server first started without a password. */
+  setupHours: number;
   /** Set the cookie's Secure flag (true behind TLS). */
   secureCookies: boolean;
   /** Take the client address from the last X-Forwarded-For entry (behind a reverse proxy). */
@@ -45,6 +55,8 @@ export const defaults: Omit<ServerConfig, 'password' | 'site'> = {
   host: '127.0.0.1',
   port: 8080,
   disc: '',
+  stateFile: '',
+  setupHours: 48,
   secureCookies: false,
   trustProxy: false,
   publicUrl: '',
@@ -59,7 +71,12 @@ function secret(env: NodeJS.ProcessEnv, name: string): string {
   const direct = env[name];
   if (direct) return direct;
   const file = env[`${name}_FILE`];
-  if (file) return readFileSync(file, 'utf8').trim();
+  if (file) {
+    const text = readFileSync(file, 'utf8').trim();
+    // An empty secret file must not turn into "no password" (which would open first-run setup).
+    if (!text) throw new Error(`${name}_FILE (${file}) is empty`);
+    return text;
+  }
   return '';
 }
 
@@ -74,7 +91,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
   };
   const bool = (s: string) => s === '1' || s === 'true';
   const password = secret(env, 'MVP_PASSWORD');
-  if (password.length < 8) throw new Error('MVP_PASSWORD (or MVP_PASSWORD_FILE) must be set, at least 8 characters');
+  if (password && password.length < 8) throw new Error('MVP_PASSWORD (or MVP_PASSWORD_FILE) must be at least 8 characters');
+  const stateFile = pick('stateFile', 'MVP_STATE_FILE', String, defaults.stateFile);
+  if (!password && !stateFile) {
+    throw new Error('no password source: set MVP_STATE_FILE ("stateFile") so the owner can create the password in the browser, or MVP_PASSWORD');
+  }
+  const setupHours = pick('setupHours', 'MVP_SETUP_HOURS', Number, defaults.setupHours);
+  if (!(setupHours > 0 && setupHours <= 24 * 365)) throw new Error('MVP_SETUP_HOURS ("setupHours") must be between 0 and 8760');
   const site = pick('site', 'MVP_SITE', String, '');
   if (!site) throw new Error('the site directory is not configured (MVP_SITE or "site")');
   const turnFile = file.turn as Partial<TurnConfig> | undefined;
@@ -88,6 +111,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ServerConfig {
     site: resolve(site),
     disc: pick('disc', 'MVP_DISC_IMAGE', String, defaults.disc),
     password,
+    stateFile: stateFile ? resolve(stateFile) : '',
+    setupHours,
     secureCookies: pick('secureCookies', 'MVP_SECURE_COOKIES', bool, defaults.secureCookies),
     trustProxy: pick('trustProxy', 'MVP_TRUST_PROXY', bool, defaults.trustProxy),
     publicUrl: pick('publicUrl', 'MVP_PUBLIC_URL', String, defaults.publicUrl),
