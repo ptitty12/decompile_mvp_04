@@ -53,14 +53,17 @@ steps. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) has the engine design. In 
 
 ## Hard rules for everyone (violating any of these means the work is rejected)
 
-- NEVER commit or host game data, or anything derived from the disc:
+- NEVER commit or publish game data, or anything derived from the disc:
   - disc images, DOL/REL files;
   - extracted, decompressed or converted assets: textures, audio, models, overlay binaries;
   - translated or recompiled game code;
   - byte dumps, memory dumps, save states, and screenshots or recordings of the game.
 
-  `orig/` and `build/` stay gitignored. The player's browser derives these
-  locally from the player's own disc, and the owner's VPS never serves them.
+  `orig/` and `build/` stay gitignored, and the public repo never contains any of it.
+  **Private deployment (owner, 2026-10-14):** the owner's own access-controlled
+  deployment may serve the owner's disc image to the owner and invited players who
+  own the game (behind a password, never a public URL). Translated code is still
+  produced in each player's browser, and nothing game-derived is served anywhere else.
 - NEVER circumvent copy protection, download game files, or fetch ROMs/ISOs.
 - NEVER modify, skip, weaken, or special-case the verification tooling, its
   config, the CI workflow, or `.claude/settings.json`. If you believe the

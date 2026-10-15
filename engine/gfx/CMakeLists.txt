@@ -141,7 +141,7 @@ if(MVP_HAVE_WEBGPU)
   # mvp-play: the game with the renderer (needs the translated code, so the disc).
   if(TARGET mvp_game_native)
     add_executable(mvp-play tools/mvp_play.cpp)
-    target_link_libraries(mvp-play PRIVATE mvp_game_native engine_gfx_wgpu engine_translator)
+    target_link_libraries(mvp-play PRIVATE mvp_game_native engine_gfx_wgpu engine_translator engine_audio_sdl)  # audio/ (E3b)
     target_compile_options(mvp-play PRIVATE ${ENGINE_WARN})
     if(MSVC)
       target_link_options(mvp-play PRIVATE /STACK:67108864)

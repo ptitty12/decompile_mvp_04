@@ -181,3 +181,13 @@ site's `licenses/` directory:
 
 Dev tools only, never served: TypeScript 6.0.3 (Apache-2.0) compiles the shell;
 Playwright 1.64.0 (Apache-2.0) drives the local browser check.
+
+### Read, not copied: audio (`engine/audio/`, E3b)
+
+Nothing is vendored for audio; SDL3 is the external SDK `engine/gfx/` already uses
+(`docs/engine/TOOLCHAIN.md`). These were read for behaviour, and no code or data was copied:
+
+| Source | License | Read for |
+|---|---|---|
+| Dolphin (DSPHLE `UCodes/AX.h`, `AX.cpp`, `AXStructs.h`, `AXVoice.h`, master as of 2026-10-14) | GPL-2.0+ (read only) | AX microcode behaviour: command numbers and arguments, the 2004 microcode's mixerCtrl bits, per-millisecond voice processing (SRC, envelope, LPF, mix with ramps), aux send/return and the Dolby Pro Logic II commands 0x13/0x10, output clamping. The DSP ROM's polyphase coefficients were not used: `audio/mixer.cpp` designs its own |
+| The game's own SDK and EA SND code (`config/GV4E69` symbols, dtk assembly of `dolphin/ax` and `snd/`) | the retail binary (read, as for the decomp) | The command list the CPU builds (fn_804181DC), the PB fields it reads back (fn_80419568), the studio/depop ramp (fn_804190A4), the aux buffer rotation (fn_80417F50), EA's mixerCtrl and ramp use (SNDDRV_DSPMixerUpdate) and its aux A callback (SNDDRV_audiocallback) |

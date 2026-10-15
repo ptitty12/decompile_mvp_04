@@ -257,6 +257,33 @@ uses neither); headless Firefox has no WebGPU adapter (run headed); Playwright's
 Windows WebKit has no WebGPU at all (ran without rendering); quick live taps fell
 between the game's frame polls during the slow intro movie (latched now).
 
+### Merged with E3b audio (2026-10-14, `claude-side-e2merge`)
+
+`engine/e2b` merged origin/main (E3b: `engine/audio/`, AX2, `mvp-play` sound and
+`--audio-wav`, `mvp-boot` `--audio-wav`/`--count`/`--peek`). Conflicts resolved as
+the union; also: SDL3 audio output is not built under Emscripten (`MVP_SDL3_DIR`
+names the native package there; the browser will use an AudioWorklet),
+`mvp-boot-wasm` links `engine_audio` (it shares `mvp_boot.cpp`), and
+`local_audio_determinism` passes the cross-compiling emulator, so it runs under
+Node too.
+
+**Yields and audio frames:** an AX frame runs inside the guest's DSP mailbox
+write (`Hardware::dsp_receive`), from the AI DMA interrupt's handler, and a host
+yield is taken only at the end of a safe point outside interrupt handlers, with
+the repeated safe point skipped; no guest instruction, so no mail, is dropped or
+repeated. Checked: `mvp-play --no-render --audio-wav` with the START script to
+2,400 fields, with and without `--yield` (2,399 yields): the same 7,958 mixed
+frames, a byte-identical WAV (sha1 `4dcd69d8...`) and the same guest line (MEM1
+`4df06af1...`, unchanged by AX2). `local_audio_determinism` gives the same WAV
+(`471e427a...`), SDK log (`09cfc165...`) and frame log natively and under Node.
+
+Tests after the merge: `ctest --preset msvc` 34 tests, all pass (`local_disasm`
+skipped in the full run without `MVP_DTK_ASM`, then passed with it set to the
+progress bot's dtk listing); `ctest --preset emscripten` 31 tests under Node, all
+pass, local tests included. Chrome 155 (headless, unpaced, the START script,
+2,400 fields): the same guest line as native (MEM1 `4df06af1...`), 0 WebGPU
+errors, only the engine's own files requested.
+
 ## Decisions to record (for the lead)
 
 - E2-W1: the browser backend emits one wasm module directly from the CFG, with

@@ -87,7 +87,7 @@ if(MVP_DISC_PATH AND EXISTS "${MVP_DISC_PATH}")
   endif()
 
   add_executable(mvp-boot tools/mvp_boot.cpp)
-  target_link_libraries(mvp-boot PRIVATE mvp_game_native engine_lockstep)
+  target_link_libraries(mvp-boot PRIVATE mvp_game_native engine_lockstep engine_audio)  # engine_audio: audio/ (E3b)
   target_compile_options(mvp-boot PRIVATE ${ENGINE_WARN})
   if(MSVC)
     target_link_options(mvp-boot PRIVATE /STACK:67108864)
@@ -96,7 +96,7 @@ if(MVP_DISC_PATH AND EXISTS "${MVP_DISC_PATH}")
     # E2: the same tool with the DOL translated to WebAssembly at startup
     # (tools/wasm_game.cpp) instead of the C++-emitted translation.
     add_executable(mvp-boot-wasm tools/mvp_boot.cpp tools/wasm_game.cpp)
-    target_link_libraries(mvp-boot-wasm PRIVATE engine_lockstep engine_wasm_host)
+    target_link_libraries(mvp-boot-wasm PRIVATE engine_lockstep engine_wasm_host engine_audio)  # --audio-wav (E3b)
     target_compile_options(mvp-boot-wasm PRIVATE ${ENGINE_WARN})
   endif()
   add_test(NAME local_lockstep COMMAND mvp-boot lockstep)

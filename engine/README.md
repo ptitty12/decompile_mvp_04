@@ -24,7 +24,8 @@ measurements:
 
 Three rules matter most here:
 
-- **Nothing derived from the disc is ever committed or hosted.** That covers
+- **Nothing derived from the disc is ever committed or published.** (The owner's
+  private, password-protected deployment may serve the owner's own disc image.) That covers
   translated code, extracted files and memory dumps. The player's browser
   produces them from the player's own disc; development builds produce them
   under `build/`.
