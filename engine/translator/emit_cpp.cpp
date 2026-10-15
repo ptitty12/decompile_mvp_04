@@ -97,6 +97,22 @@ class Writer {
     }
     labels.insert(resume_.begin(), resume_.end());
     const std::string self = fname(f.start), body = "b_" + self.substr(2);
+    // The longest straight-line run, for EmitOptions::max_optimized_run.
+    std::size_t run = 0, longest = 0;
+    for (std::size_t k = 0; k < f.insns.size(); ++k) {
+      const InsnInfo& x = f.insns[k];
+      if (!f.reachable[k] || labels.count(x.addr) || x.flow != Flow::Plain) {
+        run = 0;
+        continue;
+      }
+      longest = std::max(longest, ++run);
+    }
+    const bool unoptimized = opt_.max_optimized_run && longest > opt_.max_optimized_run;
+    if (unoptimized) {
+      out_ << "#if defined(_MSC_VER) && !defined(__clang__)\n#pragma optimize(\"\", off)  // a " << longest
+           << "-instruction straight-line run (EmitOptions::max_optimized_run)\n#endif\n";
+      ++stats_.unoptimized;
+    }
     miss_ = resume_.empty() ? "{ rt::leave(); return; }" : "goto R_;";
 
     out_ << "// " << f.sym->name << (hle_id >= 0 ? " (replaced: runtime/hle.h)" : hook_id >= 0 ? " (hooked: runtime/hle.h)" : "")
@@ -166,6 +182,7 @@ class Writer {
         out_ << entry_prologue(e, leave) << "  " << body << "(c, " << h8(e) << ");\n}\n";
       }
     }
+    if (unoptimized) out_ << "#if defined(_MSC_VER) && !defined(__clang__)\n#pragma optimize(\"\", on)\n#endif\n";
     out_ << "\n";
     ++stats_.functions;
     stats_.entries += f.entries.size();

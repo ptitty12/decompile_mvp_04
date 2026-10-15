@@ -30,6 +30,11 @@ struct HleSpec {
 struct EmitOptions {
   int shards = 64;          // game_00.cpp ... game_NN.cpp
   bool pc_per_insn = true;  // store the guest PC before every instruction (precise faults)
+  // Functions with a straight-line run (no label, no branch or call) longer than
+  // this many instructions compile without optimization under MSVC (E3a): its
+  // optimizer takes time quadratic in such a block (a 3,130-instruction
+  // initializer took over 30 minutes at /O2). 0: optimize everything.
+  std::size_t max_optimized_run = 1024;
   // Replacements and hooks (runtime/hle.h), one per rt::hle_table() entry. A
   // replaced function gets a stub calling rt::hle_call, plus its translated
   // original as f_XXXXXXXX_orig; a hooked one calls rt::hle_before after its entry.
@@ -39,6 +44,7 @@ struct EmitOptions {
 struct EmitStats {
   std::size_t functions = 0, entries = 0, instructions = 0, bytes = 0, hle_stubs = 0, resume_labels = 0;
   std::size_t fpu_checks = 0;   // FPU instructions checked for MSR[FP] (floating-point unavailable)
+  std::size_t unoptimized = 0;  // functions left unoptimized (max_optimized_run)
   std::vector<int> hle_matched;  // HleSpec::index of every spec that found its function
 };
 
