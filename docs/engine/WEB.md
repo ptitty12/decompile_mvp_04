@@ -461,6 +461,16 @@ and the browsers with E2d's emitter, with sound on, unpaced:
 | 2,400 fields, START at 280/430/580/730 | 9,737,828,100, 1,622,971,350, 966 polls, MEM1 `c70ca6c5...` | native, Chrome, Firefox; Chrome from the kept image (P1) |
 | 3,600 fields, the `menus` script | 14,602,688,100, 2,433,781,350, 2,117 polls, MEM1 `5e150b6c...` | native, Chrome (paced and unpaced), Firefox (paced and unpaced); `mvp-boot-wasm` under Node; Chrome from the kept image, unpaced (P1) |
 
+**Since CLK2 (2026-10-15):** the virtual CPU charges 1.25 cycles per instruction and
+list walks are no longer idle-skipped (CLK2_LOG.md), so every line changes again
+(the values above are CLK1's). Native `mvp-play --no-render` at `/O2`:
+
+| Run | Guest line | Matches |
+|---|---|---|
+| 700 fields, no input | 4,547,010,125 instructions, time base 473,646,888, 360 polls, MEM1 `53221c4a...` | native, Chrome 155 (unpaced) |
+| 2,400 fields, START at 280/430/580/730 | 15,574,026,125, 1,622,294,388, 1,882 polls, MEM1 `4285f135...` | native |
+| 3,600 fields, the `menus` script | 23,357,802,126, 2,433,104,388, 2,747 polls, MEM1 `40a7692d...` | native at `/O2`, at `/Od` and with `--yield`; Chrome 155 (unpaced) |
+
 ## 5. Limits and next steps
 
 - **Safari is not measured.** Playwright's WebKit on Windows has no WebGPU; the
