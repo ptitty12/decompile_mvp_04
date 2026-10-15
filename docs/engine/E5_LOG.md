@@ -13,9 +13,9 @@ Design: `docs/ARCHITECTURE.md` §8. Protocol and deployment: `docs/engine/NETPLA
 |---|---|---|
 | 1 | `engine/net/`: session, protocol v1, state hashes, transports, data-free tests | Done |
 | 2 | Netplay in the run loop; two native peers over UDP agree with the solo run | Done |
-| 3 | `engine/server/` (TypeScript): password gate, disc route, lobby, signaling, TURN config | |
-| 4 | Browser: data channel transport, lobby UI, two-browser lockstep test, latency and bandwidth | |
-| 5 | `docs/engine/NETPLAY.md` | |
+| 3 | `engine/server/` (TypeScript): password gate, disc route, lobby, signaling, TURN config | Done |
+| 4 | Browser: data channel transport, lobby UI, two-browser lockstep test, latency and bandwidth | Done (local) |
+| 5 | `docs/engine/NETPLAY.md`; deploy package | Done; deployment waits for VPS access |
 
 ## How to build and run (agents)
 
@@ -26,6 +26,14 @@ Design: `docs/ARCHITECTURE.md` §8. Protocol and deployment: `docs/engine/NETPLA
 - `engine/net/tools/lockstep.cmake` runs two `mvp-netplay` peers at once plus the solo
   reference: `-DFRAMES=N -DDELAY=D -DIMPAIR="--loss P --latency MS --jitter MS" -DPORT=N`,
   or `-DDESYNC=1` for the desync path. Logs and reports stay under `build/`.
+- Server: `npm ci` then `npm test` (or `npm run build`) in `engine/server`; ctest runs
+  the same tests as `server_node_tests` when `node_modules` is installed.
+- Browser: build `mvp-web` (`engine/tools/emsdk.cmd cmake --build --preset emscripten -j 8
+  --target mvp-web`, after `npm ci` in `engine/web`), `npm run build` in `engine/server`,
+  then `node engine/web/tools/netplay_check.mjs --script FILE --frames N --delay D`
+  (`--browser`, `--browser2` for a mixed pair, `--netsim L,J,P` for a slow network,
+  `--expect` a native guest line, `--no-render`). Summaries go to `build/engine/web-check/`.
+- Deploy package: `node engine/server/tools/package.mjs` (NETPLAY.md §6).
 
 ## 1. `engine/net` (done)
 
@@ -121,3 +129,118 @@ The test passes in 136 s (`/Od` translation, three instances).
 The RTT the session reports includes the time a datagram waits while the guest runs a
 field (the loop reads the network between fields), about 60 ms average on localhost at
 `/Od` speed.
+
+## 3. The server (done)
+
+`engine/server/` (TypeScript on Node 24, `ws` 8.22.0; NETPLAY.md §5): the password
+gate (login form, HttpOnly cookie, in-memory sessions, per-address login limit, no
+open redirects; page loads go to the form, API calls get 401), the disc route exactly
+as agreed with E2c (`/config.json` gives `{"disc":"/api/disc/image"}` or `{}`;
+`GET`/`HEAD /api/disc/image` with ranges and `Cache-Control: private, no-store`), the
+static site with a CSP, the lobby and WebRTC signaling over `/ws` (session and Origin
+checked), and coturn REST-API credentials. Templates for coturn, Caddy, systemd and the
+configuration, and `deploy/install.sh` (Debian 12 / Ubuntu 24.04). 19 Node tests.
+
+## 4. The browser (done locally)
+
+`engine/web`: `wasm/net_web.cpp` runs the session in the Worker; the page
+(`src/netplay.ts`) owns the RTCPeerConnection and its negotiated, unordered,
+unreliable data channel and relays datagrams to the Worker; the lobby panel appears
+only when the page comes from the netplay server. The Worker boots the game after the
+handshake, pumps the session every 4 ms, and runs the due fields at once when a
+datagram ends a wait. `mvp_web.cpp` changed in five small places (all marked E5).
+
+**Exit evidence, local equivalent (2026-10-14).** `netplay_check.mjs`: the server with
+a throwaway password, two isolated browser contexts (two players with their own
+cookies) log in through the form, player 1 creates a game, player 2 opens the invite
+link, both pick the disc, both play the same script (each drives its own port) to
+frame 1,200 (boot, intro, licence screen, title, first menus), paced at 59.94 fields/s,
+connected directly (no relay on one machine):
+
+| Run | Guest line at frame 1,200 (both pages) | Native solo (`mvp-netplay`) | Windows | Desyncs | Gate misses |
+|---|---|---|---|---|---|
+| Chrome 155 x2, D = 2 | `1b4a083f...`, 10,528,857,285 instructions | identical | 20 equal | 0 | 0 |
+| Chrome 155 x2, D = 3 | `520439ba...`, 10,836,931,415 instructions | identical | 20 equal | 0 | 0 |
+| Chrome 155 x2, D = 4 | `009fa27d...`, 10,484,236,787 instructions | identical | 20 equal | 0 | 0 |
+| Chrome 155 + Firefox 157 (no rendering), D = 3 | `520439ba...` | identical | 20 equal | 0 | 0 |
+
+**Latency and bandwidth** (steady state, frames 600-1,200: the title and the menus,
+where the game itself polls 55.4 times per guest second; per player, per direction):
+
+| D | frames/s | input latency (sampling to use) | payload | WebRTC transport (DTLS + SCTP) | datagrams/s | RTT |
+|---:|---:|---:|---:|---:|---:|---:|
+| 2 | 54.5 | 38.5 / 39.2 ms | 2.6 KB/s | 6.5 KB/s | 58 | 35 ms |
+| 3 | 54.2 | 57.7 / 56.5 ms | 2.6 KB/s | 5.5-6.5 KB/s | 49-58 | 41 ms |
+| 4 | 54.6-57.5 | 75.4 / 74.6 ms | 2.6-2.7 KB/s | 6.6-6.9 KB/s | 58-61 | 37 ms |
+
+- The input latency is D frames of the game's own pace (18.4 ms per poll there) plus
+  about 1.5 ms: the netplay cost is D frames, the same for both players since the waiting
+  side samples its pad when the wait ends (commit 443e4f72; before that change the side
+  that waits had 72 ms at D = 3 against 56 ms).
+- On the wire, add IP and UDP headers (28 bytes per datagram, about 1.6 KB/s): about
+  8 KB/s per direction in total.
+- RTT on one machine is 35-41 ms average: it counts the time a datagram waits in the
+  Worker while a field runs and the page-to-Worker hop, not only the network.
+- One side shows "stall" time (about 0.8 s per second): that is the side ahead in phase
+  idling until the other side's input arrives, not lost frames (both run at the same
+  rate, 98% of the game's own).
+- Startup: translation 0.51-0.53 s as in E2; the handshake 13-61 ms.
+
+**A slow network, simulated** (`--netsim 40,10,0.02`: each page delays its outgoing
+datagrams by 40-50 ms and drops 2%; RTT as measured 119-139 ms), same script and frames:
+
+| D | Guest line = native | frames/s | input latency | payload | transport | datagrams/s |
+|---:|---|---:|---:|---:|---:|---:|
+| 2 | yes (`1b4a083f...`) | **36.8** (both wait: the delay is shorter than the latency) | 57.8 / 58.1 ms | 3.3 KB/s | 7.4 KB/s | 58 |
+| 3 | yes (`520439ba...`) | 55.0-58.0 (full speed) | 56.8 / 62.3 ms | 3.9-4.1 KB/s | 9.5 KB/s | 58 |
+| 4 | yes (`009fa27d...`) | 57.6-57.7 (full speed, 10-19 ms of waiting per second) | 75.6 / 76.3 ms | 3.4 KB/s | 7.5-8.0 KB/s | 77-80 |
+
+Rule of thumb: D x 18 ms must cover the one-way latency plus about 10 ms (the Worker
+hop and a field's run). D = 3 (the default) suits a round trip up to about 90 ms; the
+lobby offers 2 to 6.
+
+All runs: 20 windows compared, 0 desyncs, 0 gate misses, no console errors, no request
+outside the server. Data-free tests: `test_net_protocol`, `test_net_session`,
+`test_net_driver` (native and under Emscripten/Node), `test_net_udp` (native),
+`server_node_tests`; `ctest -LE local`: 30/30.
+
+## Next step
+
+1. **Deploy on the owner's VPS** (the two-network exit). Ready: `build/engine/deploy/
+   mvp-netplay.tar.gz` (from `node engine/server/tools/package.mjs`) and
+   `deploy/install.sh` (NETPLAY.md §6). Access needed, all of it from the owner:
+   - SSH to the VPS as root (or a sudo user): host name or IP, user, and a key or password
+     for the agent's session; Debian 12 or Ubuntu 24.04, with ports 80, 443, 3478 (UDP
+     and TCP) and 49160-49200/UDP reachable (the provider's firewall too);
+   - a domain or subdomain with an A record pointing at the VPS (or the DNS login to
+     create one);
+   - the site password the owner wants the two players to type (or accept a generated
+     one, which the agent hands over);
+   - consent to copy the owner's disc image to `/srv/mvp/disc/` on that VPS (the
+     2026-10-14 hosting rule allows it on the private deployment); the brother can
+     instead pick his own image.
+2. Then: the owner and his brother open the site, log in, one creates a game and sends
+   the link, both pick the disc; netplay starts at power-on. To finish an exhibition game
+   the engine must first reach and run one at full speed in the browser (E3a: speed and
+   the front end to exhibition); netplay itself has no game-specific code.
+3. Later: suggest the delay from the measured round trip before the game starts; a
+   longer native lockstep run into gameplay when an exhibition script exists (E3a);
+   rollback after K5.
+
+## Decisions to record (for the lead)
+
+- **E5-N1, netplay protocol v1** (`docs/engine/NETPLAY.md` §2, `engine/net/protocol.h`):
+  HELLO/INPUT/BYE datagrams with the `MN` header and a major version; inputs are
+  PadState v1 per port; every datagram repeats all unacknowledged inputs; the handshake
+  refuses any difference in engine build, disc identity v1, pack-set hash, settings
+  string, CLK1/DVD1 constants or desync window. A versioned engine API.
+- **E5-N2, lockstep rules:** frames are frame polls; input delay D (2-4, the larger
+  proposal wins); the local pad is sampled when the frame can run (D > 0); the run loop
+  gates `rt::run()` on the next poll's input and yields early after a poll whose
+  successor is missing; a poll without its input stops the run (never happened).
+- **E5-N3, desync detection:** striped XXH64 of MEM1 over K = 60 frame windows (1/60 of
+  MEM1 per frame), window hashes exchanged; a mismatch stops both sides; local text
+  diagnostics only (slice hashes, never memory).
+- **E5-S1, VPS stack:** Node 24 + `ws` behind Caddy (TLS), coturn with time-limited
+  REST-API credentials; one shared password, HttpOnly session cookie; the disc route
+  `/config.json` + `/api/disc/image` as agreed with E2c.
