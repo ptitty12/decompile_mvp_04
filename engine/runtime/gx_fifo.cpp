@@ -85,7 +85,12 @@ std::size_t GxFifo::command_length(const std::uint8_t* p, std::size_t n) const {
   if (op >= 0x80 && op < 0xC0) {  // quads, triangles, strips, fans, lines, line strips, points
     if (n < 3) return 0;
     std::size_t count = std::size_t(p[1]) << 8 | p[2];
-    return 3 + count * vertex_size(op & 7);
+    const int fmt = op & 7;
+    if (!(vsize_valid_ & (1u << fmt))) {
+      vsize_[fmt] = vertex_size(fmt);
+      vsize_valid_ |= static_cast<std::uint8_t>(1u << fmt);
+    }
+    return 3 + count * vsize_[fmt];
   }
   return ~std::size_t(0);  // not a command
 }
@@ -123,6 +128,8 @@ void GxFifo::execute(const std::uint8_t* cmd, std::size_t len, Effects& fx, bool
       else if ((reg & 0xF8) == 0x70) vat_a_[reg & 7] = v;
       else if ((reg & 0xF8) == 0x80) vat_b_[reg & 7] = v;
       else if ((reg & 0xF8) == 0x90) vat_c_[reg & 7] = v;
+      else return;
+      vsize_valid_ = 0;  // the vertex sizes
       return;
     }
     case 0x40:
@@ -179,6 +186,8 @@ GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
   Effects fx;
   if (broken_) return fx;
   pending_.insert(pending_.end(), bytes, bytes + n);
+  if (need_ > pending_.size()) return fx;  // the command at the head is still incomplete
+  need_ = 0;
   std::size_t at = 0;
   while (at < pending_.size()) {
     std::size_t len = command_length(pending_.data() + at, pending_.size() - at);
@@ -191,7 +200,10 @@ GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
       pending_.clear();
       return fx;
     }
-    if (len == 0 || len > pending_.size() - at) break;  // the rest of the command is still to come
+    if (len == 0 || len > pending_.size() - at) {  // the rest of the command is still to come
+      if (len) need_ = len;  // its length, from the head of pending_ after the erase below
+      break;
+    }
     Recent& r = recent_[recent_n_++ % recent_.size()];
     r.offset = consumed_;
     r.len = static_cast<std::uint32_t>(len);

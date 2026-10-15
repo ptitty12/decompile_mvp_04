@@ -82,6 +82,12 @@ class GxFifo {
   void call_list(std::uint32_t addr, std::uint32_t size, Effects& fx);
 
   std::vector<std::uint8_t> pending_;
+  // P1: the length of the incomplete command at the head of pending_, once known
+  // (a long primitive arrives over many bursts: it is measured once, not per burst).
+  std::size_t need_ = 0;
+  // P1: vertex sizes per format, valid until a VCD or VAT write.
+  mutable std::array<std::uint32_t, 8> vsize_{};
+  mutable std::uint8_t vsize_valid_ = 0;
   std::uint64_t consumed_ = 0;
   std::uint32_t vcd_lo_ = 0, vcd_hi_ = 0;
   std::array<std::uint32_t, 8> vat_a_{}, vat_b_{}, vat_c_{};
