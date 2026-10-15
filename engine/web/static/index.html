@@ -6,6 +6,7 @@
   <title>MVP Baseball 2005 engine</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="controls.css">
   <script type="module" src="main.js"></script>
 </head>
 <body>
@@ -42,18 +43,14 @@
           <option value="2">2x</option>
           <option value="3">3x</option>
         </select></label>
+      <button type="button" id="pad-chip" class="chip" data-state="none" title="Controllers and keys: open the Controls panel">No controller (keyboard)</button>
       <span id="hint" class="hint" hidden></span>
     </div>
     <pre id="phases"></pre>
     <pre id="stats"></pre>
-    <details>
-      <summary>Controls</summary>
-      <p>Keyboard: Enter = START, X = A, Z = B, C = X, V = Y, arrows = D-pad, I/J/K/L = stick, Q = L, E = R,
-        Space = Z. F = fullscreen, M = sound on/off, P = pause.</p>
-      <p>Gamepad (standard layout): A/Cross = A, B/Circle = B, X/Square = X, Y/Triangle = Y, RB or LB = Z,
-        LT/RT = L/R (analog; a full press clicks), Start = START, D-pad, left stick = main stick, right stick =
-        C-stick. Change it below.</p>
-      <div id="gamepad"></div>
+    <details id="controls-details">
+      <summary>Controls <span id="controls-summary" class="note"></span></summary>
+      <div id="controls"></div>
     </details>
     <details>
       <summary>Engine log</summary>

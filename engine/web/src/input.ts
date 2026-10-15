@@ -1,27 +1,23 @@
-// Host input for port 1: the keyboard and the first connected gamepad (Gamepad
-// API, main thread only), merged into one GameCube pad. The Worker applies the
-// latest state at the game's next frame poll (runtime/input.h, E0c-IN1): input
-// enters guest state only there, once per frame.
+// Host input (E2, E2c, Q3): the keyboard and the connected gamepads (Gamepad
+// API, main thread only), merged into one GameCube pad per port (pad-manager.ts
+// decides which pad drives which port). The Worker applies the latest state at
+// the game's next frame poll (runtime/input.h, E0c-IN1): input enters guest state
+// only there, once per frame. Nothing here talks to the engine except `onChange`,
+// which the page turns into a `pad` message.
 //
-// Keyboard: Enter = START, X = A, Z = B, C = X, V = Y, arrows = D-pad,
-// I/J/K/L = main stick, Q = L, E = R, Space = Z.
-// Gamepad: the mapping in gamepad.ts (standard layout by default, rebindable,
-// stored per browser).
+// Keyboard: Enter = START, X = A, Z = B, C = X, V = Y, arrows = D-pad, I/J/K/L =
+// main stick, numeric keypad 8/4/2/6 = C-stick, Q = L, E = R, Space = Z (all
+// changeable in the Controls panel: controls-keys.ts).
+// Gamepads: the profile and mapping per controller model (gamepad-profiles.ts,
+// gamepad.ts), stored per browser (controls-store.ts).
 
-import { PAD, loadMapping, mapGamepad, saveMapping, type GamepadLike, type GamepadMapping } from './gamepad.js';
+import { PAD } from './gamepad.js';
+import { keyCodes } from './controls-keys.js';
+import { PORTS, loadConfig, saveConfig, type ControlsConfig } from './controls-store.js';
+import { PadManager, type DeviceEvent, type PadSource } from './pad-manager.js';
 import type { Pad } from './protocol.js';
 
 export { PAD };
-
-const KEYS: Record<string, number> = {
-  Enter: PAD.START, KeyX: PAD.A, KeyZ: PAD.B, KeyC: PAD.X, KeyV: PAD.Y,
-  ArrowUp: PAD.UP, ArrowDown: PAD.DOWN, ArrowLeft: PAD.LEFT, ArrowRight: PAD.RIGHT,
-  KeyQ: PAD.L, KeyE: PAD.R, Space: PAD.Z,
-};
-const STICK_KEYS: Record<string, [number, number]> = {
-  KeyI: [0, 1], KeyK: [0, -1], KeyJ: [-1, 0], KeyL: [1, 0],
-};
-const STICK_RANGE = 100;  // the pad's usual reach after origin correction
 
 function storage(): Storage | null {
   try {
@@ -32,81 +28,113 @@ function storage(): Storage | null {
 }
 
 export class HostInput {
-  private keys = new Set<string>();
-  private last = '';
-  private mappingValue: GamepadMapping = loadMapping(storage());
-  // The pad last read (for the controller panel), and whether the remapping UI
-  // holds the gamepad (it reads the raw pad itself meanwhile).
-  gamepad: Gamepad | null = null;
-  capture = false;
+  readonly manager: PadManager;
+  private readonly keys = new Set<string>();
+  private bound: Set<string>;
+  private last: string[] = Array.from({ length: PORTS }, () => '');
+  private ownConfig: ControlsConfig;
+  /** Counts changes of the settings (the panel redraws when it moves). */
+  rev = 0;
+  /** Device changes (a controller connected, claimed a port, left): the panel and the lobby listen. */
+  onDevice: (e: DeviceEvent) => void = () => {};
+  /** Every sample, after the ports changed or not (the panel's live test). */
+  onSample: () => void = () => {};
 
-  constructor(target: EventTarget, private readonly onChange: (pad: Pad) => void) {
+  constructor(target: EventTarget, private readonly onChange: (pad: Pad, port: number) => void) {
+    this.ownConfig = loadConfig(storage());
+    this.bound = keyCodes(this.ownConfig.keys);
+    this.manager = new PadManager(() => HostInput.gamepads(), this.ownConfig);
+    this.manager.keys = this.keys;
+    this.manager.onEvent = (e) => this.onDevice(e);
     target.addEventListener('keydown', (e) => this.key(e as KeyboardEvent, true));
     target.addEventListener('keyup', (e) => this.key(e as KeyboardEvent, false));
-    target.addEventListener('blur', () => this.keys.clear());
+    target.addEventListener('blur', () => this.releaseKeys());
+    document.addEventListener('visibilitychange', () => this.releaseKeys());
+    // A button clicked with the mouse must not keep the keyboard: Enter and Space would press it
+    // again, and the game's keys would be ignored until the player clicked the game.
+    let pointerAt = -1e9;
+    target.addEventListener('pointerdown', () => { pointerAt = performance.now(); }, true);
+    target.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t instanceof HTMLButtonElement && (e as MouseEvent).detail > 0) t.blur();
+    }, true);
+    target.addEventListener('change', (e) => {  // a choice made in a list with the mouse
+      const t = e.target;
+      if (t instanceof HTMLSelectElement && performance.now() - pointerAt < 4000) t.blur();
+    }, true);
+    // Chrome shows a pad only after its first press and tells the page with these.
+    target.addEventListener('gamepadconnected', () => this.poll());
+    target.addEventListener('gamepaddisconnected', () => this.poll());
   }
 
-  get mapping(): GamepadMapping {
-    return this.mappingValue;
+  get config(): ControlsConfig {
+    return this.ownConfig;
   }
 
-  set mapping(m: GamepadMapping) {
-    this.mappingValue = m;
-    saveMapping(storage(), m);
+  /** Replaces the settings and stores them in this browser. */
+  set config(c: ControlsConfig) {
+    this.ownConfig = c;
+    ++this.rev;
+    this.manager.config = c;
+    this.bound = keyCodes(c.keys);
+    saveConfig(storage(), c);
   }
 
-  private key(e: KeyboardEvent, down: boolean): void {
-    if (!(e.code in KEYS) && !(e.code in STICK_KEYS)) return;
-    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement ||
-        e.target instanceof HTMLButtonElement) return;
-    e.preventDefault();
-    if (down) this.keys.add(e.code);
-    else this.keys.delete(e.code);
+  /** The Controls panel is rebinding: neither pad nor keyboard reaches the game meanwhile. */
+  get capture(): boolean {
+    return this.manager.capture;
+  }
+
+  set capture(on: boolean) {
+    this.manager.capture = on;
+    if (on) this.releaseKeys();
+  }
+
+  /** Online (E5): only this page's player plays; the engine puts it on the player's port. */
+  set online(on: boolean) {
+    this.manager.online = on;
+  }
+
+  private releaseKeys(): void {
+    if (this.keys.size === 0) return;
+    this.keys.clear();
     this.poll();
   }
 
-  // The first connected gamepad (getGamepads() has holes for unplugged ones).
-  static firstGamepad(): Gamepad | null {
-    if (typeof navigator.getGamepads !== 'function') return null;
+  private key(e: KeyboardEvent, down: boolean): void {
+    if (!down) {  // a key that is let go is always let go, whatever has the focus now
+      if (this.keys.delete(e.code)) this.poll();
+      return;
+    }
+    if (this.manager.capture || !this.bound.has(e.code)) return;
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement ||
+        e.target instanceof HTMLButtonElement || e.target instanceof HTMLTextAreaElement) return;
+    if (e.ctrlKey || e.altKey || e.metaKey) return;  // browser shortcuts (Ctrl+C, Alt+Left)
+    e.preventDefault();
+    this.keys.add(e.code);
+    this.poll();
+  }
+
+  // The connected gamepads (getGamepads() has holes for unplugged ones).
+  static gamepads(): ArrayLike<PadSource | null> {
+    if (typeof navigator.getGamepads !== 'function') return [];
     try {
-      return navigator.getGamepads().find((g) => g && g.connected !== false) ?? null;
+      return navigator.getGamepads() as unknown as ArrayLike<PadSource | null>;
     } catch {
-      return null;  // a permissions policy can forbid the Gamepad API
+      return [];  // a permissions policy can forbid the Gamepad API
     }
   }
 
-  // Called on every animation frame (gamepads have no events for buttons).
+  // Called on every animation frame (gamepads have no events for buttons) and
+  // when a key changes: reads the pads and reports each port whose pad changed.
   poll(): void {
-    const pad: Pad = { connected: true, buttons: 0, stickX: 0, stickY: 0, cX: 0, cY: 0, trigL: 0, trigR: 0 };
-    for (const k of this.keys) {
-      if (k in KEYS) pad.buttons |= KEYS[k];
-      if (k in STICK_KEYS) {
-        pad.stickX += STICK_KEYS[k][0] * STICK_RANGE;
-        pad.stickY += STICK_KEYS[k][1] * STICK_RANGE;
-      }
+    const ports = this.manager.sample();
+    for (let p = 0; p < ports.length; ++p) {
+      const key = JSON.stringify(ports[p]);
+      if (key === this.last[p]) continue;
+      this.last[p] = key;
+      this.onChange(ports[p], p);
     }
-    if (pad.buttons & PAD.L) pad.trigL = 255;
-    if (pad.buttons & PAD.R) pad.trigR = 255;
-    this.gamepad = HostInput.firstGamepad();
-    if (this.gamepad && !this.capture) {
-      const g = mapGamepad(this.gamepad as GamepadLike, this.mappingValue);
-      pad.buttons |= g.buttons;
-      pad.trigL = Math.max(pad.trigL, g.trigL);
-      pad.trigR = Math.max(pad.trigR, g.trigR);
-      pad.stickX += g.stickX;
-      pad.stickY += g.stickY;
-      pad.cX += g.cX;
-      pad.cY += g.cY;
-    }
-    const clamp = (x: number) => Math.max(-128, Math.min(127, x));
-    pad.stickX = clamp(pad.stickX);
-    pad.stickY = clamp(pad.stickY);
-    pad.cX = clamp(pad.cX);
-    pad.cY = clamp(pad.cY);
-    const key = JSON.stringify(pad);
-    if (key !== this.last) {
-      this.last = key;
-      this.onChange(pad);
-    }
+    this.onSample();
   }
 }

@@ -29,6 +29,8 @@ export interface OnlineState {
   route?: string;      // 'direct' or 'relay' once connected
   // The WebRTC transport's own counters (DTLS and SCTP included, IP/UDP not).
   transport?: { bytesSent: number; bytesReceived: number; packetsSent: number; packetsReceived: number; at: number };
+  controller?: { connected: boolean; name?: string; ready: boolean };  // this player's controller (Q3)
+  peerController?: { connected: boolean; ready: boolean };  // the other player's, as they announced it (Q3)
   status?: NetStatus;  // the engine's session, as the Worker reports it
   windows?: string;
   diagnostic?: string;
@@ -46,6 +48,9 @@ export class Online {
   private pendingCandidates: RTCIceCandidateInit[] = [];
   private readonly el: HTMLElement;
   private readonly statusEl: HTMLElement;
+  private readonly padEl: HTMLElement;
+  private readonly peerPadEl: HTMLElement;
+  private padTimer = 0;
   private readonly inviteEl: HTMLInputElement;
   private readonly createBtn: HTMLButtonElement;
   private readonly delayEl: HTMLSelectElement;
@@ -94,7 +99,14 @@ export class Online {
     this.statusEl = document.createElement('p');
     this.statusEl.className = 'online-status';
     this.statusEl.setAttribute('role', 'status');
-    this.el.append(h, row, this.statusEl);
+    this.padEl = document.createElement('p');
+    this.padEl.className = 'online-pad';
+    this.padEl.id = 'online-pad';
+    this.peerPadEl = document.createElement('p');
+    this.peerPadEl.className = 'online-pad';
+    this.peerPadEl.id = 'online-peer-pad';
+    this.peerPadEl.hidden = true;
+    this.el.append(h, row, this.statusEl, this.padEl, this.peerPadEl);
     this.createBtn.addEventListener('click', () => this.create());
   }
 
@@ -112,6 +124,47 @@ export class Online {
     const room = this.params.get('room');
     if (room) this.connect({ t: 'join', room });
     else if (this.params.get('online') === 'create') this.create();
+  }
+
+  /**
+   * The lobby's controller readiness (Q3): whether this player's controller is connected and used.
+   * Display only: the pad reaches the game through the input queue like any other input.
+   */
+  setController(c: { connected: boolean; name?: string; ready: boolean }): void {
+    const player = this.state.player;
+    const where = player ? ` It plays as player ${player}.` : '';
+    this.padEl.textContent = !c.connected
+      ? 'Your input: keyboard only. To use a controller, connect it and press a button on it.'
+      : c.ready ? `Your controller: ${c.name} is ready.${where}`
+                : `Your controller: ${c.name} is connected. Press a button on it to use it.${where}`;
+    this.padEl.dataset.state = !c.connected ? 'keyboard' : c.ready ? 'ready' : 'idle';
+    const changed = this.state.controller?.connected !== c.connected || this.state.controller?.ready !== c.ready;
+    this.state.controller = { connected: c.connected, name: c.name, ready: c.ready };
+    if (changed) this.announcePad();
+  }
+
+  // Whether this player has a controller in use, told to the other player over the data channel as text
+  // (the engine's datagrams are binary and never see it). Display only; sent on change and every few seconds,
+  // since the channel drops packets.
+  private announcePad(): void {
+    const c = this.state.controller;
+    if (c && this.dc?.readyState === 'open') this.dc.send(JSON.stringify({ mvp: 'pad', v: 1, connected: c.connected, ready: c.ready }));
+  }
+
+  private onPeerText(text: string): void {
+    let m: { mvp?: unknown; v?: unknown; connected?: unknown; ready?: unknown };
+    try {
+      m = JSON.parse(text);
+    } catch {
+      return;
+    }
+    if (m?.mvp !== 'pad' || m.v !== 1 || typeof m.connected !== 'boolean' || typeof m.ready !== 'boolean') return;
+    this.state.peerController = { connected: m.connected, ready: m.ready };
+    const who = this.state.player ? `Player ${this.state.player === 1 ? 2 : 1}` : 'The other player';
+    this.peerPadEl.hidden = false;
+    this.peerPadEl.textContent = m.ready ? `${who}'s controller: ready.`
+      : m.connected ? `${who}'s controller: connected, not used yet.` : `${who} is on the keyboard.`;
+    this.peerPadEl.dataset.state = m.ready ? 'ready' : m.connected ? 'idle' : 'keyboard';
   }
 
   /** The netplay options for the Worker, once this page is in a room. */
@@ -269,13 +322,19 @@ export class Online {
       this.say('Connected to the other player.');
       this.findRoute().catch(() => {});
       setInterval(() => this.findRoute().catch(() => {}), 2000);
+      this.announcePad();
+      window.clearInterval(this.padTimer);
+      this.padTimer = window.setInterval(() => this.announcePad(), 3000);
       for (const w of this.openWaiters.splice(0)) w();
     });
     dc.addEventListener('close', () => {
       this.state.channel = 'closed';
       this.onChange();
     });
-    dc.addEventListener('message', (ev: MessageEvent<ArrayBuffer>) => this.onDatagram(ev.data));
+    dc.addEventListener('message', (ev: MessageEvent<ArrayBuffer | string>) => {
+      if (typeof ev.data === 'string') this.onPeerText(ev.data);  // the other player's controller line (Q3)
+      else this.onDatagram(ev.data);
+    });
     pc.addEventListener('icecandidate', (ev) => {
       const c = ev.candidate;
       this.signal({ kind: 'candidate', candidate: c ? { candidate: c.candidate, sdpMid: c.sdpMid, sdpMLineIndex: c.sdpMLineIndex } : null });
