@@ -2341,30 +2341,57 @@ bool FuncGen::run(Fn& body, std::string* error) {
     if ((N.kind == kJump || N.kind == kCJump) && seg_at_[static_cast<std::size_t>(N.s0)] == seg_at_[k])
       self_loops_[static_cast<std::size_t>(seg_at_[k])] = true;
   }
-  // MSR[FP] checks (E3a, as the C++ emitter): before the first FPU instruction
-  // of each segment; once checked, MSR[FP] stays set until a safe point, a
-  // branch, call or return, mtmsr or sc.
+  // MSR[FP] checks (E3a): an FPU instruction is checked unless MSR[FP] is known
+  // to be set on every path to it (E2d: a forward "must" dataflow). It is known
+  // set after a checked or executed FPU instruction, until a safe point (an
+  // interrupt may switch threads), a call (the callee may), mtmsr or sc; at an
+  // entry or a resume label it is unknown. So the exception is taken at the first
+  // FPU instruction that runs with MSR[FP] clear, as natively; only the number
+  // of checks differs from the C++ emitter's per-block rule.
   if (ctx_.opt.fpu_checks) {
-    bool fpu_on = false;
-    int seg = -1;
+    std::vector<std::vector<int>> preds(n);
+    std::vector<bool> unknown(n, false);
+    for (u32 e : entries) unknown[(e - f_.start) / 4] = true;
+    for (u32 r : resume_labels_) unknown[(r - f_.start) / 4] = true;
     for (std::size_t k = 0; k < n; ++k) {
-      if (!f_.reachable[k]) {
-        fpu_on = false;
-        continue;
-      }
-      if (seg_at_[k] != seg) {
-        seg = seg_at_[k];
-        fpu_on = false;
-      }
-      Node& N = nodes_[k];
-      const InsnInfo& x = f_.insns[k];
-      if (N.pre != pNone) fpu_on = false;
-      if (x.flow == Flow::Plain && ppc::uses_fpu(x.op) && !fpu_on) {
-        N.fpchk = true;
-        fpu_on = true;
-      }
-      if (x.flow != Flow::Plain || x.op == Op::mtmsr || x.op == Op::sc) fpu_on = false;
+      if (!f_.reachable[k]) continue;
+      const Node& N = nodes_[k];
+      auto add = [&](int s) {
+        if (s >= 0 && static_cast<std::size_t>(s) < n) preds[static_cast<std::size_t>(s)].push_back(static_cast<int>(k));
+      };
+      add(N.s0);
+      add(N.s1);
+      if (N.jt >= 0)
+        for (int s : jt_succ_[static_cast<std::size_t>(N.jt)]) add(s);
     }
+    auto is_fpu = [&](std::size_t k) { return f_.insns[k].flow == Flow::Plain && ppc::uses_fpu(f_.insns[k].op); };
+    // known_in: set when the node starts (before its own safe point). Starts
+    // optimistic everywhere but at entries and resume labels, then only drops.
+    std::vector<u8> known_in(n, 1), known_out(n, 1);
+    auto out_of = [&](std::size_t k, bool in) {
+      const Node& N = nodes_[k];
+      const InsnInfo& x = f_.insns[k];
+      bool v = in && N.pre == pNone;
+      if (is_fpu(k)) v = true;  // checked, or known set
+      if (N.kind == kCall || N.kind == kSc || x.op == Op::mtmsr || x.op == Op::sc) v = false;
+      return v;
+    };
+    for (bool changed = true; changed;) {
+      changed = false;
+      for (std::size_t k = 0; k < n; ++k) {
+        if (!f_.reachable[k]) continue;
+        bool in = !unknown[k] && !preds[k].empty();
+        for (int p : preds[k]) in = in && known_out[static_cast<std::size_t>(p)];
+        bool out = out_of(k, in);
+        if (in != static_cast<bool>(known_in[k]) || out != static_cast<bool>(known_out[k])) {
+          known_in[k] = in;
+          known_out[k] = out;
+          changed = true;
+        }
+      }
+    }
+    for (std::size_t k = 0; k < n; ++k)
+      if (f_.reachable[k] && is_fpu(k) && !(known_in[k] && nodes_[k].pre == pNone)) nodes_[k].fpchk = true;
   }
   dataflow();
   dispatch_ = has_resume_ || mode_ == Mode::Body || !f_.tables.empty();
