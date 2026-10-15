@@ -129,7 +129,8 @@ class Writer {
       out_ << "void " << self << "(Cpu& c) {\n  u32 sp = c.gpr[1];\n  (void)sp;\n";
       if (!resume_.empty()) out_ << "  if (rt::g_resume) goto R_;\n";
       out_ << entry_prologue(f.start, miss_);
-      if (hook_id >= 0) out_ << "  rt::hle_before(c, " << hook_id << ");\n";
+      // A hook may stop the run before the function's first instruction (runtime/hle.h).
+      if (hook_id >= 0) out_ << "  rt::hle_before(c, " << hook_id << ");\n  if (rt::g_unwinding) " << miss_ << "\n";
     }
     back_edges_.clear();
     back_edges_.insert(f.back_edges.begin(), f.back_edges.end());

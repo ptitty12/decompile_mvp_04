@@ -123,8 +123,11 @@ void hle_pad_read(Cpu& c, GuestFn) {
 }
 
 // fn_8014865C (the frame loop's lock + controller poll, DETERMINISM §2.3): one
-// frame poll. Consumes the next frame's input before the game polls.
+// frame poll. Consumes the next frame's input before the game polls. A source
+// that has to wait for that input (netplay) stops the run here instead, before
+// anything is consumed; the guest makes this poll again when the run continues.
 void hle_frame_poll(Cpu& c, GuestFn) {
+  if (g_input && !g_input->may_begin_frame(c)) return;
   std::uint64_t frame = g_input ? g_input->begin_frame() : g_frame_polls;
   ++g_frame_polls;
   if (g_frame_hook) g_frame_hook(c, frame);

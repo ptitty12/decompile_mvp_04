@@ -1,12 +1,14 @@
 // Data-free end-to-end test of the C++ emitter and the native runtime: the
 // synthetic program (translator/tests/synth.h) is translated at build time; here
 // the translated code runs against the reference interpreter in lockstep, and
-// the results it stores must be the expected ones.
+// the results it stores must be the expected ones. Then it runs again with an
+// input source that stops the run at every frame poll (poll_stop.h, E5c).
 #include <doctest/doctest.h>
 
 #include "../../ppc/tests/encode.h"
 #include "../../translator/tests/synth.h"
 #include "common/bytes.h"
+#include "poll_stop.h"
 #include "runtime/hle.h"
 #include "runtime/lockstep.h"
 
@@ -97,4 +99,28 @@ TEST_CASE("translated synthetic program matches the interpreter in lockstep") {
     u32 got = be32(nat.mem1() + (prog.results & 0x01FFFFFF) + 4 * k);
     CHECK_MESSAGE(got == want[k], "result ", k);
   }
+}
+
+// E5c: the frame poll can stop the run before it consumes anything (netplay
+// waits there), even when nothing else would stop the run between two polls,
+// and the guest then runs exactly as without the stops.
+TEST_CASE("a frame poll that must wait for its input stops the run there, invisibly") {
+  xlat::synth::Program prog = xlat::synth::make();
+  auto dol = vfs::Dol::parse(prog.dol);
+  REQUIRE(dol);
+  mvp_register_game();
+  poll_stop::Outcome plain = poll_stop::run(*dol, prog.results, false);
+  poll_stop::Outcome stopped = poll_stop::run(*dol, prog.results, true);
+  CHECK(plain.runs == 0);
+  CHECK(plain.frames == 4);
+  CHECK(plain.results == xlat::synth::expected_results());
+  CHECK(stopped.stops == 4);
+  CHECK(stopped.runs == 4);  // rt::run() returned once at each poll
+  CHECK(stopped.unwinds == plain.unwinds + 4);
+  CHECK(stopped.frames == 4);
+  CHECK(stopped.polls == plain.polls);  // each poll once, at the same instruction count, with its own input
+  CHECK(stopped.ticks == plain.ticks);
+  CHECK(stopped.regs == plain.regs);
+  CHECK(stopped.results == plain.results);
+  CHECK_FALSE(g_unwinding);
 }

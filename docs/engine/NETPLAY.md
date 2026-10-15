@@ -38,11 +38,17 @@ route), translates the game itself, and keeps any diagnostic dump local.
 - **The gate.** A frame runs only when both ports' inputs for it are known. The
   engine's run loop is unchanged except for this check (`net/driver.h`):
   `rt::run()` returns at every VI field (host yields, `runtime/host_yield.h`), and
-  the host loop calls it only while `NetplayDriver::may_run()` is true. After each
-  frame poll, if the next frame's input is still missing, the driver asks the run
-  to yield at its next safe point, so the gate is checked before that poll. A poll
-  that arrived without its input would stop the run ("gate missed") rather than
-  guess; it has never happened (0 in every measured run).
+  the host loop calls it only while `NetplayDriver::may_run()` is true. A frame poll
+  whose input is missing stops the run right there, before it consumes anything
+  (`NetplayDriver::before_poll`, `YieldingHooks::stop_before`, E5c): `rt::run()`
+  returns, the host loop waits, and the guest makes the same poll again when the
+  input is there, exactly as if it had never stopped. After each poll whose
+  successor's input is still missing, the driver also asks the run to yield at its
+  next stopping safe point, so the host loop pumps the network meanwhile. A poll that
+  cannot stop (inside an interrupt handler) and has no input would stop the game
+  ("gate missed") rather than guess; it has never happened. (Before E5c the gate
+  relied on that yield alone, which waits for a safe point where an event is due; at
+  the match's loading frames come faster than events, and the game stopped there.)
 - **Sampling.** With D > 0 the local input of frame F + D is sampled when frame F
   can run: a player who waits for the other samples the pad when the wait ends, so
   both players' input latency is D frames. With D = 0 the input is sampled before
@@ -366,7 +372,7 @@ players must reload the page: the build id changes).
 
 ## 7. Measurements (2026-10-14, one machine)
 
-Details and the commands: `docs/engine/E5_LOG.md` §2 and §4.
+Details and the commands: `docs/engine/E5_LOG.md` §2, §4 and §5.
 
 - **Native, two processes over UDP** (`local_netplay_lockstep`, 1,200 frames, D = 3):
   both peers and the solo reference agree on every frame's input, all 20 window
@@ -391,6 +397,15 @@ Details and the commands: `docs/engine/E5_LOG.md` §2 and §4.
   4 KB/s at a 45 ms one-way latency (more unacknowledged inputs per datagram);
   5.5-9.5 KB/s through WebRTC's DTLS and SCTP; plus 28 bytes of IP/UDP per datagram
   (50-60 datagrams/s). A TURN relay carries the same.
+- **Into the match (E5c, 2026-10-15; E5_LOG §5):** a two-player exhibition game (player
+  2 takes the away team at Select Team), D = 3. Natively: two peers equal the solo run
+  to frame 5,600 (the first pitches) over a link with 25% loss and 40-70 ms latency,
+  and to frame 60,000 on a local link (two full innings and part of the third);
+  `local_netplay_lockstep` and `local_netplay_lossy` run into the match's loading. Two
+  Chrome pages: identical guest lines, equal to native, at frame 5,600 (also with
+  `--netsim 40,10,0.02`), and with the example roster pack on both pages at frame 4,420
+  (the Harbor City Lanterns' defensive line-up on both screens); zero desyncs and zero
+  gate misses in every run.
 
 ## 8. What netplay relies on (DETERMINISM.md §6)
 
@@ -415,7 +430,8 @@ guest state on every machine and browser. It relies on:
   stream has to be agreed on. **R15**: exact arithmetic, identical in native code and
   in V8, SpiderMonkey and JavaScriptCore (E2: identical guest lines across browsers).
 - E2's host yields are invisible to the guest; netplay's early yields are the same
-  mechanism.
+  mechanism, and so are its stops at a frame poll (the poll is made again, from its
+  entry, with the repeated safe point skipped).
 
 ## 9. Limits and next steps
 
@@ -428,9 +444,7 @@ guest state on every machine and browser. It relies on:
   run; Edge is Chromium; Safari is untested (no Mac).
 - **Not yet over the internet:** the server, TURN and the two-network exit need the
   VPS (E5_LOG, "Next step").
-- **Not yet into a match in the browser** (found in E6, 2026-10-15): two pages in
-  lockstep through the menus stop at the loading after the difficulty screen (frame
-  ~3,310 of the E3a path) with "frame N was polled before its input arrived (gate
-  missed)", with or without roster packs. The gate's early yield did not happen between
-  two polls there (`docs/engine/E6_LOG.md` §5).
+- **Into a match:** fixed in E5c (2026-10-15). E6 found two pages stopping at the
+  match's loading with "gate missed"; the run now stops at any poll whose input is
+  missing (§1, E5_LOG §5). A whole nine-inning game has not been run in netplay yet.
 - **Memory card:** absent on both sides; saves in netplay come with K5 or later.

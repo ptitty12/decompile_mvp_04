@@ -48,6 +48,7 @@ export interface NetStatus {
   longestStallMs: number;
   gateMisses: number;
   earlyYields: number;
+  pollStops: number;  // runs stopped at a frame poll to wait for the peer's input (E5c)
   latencyAvg: number;  // ms from sampling the local pad to the frame that uses it
   latencyMax: number;
   latencySum: number;

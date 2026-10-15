@@ -35,6 +35,17 @@ bool NetplayDriver::may_run(std::uint64_t now_ms) {
   return false;
 }
 
+bool NetplayDriver::before_poll(ppc::Cpu& c, std::uint64_t frame) {
+  if (s_.ready(frame, clock_())) return true;
+  // Not here yet: the run stops before this poll; the host loop waits in
+  // may_run() and runs the guest again, from this poll, once the input is known.
+  if (yh_ && yh_->stop_before(c)) {
+    ++poll_stops;
+    return false;
+  }
+  return true;  // cannot stop here: input_for() waits (blocking mode) or reports the gate miss
+}
+
 rt::FrameInput NetplayDriver::input_for(std::uint64_t frame) {
   std::uint64_t now = clock_();
   if (!s_.ready(frame, now)) {
@@ -82,10 +93,11 @@ void NetplayDriver::after_poll(std::uint64_t frame) {
 
 std::string NetplayDriver::diagnostic() const {
   std::string d = s_.diagnostic();
-  char b[96];
-  std::snprintf(b, sizeof b, "stalls %llu (%llu ms, longest %llu ms), gate misses %llu\n",
+  char b[128];
+  std::snprintf(b, sizeof b, "stalls %llu (%llu ms, longest %llu ms), poll stops %llu, gate misses %llu\n",
                 static_cast<unsigned long long>(stalls), static_cast<unsigned long long>(stall_ms),
-                static_cast<unsigned long long>(longest_stall_ms), static_cast<unsigned long long>(gate_misses));
+                static_cast<unsigned long long>(longest_stall_ms), static_cast<unsigned long long>(poll_stops),
+                static_cast<unsigned long long>(gate_misses));
   d += b;
   for (std::size_t k = windows_.size() > 20 ? windows_.size() - 20 : 0; k < windows_.size(); ++k) {
     const HashRecord& w = windows_[k];

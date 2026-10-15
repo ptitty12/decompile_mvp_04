@@ -239,3 +239,50 @@ TEST_CASE("PADRead returns the current frame's input; the frame poll hook consum
   CHECK(s[10] == 0xFF);
   g_frame_hook = nullptr;
 }
+
+TEST_CASE("a source may stop the run at the frame poll; the poll then consumes nothing (E5c)") {
+  Machine m;
+  ppc::Cpu& c = m.cpu();
+  int poll = hle_by_address(0x8014865Cu);
+  REQUIRE(poll >= 0);
+  struct Waiting : InputSource {
+    int asked = 0;
+    bool here = false;  // whether the frame's input is known (else: "stopped the run")
+    bool before_poll(ppc::Cpu&, u64) override {
+      ++asked;
+      return here;
+    }
+    FrameInput input_for(u64) override { return with_buttons(pad::kA); }
+  } src;
+  InputQueue q(neutral_input(1));
+  q.set_source(&src);
+  g_input = &q;
+  static int hooked;
+  hooked = 0;
+  g_frame_hook = [](ppc::Cpu&, std::uint64_t) { ++hooked; };
+  const std::uint64_t polls = g_frame_polls;
+
+  hle_before(c, poll);  // the source stops the run: nothing happens
+  CHECK(src.asked == 1);
+  CHECK(q.frames() == 0);
+  CHECK(g_frame_polls == polls);
+  CHECK(hooked == 0);
+  CHECK(q.current() == neutral_input(1));
+
+  src.here = true;
+  hle_before(c, poll);  // the same poll again, now with its input
+  CHECK(src.asked == 2);
+  CHECK(q.frames() == 1);
+  CHECK(g_frame_polls == polls + 1);
+  CHECK(hooked == 1);
+  CHECK(q.current().pad[0].buttons == pad::kA);
+
+  src.here = false;
+  q.push(with_buttons(pad::kB));  // a queued input never waits
+  hle_before(c, poll);
+  CHECK(src.asked == 2);
+  CHECK(q.frames() == 2);
+  CHECK(q.current().pad[0].buttons == pad::kB);
+  g_input = nullptr;
+  g_frame_hook = nullptr;
+}

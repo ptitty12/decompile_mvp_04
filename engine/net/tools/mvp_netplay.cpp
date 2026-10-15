@@ -7,10 +7,13 @@
 //                    --frames N [--delay D] [--hash-every K] [--log FILE]
 //                    [--loss P] [--latency MS] [--jitter MS] [--timeout MS]
 //                    [--corrupt-window FRAME] [--diag FILE] [--report FILE]
+//                    [--stall-from F --stall-to G --stall-ms MS]
 //       Player P's controller (port P) follows the script's port-P events: the
 //       state sampled at frame f becomes the input of frame f + D (the session's
 //       delay rule); the other port comes from the peer. --loss/--latency/--jitter
-//       impair this side's outgoing datagrams.
+//       impair this side's outgoing datagrams. --stall-*: this side's host sleeps
+//       MS ms after each frame poll F..G (a slow machine; the guest cannot tell),
+//       so the other side waits for it at those frames (E5c tests).
 //   mvp-netplay solo --input SCRIPT --frames N [--delay D] [--hash-every K] [--log FILE]
 //       The reference: no network; ports 1 and 2 follow the script shifted by D
 //       frames, i.e. exactly the inputs two peers must agree on.
@@ -76,7 +79,8 @@ struct Args {
   std::string mode, input, log = "netplay-frames.log", diag, report;
   int player = 1;
   unsigned port = 0, peer_port = 0;
-  std::uint64_t frames = 600, corrupt = ~0ull;
+  std::uint64_t frames = 600, corrupt = ~0ull, stall_from = ~0ull, stall_to = 0;
+  std::uint32_t stall_ms = 0;
   std::uint32_t delay = 3, hash_every = 60, latency = 0, jitter = 0, timeout = 15000;
   double loss = 0;
 };
@@ -112,6 +116,8 @@ struct Run {
   net::StateHasher* hasher = nullptr;    // solo mode
   std::vector<net::HashRecord> solo_windows;
   std::uint64_t stop_at = 0;
+  std::uint64_t stall_from = ~0ull, stall_to = 0;
+  std::uint32_t stall_ms = 0;
   std::FILE* log = nullptr;
   Sha1 log_sha;
   std::uint64_t log_bytes = 0;
@@ -135,6 +141,7 @@ void frame_hook(ppc::Cpu& c, std::uint64_t frame) {
   if (r.log) std::fwrite(line.data(), 1, line.size(), r.log);
   if (r.driver) {
     r.driver->after_poll(frame);
+    if (frame >= r.stall_from && frame <= r.stall_to) std::this_thread::sleep_for(std::chrono::milliseconds(r.stall_ms));
   } else if (r.hasher) {
     if (auto h = r.hasher->at_frame(frame, r.m->mem1(), Machine::kMem1Size, c.ticks))
       r.solo_windows.push_back({static_cast<std::uint32_t>(frame), *h});
@@ -189,6 +196,9 @@ int run(const xlat::Inputs& in, const Args& a) {
   r.hooks = &hooks;
   r.queue = &queue;
   r.stop_at = a.frames;
+  r.stall_from = a.stall_from;
+  r.stall_to = a.stall_to;
+  r.stall_ms = a.stall_ms;
   r.log = std::fopen(a.log.c_str(), "wb");
   g_run = &r;
 
@@ -308,11 +318,12 @@ int run(const xlat::Inputs& in, const Args& a) {
                 s.rtt_avg());
     say("input latency: avg %.1f ms, max %llu ms (from sampling the pad to the frame that uses it)\n",
         s.latency_avg(), static_cast<ull>(s.latency_max));
-    say("lockstep: %llu stalls, %llu ms stalled (longest %llu), %llu early yields, %llu gate misses; "
-                "%llu yields\n",
+    say("lockstep: %llu stalls, %llu ms stalled (longest %llu), %llu early yields, %llu poll stops, "
+                "%llu gate misses; %llu yields\n",
                 static_cast<ull>(driver->stalls), static_cast<ull>(driver->stall_ms),
                 static_cast<ull>(driver->longest_stall_ms), static_cast<ull>(driver->early_yields),
-                static_cast<ull>(driver->gate_misses), static_cast<ull>(hooks.yields));
+                static_cast<ull>(driver->poll_stops), static_cast<ull>(driver->gate_misses),
+                static_cast<ull>(hooks.yields));
     if (impaired)
       say("impaired: %llu dropped, %llu delayed\n", static_cast<ull>(impaired->dropped),
                   static_cast<ull>(impaired->delayed));
@@ -352,12 +363,15 @@ int main(int argc, char** argv) {
     if (s == "--jitter") a.jitter = static_cast<std::uint32_t>(std::atoi(v));
     if (s == "--timeout") a.timeout = static_cast<std::uint32_t>(std::atoi(v));
     if (s == "--corrupt-window") a.corrupt = std::strtoull(v, nullptr, 10);
+    if (s == "--stall-from") a.stall_from = std::strtoull(v, nullptr, 10);
+    if (s == "--stall-to") a.stall_to = std::strtoull(v, nullptr, 10);
+    if (s == "--stall-ms") a.stall_ms = static_cast<std::uint32_t>(std::atoi(v));
   }
   if ((a.mode != "peer" && a.mode != "solo") || a.input.empty() || (a.mode == "peer" && (!a.port || !a.peer_port))) {
     std::fprintf(stderr,
                  "usage: mvp-netplay peer --player 1|2 --port LOCAL --peer-port REMOTE --input SCRIPT --frames N "
                  "[--delay D] [--hash-every K] [--log FILE] [--loss P] [--latency MS] [--jitter MS] [--timeout MS] "
-                 "[--corrupt-window FRAME] [--diag FILE]\n"
+                 "[--corrupt-window FRAME] [--diag FILE] [--stall-from F --stall-to G --stall-ms MS]\n"
                  "       mvp-netplay solo --input SCRIPT --frames N [--delay D] [--hash-every K] [--log FILE]\n");
     return 2;
   }

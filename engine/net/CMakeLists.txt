@@ -23,7 +23,10 @@ endif()
 # ---- Local only: the translated DOL under netplay (needs the disc) ----
 # mvp-netplay runs two peers over UDP on 127.0.0.1 (tools/mvp_netplay.cpp);
 # local_netplay_lockstep checks that two peers and the solo reference agree on
-# every frame's input, every state-hash window and the final guest state.
+# every frame's input, every state-hash window and the final guest state, from
+# power-on into the loading of a two-player exhibition game (E5c), with player 2
+# slowed down over the loading's fast frame polls so that player 1's run must
+# stop at one to wait; local_netplay_lossy does the same over a slow, lossy link.
 if(TARGET mvp_game_native AND NOT EMSCRIPTEN)
   add_executable(mvp-netplay tools/mvp_netplay.cpp)
   target_link_libraries(mvp-netplay PRIVATE mvp_game_native engine_net_udp engine_translator)
@@ -33,6 +36,12 @@ if(TARGET mvp_game_native AND NOT EMSCRIPTEN)
   endif()
   add_test(NAME local_netplay_lockstep
            COMMAND ${CMAKE_COMMAND} -DTOOL=$<TARGET_FILE:mvp-netplay> -DWORK=${CMAKE_BINARY_DIR}/netplay
-                   -DFRAMES=1200 -DDELAY=3 -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/lockstep.cmake)
-  set_tests_properties(local_netplay_lockstep PROPERTIES SKIP_RETURN_CODE 77 LABELS local TIMEOUT 1800)
+                   -DFRAMES=3050 -DDELAY=3 "-DSTALL=--stall-from 2905 --stall-to 3045 --stall-ms 20" -DEXPECT_STOPS=1
+                   -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/lockstep.cmake)
+  add_test(NAME local_netplay_lossy
+           COMMAND ${CMAKE_COMMAND} -DTOOL=$<TARGET_FILE:mvp-netplay> -DWORK=${CMAKE_BINARY_DIR}/netplay-lossy
+                   -DFRAMES=3050 -DDELAY=3 -DPORT=47321 "-DIMPAIR=--loss 0.1 --latency 20 --jitter 10"
+                   -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/lockstep.cmake)
+  set_tests_properties(local_netplay_lockstep local_netplay_lossy PROPERTIES SKIP_RETURN_CODE 77 LABELS local
+                       TIMEOUT 1800)
 endif()

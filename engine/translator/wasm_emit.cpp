@@ -2462,6 +2462,13 @@ bool FuncGen::run(Fn& body, std::string* error) {
         body.get(kCpu);
         body.i32c(hook_);
         body.call(iHleBefore);
+        // The hook may stop the run before the first instruction (runtime/hle.h).
+        body.global(gUnwinding);
+        body.mem(op::i32_load8_u, 0, 0);
+        body.if_();
+        if (has_resume_) body.br(pre_level_);
+        else leave();
+        body.end();
       }
     }
     reload(nodes_[0].Lin);

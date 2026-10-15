@@ -151,6 +151,10 @@ Two Chrome pages through the netplay server (`netplay_check.mjs`, D = 3, `--fast
   an interrupt-level callback while the main thread idles). Owner of the fix: netplay /
   runtime (E5 follow-up or E3c), not E6. Until then an online game can play the menus
   with packs but not start the match in the browser.
+  **Fixed by E5c** (`E5_LOG.md` §5): not an interrupt-level poll; the polls during the
+  loading come faster than any runtime event, and a requested yield waits for one. The
+  run now stops at a poll whose input is missing. Two Chrome pages with the example pack
+  reach the Lanterns' defensive line-up in lockstep (frame 4,420).
 
 ## Notes for the lead (docs outside docs/engine/)
 
@@ -165,7 +169,7 @@ Two Chrome pages through the netplay server (`netplay_check.mjs`, D = 3, `--fast
 
 ## Next step
 
-0. **Netplay into the match** (E5 follow-up, see section 5): reproduce the gate miss at
+0. Done by E5c (`E5_LOG.md` §5). **Netplay into the match** (E5 follow-up, see section 5): reproduce the gate miss at
    the loading after the difficulty screen, find the polls without a yieldable safe
    point between them, and make the gate hold there (or yield outside the handler
    first). Then rerun `netplay_check.mjs --packs docs/examples/packs/fictional-league

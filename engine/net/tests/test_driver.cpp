@@ -1,8 +1,9 @@
 // Data-free tests for net/driver.h: the lockstep gate in the run loop, the
-// early yield after a frame poll whose successor is missing, the "gate missed"
-// stop, and the state-hash desync stop, on a bare machine (no game code). The
-// two peers share one Machine: the hashed memory is the same unless a test
-// changes it between the two peers' polls.
+// early yield after a frame poll whose successor is missing, the stop at a poll
+// whose input is missing (E5c), the "gate missed" stop, and the state-hash
+// desync stop, on a bare machine (no game code). The two peers share one
+// Machine: the hashed memory is the same unless a test changes it between the
+// two peers' polls.
 #include <doctest/doctest.h>
 
 #include <vector>
@@ -12,6 +13,7 @@
 #include "net/session.h"
 #include "runtime/hle.h"
 #include "runtime/hw.h"
+#include "runtime/native.h"
 
 using namespace mvp;
 using namespace mvp::net;
@@ -138,5 +140,54 @@ TEST_CASE("different memory at a window stops both sides with a desync") {
   CHECK(a.s.mismatch()->frame == 43);
   CHECK(a.d.diagnostic().find("last window slice") != std::string::npos);
   CHECK(a.polls < 43 + 4);
+  rt::g_frame_polls = 0;
+}
+
+TEST_CASE("a poll whose input is missing stops the run right there (E5c)") {
+  rt::Machine m;
+  rt::YieldingHooks ha(&m), hb(&m);
+  SimLink link({30, 0, 0.0, 0.0, 8});
+  Side a(link.end(0), 1, m, ha), b(link.end(1), 2, m, hb);
+  g_now = 0;
+  while (!a.s.running() || !b.s.running()) {
+    a.s.update(g_now);
+    b.s.update(g_now);
+    link.advance(1);
+    ++g_now;
+  }
+  ppc::Cpu& c = m.cpu();
+  // Frames 0 and 1 are below the delay: known, the polls go on.
+  CHECK(a.d.before_poll(c, 0));
+  a.d.input_for(0);
+  CHECK(a.d.before_poll(c, 1));
+  a.d.input_for(1);
+  CHECK_FALSE(rt::g_yield);
+  // Frame 2 needs b's input: the run stops before the poll consumes anything.
+  CHECK_FALSE(a.d.before_poll(c, 2));
+  CHECK(a.d.poll_stops == 1);
+  CHECK(ha.stops == 1);
+  CHECK(rt::g_yield);
+  CHECK(rt::g_unwinding);
+  rt::g_yield = rt::g_unwinding = false;  // what the dispatcher does when the unwind arrives
+  // Inside an interrupt handler a run cannot stop: the poll goes on, and
+  // input_for() reports the miss rather than guess.
+  rt::g_exception_depth = 1;
+  CHECK(a.d.before_poll(c, 2));
+  rt::g_exception_depth = 0;
+  CHECK(a.d.poll_stops == 1);
+  CHECK_FALSE(rt::g_yield);
+  CHECK_THROWS_AS(a.d.input_for(2), rt::StopRun);
+  CHECK(a.d.gate_misses == 1);
+  // Once b ran its frame 0 (sampling its input of frame 2) and the datagram
+  // arrived, the poll of frame 2 goes on.
+  REQUIRE(b.step());
+  for (int k = 0; k < 40; ++k) {
+    link.advance(1);
+    ++g_now;
+    a.s.update(g_now);
+  }
+  CHECK(a.d.before_poll(c, 2));
+  CHECK(a.d.input_for(2).pad[1].connected);
+  CHECK(a.d.poll_stops == 1);
   rt::g_frame_polls = 0;
 }

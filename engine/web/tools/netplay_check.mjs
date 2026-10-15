@@ -248,9 +248,11 @@ try {
   const noDesync = !!netA && !!netB && !netA.desync && !netB.desync;
   const stoppedAtN = [sa, sb].every((st) => st.stopped?.status.why === `ran ${frames} frames`);
   const matchesExpect = !expect || sa.stopped?.guestLine === expect;
-  summary.checks = { sameGuest, sameWindows, noDesync, stoppedAtN, matchesExpect, windows: summary.pages[0].windowsCount };
+  const noGateMiss = !!netA && !!netB && netA.gateMisses === 0 && netB.gateMisses === 0;
+  summary.checks = { sameGuest, sameWindows, noDesync, stoppedAtN, matchesExpect, noGateMiss,
+                     pollStops: [netA?.pollStops ?? null, netB?.pollStops ?? null], windows: summary.pages[0].windowsCount };
   if (expect) summary.expect = expect;
-  rc = sameGuest && sameWindows && noDesync && stoppedAtN && matchesExpect ? 0 : 1;
+  rc = sameGuest && sameWindows && noDesync && stoppedAtN && matchesExpect && noGateMiss ? 0 : 1;
   if (expectReject) {
     // Both refused at the handshake, for the roster packs, and neither booted.
     const refused = [sa, sb].map((st) => st.net?.status?.state === 'rejected' &&

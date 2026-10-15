@@ -3,15 +3,26 @@
 # reference (no network, the script shifted by the delay) must agree on every
 # frame's input, every state-hash window and the final guest state (instructions,
 # time base, frame polls, MEM1 SHA-1). Run by ctest as `local_netplay_lockstep`
-# (needs the disc); the script is written here, the logs stay in the build tree.
+# and, over an impaired link, `local_netplay_lossy` (both need the disc); the
+# script is written here, the logs stay in the build tree.
 #
 #   cmake -DTOOL=<mvp-netplay> -DWORK=<dir> [-DFRAMES=N] [-DDELAY=D] [-DIMPAIR="--loss 0.2 --latency 30 --jitter 20"]
-#         [-DPORT=47311] -P lockstep.cmake
+#         [-DPORT=47311] [-DSTALL="--stall-from F --stall-to G --stall-ms MS"] [-DEXPECT_STOPS=1] -P lockstep.cmake
+#
+# The script starts an exhibition game between the two players (E5c): the menus,
+# Select Team with player 2 on the away side, then the match's loading, where the
+# game polls frames without rendering, closer together than any VI, audio or DVD
+# event (frames 2,914-3,000). There a poll could come before the run had a
+# chance to wait for the peer ("gate missed", E6); now the run stops at such a
+# poll. -DSTALL makes player 2's host sleep after each poll in a range (the
+# guest cannot tell), so player 1 waits for it at every one of those frames; with
+# the range over the loading's fast polls, player 1's run must stop at a poll
+# (-DEXPECT_STOPS=1 checks that it did).
 #
 # With -DDESYNC=1 player 2 corrupts one window hash instead: both peers must stop
 # with a desync at that window.
 if(NOT FRAMES)
-  set(FRAMES 1200)
+  set(FRAMES 3050)
 endif()
 if(NOT DELAY)
   set(DELAY 3)
@@ -23,20 +34,30 @@ math(EXPR PORT2 "${PORT} + 1")
 file(MAKE_DIRECTORY "${WORK}")
 set(script "${WORK}/netplay_input.txt")
 file(WRITE "${script}" "mvp-input 1
-# E5 local test: both players press buttons through the intro, the licence
-# screen, the title and the first menus.
+# E5c local test: E3a's path into an exhibition game. Player 1 (port 1) skips
+# the intro, passes the memory card and profile dialogs, picks Play Now and
+# stays on the home team (Boston); player 2 moves to the away team (St. Louis)
+# at Select Team, and both advance their sides through the uniforms and the
+# difficulty. The match loads from frame 2,913.
 280 1 tap 3 START
-430 2 tap 3 START
+430 1 tap 3 START
 580 1 tap 3 START
-730 2 tap 3 START
-900 2 stick 60 -40
-905 2 stick 0 0
-1000 1 tap 3 DOWN
-1060 2 tap 3 A
-1100 1 press R
-1110 1 release R
+730 1 tap 3 START
+800 1 tap 3 DOWN
+860 1 tap 3 A
+1300 1 tap 3 DOWN
+1360 1 tap 3 A
+1500 1 tap 3 A
+1700 2 tap 3 LEFT
+1900 1 tap 3 A
+1910 2 tap 3 A
+2700 1 tap 3 A
+2710 2 tap 3 A
+2900 1 tap 3 A
+2910 2 tap 3 A
 ")
 separate_arguments(impair UNIX_COMMAND "${IMPAIR}")
+separate_arguments(stall UNIX_COMMAND "${STALL}")
 set(common --input "${script}" --frames ${FRAMES} --delay ${DELAY} --hash-every 60)
 
 if(NOT DESYNC)
@@ -57,7 +78,7 @@ endif()
 execute_process(
   COMMAND "${TOOL}" peer --player 1 --port ${PORT} --peer-port ${PORT2} ${common} ${impair}
           --log "${WORK}/p1.frames" --report "${WORK}/p1.report" --diag "${WORK}/p1.diag"
-  COMMAND "${TOOL}" peer --player 2 --port ${PORT2} --peer-port ${PORT} ${common} ${impair} ${corrupt}
+  COMMAND "${TOOL}" peer --player 2 --port ${PORT2} --peer-port ${PORT} ${common} ${impair} ${corrupt} ${stall}
           --log "${WORK}/p2.frames" --report "${WORK}/p2.report" --diag "${WORK}/p2.diag"
   WORKING_DIRECTORY "${WORK}"
   RESULTS_VARIABLE rcs
@@ -95,10 +116,13 @@ foreach(p solo p1 p2)
   string(REGEX MATCH "windows: [^\n]*" windows_${p} "${out_${p}}")
   string(REGEX MATCH "guest: [^\n]*" guest_${p} "${out_${p}}")
 endforeach()
+set(stops 0)
 foreach(p p1 p2)
-  if(NOT out_${p} MATCHES "0 gate misses")
+  if(NOT out_${p} MATCHES " 0 gate misses")
     message(FATAL_ERROR "${p}: the lockstep gate missed a frame poll")
   endif()
+  string(REGEX MATCH "([0-9]+) poll stops" m "${out_${p}}")
+  math(EXPR stops "${stops} + ${CMAKE_MATCH_1}")
   if(out_${p} MATCHES "session: desynced")
     message(FATAL_ERROR "${p}: desync")
   endif()
@@ -108,5 +132,8 @@ foreach(p p1 p2)
     endif()
   endforeach()
 endforeach()
+if(EXPECT_STOPS AND stops EQUAL 0)
+  message(FATAL_ERROR "no run stopped at a frame poll: the test did not exercise the wait at the poll")
+endif()
 message("PASS: two peers and the solo reference agree on ${FRAMES} frames of input, every state-hash window and the "
-        "final guest state")
+        "final guest state; ${stops} runs stopped at a poll to wait for the peer, 0 gate misses")

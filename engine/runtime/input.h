@@ -21,6 +21,10 @@
 #include <string>
 #include <vector>
 
+namespace mvp::ppc {
+struct Cpu;
+}
+
 namespace mvp::rt {
 
 using u8 = std::uint8_t;
@@ -68,11 +72,19 @@ inline constexpr std::size_t kFrameWireSize = 1 + kPorts * 11;
 std::vector<u8> encode_frame(const FrameInput& in);
 std::optional<FrameInput> decode_frame(const u8* data, std::size_t size);
 
-// Where frames come from when nothing was pushed for them (a script, a recording).
+// Where frames come from when nothing was pushed for them (a script, a recording,
+// the netplay session).
 class InputSource {
  public:
   virtual ~InputSource() = default;
   virtual FrameInput input_for(u64 frame) = 0;
+  // Asked at the frame poll, before anything is consumed: whether frame `frame`
+  // may be polled now. A source whose input may not be known yet (netplay,
+  // net/driver.h) can instead stop the run right there
+  // (YieldingHooks::stop_before) and return false: the poll then changes
+  // nothing, and the guest makes it again, unchanged, when the run continues.
+  // The default: always.
+  virtual bool before_poll(ppc::Cpu&, u64 /*frame*/) { return true; }
 };
 
 // The per-frame input queue.
@@ -89,6 +101,9 @@ class InputQueue {
   // Whether the next frame poll has an input (queued, or from the source).
   bool ready() const { return !pending_.empty() || source_; }
 
+  // The frame poll's first step: false when the source stopped the run to wait
+  // for the next frame's input (InputSource::before_poll); then nothing changed.
+  bool may_begin_frame(ppc::Cpu& c) { return !pending_.empty() || !source_ || source_->before_poll(c, frames_); }
   // A frame poll: consumes frame `frames()`'s input (the queued one, else the
   // source's, else the previous frame's again) and returns that frame's index.
   u64 begin_frame();
