@@ -17,16 +17,19 @@ Design: `docs/ARCHITECTURE.md` §8. Protocol and deployment: `docs/engine/NETPLA
 | 4 | Browser: data channel transport, lobby UI, two-browser lockstep test, latency and bandwidth | Done (local) |
 | 5 | `docs/engine/NETPLAY.md`; deploy package | Done; deployment waits for VPS access |
 | 6 | First-run password setup (E5b): the owner creates the site password in the browser, agents never handle it | Done |
+| 7 | Into the match (E5c): E6's "gate missed" at the match's loading; the run now waits at every frame poll whose input is missing | Done: native (also lossy) and two Chrome pages (also with the example pack) into a two-player game (§5) |
 
 ## How to build and run (agents)
 
 - Native (`msvc` preset, `engine/tools/msvc.cmd`, as in E0B_LOG): `cmake --build --preset msvc -j 8`
   builds `engine_net` and its tests (`test_net_protocol`, `test_net_session`, `test_net_udp`;
   data-free, in `ctest`). With `MVP_DISC` set at configure time it also builds `mvp-netplay`
-  and the local test `local_netplay_lockstep` (label `local`).
+  and the local tests `local_netplay_lockstep` and `local_netplay_lossy` (label `local`).
 - `engine/net/tools/lockstep.cmake` runs two `mvp-netplay` peers at once plus the solo
-  reference: `-DFRAMES=N -DDELAY=D -DIMPAIR="--loss P --latency MS --jitter MS" -DPORT=N`,
-  or `-DDESYNC=1` for the desync path. Logs and reports stay under `build/`.
+  reference: `-DFRAMES=N -DDELAY=D -DIMPAIR="--loss P --latency MS --jitter MS" -DPORT=N`
+  (`-DSTALL="--stall-from F --stall-to G --stall-ms MS"`: player 2's host sleeps after
+  those polls; `-DEXPECT_STOPS=1`: a run must have stopped at a poll), or `-DDESYNC=1`
+  for the desync path. Logs and reports stay under `build/`.
 - Server: `npm ci` then `npm test` (or `npm run build`) in `engine/server`; ctest runs
   the same tests as `server_node_tests` when `node_modules` is installed.
 - Browser: build `mvp-web` (`engine/tools/emsdk.cmd cmake --build --preset emscripten -j 8
@@ -97,7 +100,9 @@ poll, `after_poll()` feeds the state hasher and, if the following frame's input 
 known yet, asks the run to yield at its next safe point, so the gate is checked before
 that poll. If a poll ever arrived without that chance, the input source stops the run
 ("gate missed") instead of guessing; it never happened (0 in every run below). No
-runtime file changed.
+runtime file changed. (It did happen at the match's loading, found by E6: a requested
+yield waits for a safe point where an event is due, and there frames come faster than
+events. E5c makes the run stop at the poll itself: §5.)
 
 `mvp-netplay` (`net/tools/mvp_netplay.cpp`, local only): `peer` mode runs the
 translated DOL with the session over UDP on 127.0.0.1, its controller port driven by
@@ -250,6 +255,117 @@ outside the server. Data-free tests: `test_net_protocol`, `test_net_session`,
 `test_net_driver` (native and under Emscripten/Node), `test_net_udp` (native),
 `server_node_tests`; `ctest -LE local`: 30/30.
 
+## 5. Into the match (E5c, `claude-side-e5c`, branch `engine/e5c`)
+
+E6 found that two pages in lockstep through the menus stopped when the match started
+loading: "frame N was polled before its input arrived (gate missed)", with or without
+roster packs (`E6_LOG.md` §5). E5's own runs had ended at frame 1,200, in the menus.
+
+**Reproduced natively.** `mvp-netplay` peers with E3a's path into an exhibition game
+(D = 3, no impairment): player 2 stopped with the gate miss at frame 2,908 (first run),
+both players at frame 2,910 (second run), right after the difficulty screen's A (frame
+2,903). The two frame logs up to there equal the solo run's.
+
+**Instrumented** (a counting `YieldingHooks` and a tracing input source in `mvp-netplay`,
+removed afterwards), at the poll of frame 2,910 that found no input: the same thread as
+every poll (OS thread 0x806DF830, the main thread), exception depth 0, called from the
+frame loop (LR 0x801489F4 in fn_80148930), MSR[EE] set; the yield `after_poll()` had
+requested at frame 2,909 was still pending, and **the runtime had not called its safe
+point hook once since that poll**: 129,453 instructions between the two polls, with the
+next scheduled event 232,003 instructions away. Not a thread, not an interrupt.
+
+**Root cause.** A requested yield (`YieldingHooks::request_yield`) is taken at the end of
+a safe point the runtime stops at, one where an event is due (`c.ticks >= c.next_event`:
+a VI line, the audio sample counter, a DVD or DSP completion, the decrementer). The guest
+passes safe points all the time, but the runtime looks at them only when an event is
+due. Through the menus a frame waits for the retrace (a field, 4.05 million
+instructions, with VI events in it), so an event falls between two polls. When the
+match loads, the frame loop runs frames without rendering (the loaders' render-skip
+countdown, DETERMINISM §2.4): frames 2,906-2,911 of that path came 0.13 to 0.75 million
+instructions apart, and the audio counter, whose changes are events every 5,000-7,600
+instructions while it runs, was stopped (the next event was 232,003 instructions away).
+So a poll could follow the previous one with no point where the run returned to the
+host loop.
+
+**Fix: the run waits at the poll itself.** The frame poll's hook (`hle_frame_poll`) first
+asks the input queue whether it may poll (`InputQueue::may_begin_frame` ->
+`InputSource::before_poll`). `NetplayDriver::before_poll` answers yes when the frame's
+input is known; otherwise it stops the run right there with
+`YieldingHooks::stop_before`, before the poll consumes anything, and the host loop waits
+in `may_run()` as before. The stop is an unwind like a host yield's: the translated
+fn_8014865C returns at once (the C++ and wasm emitters now check `g_unwinding` after a
+Before hook: one line each), every native frame returns, and the next `rt::run()` enters
+fn_8014865C afresh at c.pc. Its entry safe point at the same PC and instruction count is
+skipped as the repeat of the one the stopped call passed (the E2 mechanism), the hook
+runs again, now with the input, and the guest goes on exactly as if it had never
+stopped. While the game waits the guest does not run, so the virtual clock stands still.
+A poll that cannot stop (inside an interrupt handler, never seen) still reports the gate
+miss; native blocking mode still waits inside `input_for()`. `after_poll()`'s early
+yield stays as §4 measured it: it lets the host loop pump the network during the
+frame, and the stop only acts where that yield did not come in time. The per-field
+host yield (E2-W3), live input at the polls (E2-W5) and the D4 thread model are
+untouched; nothing in the guest's timeline depends on where the run stops.
+
+Not chosen: forcing a safe point to fire right after the poll (lowering `c.next_event`).
+An extra call of the runtime's safe point when no event is due is not provably invisible
+(the hardware model keeps the time of its last update: the next audio-counter change and
+the VI interrupt-register write path read it, and register writes and DSP mail arm the
+next look through `kick()`), and the peers would make that call at different, host-timed
+moments.
+
+**Evidence, native** (`mvp-netplay`, two processes over UDP on 127.0.0.1, D = 3, K = 60):
+
+| Run | Frames | Frame log | Windows | MEM1 at the end | Poll stops (P1/P2) | Gate misses |
+|---|---:|---|---|---|---:|---:|
+| E3a's path (port 1 only), into the first pitch | 5,400 | `6de8f6f5...` | 90, `e12223e0...` | `0b7d1d1c...` | 0 / 4 | 0 |
+| Two players (P2 takes the away team), pitch cycles, 25% loss, 40 ms + 0-30 ms jitter | 5,600 | `6bc617bf...` | 93, `1c0391d4...` | `618ce8bc...` | 3 / 3 | 0 |
+| Same script, local link, to frame 60,000 (pitch cycles until frame 40,100) | 60,000 | `cf1b7442...` | 1,000, `07744a7b...` | `93f8cf51...` | 18 / 30 | 0 |
+
+Each row equals the solo reference of the same script and delay (and the first equals the
+solo run of E6's build, before this change, and `mvp-play` with the same input stream:
+the solo guest line is unchanged). `mvp-play` with the same stream and captures shows
+where the peers are (captures local, `build/engine/e5c/`): a ball in play at Fenway at
+frame 5,316 (first row); in the two-player game, frame 4,799 is player 1 pitching to D.
+Eckstein, frame 19,837 the bottom of the first (2 out, 0-0), frame 22,690 the top of the
+second, frame 31,942 the bottom of the second and frame 42,293 the top of the third (0-0,
+1 out), where the game waits at the pitch menu once the script's pitch cycles end: two
+full innings and part of a third in lockstep. The impaired run
+(2,490 and 2,503 datagrams dropped, RTT 127 ms average) took 2 min 36 s for 5,600 frames,
+70 s of it waiting.
+
+**Evidence, browser** (`netplay_check.mjs`, two Chrome 155 pages through the local
+server, D = 3, `--fast`; each page drives its own port from the script):
+
+| Run | Frames | Guest line (both pages) = native | Windows equal | Desyncs | Gate misses | Poll stops (P1/P2) |
+|---|---:|---|---:|---:|---:|---:|
+| Two-player game, the first at-bat | 5,600 | `618ce8bc...` | 93 | 0 | 0 | 1 / 3 |
+| Same, `--netsim 40,10,0.02` | 5,600 | `618ce8bc...` | 93 | 0 | 0 | 3 / 3 |
+| Example pack on both pages (`--packs docs/examples/packs/fictional-league`); P1 picks the Lanterns | 4,420 | `a4b09126...` (= `mvp-play --pack`) | 73 | 0 | 0 | 1 / 0 |
+
+Both pages' last frames: the first run shows the first at-bat (St. Louis at Boston, count
+0-1, the pitch menu); the pack run shows the **Harbor City Lanterns' Defensive Lineup**
+(J. Falkenrath CF ... D. Arkwright C) on both screens, as E6 saw natively.
+
+**Tests.**
+- Data-free: the synthetic program (`translator/tests/synth.h`) gained a function at the
+  frame poll's address, called four times in a row with no stopping safe point between
+  the calls; `test_emit_lockstep` (C++ emitter) and `test_wasm_lockstep` (wasm emitter,
+  under Node) run it with an input source that makes every poll wait once: four stops,
+  and the same polls (frame, instruction count, input), registers, instruction count and
+  results as without stops (`runtime/tests/poll_stop.h`). Without the emitter's check the
+  native case fails (two polls lost). `test_input`: a refused poll consumes nothing.
+  `test_net_driver`: `before_poll` stops the run when the input is missing, not inside an
+  interrupt handler, and goes on once it arrived.
+- Local (the disc): `local_netplay_lockstep` now plays the two-player path into the
+  match's loading, to frame 3,050, with player 2's host sleeping 20 ms after each poll
+  of frames 2,905-3,045 (`mvp-netplay --stall-*`, a slow machine; the guest cannot
+  tell): player 1 then waits at every one of those frames, so its run must stop at the
+  loading's fast poll, and the test requires it (one stop in each of three runs; 48 s).
+  `local_netplay_lossy` plays the same over a slow, lossy link (10% loss, 20 ms + 0-10
+  ms; 73 s). Before the fix, the same path missed the gate in both runs tried.
+- `ctest` natively, the local tests included: 44 tests, 43 passed, `local_disasm` skipped
+  (no dtk listing); under Emscripten (Node): 33 tests, 30 passed, 3 local ones skipped.
+
 ## Next step
 
 1. **Deploy on the owner's VPS** (the two-network exit). Ready: `build/engine/deploy/
@@ -266,11 +382,11 @@ outside the server. Data-free tests: `test_net_protocol`, `test_net_session`,
      2026-10-14 hosting rule allows it on the private deployment), done after the owner
      has created the password; the brother can instead pick his own image.
 2. Then: the owner and his brother open the site, log in, one creates a game and sends
-   the link, both pick the disc; netplay starts at power-on. To finish an exhibition game
-   the engine must first reach and run one at full speed in the browser (E3a: speed and
-   the front end to exhibition); netplay itself has no game-specific code.
-3. Later: suggest the delay from the measured round trip before the game starts; a
-   longer native lockstep run into gameplay when an exhibition script exists (E3a);
+   the link, both pick the disc; netplay starts at power-on and, since E5c, plays into
+   the match (Select Team: player 2 moves its controller to the other side; both advance
+   their sides). Playing a whole game well needs the in-game speed in the browser (E3's
+   area); netplay itself has no game-specific code.
+3. Later: suggest the delay from the measured round trip before the game starts;
    rollback after K5.
 
 ## Decisions to record (for the lead)
@@ -284,6 +400,17 @@ outside the server. Data-free tests: `test_net_protocol`, `test_net_session`,
   proposal wins); the local pad is sampled when the frame can run (D > 0); the run loop
   gates `rt::run()` on the next poll's input and yields early after a poll whose
   successor is missing; a poll without its input stops the run (never happened).
+  Amended by E5c: a poll whose input is missing stops the run right there, before it
+  consumes anything, and the host loop waits (`NetplayDriver::before_poll`,
+  `YieldingHooks::stop_before`); "gate missed" remains only for a poll that cannot stop
+  (inside an interrupt handler; never seen).
+- **E5-N4 (E5c), stopping at a hook:** a Before hook (`runtime/hle.h`) may stop the run:
+  the C++ and wasm emitters check `g_unwinding` right after it, the function returns
+  unwinding, and the next `rt::run()` enters it afresh with the repeated entry safe
+  point skipped (as for E2's host yields). The input source API gains `before_poll`
+  (`runtime/input.h`). The guest runs the same instructions with or without stops
+  (data-free: `poll_stop.h` in `test_emit_lockstep` and `test_wasm_lockstep`). The
+  netplay wire protocol is unchanged (version 1).
 - **E5-N3, desync detection:** striped XXH64 of MEM1 over K = 60 frame windows (1/60 of
   MEM1 per frame), window hashes exchanged; a mismatch stops both sides; local text
   diagnostics only (slice hashes, never memory).
