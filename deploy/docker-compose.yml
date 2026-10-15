@@ -17,9 +17,18 @@
 #
 # Everything that must survive a redeploy is in the named volume mvp-data (/data):
 #   state.json   the site password's scrypt hash (created on the first-run page)
-#   disc/        the disc image uploaded on the Server disc page (owner-only directory)
+#   disc/        the disc image uploaded on the Server disc page (owner-only directory), and its
+#                piece hashes for the players' one-time download (GV4E69.manifest.json)
 #   turn/secret  the TURN shared secret, generated on the first start and read by coturn
 # The images hold no game data and no secrets.
+#
+# The volume's name is not pinned, on purpose. Dokploy deploys with
+# "docker compose -p <app name> -f ... up -d --build --remove-orphans", and the app name is fixed
+# when the app is created, so every deploy mounts the same <app name>_mvp-data, and `up` never
+# removes a named volume. Pinning a name now (a `name:` under the volume) would move existing
+# deployments to a new, empty volume and lose the uploaded disc. Only deleting the app with its
+# volumes, creating a new app, or Dokploy's "Randomize Compose" (it renames volumes) starts with
+# an empty one (docs/engine/DEPLOY_DOKPLOY.md, "Where the disc is kept").
 
 services:
   mvp:
