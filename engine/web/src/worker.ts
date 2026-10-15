@@ -567,7 +567,7 @@ chase.port1.onmessage = () => {
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
   let due = Math.floor((now - pacedStart) / FIELD_MS) - pacedFields;
-  const slowMotion = saturated && mt;  // the threaded engine: presenting costs the emulation nothing
+  const slowMotion = saturated && mt && opts?.slowMotion !== false;  // threaded: presenting costs the emulation nothing
   if (due > (slowMotion ? 2 : MAX_FIELDS_PER_FRAME * 2)) {
     // Too far behind (a slow stretch, a background tab, a slow machine): drop the debt.
     pacedStart = now - pacedFields * FIELD_MS;

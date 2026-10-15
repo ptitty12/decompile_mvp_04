@@ -27,6 +27,7 @@
 //   bitmaps=0       threaded: the render thread draws into the page's canvas instead of sending ImageBitmaps
 //   digest=1        a renderer digest per VI field (window.mvp.digest; digestDetail=F1-F2: per draw)
 //   rtTune=US,MS,KIB,SYNC   the render thread's waiting (fence poll, record poll, publish step, sync fences)
+//   slowMotion=0    no even slow motion when the machine cannot keep up (Q2, comparisons)
 //   audioRing=0     the sound goes to the worklet as messages even where the page could share memory (Q2)
 //   hostSlow=N, hostSlowFrom=F   a machine N times slower, simulated from VI field F on (Q2: the engine's
 //                   threads spin N - 1 times their working time; host timing only)
@@ -117,6 +118,7 @@ const options: RunOptions = {
   tracePresent: params.get('tracePresent') === '1',
   fastUntil: Number(params.get('fastUntil') ?? 0) || 0,
   pacing: params.get('pacing') === 'raf' ? 'raf' : 'chase',
+  slowMotion: params.get('slowMotion') !== '0',
   ioLog: params.get('ioLog') === '1',
   inputLog: params.get('inputLog') === '1',
   threads: params.get('threads') !== '0',
