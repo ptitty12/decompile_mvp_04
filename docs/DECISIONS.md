@@ -341,6 +341,16 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/e5c
 
+- 2026-10-15 | **P1-disc: no more disc-read hangs in the browser** (lead, under the owner's delegation; docs/engine/P1_LOG.md).
+  - Measured cause: every guest DVD read was a network round trip to the VPS. That added 18.6 s of read waits up to the first pitch, single reads up to 1.4 s, and fields up to 0.7 s.
+  - **P1-D1:** the page downloads the server's disc once into OPFS (resumable, 4 pieces in parallel, each checked by hash), then reads it locally. After the fix: 0 reads over 50 ms.
+  - **P1-D2:** the image hash is a SHA-256 over the 8 MiB piece hashes. It is advertised in `/config.json` and computed once by the server, which caches it in the volume.
+  - **P1-D3:** no start during the download (reads would queue behind it).
+  - **P1-D4:** the Dokploy volume name is left unpinned, so the disc the owner already uploaded is kept.
+  - Also: no picker or upload in the main flow when the server has a disc.
+
+  | | merge of engine/p1-disc
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
