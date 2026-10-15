@@ -120,6 +120,7 @@ void GxProcessor::reset() {
   tlut_.assign(512 * 1024, 0);
   tmem_.assign(kTmemSize, 0);
   fmt_valid_ = 0;
+  xs_valid_ = false;
   stats_ = {};
   ++state_serial_;
   // Power-on state that matters before the game's GXInit: one TEV stage,
@@ -180,12 +181,30 @@ void GxProcessor::load_cp(u8 reg, u32 v) {
   else if ((reg & 0xF0) == cp::kArrayStride) array_stride_[reg & 15] = v & 0xFF;
 }
 
+void GxProcessor::xf_written(u32 a) {
+  if (!xs_valid_) return;  // the next primitive rebuilds everything
+  if (a < 0x100) {
+    // Position/texture matrix i reads words (4i .. 4i + 11) & 0xFF: word a is in i = q, q - 1, q - 2.
+    const u32 q = a >> 2;
+    xs_.have_pos &= ~(1ull << q | 1ull << ((q - 1) & 63) | 1ull << ((q - 2) & 63));
+  } else if (a < xf::kNrmMtx) {
+    // Not read by the transform unit.
+  } else if (a < xf::kPostMtx) {
+    // Normal matrix n reads words kNrmMtx + 3n .. + 8 (n < 32).
+    const u32 w = a - xf::kNrmMtx;
+    for (u32 n = w >= 8 ? (w - 6) / 3 : 0; n <= w / 3 && n < 32; ++n) xs_.have_nrm &= ~(1ull << n);
+  } else {
+    xs_valid_ = false;  // post matrices, lights, registers
+  }
+}
+
 void GxProcessor::load_xf(u32 addr, u32 count, const u8* data) {
   for (u32 k = 0; k < count; ++k) {
     u32 a = addr + k;
     u32 v = be32_at(data + 4 * k);
     if (a < xf::kMemSize) xf_mem_[a] = v;
     else if (a >= xf::kRegBase && a < xf::kRegBase + xf::kRegCount) xf_regs_[a - xf::kRegBase] = v;
+    xf_written(a);
   }
 }
 
@@ -197,7 +216,10 @@ void GxProcessor::load_xf_indexed(int array, u32 v) {
   const u8* p = phys(array_base_[array] + index * array_stride_[array], 4 * count);
   if (!p) return;
   for (u32 k = 0; k < count; ++k)
-    if (addr + k < xf::kMemSize) xf_mem_[addr + k] = be32_at(p + 4 * k);
+    if (addr + k < xf::kMemSize) {
+      xf_mem_[addr + k] = be32_at(p + 4 * k);
+      xf_written(addr + k);
+    }
 }
 
 void GxProcessor::load_bp(u32 value) {
@@ -212,6 +234,7 @@ void GxProcessor::load_bp(u32 value) {
   v = (bp_[reg] & ~bp_mask_) | (v & bp_mask_);
   bp_mask_ = 0xFFFFFF;
   bp_[reg] = v;
+  if (reg == bp::kScissorOffset) xs_valid_ = false;  // the transform's window offset
   if (reg >= bp::kTevReg && reg < bp::kTevReg + 8) {
     int r = (reg - bp::kTevReg) >> 1;
     bool konst = (v >> 23) & 1;
@@ -864,7 +887,10 @@ void GxProcessor::primitive(u8 op, const u8* data, u32 count) {
   // Each vertex is loaded and transformed once; assembly below only indexes them.
   std::vector<OutVertex>& vs = d.verts;
   vs.resize(count);
-  setup_transform(xs_);
+  if (!xs_valid_) {
+    setup_transform(xs_);
+    xs_valid_ = true;
+  }
   for (u32 k = 0; k < count; ++k) {
     InVertex in;
     load_vertex(vf, data + static_cast<std::size_t>(k) * vsize, in);

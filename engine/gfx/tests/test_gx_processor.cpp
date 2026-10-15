@@ -393,6 +393,69 @@ TEST_CASE("indexed XF loads read matrices from memory") {
   CHECK(p.stats().xf_indexed == 1);
 }
 
+TEST_CASE("the transform setup is kept across primitives until XF or the scissor offset changes (P1)") {
+  // Every primitive after a write must see it: position matrix words (also of the
+  // matrix that overlaps them), normal matrices, lights and channel registers, the
+  // scissor offset. Each result is checked against a fresh processor that sees the
+  // same state before its first primitive.
+  auto stream = [](int step) {
+    Stream s = setup_2d();
+    Stream f = pos_color_format();
+    s.cmds.insert(s.cmds.end(), f.cmds.begin(), f.cmds.end());
+    s.xff(xf::kNrmMtx, {1, 0, 0, 0, 1, 0, 0, 0, 1});
+    s.xf(xf::kNumColors, {1});
+    s.xf(xf::kAmbient0, {0x20202020});
+    s.xf(xf::kMaterial0, {0xFF8000FF});
+    s.xf(xf::kColor0Cntrl, {0u | 1u << 1 | 1u << 2 | 2u << 7});
+    s.xf(xf::kColor0Cntrl + 2, {0});
+    s.xf(xf::kLights + 3, {0xFFFFFFFF});
+    s.xff(xf::kLights + 10, {0, 0, 1e6f});
+    if (step >= 1) s.xff(0x003, {10});                   // matrix 0, row 0, translation
+    if (step >= 2) s.xff(0x00B, {-7});                   // matrix 0 row 2 (also matrix 2's first word)
+    if (step >= 3) s.xff(xf::kNrmMtx, {0, 0, 1, 0, 1, 0, -1, 0, 0});  // normal matrix 0
+    if (step >= 4) s.xf(xf::kMaterial0, {0x00FF00FF});  // channel register
+    if (step >= 5) s.xf(xf::kLights + 3, {0x80808080});  // light color
+    if (step >= 6) s.bp(bp::kScissorOffset, 160u | 171u << 10);
+    return s;
+  };
+  std::vector<std::uint8_t> v;
+  vtx(v, 100, 50, 0, 0xFFFFFFFF);
+  vtx(v, 200, 50, 0, 0xFFFFFFFF);
+  vtx(v, 200, 90, 0, 0xFFFFFFFF);
+  vtx(v, 100, 90, 0, 0xFFFFFFFF);
+  // One processor: a primitive after each step's writes (the setup cached in between).
+  Capture cached;
+  GxProcessor p(&cached);
+  Stream all = stream(0);
+  all.prim(cmd::kQuads, 4, v);
+  for (int step = 1; step <= 6; ++step) {
+    Stream s = stream(step);
+    // Only the writes after stream(step - 1)'s: the extra commands at the end.
+    const std::size_t before = stream(step - 1).cmds.size();
+    for (std::size_t k = before; k < s.cmds.size(); ++k) all.cmds.push_back(s.cmds[k]);
+    all.prim(cmd::kQuads, 4, v);
+  }
+  all.run(p);
+  REQUIRE(cached.raw.size() == 7);
+  for (int step = 0; step <= 6; ++step) {
+    Capture fresh;
+    GxProcessor q(&fresh);
+    Stream s = stream(step);
+    s.prim(cmd::kQuads, 4, v);
+    s.run(q);
+    REQUIRE(fresh.raw.size() == 1);
+    const DrawCall& a = cached.raw[static_cast<std::size_t>(step)];
+    const DrawCall& b = fresh.raw[0];
+    REQUIRE(a.verts.size() == b.verts.size());
+    for (std::size_t k = 0; k < a.verts.size(); ++k)
+      CHECK(std::memcmp(&a.verts[k], &b.verts[k], sizeof(OutVertex)) == 0);
+  }
+  // The steps did change the output (the test would pass vacuously otherwise).
+  CHECK(std::memcmp(&cached.raw[0].verts[0], &cached.raw[1].verts[0], sizeof(OutVertex)) != 0);
+  CHECK(std::memcmp(&cached.raw[3].verts[0], &cached.raw[4].verts[0], sizeof(OutVertex)) != 0);
+  CHECK(std::memcmp(&cached.raw[5].verts[0], &cached.raw[6].verts[0], sizeof(OutVertex)) != 0);
+}
+
 TEST_CASE("lighting: a diffuse light and the ambient color") {
   Capture cap;
   GxProcessor p(&cap);
