@@ -323,3 +323,13 @@ E2 is done. Suggested follow-ups:
    script) for bug reports and the netplay work.
 5. Before the VPS: production headers (CSP, caching, compression) and serving
    `licenses/` with the engine.
+
+## E2c follow-up (2026-10-14, `claude-side-e2c`)
+
+The browser client after E2: sound through an AudioWorklet, the gamepad mapping,
+the disc from the owner's server, the translation cached in the browser,
+fullscreen, pause and clearer errors. Evidence and measurements:
+`docs/engine/E2C_LOG.md`; the design: `docs/engine/WEB.md`. Next steps 3 and 4
+above are done there (audio; the module cache, not the image). One correction:
+in E2c's runs, START before field ~1100 does not skip the intro movie (the game
+ignores it during the EA SPORTS logo part); a press at field ~1200 does.
