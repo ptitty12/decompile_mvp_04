@@ -27,12 +27,19 @@ bool spin_continues(ppc::Cpu& c) {
 
 std::uint64_t SystemHooks::ticks_for(std::uint64_t tb) const {
   if (tb <= tb_offset_) return 0;
-  std::uint64_t d = tb - tb_offset_;  // ticks * cpi / 12 >= d
-  return (d * 12 + clk_.cpi - 1) / clk_.cpi;
+  std::uint64_t d = tb - tb_offset_;  // ticks * cpi_milli / 12000 >= d
+  return (d * ClockConfig::kMilliPerTb + clk_.cpi_milli - 1) / clk_.cpi_milli;
 }
 
 void SystemHooks::set_time_base(ppc::Cpu& c, std::uint64_t v) {
-  tb_offset_ = v - c.ticks * clk_.cpi / 12;  // modular: the base may go "negative"
+  tb_offset_ = v - c.ticks * clk_.cpi_milli / ClockConfig::kMilliPerTb;  // modular: the base may go "negative"
+  reschedule(c);
+}
+
+void SystemHooks::set_clock(ppc::Cpu& c, ClockConfig clk) {
+  const std::uint64_t tb = tb_at(c.ticks);
+  clk_ = clk;
+  tb_offset_ = tb - c.ticks * clk_.cpi_milli / ClockConfig::kMilliPerTb;
   reschedule(c);
 }
 

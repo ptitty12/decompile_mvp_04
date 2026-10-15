@@ -128,20 +128,24 @@ TEST_CASE("back edges and idle spins") {
   // h1: 0: lwz r3, 0(r4) / 4: cmpwi r3, 0 / 8: beq 0     (a pure spin: idle)
   //     c: lwz r5, 0(r4) / 10: bdnz c                    (counts down CTR: not idle)
   //     14: addi r6, r6, 1 / 18: cmpwi r6, 9 / 1c: blt 14 (does work: not idle)
-  //     20: blr
+  //     20: lwz r8, 0x14(r8) / 24: cmplw r4, r8 / 28: blt 20 (walks a list: not idle, CLK2)
+  //     2c: lwzx r0, r3, r9 / 30: cmpwi r0, 0 / 34: beq 2c   (the same address every pass: idle)
+  //     38: blr
   Image im;
   im.text = {D(32, 3, 4, 0), D(11, 0, 3, 0), B(12, 2, -8), D(32, 5, 4, 0), B(16, 0, -4),
-             D(14, 6, 6, 1), D(11, 0, 6, 9), B(12, 0, -8), X(19, 20, 0, 0, 16)};
+             D(14, 6, 6, 1), D(11, 0, 6, 9), B(12, 0, -8),
+             D(32, 8, 8, 0x14), X(31, 0, 4, 8, 32), B(12, 0, -8),
+             X(31, 0, 3, 9, 23), D(11, 0, 0, 0), B(12, 2, -8), X(19, 20, 0, 0, 16)};
   im.data = {0};
-  SymbolTable st = SymbolTable::parse("h1 = .text:0x80003100; // type:function size:0x24\n");
+  SymbolTable st = SymbolTable::parse("h1 = .text:0x80003100; // type:function size:0x3C\n");
   auto dol = im.dol();
   ProgramCfg p = build_cfg(dol, st);
   REQUIRE(p.functions.size() == 1);
   const FunctionCfg& f = p.functions[0];
   CHECK(f.errors.empty());
-  CHECK(f.back_edges == std::vector<u32>{kText + 8, kText + 0x10, kText + 0x1C});
-  CHECK(f.idle_spins == std::vector<u32>{kText + 8});
-  CHECK(p.idle_spins == 1);
+  CHECK(f.back_edges == std::vector<u32>{kText + 8, kText + 0x10, kText + 0x1C, kText + 0x28, kText + 0x34});
+  CHECK(f.idle_spins == std::vector<u32>{kText + 8, kText + 0x34});
+  CHECK(p.idle_spins == 2);
 }
 
 TEST_CASE("secondary entries, gap functions, running into the next function, expected traps") {

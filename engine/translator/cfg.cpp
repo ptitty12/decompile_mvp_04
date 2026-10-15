@@ -403,19 +403,31 @@ void walk(FunctionCfg& f, const FunctionIndex& fx) {
     if ((x.flow == Flow::Jump || x.flow == Flow::CondJump) && f.contains(x.target) && x.target <= x.addr) {
       f.back_edges.push_back(x.addr);
       // A pure spin: only loads and compares between the target and this branch,
-      // which does not count down CTR (a bdnz loop ends by itself).
+      // which does not count down CTR (a bdnz loop ends by itself), and every pass
+      // reads the same addresses: no load writes a register a load addresses with.
+      // A list walk (EA's FREE_add: lwz r8, 0x14(r8) / cmplw / blt) is work, not a
+      // wait; skipping virtual time on each of its passes froze the game for
+      // seconds (CLK2).
       if ((x.addr - x.target) / 4 + 1 <= 4 && (x.op == Op::b || (ppc::Insn{x.word}.bo() & 4))) {
         bool pure = true;
+        u32 loaded = 0, addressing = 0;  // register masks
         for (u32 a = x.target; a < x.addr && pure; a += 4) {
+          const ppc::Insn i{f.at(a).word};
           switch (f.at(a).op) {
-            case Op::lbz: case Op::lhz: case Op::lha: case Op::lwz: case Op::lbzx: case Op::lhzx: case Op::lhax:
-            case Op::lwzx: case Op::cmp: case Op::cmpi: case Op::cmpl: case Op::cmpli:
+            case Op::lbzx: case Op::lhzx: case Op::lhax: case Op::lwzx:
+              addressing |= 1u << i.rB();
+              [[fallthrough]];
+            case Op::lbz: case Op::lhz: case Op::lha: case Op::lwz:
+              if (i.rA()) addressing |= 1u << i.rA();
+              loaded |= 1u << i.rD();
+              break;
+            case Op::cmp: case Op::cmpi: case Op::cmpl: case Op::cmpli:
               break;
             default:
               pure = false;
           }
         }
-        if (pure) f.idle_spins.push_back(x.addr);
+        if (pure && !(loaded & addressing)) f.idle_spins.push_back(x.addr);
       }
     }
     if (x.flow == Flow::JumpTable)

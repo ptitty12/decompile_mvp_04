@@ -3,9 +3,9 @@
 // changes, icbi and sc (E0b items 7 and 9).
 //
 // Virtual clock (DETERMINISM R1): the time base is derived only from the number
-// of guest instructions run (c.ticks) at a fixed charge of `cpi` CPU cycles per
-// instruction; the CPU runs at 486 MHz and the time base at 1/12 of that. Host
-// time never enters. Interrupts (decrementer, and PI causes from the hardware
+// of guest instructions run (c.ticks) at a fixed charge of CPU cycles per
+// instruction (ClockConfig); the CPU runs at 486 MHz and the time base at 1/12 of
+// that. Host time never enters. Interrupts (decrementer, and PI causes from the hardware
 // model) are delivered only at safe points (function entries and loop back
 // edges) while MSR[EE] is set (R4), by running the OS's own exception vector code.
 // The floating-point unavailable exception is synchronous: it is taken at the
@@ -21,8 +21,14 @@ namespace mvp::rt {
 
 class Hardware;
 
+// The charge per guest instruction, in thousandths of a CPU cycle: the time base
+// advances ticks * cpi_milli / 12000 (12 CPU cycles per time-base tick). Part of
+// the netplay handshake. E0b-CLK1 charged 2 cycles (2000); CLK2 charges 1.25
+// (388.8 million instructions per guest second), with which the game's heaviest
+// play still fits a 60 Hz frame (docs/engine/CLK2_LOG.md).
 struct ClockConfig {
-  std::uint32_t cpi = 2;  // CPU cycles charged per guest instruction (part of the netplay handshake)
+  static constexpr std::uint32_t kMilliPerTb = 12000;  // thousandths of a CPU cycle per time-base tick
+  std::uint32_t cpi_milli = 1250;
 };
 
 class SystemHooks : public ppc::Hooks {
@@ -30,12 +36,16 @@ class SystemHooks : public ppc::Hooks {
   explicit SystemHooks(Machine* m, Hardware* hw = nullptr, ClockConfig clk = {}) : m_(m), hw_(hw), clk_(clk) {}
 
   // Time base for the instruction count `ticks`.
-  std::uint64_t tb_at(std::uint64_t ticks) const { return tb_offset_ + ticks * clk_.cpi / 12; }
+  std::uint64_t tb_at(std::uint64_t ticks) const { return tb_offset_ + ticks * clk_.cpi_milli / ClockConfig::kMilliPerTb; }
   // First instruction count at which the time base reaches `tb`.
   std::uint64_t ticks_for(std::uint64_t tb) const;
 
   std::uint64_t time_base(ppc::Cpu& c) override { return tb_at(c.ticks); }
   void set_time_base(ppc::Cpu& c, std::uint64_t v) override;
+  const ClockConfig& clock() const { return clk_; }
+  // Charges `clk` from the current instruction on; the time base stays where it
+  // is (experiments only, mvp-play --cpi-switch: a run's charge is otherwise fixed).
+  void set_clock(ppc::Cpu& c, ClockConfig clk);
   u32 decrementer(ppc::Cpu& c) override;
   void set_decrementer(ppc::Cpu& c, u32 v) override;
   // Translation off (IR or DR clear) maps physical MEM1 at 0 (real mode); EE set

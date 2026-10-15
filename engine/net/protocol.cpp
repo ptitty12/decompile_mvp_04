@@ -108,7 +108,7 @@ std::optional<PadState> get_pad(const u8* q) {
 }
 
 // HELLO body: minor, player, flags (bit 0: seen_peer), delay, hash_interval (2),
-// reserved (2, zero), nonce (8), seed (8), disc (20), packset (32), cpi (4),
+// reserved (2, zero), nonce (8), seed (8), disc (20), packset (32), cpi_milli (4),
 // di_latency_tb (4), di_tb_per_kib (4), build length (1) + bytes, settings
 // length (2) + bytes.
 std::vector<u8> encode(const Hello& m) {
@@ -124,7 +124,7 @@ std::vector<u8> encode(const Hello& m) {
   u64_(out, m.seed);
   out.insert(out.end(), m.id.disc.begin(), m.id.disc.end());
   out.insert(out.end(), m.id.packset.begin(), m.id.packset.end());
-  u32_(out, m.id.cpi);
+  u32_(out, m.id.cpi_milli);
   u32_(out, m.id.di_latency_tb);
   u32_(out, m.id.di_tb_per_kib);
   const std::size_t bl = std::min(m.id.build.size(), kMaxBuildId);
@@ -151,7 +151,7 @@ std::optional<Hello> decode_hello(const u8* d, std::size_t n) {
   m.seed = r.q();
   if (const u8* p = r.bytes(20)) std::memcpy(m.id.disc.data(), p, 20);
   if (const u8* p = r.bytes(32)) std::memcpy(m.id.packset.data(), p, 32);
-  m.id.cpi = r.d();
+  m.id.cpi_milli = r.d();
   m.id.di_latency_tb = r.d();
   m.id.di_tb_per_kib = r.d();
   u8 bl = r.b();
@@ -278,8 +278,9 @@ std::string incompatibility(const Hello& a, const Hello& b) {
            ", player 2: " + hex(p2.id.packset.data(), 32).substr(0, 16) +
            "); both must pick the same packs in the same order";
   }
-  if (a.id.cpi != b.id.cpi || a.id.di_latency_tb != b.id.di_latency_tb || a.id.di_tb_per_kib != b.id.di_tb_per_kib)
-    return "different engine timing constants (CLK1/DVD1)";
+  if (a.id.cpi_milli != b.id.cpi_milli || a.id.di_latency_tb != b.id.di_latency_tb ||
+      a.id.di_tb_per_kib != b.id.di_tb_per_kib)
+    return "different engine timing constants (CLK2/DVD1)";
   if (a.id.settings != b.id.settings) return "different settings (" + a.id.settings + " vs " + b.id.settings + ")";
   if (a.hash_interval != b.hash_interval)
     return "different desync-check intervals (" + std::to_string(a.hash_interval) + " vs " +

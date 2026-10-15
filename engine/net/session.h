@@ -18,7 +18,7 @@
 //   mismatch stops the session on both sides (state Desynced) with a local
 //   diagnostic.
 // - The handshake (HELLO) refuses a match unless both peers have the same engine
-//   build, disc identity, pack set, settings, CLK1/DVD1 constants and desync
+//   build, disc identity, pack set, settings, CLK2/DVD1 constants and desync
 //   interval, and complementary roles.
 // - A peer silent for `timeout_ms` ends the session (Disconnected).
 //

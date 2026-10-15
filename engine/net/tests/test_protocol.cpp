@@ -180,11 +180,17 @@ TEST_CASE("handshake compatibility") {
   CHECK(incompatibility(a, c).find("player 2: " + hex(c.id.packset.data(), 32).substr(0, 16)) != std::string::npos);
   CHECK(incompatibility(c, a) == incompatibility(a, c));  // the same text on both sides
   c = sample_hello(2);
-  c.id.cpi = 3;
-  CHECK(incompatibility(a, c).find("CLK1/DVD1") != std::string::npos);
+  c.id.cpi_milli = 3;
+  CHECK(incompatibility(a, c).find("CLK2/DVD1") != std::string::npos);
+  // CLK2: the identity carries the runtime's clock; a CLK1 build sent 2 (whole cycles) in the same field.
+  CHECK(Identity{}.cpi_milli == rt::ClockConfig{}.cpi_milli);
+  c = sample_hello(2);
+  c.id.cpi_milli = 2;
+  CHECK(incompatibility(a, c).find("CLK2/DVD1") != std::string::npos);
+  CHECK(incompatibility(c, a).find("CLK2/DVD1") != std::string::npos);
   c = sample_hello(2);
   c.id.di_tb_per_kib = 1;
-  CHECK(incompatibility(a, c).find("CLK1/DVD1") != std::string::npos);
+  CHECK(incompatibility(a, c).find("CLK2/DVD1") != std::string::npos);
   c = sample_hello(2);
   c.id.settings = "ax_voices=0;ports=0x3";
   CHECK(incompatibility(a, c).find("settings") != std::string::npos);

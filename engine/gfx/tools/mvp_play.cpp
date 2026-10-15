@@ -46,8 +46,18 @@
 //   --pacing-from N   (E3c) frame pacing statistics (window) from VI field N on
 //   --pace            (E3c, window) show each VI field at its own time (59.94 Hz) and
 //                     present without waiting for the display (mailbox) when it can
-//   --cpi N           (E3c, experiments) CPU cycles charged per guest instruction instead of
-//                     E0b-CLK1's 2: changes guest timing (not the netplay default)
+//   --cpi X           (E3c, CLK2; experiments) CPU cycles charged per guest instruction, a
+//                     decimal (1.25), instead of the default (rt::ClockConfig): changes
+//                     guest timing (not the netplay default)
+//   --cpi-switch F:X  (CLK2, experiments) from frame poll F on, charge X cycles (the time
+//                     base goes on from where it is): a script made for one charge can
+//                     reach a match, then the game runs at another
+//   --perf-every N also prints the XFB copies (rendered frames), the logic ticks the
+//                     frame loop ran (its tick count n per frame poll, read from the
+//                     guest: 1, 2, 3), the instructions run (idle skips excluded) and
+//                     the DVD commands and bytes so far
+//   --threads-at F1,F2 (CLK2, diagnostics) the OS threads at those VI fields: state,
+//                     priority, the queue each sleeps on, PC, LR and the stack's callers
 //   --audio-wav FILE  (E3b) the AX mix as a 16-bit stereo WAV, exactly as virtual
 //                     time produced it (keep it under build/; never commit it)
 //   --no-audio        no playback (default: SDL3 playback when a window is open)
@@ -361,19 +371,32 @@ struct Play : GfxObserver {
   std::uint64_t perf_every = 0;
   std::chrono::steady_clock::time_point t0;
   rt::SystemHooks* hooks = nullptr;
+  const rt::Hardware* hw = nullptr;
   ppc::Cpu* cpu = nullptr;
 
+  // CLK2 statistics (host side, read only): XFB copies (BP 0x52 with bit 14 set:
+  // a rendered frame) and the frame loop's tick count per frame poll
+  // (lbl_8061B884, DETERMINISM §2.4: n of the frame before the poll).
+  std::uint64_t xfb_copies = 0;
+  std::uint64_t tick_frames[4] = {};  // frame polls whose previous frame ran n = 0 (none yet), 1, 2, 3 ticks
   void perf(std::uint64_t field) {
     if (!perf_every || field % perf_every) return;
     const double host = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
     const double guest = static_cast<double>(hooks->time_base(*cpu)) / 40500000.0;
-    std::printf("perf: field %llu frame %llu guest %.3f s host %.3f s\n", static_cast<unsigned long long>(field),
-                static_cast<unsigned long long>(frames), guest, host);
+    std::printf("perf: field %llu frame %llu guest %.3f s host %.3f s copies %llu n1 %llu n2 %llu n3 %llu run %llu "
+                "dvd %llu %llu\n",
+                static_cast<unsigned long long>(field), static_cast<unsigned long long>(frames), guest, host,
+                static_cast<unsigned long long>(xfb_copies), static_cast<unsigned long long>(tick_frames[1]),
+                static_cast<unsigned long long>(tick_frames[2]), static_cast<unsigned long long>(tick_frames[3]),
+                static_cast<unsigned long long>(cpu->ticks - hooks->idle_ticks_skipped),
+                static_cast<unsigned long long>(hw ? hw->di_commands() : 0),
+                static_cast<unsigned long long>(hw ? hw->di_bytes() : 0));
     std::fflush(stdout);  // long runs are watched while they run
   }
 
   // Without a renderer (--no-render) the observer only counts fields.
   void gx_command(const std::uint8_t* cmd, std::size_t len) override {
+    if (len >= 5 && cmd[0] == 0x61 && cmd[1] == 0x52 && (cmd[3] & 0x40)) ++xfb_copies;  // bit 14 of the BP value
     if (gx_log && fields >= gx_log_from && fields <= gx_log_to) log_command(cmd, len);
     if (proc) proc->command(cmd, len);
   }
@@ -402,9 +425,49 @@ struct Play : GfxObserver {
     std::fprintf(gx_log, "\n");
   }
 
+  // --threads-at F1,F2,... (CLK2, diagnostics): the OS's threads at those VI fields.
+  std::set<std::uint64_t> threads_at;
+  const xlat::SymbolTable* syms = nullptr;
+  std::uint32_t rd32(std::uint32_t a) const {
+    if ((a & 0xFE000000u) != 0x80000000u || (a & 0x01FFFFFFu) + 4 > mem1_size) return 0;
+    const std::uint8_t* p = mem1 + (a & 0x01FFFFFFu);
+    return std::uint32_t(p[0]) << 24 | std::uint32_t(p[1]) << 16 | std::uint32_t(p[2]) << 8 | p[3];
+  }
+  std::string where(std::uint32_t a) const {
+    const xlat::Symbol* f = syms ? syms->function_containing(a) : nullptr;
+    char b[160];
+    if (f) std::snprintf(b, sizeof b, "%08X %s+0x%X", a, f->name.c_str(), a - f->address);
+    else std::snprintf(b, sizeof b, "%08X", a);
+    return b;
+  }
+  void dump_threads(std::uint64_t field) const {
+    // Dolphin OS: the active-thread queue at 0x800000DC, the current thread at 0x800000E4;
+    // OSThread: context (gpr at 0, lr 0x84, srr0 0x198), state 0x2C8 (u16), priority 0x2D0,
+    // queue 0x2DC (the queue it sleeps on), linkActive.next 0x2FC.
+    const std::uint32_t cur = rd32(0x800000E4);
+    std::printf("threads at field %llu (current %08X):\n", static_cast<unsigned long long>(field), cur);
+    int n = 0;
+    for (std::uint32_t t = rd32(0x800000DC); t && n < 16; t = rd32(t + 0x2FC), ++n) {
+      const bool running = t == cur;
+      const std::uint32_t state = rd32(t + 0x2C8) >> 16, prio = rd32(t + 0x2D0), queue = rd32(t + 0x2DC);
+      const std::uint32_t pc = running ? cpu->pc : rd32(t + 0x198), lr = running ? cpu->lr : rd32(t + 0x84);
+      std::uint32_t sp = running ? cpu->gpr[1] : rd32(t + 4);
+      std::printf("  thread %08X state %u prio %u queue %08X%s\n    pc %s\n    lr %s\n", t, state, prio, queue,
+                  running ? " (running)" : "", where(pc).c_str(), where(lr).c_str());
+      for (int k = 0; k < 24 && sp; ++k) {  // the back chain: each frame's caller saved its LR at [back chain + 4]
+        const std::uint32_t up = rd32(sp);
+        if (!up || up <= sp) break;
+        std::printf("    <- %s\n", where(rd32(up + 4)).c_str());
+        sp = up;
+      }
+    }
+    std::fflush(stdout);
+  }
+
   void vi_field(std::uint64_t field, std::uint32_t xfb) override {
     fields = field;
     perf(field);
+    if (threads_at.count(field)) dump_threads(field);
     if (yield_hooks) yield_hooks->request_yield();
     if (!renderer) {
       if (field >= max_fields) throw StopRun{"ran " + std::to_string(max_fields) + " VI fields (--fields)"};
@@ -451,9 +514,23 @@ struct Play : GfxObserver {
 };
 Play* g_play = nullptr;
 
+// --cpi-switch F:X (CLK2, experiments): the charge from frame poll F on.
+std::uint64_t g_cpi_switch_frame = ~0ull;
+ClockConfig g_cpi_switch_to;
+
 void frame_hook(ppc::Cpu& c, std::uint64_t frame) {
   g_play->frames = frame;
   if (frame >= g_play->max_frames) throw StopRun{"ran " + std::to_string(frame) + " frames (--frames)"};
+  {
+    const std::uint8_t* n = g_play->mem1 + (0x8061B884u & 0x01FFFFFFu);  // the frame loop's tick count
+    const std::uint32_t ticks = std::uint32_t(n[0]) << 24 | std::uint32_t(n[1]) << 16 | std::uint32_t(n[2]) << 8 | n[3];
+    ++g_play->tick_frames[ticks < 4 ? ticks : 0];
+  }
+  if (frame == g_cpi_switch_frame) {
+    g_play->hooks->set_clock(c, g_cpi_switch_to);
+    std::printf("clock: %.3f cycles per instruction from frame %llu\n", g_cpi_switch_to.cpi_milli / 1000.0,
+                static_cast<unsigned long long>(frame));
+  }
   // --hash-every N: the guest state at every Nth frame poll (compare two runs line by line).
   if (g_play->hash_every && frame % g_play->hash_every == 0) {
     Sha1 h;
@@ -571,7 +648,12 @@ int main(int argc, char** argv) {
   std::string dump_dir, audio_wav, record_input;
   bool no_audio = false;
   std::uint32_t audio_latency = 100;
-  std::uint32_t cpi = 0;  // --cpi (0: the default, E0b-CLK1)
+  std::uint32_t cpi_milli = 0;  // --cpi (0: the default, rt::ClockConfig)
+  // A decimal number of cycles per instruction in thousandths (0: not a positive number).
+  auto parse_cpi = [](const std::string& s) -> std::uint32_t {
+    const double x = std::strtod(s.c_str(), nullptr);
+    return x > 0 && x < 1000 ? static_cast<std::uint32_t>(std::lround(x * 1000)) : 0;
+  };
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
   bool headless = false, no_render = false, yield = false;
@@ -599,7 +681,30 @@ int main(int argc, char** argv) {
     else if (a == "--stop-file") play.stop_file = next();
     else if (a == "--record-input") record_input = next();
     else if (a == "--pacing-from") play.pacing_from = std::strtoull(next().c_str(), nullptr, 10);
-    else if (a == "--cpi") cpi = static_cast<std::uint32_t>(std::strtoul(next().c_str(), nullptr, 10));
+    else if (a == "--cpi") {
+      cpi_milli = parse_cpi(next());
+      if (!cpi_milli) {
+        std::fprintf(stderr, "mvp-play: --cpi wants a positive number of cycles\n");
+        return 2;
+      }
+    } else if (a == "--threads-at") {
+      const std::string v = next();
+      for (std::size_t at = 0; at < v.size();) {
+        std::size_t comma = v.find(',', at);
+        if (comma == std::string::npos) comma = v.size();
+        play.threads_at.insert(std::strtoull(v.substr(at, comma - at).c_str(), nullptr, 10));
+        at = comma + 1;
+      }
+    } else if (a == "--cpi-switch") {
+      const std::string v = next();
+      const std::size_t colon = v.find(':');
+      g_cpi_switch_to.cpi_milli = colon == std::string::npos ? 0 : parse_cpi(v.substr(colon + 1));
+      if (!g_cpi_switch_to.cpi_milli) {
+        std::fprintf(stderr, "mvp-play: --cpi-switch wants FRAME:CYCLES\n");
+        return 2;
+      }
+      g_cpi_switch_frame = std::strtoull(v.substr(0, colon).c_str(), nullptr, 10);
+    }
     else if (a == "--pace") play.pace = true;
     else if (a == "--gx-log") play.gx_log = std::fopen(next().c_str(), "w");
     else if (a == "--gx-log-from") play.gx_log_from = std::strtoull(next().c_str(), nullptr, 10);
@@ -626,7 +731,7 @@ int main(int argc, char** argv) {
     else if (a == "--pack") packs.push_back(next());
     else {
       std::fprintf(stderr,
-                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--stop-file F] [--hash-every N] [--record-input F] [--pacing-from N] [--pace] [--cpi N] [--max-ticks N] "
+                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--stop-file F] [--hash-every N] [--record-input F] [--pacing-from N] [--pace] [--cpi X] [--cpi-switch F:X] [--max-ticks N] "
                    "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-from N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
                    "[--perf-every N] [--profile N] [--host-profile N] [--profile-from F] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
@@ -716,7 +821,8 @@ int main(int argc, char** argv) {
   Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size);
   hw.set_disc(in->disc.image.get());
   ClockConfig clock;
-  if (cpi) clock.cpi = cpi;
+  if (cpi_milli) clock.cpi_milli = cpi_milli;
+  std::printf("clock: %.3f cycles per instruction\n", clock.cpi_milli / 1000.0);
   YieldingHooks hooks(&m, &hw, clock);
   m.memory().io = &hw;
   m.cpu().hooks = &hooks;
@@ -795,6 +901,8 @@ int main(int argc, char** argv) {
   const auto t0 = std::chrono::steady_clock::now();
   play.t0 = t0;
   play.hooks = &hooks;
+  play.hw = &hw;
+  play.syms = &in->symbols;
   play.mem1 = m.mem1();
   play.mem1_size = Machine::kMem1Size;
   play.cpu = &m.cpu();
