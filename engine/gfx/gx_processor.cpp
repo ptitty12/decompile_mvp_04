@@ -117,6 +117,7 @@ void GxProcessor::reset() {
   std::memset(konst_, 0, sizeof konst_);
   tlut_.assign(512 * 1024, 0);
   stats_ = {};
+  ++state_serial_;
   // Power-on state that matters before the game's GXInit: one TEV stage,
   // scissor and alpha compare open.
   bp_[bp::kScissorBR] = (342u + kEfbHeight - 1) | (342u + kEfbWidth - 1) << 12;
@@ -207,6 +208,7 @@ void GxProcessor::load_xf_indexed(int array, u32 v) {
 }
 
 void GxProcessor::load_bp(u32 value) {
+  ++state_serial_;  // all the draw state snapshot() reads comes from BP writes (TLUT loads included)
   const u8 reg = static_cast<u8>(value >> 24);
   u32 v = value & 0xFFFFFF;
   if (reg == bp::kMask) {
@@ -782,41 +784,52 @@ void GxProcessor::primitive(u8 op, const u8* data, u32 count) {
   const u32 vsize = vertex_size(fmt);
   stats_.vertices += count;
   if (count == 0) return;
-  std::vector<OutVertex>& vs = vs_;
+  DrawCall& d = draw_;
+  // Each vertex is loaded and transformed once; assembly below only indexes them.
+  std::vector<OutVertex>& vs = d.verts;
   vs.clear();
   vs.reserve(count);
   setup_transform(xs_);
   for (u32 k = 0; k < count; ++k)
     vs.push_back(transform(load_vertex(fmt, data + static_cast<std::size_t>(k) * vsize), xs_));
 
-  prim_info_.op = op;
-  prim_info_.count = count;
-  prim_info_.vertex_size = vsize;
-  prim_info_.vcd_lo = vcd_lo_;
-  prim_info_.vcd_hi = vcd_hi_;
-  prim_info_.vat[0] = vat_a_[fmt];
-  prim_info_.vat[1] = vat_b_[fmt];
-  prim_info_.vat[2] = vat_c_[fmt];
-  prim_info_.matidx[0] = matidx_a_;
-  prim_info_.matidx[1] = matidx_b_;
-  prim_info_.texgen[0] = xf_word(xf::kTexGen);
-  prim_info_.texgen[1] = xf_word(xf::kTexGen + 1);
-  prim_info_.num_texgens = xf_word(xf::kNumTexGens);
-  prim_info_.dual_tex = xf_word(xf::kDualTex);
-  for (int k = 0; k < 6; ++k) {
-    prim_info_.array_base[k] = array_base_[static_cast<std::size_t>(k)];
-    prim_info_.array_stride[k] = array_stride_[static_cast<std::size_t>(k)];
+  if (keep_prim_info_) {
+    prim_info_.op = op;
+    prim_info_.count = count;
+    prim_info_.vertex_size = vsize;
+    prim_info_.vcd_lo = vcd_lo_;
+    prim_info_.vcd_hi = vcd_hi_;
+    prim_info_.vat[0] = vat_a_[fmt];
+    prim_info_.vat[1] = vat_b_[fmt];
+    prim_info_.vat[2] = vat_c_[fmt];
+    prim_info_.matidx[0] = matidx_a_;
+    prim_info_.matidx[1] = matidx_b_;
+    prim_info_.texgen[0] = xf_word(xf::kTexGen);
+    prim_info_.texgen[1] = xf_word(xf::kTexGen + 1);
+    prim_info_.num_texgens = xf_word(xf::kNumTexGens);
+    prim_info_.dual_tex = xf_word(xf::kDualTex);
+    for (int k = 0; k < 6; ++k) {
+      prim_info_.array_base[k] = array_base_[static_cast<std::size_t>(k)];
+      prim_info_.array_stride[k] = array_stride_[static_cast<std::size_t>(k)];
+    }
+    prim_info_.first_vertex.assign(data, data + vsize);
   }
-  prim_info_.first_vertex.assign(data, data + vsize);
 
-  DrawCall& d = draw_;
-  d.verts.clear();
-  d.u = DrawUniforms{};
-  snapshot(d);
+  // The pixel state: rebuilt only when a register it reads was written since
+  // the last draw (consecutive primitives usually share it).
+  if (snap_serial_ != state_serial_) {
+    d.u = DrawUniforms{};
+    snapshot(d);
+    snap_serial_ = state_serial_;
+    ++stats_.snapshots;
+  }
+  d.state = state_serial_;
+  std::vector<u32>& ix = d.index;
+  ix.clear();
   auto tri = [&](u32 a, u32 b, u32 c) {
-    d.verts.push_back(vs[a]);
-    d.verts.push_back(vs[b]);
-    d.verts.push_back(vs[c]);
+    ix.push_back(a);
+    ix.push_back(b);
+    ix.push_back(c);
   };
   Topology topo = Topology::Triangles;
   switch (kind) {
@@ -841,26 +854,26 @@ void GxProcessor::primitive(u8 op, const u8* data, u32 count) {
     case cmd::kLines:
       topo = Topology::Lines;
       for (u32 k = 0; k + 1 < count; k += 2) {
-        d.verts.push_back(vs[k]);
-        d.verts.push_back(vs[k + 1]);
+        ix.push_back(k);
+        ix.push_back(k + 1);
       }
       break;
     case cmd::kLineStrip:
       topo = Topology::Lines;
       for (u32 k = 1; k < count; ++k) {
-        d.verts.push_back(vs[k - 1]);
-        d.verts.push_back(vs[k]);
+        ix.push_back(k - 1);
+        ix.push_back(k);
       }
       break;
     default:  // points
       topo = Topology::Points;
-      d.verts = vs;
+      for (u32 k = 0; k < count; ++k) ix.push_back(k);
       break;
   }
   d.cfg.topology = static_cast<u8>(topo);
-  if (topo == Topology::Triangles) stats_.triangles += d.verts.size() / 3;
+  if (topo == Topology::Triangles) stats_.triangles += ix.size() / 3;
   ++stats_.draws;
-  if (backend_ && !d.verts.empty()) backend_->draw(d);
+  if (backend_ && !ix.empty()) backend_->draw(d);
 }
 
 }  // namespace mvp::gfx

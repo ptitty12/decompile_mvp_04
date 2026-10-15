@@ -83,7 +83,16 @@ class Capture : public Backend {
   std::vector<DrawCall> draws;
   std::vector<EfbCopy> copies;
   int invalidations = 0;
-  void draw(const DrawCall& d) override { draws.push_back(d); }
+  // Kept expanded (verts as the triangle/line/point list, E1's form); `raw` as sent.
+  std::vector<DrawCall> raw;
+  void draw(const DrawCall& d) override {
+    raw.push_back(d);
+    DrawCall e = d;
+    e.verts = d.expanded();
+    e.index.clear();
+    for (u32 k = 0; k < e.verts.size(); ++k) e.index.push_back(k);
+    draws.push_back(std::move(e));
+  }
   void efb_copy(const EfbCopy& c) override { copies.push_back(c); }
   void invalidate_textures() override { ++invalidations; }
 };

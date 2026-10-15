@@ -117,6 +117,47 @@ TEST_CASE("strips, fans, lines and points") {
   CHECK(cap.draws[3].cfg.topology == static_cast<u8>(Topology::Points));
 }
 
+TEST_CASE("draws carry each vertex once, with indices, and a pixel-state identity (E3c)") {
+  Capture cap;
+  GxProcessor p(&cap);
+  Stream s = setup_2d();
+  s.cp(cp::kVcdLo, 1u << 9);
+  s.cp(cp::kVatA, 0u /*xy*/ | 4u << 1);
+  std::vector<std::uint8_t> v;
+  for (int k = 0; k < 5; ++k) {
+    f32(v, static_cast<float>(k));
+    f32(v, 0);
+  }
+  std::vector<std::uint8_t> quad(v.begin(), v.begin() + 32);
+  s.prim(cmd::kTriStrip, 5, v);
+  s.prim(cmd::kQuads, 4, quad);
+  s.cp(cp::kMatIndexA, 0);              // CP and XF writes keep the pixel state
+  s.xf(xf::kNumColors, {0});
+  s.prim(cmd::kTriFan, 5, v);
+  s.bp(bp::kTevReg, 0);                 // any BP write starts a new one
+  s.prim(cmd::kTriFan, 5, v);
+  s.prim(cmd::kTriFan, 5, v);
+  s.run(p);
+  REQUIRE(cap.raw.size() == 5);
+  const DrawCall& strip = cap.raw[0];
+  CHECK(strip.verts.size() == 5);
+  CHECK(strip.index == std::vector<u32>{0, 1, 2, 2, 1, 3, 2, 3, 4});
+  const DrawCall& q = cap.raw[1];
+  CHECK(q.verts.size() == 4);
+  CHECK(q.index == std::vector<u32>{0, 1, 2, 0, 2, 3});
+  CHECK(q.expanded().size() == 6);
+  CHECK(q.expanded()[4].pos[0] == q.verts[2].pos[0]);
+  CHECK(cap.raw[0].state != 0);
+  CHECK(cap.raw[1].state == cap.raw[0].state);
+  CHECK(cap.raw[2].state == cap.raw[0].state);
+  CHECK(cap.raw[3].state != cap.raw[2].state);
+  CHECK(cap.raw[4].state == cap.raw[3].state);
+  // The rebuilt state equals the reused one when nothing changed.
+  CHECK(cap.raw[3].cfg == cap.raw[2].cfg);
+  CHECK(std::memcmp(&cap.raw[3].u, &cap.raw[2].u, sizeof(DrawUniforms)) == 0);
+  CHECK(p.stats().snapshots == 2);
+}
+
 TEST_CASE("indexed attributes from arrays, fixed-point formats, matrix indices") {
   std::vector<std::uint8_t> mem(0x10000, 0);
   // Positions at 0x1000: s16 xyz with 4 fractional bits, stride 6.

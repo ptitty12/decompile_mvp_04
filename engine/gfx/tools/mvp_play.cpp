@@ -18,7 +18,8 @@
 //   --capture DIR     write the scanned-out frame as DIR/field_N_frame_F.png (VI field N,
 //                     game frame poll F, the number input scripts use) every
 //                     --capture-every N fields (default 60) and at the --capture-at
-//                     fields; only frames that changed since the last capture
+//                     fields (--capture-from N: periodic captures from VI field N on);
+//                     only frames that changed since the last capture
 //   --draw-log FILE   one line per draw and EFB copy (state, textures) from VI field
 //                     --draw-log-from N (default 0) to --draw-log-to N
 //   --dump-textures DIR at VI field --dump-field N: every texture each draw
@@ -27,6 +28,9 @@
 //   --perf-every N    print guest and host seconds every N VI fields (speed per stretch)
 //   --profile N       sample the guest PC (a host thread); print the N busiest functions
 //                     (--profile-from F: from VI field F on)
+//   --host-profile N  (Windows) sample the host thread's instruction pointer; print the N
+//                     busiest host functions (translated guest code as one bucket),
+//                     from --profile-from on
 //   --trace-entry A,B registers and memory at r3/r4 at each entry of those functions (hex
 //                     addresses), from VI field --trace-from to --trace-to, to --trace-file;
 //                     --trace-peek O1,O2: also the words at r3 + those (hex) offsets
@@ -69,6 +73,7 @@
 #include "gfx/wgpu/gpu.h"
 #include "gfx/wgpu/renderer.h"
 #include "gfx/wgpu/window.h"
+#include "host_profiler.h"
 #include "mods/mount.h"
 #include "runtime/boot.h"
 #include "runtime/hle.h"
@@ -118,9 +123,9 @@ struct DrawLog : gfx::Backend {
   void draw(const gfx::DrawCall& d) override {
     if (on()) {
       const gfx::PipelineConfig& c = d.cfg;
-      std::fprintf(f, "field %llu draw %zu verts topo %u stages %u texgens %u chans %u ind %u blend %u/%u/%u/%u z %u/%u/%u "
+      std::fprintf(f, "field %llu draw %zu verts %zu indices topo %u stages %u texgens %u chans %u ind %u blend %u/%u/%u/%u z %u/%u/%u "
                    "cull %u fmt %u acmp %u/%u/%u ref %d/%d logic %u/%u fog %u scissor %u,%u-%u,%u\n",
-                   static_cast<unsigned long long>(*field), d.verts.size(), c.topology, c.num_stages, c.num_texgens,
+                   static_cast<unsigned long long>(*field), d.verts.size(), d.index.size(), c.topology, c.num_stages, c.num_texgens,
                    c.num_chans, c.num_ind, c.blend_enable, c.blend_src, c.blend_dst, c.blend_sub, c.z_enable, c.z_func,
                    c.z_update, c.cull, c.pixel_format, c.alpha_comp0, c.alpha_comp1, c.alpha_logic, d.u.alpha_ref[0],
                    d.u.alpha_ref[1], c.logic_enable, c.logic_op, c.fog_type, d.scissor[0], d.scissor[1], d.scissor[2],
@@ -183,7 +188,7 @@ struct Play : GfxObserver {
   audio::SdlAudioOut* audio_out = nullptr;
   std::uint64_t present_every = 1, max_fields = ~0ull;
   std::string capture_dir;
-  std::uint64_t capture_every = 60;
+  std::uint64_t capture_every = 60, capture_from = 0;
   std::set<std::uint64_t> capture_at;
   std::uint64_t last_capture_serial = 0, captures = 0, fields = 0, presents = 0;
   std::uint64_t frames = 0, max_frames = ~0ull;
@@ -226,7 +231,7 @@ struct Play : GfxObserver {
       }
     }
     if (!capture_dir.empty() && f && f->serial != last_capture_serial &&
-        (field % capture_every == 0 || capture_at.count(field))) {
+        ((field >= capture_from && field % capture_every == 0) || capture_at.count(field))) {
       auto px = renderer->read_frame(*f);
       char name[64];
       std::snprintf(name, sizeof name, "/field_%06llu_frame_%06llu.png", static_cast<unsigned long long>(field),
@@ -349,7 +354,7 @@ int main(int argc, char** argv) {
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
   bool headless = false, no_render = false, yield = false;
-  int profile_top = 0;
+  int profile_top = 0, host_profile_top = 0;
   std::uint64_t profile_from = 0;
   std::string trace_entry, trace_file;
   std::vector<std::string> packs;
@@ -369,6 +374,7 @@ int main(int argc, char** argv) {
     else if (a == "--capture") play.capture_dir = next();
     else if (a == "--capture-every") play.capture_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
     else if (a == "--capture-at") capture_at = next();
+    else if (a == "--capture-from") play.capture_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--draw-log") draw_log_path = next();
     else if (a == "--draw-log-from") draw_log_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--draw-log-to") draw_log_to = std::strtoull(next().c_str(), nullptr, 10);
@@ -378,6 +384,7 @@ int main(int argc, char** argv) {
     else if (a == "--perf-every") play.perf_every = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--profile") profile_top = std::atoi(next().c_str());
     else if (a == "--profile-from") profile_from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--host-profile") host_profile_top = std::atoi(next().c_str());
     else if (a == "--trace-entry") trace_entry = next();
     else if (a == "--trace-file") trace_file = next();
     else if (a == "--trace-from") g_trace.from = std::strtoull(next().c_str(), nullptr, 10);
@@ -390,9 +397,9 @@ int main(int argc, char** argv) {
     else {
       std::fprintf(stderr,
                    "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
-                   "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
+                   "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-from N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
-                   "[--perf-every N] [--profile N [--profile-from F]] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
+                   "[--perf-every N] [--profile N] [--host-profile N] [--profile-from F] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
                    "[--trace-to N] [--trace-peek HEX,...]] [--audio-wav FILE] [--no-audio] [--audio-latency MS] [--pack PATH]...\n");
       return 2;
     }
@@ -489,6 +496,7 @@ int main(int argc, char** argv) {
   const bool wrap = draw_log.f || !dump_dir.empty();
   gfx::GxProcessor proc(wrap ? static_cast<gfx::Backend*>(&draw_log) : renderer);
   draw_log.proc = &proc;
+  proc.set_keep_primitive_info(draw_log.f != nullptr);
   proc.set_memory(m.mem1(), Machine::kMem1Size);
   play.proc = &proc;
   play.renderer = renderer;
@@ -547,6 +555,8 @@ int main(int argc, char** argv) {
   int rc = 0;
   GuestProfiler profiler;
   if (profile_top > 0) profiler.start(&m.cpu(), &play.fields, profile_from);
+  tools::HostProfiler host_profiler;
+  if (host_profile_top > 0) host_profiler.start(&play.fields, profile_from);
   try {
     for (;;) rt::run(m.cpu());  // returns at each VI field with --yield
   } catch (const StopRun& s) {
@@ -557,6 +567,7 @@ int main(int argc, char** argv) {
   }
   const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
   if (profile_top > 0) profiler.finish(in->symbols, profile_top);
+  if (host_profile_top > 0) host_profiler.finish(host_profile_top);
   hw.set_gfx_observer(nullptr);
   hw.set_ax_observer(nullptr);
   rt::g_input = nullptr;
@@ -608,17 +619,19 @@ int main(int argc, char** argv) {
   if (!renderer) return rc;
   const auto& ps = proc.stats();
   std::printf("gx: %llu commands, %llu draws, %llu vertices, %llu triangles, %llu EFB copies (%llu to the XFB), "
-              "%llu TLUT loads, %llu unknown\n",
+              "%llu TLUT loads, %llu unknown; %llu state snapshots\n",
               ull(ps.commands), ull(ps.draws), ull(ps.vertices), ull(ps.triangles), ull(ps.copies), ull(ps.xfb_copies),
-              ull(ps.tlut_loads), ull(ps.unknown));
+              ull(ps.tlut_loads), ull(ps.unknown), ull(ps.snapshots));
   const auto& rs = renderer->stats();
   std::printf("renderer: %llu draws (%llu skipped, %llu merged into the one before; %llu encoded), %llu passes, "
               "%llu pipelines, %llu textures decoded, %llu hits, "
               "%llu EFB-copy textures used, %llu texture copies, %llu clears; %llu unknown formats, "
-              "%llu indirect draws, %llu fog draws\n",
+              "%llu indirect draws, %llu fog draws; %llu with the previous draw's state; uploaded %.1f MB of vertices, "
+              "%.1f MB of indices\n",
               ull(rs.draws), ull(rs.skipped), ull(rs.merged), ull(rs.encoded), ull(rs.passes), ull(rs.pipelines),
               ull(rs.textures_decoded), ull(rs.texture_hits), ull(rs.copy_textures_used), ull(rs.tex_copies),
-              ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws));
+              ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws), ull(rs.same_state),
+              static_cast<double>(rs.vertex_bytes) / 1e6, static_cast<double>(rs.index_bytes) / 1e6);
   std::printf("display: %llu presents, %llu captures%s%s; WebGPU errors %llu\n", ull(play.presents), ull(play.captures),
               play.capture_dir.empty() ? "" : " in ", play.capture_dir.c_str(), ull(gpu->errors()));
   if (gpu->errors() || ps.xfb_copies == 0) rc = 1;

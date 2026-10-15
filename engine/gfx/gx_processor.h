@@ -98,6 +98,7 @@ class GxProcessor {
   struct Stats {
     std::uint64_t commands = 0, draws = 0, vertices = 0, triangles = 0, copies = 0, xfb_copies = 0;
     std::uint64_t tlut_loads = 0, xf_indexed = 0, unknown = 0;
+    std::uint64_t snapshots = 0;  // draws whose pixel state was rebuilt (the others reuse the last one)
   };
   const Stats& stats() const { return stats_; }
 
@@ -111,6 +112,8 @@ class GxProcessor {
     std::vector<u8> first_vertex;
   };
   const PrimInfo& last_primitive() const { return prim_info_; }
+  // Fill last_primitive() at every draw (off by default: it costs a copy per draw).
+  void set_keep_primitive_info(bool on) { keep_prim_info_ = on; }
 
  private:
   void load_bp(u32 value);
@@ -140,6 +143,10 @@ class GxProcessor {
   std::vector<u8> tlut_;  // TMEM's palette half: 512 KiB
   Stats stats_;
   PrimInfo prim_info_;
+  bool keep_prim_info_ = false;
+  // Bumped by every write that snapshot() depends on (BP registers, TLUT loads);
+  // a draw with the serial of the last snapshot reuses it (E3c).
+  std::uint64_t state_serial_ = 1, snap_serial_ = 0;
   // Reused per primitive (no allocation per draw).
   XformSetup xs_;
   std::vector<OutVertex> vs_;

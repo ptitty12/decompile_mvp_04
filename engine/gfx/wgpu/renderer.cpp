@@ -14,6 +14,7 @@ namespace {
 
 constexpr std::uint32_t kUniformSlot = 512;              // DrawUniforms (416 bytes), 256-aligned
 constexpr std::uint64_t kVertexCapacity = 16u << 20;     // per pass
+constexpr std::uint64_t kIndexCapacity = 8u << 20;       // per pass (2 Mi indices)
 constexpr std::uint64_t kUniformCapacity = 2u << 20;     // per pass (4,096 draws)
 
 std::uint64_t mix64(std::uint64_t h) {
@@ -196,6 +197,10 @@ Renderer::Renderer(Gpu& gpu, const std::uint8_t* mem, std::uint32_t mem_size)
   b.usage = wgpu::BufferUsage::Vertex | wgpu::BufferUsage::CopyDst;
   b.label = "vertices";
   vbuf_ = dev.CreateBuffer(&b);
+  b.size = kIndexCapacity;
+  b.usage = wgpu::BufferUsage::Index | wgpu::BufferUsage::CopyDst;
+  b.label = "indices";
+  ibuf_ = dev.CreateBuffer(&b);
   b.size = kUniformCapacity;
   b.usage = wgpu::BufferUsage::Uniform | wgpu::BufferUsage::CopyDst;
   b.label = "uniforms";
@@ -343,10 +348,11 @@ void Renderer::begin_pass() {
   ++pass_serial_;
   vdata_.clear();
   udata_.clear();
+  idata_.clear();
   bound_pipeline_ = bound_textures_ = nullptr;
   bound_uoff_ = ~0u;
   bound_scissor_[0] = bound_scissor_[1] = bound_scissor_[2] = bound_scissor_[3] = ~0u;
-  bound_vbuf_ = false;
+  bound_vbuf_ = bound_ibuf_ = false;
   ++stats_.passes;
 }
 
@@ -369,12 +375,16 @@ void Renderer::emit_pending() {
     pass_.SetVertexBuffer(0, vbuf_, 0, kVertexCapacity);
     bound_vbuf_ = true;
   }
+  if (!bound_ibuf_) {
+    pass_.SetIndexBuffer(ibuf_, wgpu::IndexFormat::Uint32, 0, kIndexCapacity);
+    bound_ibuf_ = true;
+  }
   if (std::memcmp(bound_scissor_, pending_.scissor, sizeof bound_scissor_) != 0) {
     pass_.SetScissorRect(pending_.scissor[0], pending_.scissor[1], pending_.scissor[2] - pending_.scissor[0],
                          pending_.scissor[3] - pending_.scissor[1]);
     std::memcpy(bound_scissor_, pending_.scissor, sizeof bound_scissor_);
   }
-  pass_.Draw(pending_.count, 1, pending_.first, 0);
+  pass_.DrawIndexed(pending_.index_count, 1, pending_.first_index, static_cast<std::int32_t>(pending_.base), 0);
   ++stats_.encoded;
 }
 
@@ -384,34 +394,50 @@ void Renderer::flush() {
   pass_.End();
   pass_ = nullptr;
   if (!vdata_.empty()) gpu_.queue().WriteBuffer(vbuf_, 0, vdata_.data(), vdata_.size());
+  if (!idata_.empty()) gpu_.queue().WriteBuffer(ibuf_, 0, idata_.data(), idata_.size() * 4);
   if (!udata_.empty()) gpu_.queue().WriteBuffer(ubuf_, 0, udata_.data(), udata_.size());
+  stats_.vertex_bytes += vdata_.size();
+  stats_.index_bytes += idata_.size() * 4;
   wgpu::CommandBuffer cb = encoder_.Finish();
   gpu_.queue().Submit(1, &cb);
   encoder_ = nullptr;
   pass_open_ = false;
 }
 
-wgpu::RenderPipeline Renderer::pipeline(const PipelineConfig& c) {
+const Renderer::Pipeline& Renderer::pipeline(const PipelineConfig& c) {
   auto it = pipelines_.find(c);
   if (it != pipelines_.end()) return it->second;
   std::string wgsl = generate_wgsl(c);
   wgpu::ShaderModule& sm = modules_[wgsl];
   if (!sm) sm = gpu_.shader(wgsl, "tev");
 
+  // Only the attributes the shader reads, packed (tev_wgsl.h).
+  Pipeline info;
+  info.attrs = vertex_attrs(c);
+  info.stride = vertex_stride(info.attrs);
   wgpu::VertexAttribute attrs[11]{};
-  for (std::uint32_t k = 0; k < 11; ++k) {
-    attrs[k].shaderLocation = k;
-    if (k < 3) {
-      attrs[k].format = wgpu::VertexFormat::Float32x4;
-      attrs[k].offset = 16ull * k;
-    } else {
-      attrs[k].format = wgpu::VertexFormat::Float32x3;
-      attrs[k].offset = 48ull + 12ull * (k - 3);
+  std::uint32_t na = 0, off = 0;
+  attrs[na].shaderLocation = 0;
+  attrs[na].format = wgpu::VertexFormat::Float32x4;
+  attrs[na++].offset = off;
+  off += 16;
+  for (std::uint32_t k = 0; k < 2; ++k)
+    if (info.attrs & (1u << k)) {
+      attrs[na].shaderLocation = 1 + k;
+      attrs[na].format = wgpu::VertexFormat::Float32x4;
+      attrs[na++].offset = off;
+      off += 16;
     }
-  }
+  for (std::uint32_t k = 0; k < 8; ++k)
+    if (info.attrs & (4u << k)) {
+      attrs[na].shaderLocation = 3 + k;
+      attrs[na].format = wgpu::VertexFormat::Float32x3;
+      attrs[na++].offset = off;
+      off += 12;
+    }
   wgpu::VertexBufferLayout vbl{};
-  vbl.arrayStride = sizeof(OutVertex);
-  vbl.attributeCount = 11;
+  vbl.arrayStride = info.stride;
+  vbl.attributeCount = na;
   vbl.attributes = attrs;
 
   const bool has_alpha = efb_has_alpha(c.pixel_format);
@@ -464,10 +490,9 @@ wgpu::RenderPipeline Renderer::pipeline(const PipelineConfig& c) {
                           : c.cull == 1               ? wgpu::CullMode::Back
                           : c.cull == 2               ? wgpu::CullMode::Front
                                                       : wgpu::CullMode::None;
-  wgpu::RenderPipeline p = gpu_.device().CreateRenderPipeline(&pd);
-  pipelines_.emplace(c, p);
+  info.pipe = gpu_.device().CreateRenderPipeline(&pd);
   ++stats_.pipelines;
-  return p;
+  return pipelines_.emplace(c, std::move(info)).first->second;
 }
 
 std::uint64_t Renderer::hash_memory(std::uint32_t addr, std::uint32_t size) const {
@@ -588,94 +613,145 @@ void Renderer::draw(const DrawCall& d) {
     ++stats_.skipped;
     return;
   }
-  if (d.scissor[2] <= d.scissor[0] || d.scissor[3] <= d.scissor[1]) {
+  if (d.scissor[2] <= d.scissor[0] || d.scissor[3] <= d.scissor[1] || d.index.empty()) {
     ++stats_.skipped;
     return;
   }
-  const std::size_t vbytes = d.verts.size() * sizeof(OutVertex);
-  if (vbytes > kVertexCapacity) {
+  // Room for the largest layout (144 bytes per vertex, plus alignment).
+  const std::size_t vmax = (d.verts.size() + 1) * sizeof(OutVertex);
+  const std::size_t ibytes = d.index.size() * sizeof(std::uint32_t);
+  if (vmax > kVertexCapacity || ibytes > kIndexCapacity) {
     ++stats_.skipped;
     return;
   }
-  if (pass_open_ && (vdata_.size() + vbytes > kVertexCapacity || udata_.size() + kUniformSlot > kUniformCapacity))
+  if (pass_open_ && (vdata_.size() + vmax > kVertexCapacity || idata_.size() * 4 + ibytes > kIndexCapacity ||
+                     udata_.size() + kUniformSlot > kUniformCapacity))
     flush();
-  // Textures first: decoding uploads with the queue, which must precede the pass's submit (it does).
-  wgpu::BindGroupEntry te[16]{};
-  for (int k = 0; k < 8; ++k) {
-    te[k].binding = static_cast<std::uint32_t>(k);
-    te[k].textureView = dummy_view_;
-    te[8 + k].binding = static_cast<std::uint32_t>(8 + k);
-    te[8 + k].sampler = dummy_sampler_;
-  }
-  DrawUniforms u = d.u;
-  for (int k = 0; k < 8; ++k) {
-    const TextureDesc& t = d.tex[static_cast<std::size_t>(k)];
-    if (!t.valid) continue;
-    std::uint32_t w = 0, h = 0;
-    te[k].textureView = texture(t, &w, &h);
-    te[8 + k].sampler = sampler(t);
-  }
-  for (int s = 0; s < c.num_stages; ++s)
-    if (c.stages[s].ind_cmd) {
-      ++stats_.indirect_draws;
-      break;
+
+  // The same pixel state as the previous draw, in the same pass and texture
+  // epoch: its pipeline, textures and constants (nothing they come from changed).
+  const bool same = d.state != 0 && d.state == last_.state && c.topology == last_.topology && pass_open_ &&
+                    pass_serial_ == last_.pass && epoch_ == last_.epoch;
+  if (same) {
+    ++stats_.same_state;
+  } else {
+    // Textures first: decoding uploads with the queue, which must precede the pass's submit (it does).
+    wgpu::BindGroupEntry te[16]{};
+    for (int k = 0; k < 8; ++k) {
+      te[k].binding = static_cast<std::uint32_t>(k);
+      te[k].textureView = dummy_view_;
+      te[8 + k].binding = static_cast<std::uint32_t>(8 + k);
+      te[8 + k].sampler = dummy_sampler_;
     }
-  if (c.fog_type) ++stats_.fog_draws;
-  wgpu::RenderPipeline p = pipeline(c);
-  // Texture bind groups by their views and samplers. A cached group holds
-  // references to its views, so a handle's identity is never reused while the
-  // entry exists.
-  std::array<const void*, 16> key{};
-  for (int k = 0; k < 8; ++k) {
-    key[static_cast<std::size_t>(k)] = te[k].textureView.Get();
-    key[static_cast<std::size_t>(8 + k)] = te[8 + k].sampler.Get();
+    for (int k = 0; k < 8; ++k) {
+      const TextureDesc& t = d.tex[static_cast<std::size_t>(k)];
+      if (!t.valid) continue;
+      std::uint32_t w = 0, h = 0;
+      te[k].textureView = texture(t, &w, &h);
+      te[8 + k].sampler = sampler(t);
+    }
+    last_.indirect = false;
+    for (int s = 0; s < c.num_stages; ++s)
+      if (c.stages[s].ind_cmd) {
+        last_.indirect = true;
+        break;
+      }
+    last_.fog = c.fog_type != 0;
+    last_.pipe = &pipeline(c);
+    // Texture bind groups by their views and samplers. A cached group holds
+    // references to its views, so a handle's identity is never reused while the
+    // entry exists.
+    std::array<const void*, 16> key{};
+    for (int k = 0; k < 8; ++k) {
+      key[static_cast<std::size_t>(k)] = te[k].textureView.Get();
+      key[static_cast<std::size_t>(8 + k)] = te[8 + k].sampler.Get();
+    }
+    if (bind_groups_.size() > 4096) bind_groups_.clear();
+    wgpu::BindGroup& tg = bind_groups_[key];
+    if (!tg) {
+      wgpu::BindGroupDescriptor bgd{};
+      bgd.layout = bgl_textures_;
+      bgd.entryCount = 16;
+      bgd.entries = te;
+      tg = gpu_.device().CreateBindGroup(&bgd);
+    }
+    last_.textures = tg;
   }
-  if (bind_groups_.size() > 4096) bind_groups_.clear();
-  wgpu::BindGroup& tg = bind_groups_[key];
-  if (!tg) {
-    wgpu::BindGroupDescriptor bgd{};
-    bgd.layout = bgl_textures_;
-    bgd.entryCount = 16;
-    bgd.entries = te;
-    tg = gpu_.device().CreateBindGroup(&bgd);
-  }
+  if (last_.indirect) ++stats_.indirect_draws;
+  if (last_.fog) ++stats_.fog_draws;
+  const Pipeline& pl = *last_.pipe;
 
   begin_pass();
-  const std::uint64_t voff = vdata_.size();
-  const std::uint32_t n = static_cast<std::uint32_t>(d.verts.size());
+  last_.state = d.state;
+  last_.topology = c.topology;
+  last_.pass = pass_serial_;
+  last_.epoch = epoch_;
   ++stats_.draws;
-  // The same state as the recorded draw, whose vertices end where these begin:
-  // one draw for both.
-  if (pending_.active && pending_.pipeline.Get() == p.Get() && pending_.textures.Get() == tg.Get() &&
-      std::memcmp(pending_.scissor, d.scissor, sizeof pending_.scissor) == 0 &&
-      std::memcmp(&pending_.u, &u, sizeof u) == 0 &&
-      static_cast<std::uint64_t>(pending_.first + pending_.count) * sizeof(OutVertex) == voff) {
-    vdata_.resize(vdata_.size() + vbytes);
-    std::memcpy(vdata_.data() + voff, d.verts.data(), vbytes);
-    pending_.count += n;
+  const std::uint32_t stride = pl.stride;
+  // The same state as the recorded draw: append to it. Otherwise record a new
+  // draw whose vertices start at a multiple of its stride.
+  const bool merge = pending_.active && pending_.pipeline.Get() == pl.pipe.Get() &&
+                     pending_.textures.Get() == last_.textures.Get() &&
+                     ((d.state != 0 && pending_.state == d.state) ||
+                      (std::memcmp(pending_.scissor, d.scissor, sizeof pending_.scissor) == 0 &&
+                       std::memcmp(&pending_.u, &d.u, sizeof d.u) == 0));
+  if (merge) {
     ++stats_.merged;
-    return;
-  }
-  emit_pending();
-  // A new uniform slot unless the constants are those of the draw before.
-  std::uint32_t uoff;
-  if (!udata_.empty() && std::memcmp(udata_.data() + (udata_.size() - kUniformSlot), &u, sizeof u) == 0) {
-    uoff = static_cast<std::uint32_t>(udata_.size() - kUniformSlot);
   } else {
-    uoff = static_cast<std::uint32_t>(udata_.size());
-    udata_.resize(udata_.size() + kUniformSlot, 0);
-    std::memcpy(udata_.data() + uoff, &u, sizeof u);
+    emit_pending();
+    // A new uniform slot unless the constants are those of the draw before.
+    std::uint32_t uoff;
+    if (!udata_.empty() && std::memcmp(udata_.data() + (udata_.size() - kUniformSlot), &d.u, sizeof d.u) == 0) {
+      uoff = static_cast<std::uint32_t>(udata_.size() - kUniformSlot);
+    } else {
+      uoff = static_cast<std::uint32_t>(udata_.size());
+      udata_.resize(udata_.size() + kUniformSlot, 0);
+      std::memcpy(udata_.data() + uoff, &d.u, sizeof d.u);
+    }
+    const std::size_t base = (vdata_.size() + stride - 1) / stride;
+    vdata_.resize(base * stride);
+    pending_.active = true;
+    pending_.pipeline = pl.pipe;
+    pending_.textures = last_.textures;
+    pending_.uoff = uoff;
+    pending_.first_index = static_cast<std::uint32_t>(idata_.size());
+    pending_.index_count = 0;
+    pending_.base = static_cast<std::uint32_t>(base);
+    pending_.vertices = 0;
+    pending_.stride = stride;
+    std::memcpy(pending_.scissor, d.scissor, sizeof pending_.scissor);
+    pending_.u = d.u;
   }
-  vdata_.resize(vdata_.size() + vbytes);
-  std::memcpy(vdata_.data() + voff, d.verts.data(), vbytes);
-  pending_.active = true;
-  pending_.pipeline = p;
-  pending_.textures = tg;
-  pending_.uoff = uoff;
-  pending_.first = static_cast<std::uint32_t>(voff / sizeof(OutVertex));
-  pending_.count = n;
-  std::memcpy(pending_.scissor, d.scissor, sizeof pending_.scissor);
-  pending_.u = u;
+  pending_.state = d.state;
+  // Vertices, packed to the pipeline's layout.
+  const std::size_t voff = vdata_.size();
+  vdata_.resize(voff + d.verts.size() * stride);
+  std::uint8_t* out = vdata_.data() + voff;
+  const std::uint32_t attrs = pl.attrs;
+  for (const OutVertex& v : d.verts) {
+    std::memcpy(out, v.pos, 16);
+    out += 16;
+    if (attrs & 1u) {
+      std::memcpy(out, v.color[0], 16);
+      out += 16;
+    }
+    if (attrs & 2u) {
+      std::memcpy(out, v.color[1], 16);
+      out += 16;
+    }
+    for (int k = 0; k < 8; ++k)
+      if (attrs & (4u << k)) {
+        std::memcpy(out, v.tex[k], 12);
+        out += 12;
+      }
+  }
+  // Indices, relative to the recorded draw's first vertex.
+  const std::uint32_t first = pending_.vertices;
+  const std::size_t ioff = idata_.size();
+  idata_.resize(ioff + d.index.size());
+  for (std::size_t k = 0; k < d.index.size(); ++k) idata_[ioff + k] = first + d.index[k];
+  pending_.index_count += static_cast<std::uint32_t>(d.index.size());
+  pending_.vertices += static_cast<std::uint32_t>(d.verts.size());
 }
 
 void Renderer::clear_efb(const EfbCopy& c) {

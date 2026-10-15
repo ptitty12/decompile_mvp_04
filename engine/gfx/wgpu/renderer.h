@@ -58,11 +58,17 @@ class Renderer : public Backend {
     std::uint64_t copy_textures_used = 0, xfb_copies = 0, tex_copies = 0, clears = 0;
     std::uint64_t unknown_formats = 0, indirect_draws = 0, fog_draws = 0;
     std::uint64_t merged = 0, encoded = 0;  // draws appended to the previous one; WebGPU draws encoded
+    std::uint64_t same_state = 0;           // draws that reused the previous draw's resolved state
+    std::uint64_t vertex_bytes = 0, index_bytes = 0;  // uploaded
   };
   const Stats& stats() const { return stats_; }
 
  private:
-  struct Pipeline;
+  // A pipeline and its vertex layout (which attributes, the stride).
+  struct Pipeline {
+    wgpu::RenderPipeline pipe;
+    std::uint32_t attrs = 0, stride = 16;
+  };
   struct TexEntry;
   struct CopyEntry;
   struct CfgHash {
@@ -71,7 +77,7 @@ class Renderer : public Backend {
 
   void begin_pass();
   void emit_pending();
-  wgpu::RenderPipeline pipeline(const PipelineConfig& c);
+  const Pipeline& pipeline(const PipelineConfig& c);
   wgpu::TextureView texture(const TextureDesc& t, std::uint32_t* w, std::uint32_t* h);
   wgpu::Sampler sampler(const TextureDesc& t);
   void clear_efb(const EfbCopy& c);
@@ -86,7 +92,7 @@ class Renderer : public Backend {
   wgpu::TextureView efb_color_view_, efb_depth_view_;
   wgpu::BindGroupLayout bgl_uniforms_, bgl_textures_;
   wgpu::PipelineLayout layout_;
-  wgpu::Buffer vbuf_, ubuf_;
+  wgpu::Buffer vbuf_, ubuf_, ibuf_;
   wgpu::BindGroup uniform_group_;
   wgpu::Texture dummy_tex_;
   wgpu::TextureView dummy_view_;
@@ -98,25 +104,39 @@ class Renderer : public Backend {
   bool pass_open_ = false;
   std::uint64_t pass_serial_ = 0;
   std::vector<std::uint8_t> vdata_, udata_;
+  std::vector<std::uint32_t> idata_;
   // The last draw, recorded but not encoded yet: a next draw with the same
-  // pipeline, textures, constants and scissor appends its vertices to it (the
-  // game sends thousands of small primitives with one state).
+  // pipeline, textures, constants and scissor appends its vertices and indices
+  // to it (the game sends thousands of small primitives with one state). Its
+  // vertices start at `base` (in strides) in the pass's vertex buffer.
   struct Pending {
     bool active = false;
     wgpu::RenderPipeline pipeline;
     wgpu::BindGroup textures;
-    std::uint32_t uoff = 0, first = 0, count = 0;
+    std::uint32_t uoff = 0, first_index = 0, index_count = 0, base = 0, vertices = 0, stride = 0;
     std::uint32_t scissor[4] = {};
+    std::uint64_t state = 0;
     DrawUniforms u;
   } pending_;
+  // The previous draw's resolved state (E3c): a draw with the same nonzero
+  // DrawCall::state and topology, in the same open pass and texture epoch,
+  // samples the same textures with the same pipeline and constants.
+  struct Last {
+    std::uint64_t state = 0, pass = 0, epoch = 0;
+    std::uint8_t topology = 0xFF;
+    const Pipeline* pipe = nullptr;
+    wgpu::BindGroup textures;
+    bool indirect = false, fog = false;
+  } last_;
   // What the open pass has bound, to skip repeated state.
   const void* bound_pipeline_ = nullptr;
   const void* bound_textures_ = nullptr;
   std::uint32_t bound_uoff_ = ~0u;
   std::uint32_t bound_scissor_[4] = {};
   bool bound_vbuf_ = false;
+  bool bound_ibuf_ = false;
 
-  std::unordered_map<PipelineConfig, wgpu::RenderPipeline, CfgHash> pipelines_;
+  std::unordered_map<PipelineConfig, Pipeline, CfgHash> pipelines_;
   std::unordered_map<std::string, wgpu::ShaderModule> modules_;
   std::map<std::uint64_t, std::unique_ptr<TexEntry>> textures_;
   std::map<std::uint32_t, std::unique_ptr<CopyEntry>> copies_;  // EFB copies to textures, by address
