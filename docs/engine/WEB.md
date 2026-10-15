@@ -85,7 +85,12 @@ Everything below is run by agents; the owner never runs commands.
    isolated page), `--no-isolation`, `--digest` (the renderer digest of every field,
    written to `digest-BROWSER-rN.txt`) and `--cast-size WxH` (small JPEG screencast
    frames that keep up at 60 fps); the summary says whether the page was
-   cross-origin isolated and whether the render thread drew; `netplay_check.mjs
+   cross-origin isolated and whether the render thread drew; Q2 adds `--host-slow N[@F]`
+   (a machine N times slower, simulated from field F: the engine's threads spin N - 1
+   times their working time and DevTools throttles the main thread, `hostSlow=N`,
+   `hostSlowFrom=F`), `--affinity HEXMASK` (the browser on chosen logical processors)
+   and `--load N` (busy processes), and the worklet's gap, stretch and target
+   statistics in every window; `netplay_check.mjs
    --server-disc` runs E5's two-page check the deployment's way. It starts the server, opens the page with Playwright,
    and writes `summary-BROWSER[-TAG].json` and the screenshots to `--out`
    (default `build/engine/web-check`; screenshots are game-derived and stay under
@@ -119,8 +124,9 @@ Everything below is run by agents; the owner never runs commands.
  requestAnimationFrame -- tick (fallback) --> paced loop: mvp_run_fields(n), mvp_present()
  status, progress, log, errors <-- messages - phases, stats, first frame, guest line
  AudioContext (after the first gesture)       OPFS: the translated module (DOL SHA-1 + build id)
-   AudioWorkletNode <==== MessageChannel ==== each batch's mixed frames (Int16Array, transferred)
-     drift resampler 32 -> 48 kHz
+   AudioWorkletNode <==== ring in shared memory (Q2; isolated pages) ==== the mixer, as it mixes
+                    <==== MessageChannel (no isolation) ==== each batch's frames (Int16Array, transferred)
+     drift resampler 32 -> 48 kHz, time-stretch when behind (Q2)
      -> gain -> speakers; -> AnalyserNode (level probe)
 ```
 
@@ -184,7 +190,12 @@ Everything below is run by agents; the owner never runs commands.
   it exists, else a tick message from the page's) runs as many whole VI fields as
   the wall clock asks for at 59.94 fields/s, at most 4 per frame; if the game falls
   more than 8 fields behind (the intro movie, a slow stretch) the debt is dropped
-  instead of racing. Then `mvp_present()` draws the field's frame. `fast=1` runs
+  instead of racing. Then `mvp_present()` draws the field's frame. (Q2) In the
+  threaded engine, while the host time per field (smoothed over about a second) is a
+  whole field or more, every batch is one field with its present, back to back, and
+  the clock runs at most two fields ahead: on a machine that cannot keep up the game
+  runs evenly in slow motion with every frame shown (the sound stretches to match)
+  instead of in two-field jumps. `fast=1` runs
   fields back to back for 40 ms per task instead (measurements). **Wall time
   decides only how many fields run, never what happens inside one**: guest state
   depends on the disc and the per-frame pad inputs alone.
@@ -254,20 +265,27 @@ Everything below is run by agents; the owner never runs commands.
   after a user gesture, so the page creates the AudioContext on the first
   pointer press, key press or touch (a hint says so; gamepad buttons do not
   count as a gesture), adds the worklet and gives one end of a MessageChannel to
-  the worklet and the other to the Worker; the Worker then attaches the mixer
-  and, after each run batch, posts the batch's frames (16-bit stereo at the AI's
-  rate, 32 kHz; the buffer transferred) straight to the worklet. The worklet's
-  drift resampler is the native one's design (`audio/drift.h`): it reads at
-  32000 / the context's rate (usually 48 kHz) times a ratio within +-0.5 %,
-  steered by its smoothed fill toward a 60 ms target, with cubic (Catmull-Rom)
-  interpolation; dry, it fades out and waits for the target again; more than 4 x
-  the target, it skips down to it; full, it drops. An AnalyserNode taps its
-  output (`window.mvp.audioProbe()`); M or the Sound button mutes. **Why a
-  MessagePort and no SharedArrayBuffer:** a SAB ring needs cross-origin isolation
-  (COOP/COEP headers) on every server that serves the page (since P2 they are
-  sent, for the render thread, but the fallback engine runs without them), and
-  would not lower the latency, which the Worker's batches (one animation frame)
-  and the device set. Nothing goes back from the worklet to the Worker.
+  the worklet and the other to the Worker; the Worker then attaches the mixer.
+  **The frames' way (Q2):** on a cross-origin isolated page they go through a ring
+  in shared memory (`wasm/web_audio.h` `AudioRing`), which the worklet drains at
+  every render quantum: the threaded engine's mixer writes into a ring in the
+  engine's own (shared) memory as it mixes, inside the run; the single-threaded
+  engine's Worker copies each run batch into a SharedArrayBuffer ring of its own.
+  Without isolation (or `audioRing=0`) the Worker posts each batch's frames (16-bit
+  stereo at the AI's rate, 32 kHz; the buffer transferred) through the channel, as
+  E2c did. The worklet's drift resampler is the native one's design
+  (`audio/drift.h`): it reads at 32000 / the context's rate (usually 48 kHz) times a
+  ratio within +-0.5 %, steered by its smoothed fill toward a 60 ms target, with
+  cubic (Catmull-Rom) interpolation. **When the emulation runs behind (Q2)** the
+  buffer would empty over and over (sound on, off, on, off): once it falls well
+  under the target the input is time-stretched with its pitch kept (contiguous
+  stretches, and a jump back to the best-matching point near the speed's ideal
+  track, cross-faded over 4 ms), at a speed a PI controller on the fill sets (down
+  to a quarter speed), until the input keeps up. Dry (a stall), it fades out, plays
+  again once half the target is back and raises its target 20 ms (up to 200 ms; 10
+  ms back per quiet 30 s). More than 4 x the target, it skips down to it; full, it
+  drops. An AnalyserNode taps its output (`window.mvp.audioProbe()`); M or the Sound
+  button mutes. Nothing goes back from the worklet to the Worker (Q2_LOG.md).
 - **The render thread** (P2: `wasm/render_thread.h`, `wasm/render_side.h`,
   `gfx/render_ring.h`, `gfx/gp_reads.h`; P2_LOG.md). Where the page is
   cross-origin isolated (the server's and `serve.mjs`'s headers) and `threads=0`
