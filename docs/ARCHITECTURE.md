@@ -146,8 +146,8 @@ what binds.
 ## 7. Audio (`engine/audio/`)
 
 - The game uses Nintendo's AX library (the `dolphin/ax` units) under EA SND.
-  Whether to replace it at the AX API level or at the DSP command-list level is
-  decision **D5**, settled in E3.
+  Audio is replaced at the DSP command-list level (**D5**, decided in E3b). AX, EA SND and EA's CPU
+  mixer stay retail code (`docs/engine/E3B_LOG.md`).
 - Mixing runs on the virtual clock. Output goes to an AudioWorklet with a small
   resampling buffer.
 - **Audio never feeds back into game state.** AX callbacks run on virtual time,
@@ -223,7 +223,7 @@ Lead decisions under the owner's 2026-10-14 delegation. Settled ones are also in
 | D2 | Where translation runs, and what it emits | **Decided:** in the player's browser on first load, cached in browser storage (§3 requires it). The backend emits WebAssembly. A CLI build of the same translator serves development. Whether to emit one module or translate lazily per function is measured in E2 |
 | D3 | Languages and toolchain | **Decided:** C++20 for the translator and runtime (Emscripten for the browser; clang or MSVC natively for development and tests); `webgpu.h` (Dawn natively, browser WebGPU under Emscripten); TypeScript for the web shell and the VPS services, so the protocol types are shared. Revisit only if D1 adopts a codebase in another language |
 | D4 | How guest threads switch | **Chosen (E0a), confirmed by E0b item 9:** resumable guest threads on one host thread. A context switch unwinds to the dispatcher, and the target resumes at its guest PC, with the reference interpreter running what's left of the suspended frames. This keeps all state in guest memory plus the CPU context, so save states and rollback stay possible. Implemented in E0c: unwinding uses plain returns, and every call-return address and loop back edge is a resume label where native code re-enters. That gives 1 unwind per switch, with 0.01% of instructions interpreted Fallback if it costs too much: one host thread per guest thread with a baton (`E0_SURVEY.md` §6) |
-| D5 | Audio replacement level | **Open, settles in E3:** AX API or DSP command lists |
+| D5 | Audio replacement level | **Decided (E3b, 2026-10-14):** DSP command lists. Retail AX, EA SND and EA's CPU mixer keep running; the mixer is a read-only observer |
 | D6 | Renderer input | **Decided:** the GX command stream (§6) |
 | D7 | Disc image formats | **Decided:** ISO and CISO first; RVZ later |
 | D8 | Guest memory byte order | **Decided:** big-endian, with byte-swapped accesses (§5) |
