@@ -105,6 +105,7 @@ EMSCRIPTEN_KEEPALIVE void mvp_rt_hle_before(Cpu* c, u32 index) { hle_before(*c, 
 EMSCRIPTEN_KEEPALIVE void mvp_rt_trap(Cpu* c, u32 a, u32 code) { trap(*c, a, xlat::wasm_trap_text(code)); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_rfi(Cpu* c) { ppc::sem::rfi(*c); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_system_call(Cpu* c) { c->hooks->system_call(*c); }
+EMSCRIPTEN_KEEPALIVE void mvp_rt_fp_unavailable(Cpu* c, u32 at) { fp_unavailable(*c, at); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_tw(Cpu* c, u32 w, u32 pc) {
   ppc::Insn i{w};
   bool is_tw = ppc::decode(w) == ppc::Op::tw;
@@ -121,7 +122,7 @@ EM_JS(int, mvp_js_instantiate,
       {
         var names = ["on_entry", "safepoint", "read8", "read16", "read32", "write8", "write16", "write32", "exec",
                      "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap", "rfi",
-                     "system_call", "tw"];
+                     "system_call", "tw", "fp_unavailable"];
         try {
           var table = (typeof wasmTable != 'undefined') ? wasmTable : __indirect_function_table;
           var t0 = performance.now();

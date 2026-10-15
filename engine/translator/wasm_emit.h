@@ -57,6 +57,10 @@ struct WasmEmitOptions {
   // Add a "name" custom section (function names: the guest symbol, the helpers
   // and imports), for profilers. Off by default: it only costs bytes.
   bool names = false;
+  // Check MSR[FP] before FPU instructions (floating-point unavailable, E3a): the
+  // first of each block, as the C++ emitter does. Off only for tests that compare
+  // single instructions with execute_plain(), which has no such check.
+  bool fpu_checks = true;
 };
 
 // A guest address and the table slot (relative to the module's table base) of

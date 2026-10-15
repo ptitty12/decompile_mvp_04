@@ -85,6 +85,7 @@ std::vector<rt::GuestFn> translate(const std::vector<u32>& words, std::size_t* m
   xlat::ProgramCfg cfg = xlat::build_cfg(*keep.back(), *keep_syms.back());
   REQUIRE(cfg.errors == 0);
   xlat::WasmEmitOptions opt;
+  opt.fpu_checks = false;  // execute_plain(), the reference, has no MSR[FP] check
   xlat::WasmModule mod;
   std::string err;
   REQUIRE_MESSAGE(xlat::emit_wasm(cfg, opt, &mod, &err), err);

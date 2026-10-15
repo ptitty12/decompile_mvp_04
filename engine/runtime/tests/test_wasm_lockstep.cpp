@@ -28,6 +28,25 @@ void capture(const std::string& s) { g_reported += s; }
 using namespace mvp;
 using namespace mvp::rt;
 
+// The programs start with MSR[FP] clear (MSR 0), so their first FPU instruction
+// raises floating-point unavailable (E3a). The handler at 0x800 sets FP in SRR1
+// and returns: the reference interpreter runs it in line, the translated side
+// runs it to its rfi from the translated frame (rt.fp_unavailable) and goes on,
+// as in test_emit_lockstep.
+static void install_fp_handler(Machine& m) {
+  using namespace mvp::ppc::enc;
+  const u32 handler[] = {
+      SPR(467, 3, 272),     // mtsprg0 r3
+      SPR(339, 3, 27),      // mfsrr1 r3
+      D(24, 3, 3, 0x2000),  // ori r3, r3, MSR[FP]
+      SPR(467, 3, 27),      // mtsrr1 r3
+      SPR(339, 3, 272),     // mfsprg0 r3
+      X(19, 0, 0, 0, 50),   // rfi
+  };
+  for (std::size_t k = 0; k < std::size(handler); ++k) put_be32(m.mem1() + 0x800 + 4 * k, handler[k]);
+  m.set_real_mode(true);  // the vector runs at its physical address
+}
+
 static void run_case(bool inline_ops) {
   xlat::synth::Program prog = xlat::synth::make();
   auto syms = xlat::SymbolTable::parse(prog.symbols);
@@ -59,6 +78,9 @@ static void run_case(bool inline_ops) {
   nat.cpu().hooks = &hn;
   ref.load_dol(*dol);
   nat.load_dol(*dol);
+  install_fp_handler(ref);
+  install_fp_handler(nat);
+  hn.run_handlers = true;
   WasmLoadStats ls;
   REQUIRE_MESSAGE(load_wasm_module(mod, &ls, &err), err);
   REQUIRE_FALSE(g_native.empty());
@@ -76,7 +98,10 @@ static void run_case(bool inline_ops) {
   CHECK(g_unwinds == unwinds + 2);
   CHECK(g_inframe_resumes == inframe + 2);
   CHECK(g_resume_entries == entries + 3);
-  CHECK(g_interpreted == interpreted + 2);
+  // main's two instructions after jumper's return, and the six of the handler.
+  CHECK(g_interpreted == interpreted + 2 + 6);
+  CHECK(hr.exceptions == 1);
+  CHECK(hn.exceptions == 1);
   CHECK_FALSE(g_unwinding);
   CHECK(g_reported.find("x=42") == 0);
   auto want = xlat::synth::expected_results();
@@ -212,12 +237,17 @@ TEST_CASE("wasm-emitted floating-point moves and conversions match the interpret
   nat.cpu().hooks = &hn;
   ref.load_dol(*dol);
   nat.load_dol(*dol);
+  install_fp_handler(ref);
+  install_fp_handler(nat);
+  hn.run_handlers = true;
   WasmLoadStats ls;
   REQUIRE_MESSAGE(load_wasm_module(mod, &ls, &err), err);
   LockstepResult r = run_lockstep(ref, nat, cfg, 1);
   INFO(r.message);
   REQUIRE(r.pass);
   CHECK(r.stop.addr == 0xCC000000u);
+  CHECK(hr.exceptions == 1);  // the first lfs; MSR[FP] stays set after
+  CHECK(hn.exceptions == 1);
   // Spot checks against the conversion rules (fp.h): lfs of the smallest
   // single denormal, stfs of a NaN keeps the top fraction bits.
   CHECK(be64(nat.mem1() + 0x300000 + 48 * 4) == 0x36A0000000000000ull);

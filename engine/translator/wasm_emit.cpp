@@ -66,10 +66,11 @@ u32 reg_offset(int r) {
 enum Ty : u32 { tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, tL_I, tI_L, tV_IIIIIL, kTypes };
 enum Imp : u32 {
   iOnEntry, iSafepoint, iRead8, iRead16, iRead32, iWrite8, iWrite16, iWrite32, iExec, iCallIndirect,
-  iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, kImports
+  iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, iFpUnavailable, kImports
 };
 constexpr Ty kImportType[kImports] = {tV_II,   tV_I,  tI_IIIL, tI_IIIL, tI_IIIL, tV_IIIIL, tV_IIIIL, tV_IIIIL, tV_IIIL,
-                                      tV_II,   tV_II, tI_III,  tV_III,  tV_II,   tV_III,   tV_I,     tV_I,     tV_III};
+                                      tV_II,   tV_II, tI_III,  tV_III,  tV_II,   tV_III,   tV_I,     tV_I,     tV_III,
+                                      tV_II};
 // Helpers defined in every module, after the imports.
 enum Hlp : u32 {
   hRd8 = kImports, hRd16, hRd32, hWr8, hWr16, hWr32, hCmps, hCmpu, hDivw, hDivwu, hS2D, hD2S,
@@ -227,6 +228,7 @@ class FuncGen {
   struct Node {
     u8 kind = kNop, grp = gInline, pre = pNone;
     bool cond = false, mem = false;
+    bool fpchk = false;  // checks MSR[FP] before it starts (floating-point unavailable)
     RegSet R = 0, W = 0;
     RegSet Din = 0, Lm = 0, Lin = 0, Lout = 0;
     int s0 = -1, s1 = -1, jt = -1;
@@ -548,7 +550,9 @@ void FuncGen::dataflow() {
         case gCall: case gExit: L = N.cond ? (((out | D) & ~N.W) | N.R) : ((D & ~N.W) | N.R); break;
         default: L = D; break;
       }
-      RegSet in = N.pre == pBack ? (L | N.Din) : N.pre == pIdle ? N.Din : L;
+      // A safe point or an MSR[FP] check spills the dirty registers (so they are
+      // live there) and reloads the instruction's own live set after its call.
+      RegSet in = N.pre == pIdle ? N.Din : (N.pre == pBack || N.fpchk) ? (L | N.Din) : L;
       if (in != N.Lin) changed = true;
       N.Lin = in;
       N.Lout = out;
@@ -2054,6 +2058,27 @@ void FuncGen::emit_node(std::size_t k) {
     safepoint();
     b.end();
   }
+  if (N.fpchk) {
+    // Floating-point unavailable (E3a): with MSR[FP] clear this FPU instruction
+    // does not start; the OS handler switches the FPU context and returns here.
+    materialize();
+    b.get(kCpu);
+    b.mem(op::i32_load, 2, kMsr);
+    b.i32c(ppc::msr::FP);
+    b.op(op::i32_and);
+    b.op(op::i32_eqz);
+    b.if_();
+    flush(N.Din);
+    store_ticks();
+    load_sp();
+    b.get(kCpu);
+    b.i32c(a);
+    b.call(iFpUnavailable);
+    check(a);
+    reload(N.Lm);
+    load_ticks();
+    b.end();
+  }
   ++p_;  // ++c.ticks: this instruction has started
   ++ctx_.out->stats.instructions;
   const RegSet D = dm(N);
@@ -2280,7 +2305,6 @@ bool FuncGen::run(Fn& body, std::string* error) {
     resume_labels_.erase(std::unique(resume_labels_.begin(), resume_labels_.end()), resume_labels_.end());
   }
   has_resume_ = !resume_labels_.empty();
-  dataflow();
 
   // Code segments: one per label.
   std::vector<u32> labels(entries.begin(), entries.end());
@@ -2317,6 +2341,32 @@ bool FuncGen::run(Fn& body, std::string* error) {
     if ((N.kind == kJump || N.kind == kCJump) && seg_at_[static_cast<std::size_t>(N.s0)] == seg_at_[k])
       self_loops_[static_cast<std::size_t>(seg_at_[k])] = true;
   }
+  // MSR[FP] checks (E3a, as the C++ emitter): before the first FPU instruction
+  // of each segment; once checked, MSR[FP] stays set until a safe point, a
+  // branch, call or return, mtmsr or sc.
+  if (ctx_.opt.fpu_checks) {
+    bool fpu_on = false;
+    int seg = -1;
+    for (std::size_t k = 0; k < n; ++k) {
+      if (!f_.reachable[k]) {
+        fpu_on = false;
+        continue;
+      }
+      if (seg_at_[k] != seg) {
+        seg = seg_at_[k];
+        fpu_on = false;
+      }
+      Node& N = nodes_[k];
+      const InsnInfo& x = f_.insns[k];
+      if (N.pre != pNone) fpu_on = false;
+      if (x.flow == Flow::Plain && ppc::uses_fpu(x.op) && !fpu_on) {
+        N.fpchk = true;
+        fpu_on = true;
+      }
+      if (x.flow != Flow::Plain || x.op == Op::mtmsr || x.op == Op::sc) fpu_on = false;
+    }
+  }
+  dataflow();
   dispatch_ = has_resume_ || mode_ == Mode::Body || !f_.tables.empty();
   for (std::size_t k = 0; k < n && !dispatch_; ++k) {
     if (!f_.reachable[k]) continue;
@@ -3323,7 +3373,8 @@ void functype(Buf& b, const std::vector<u8>& params, const std::vector<u8>& resu
 const std::vector<std::string>& wasm_import_names() {
   static const std::vector<std::string> names = {
       "on_entry", "safepoint", "read8",    "read16",     "read32", "write8", "write16",     "write32", "exec",
-      "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap",   "rfi",    "system_call", "tw"};
+      "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap",   "rfi",    "system_call", "tw",
+      "fp_unavailable"};
   return names;
 }
 
