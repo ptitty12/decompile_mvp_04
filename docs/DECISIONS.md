@@ -325,6 +325,15 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/e6
 
+- 2026-10-15 | **E3c: a full 9-inning game natively** (lead, under the owner's delegation; docs/engine/E3C_LOG.md).
+  - CPU vs CPU from the first pitch, through the game's pause-menu controller select, to Game Over (Cardinals 18, Red Sox 11). No crash; audio above -60 dBFS throughout.
+  - Two runs, with and without the renderer and audio, are identical at all 54 checkpoints. A window session's recorded keyboard input replays headless to the same state.
+  - In-game speed went from 0.68× to 1.12× real time: hardware registers moved to flat arrays, indexed and packed draws, draw-state reuse.
+  - **E3 exit status:** natively met. Frame pacing is steady at the median (16.8 ms) but not in heavy scenes.
+  - **Open engine decision CLK2:** at 2 cycles per instruction (CLK1) the game renders about 38 fps in play (logic stays 60 Hz). Lowering it would change guest timing and the netplay handshake. Decide with evidence about the console's in-game frame rate.
+
+  | | merge of engine/e3c
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
