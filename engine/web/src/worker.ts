@@ -47,6 +47,7 @@ let frames: MessagePort | null = null;       // P2: the page shows the frames se
 let opts: RunOptions | null = null;
 let running = false, paused = false, firstFrame = false, booted = false;
 let pacedStart = 0, pacedFields = 0;
+let fieldsRun = 0, slowApplied = false;  // Q2 (development): hostSlow from hostSlowFrom on
 // Stats window (reported about twice a second).
 let winFields = 0, winMs = 0, winWall = performance.now();
 // Audio: the worklet's channel, once the page has one (first user gesture).
@@ -439,6 +440,11 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
 function afterRun(ran: number, ms: number): boolean {
   winFields += Math.max(0, ran);
   winMs += ms;
+  fieldsRun += Math.max(0, ran);
+  if (opts?.hostSlow && !slowApplied && fieldsRun >= (opts.hostSlowFrom ?? 0)) {
+    slowApplied = true;
+    M!._mvp_host_slow(opts.hostSlow);
+  }
   pumpAudio();
   pumpDisc();
   if (M!._mvp_present() && !firstFrame) {

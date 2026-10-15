@@ -726,6 +726,26 @@ EMSCRIPTEN_KEEPALIVE void mvp_canvas_resize(int width, int height) {
   g.rs.resize(width, height);
 }
 
+// Development (Q2): a slower machine, simulated on this one. After each VI field
+// (and each inline present) the emulation spins (factor - 1) times the host time
+// it worked (its waits for the render thread excluded), and so does the render
+// thread after each stretch of its work; 1: off. Host time only: guest state is
+// the same at any factor. (Chrome's CPU throttling through DevTools slows only
+// the page's main thread, not its Workers.)
+double g_host_slow = 1.0;
+void host_slow_spin(double work_ms) {
+  if (g_host_slow <= 1 || work_ms <= 0) return;
+  const double until = now_ms() + (g_host_slow - 1) * work_ms;
+  while (now_ms() < until) {
+  }
+}
+EMSCRIPTEN_KEEPALIVE void mvp_host_slow(double factor) {
+  g_host_slow = factor > 1 ? factor : 1.0;
+#ifdef MVP_WEB_THREADS
+  web::render_host_slow(g_host_slow);
+#endif
+}
+
 // Runs `n` VI fields (fewer if the run stops). Returns the fields run, or -1
 // once stopped (mvp_status() says why).
 EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
@@ -740,8 +760,19 @@ EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
     while (g.hw->vi_fields() < target) {
       if (web::net_active() && !web::net_may_run()) break;  // netplay: the next frame's input is not here yet
       double f0 = now_ms();
+#ifdef MVP_WEB_THREADS
+      const double waited0 = g.threaded ? web::render_waited_ms() : 0;
+#endif
       rt::run(g.m->cpu());
       double dt = now_ms() - f0;
+      if (g_host_slow > 1) {
+        double work = dt;
+#ifdef MVP_WEB_THREADS
+        if (g.threaded) work -= web::render_waited_ms() - waited0;
+#endif
+        host_slow_spin(work);
+        dt = now_ms() - f0;
+      }
       if (dt > g.max_field_ms) g.max_field_ms = dt;
     }
   } catch (const StopRun& s) {
@@ -774,7 +805,10 @@ EMSCRIPTEN_KEEPALIVE int mvp_present() {
 #ifdef MVP_WEB_THREADS
   if (g.threaded) return web::render_present(g_frame_polls) ? 1 : 0;
 #endif
-  return g.rs.present(g_frame_polls, now_ms()) ? 1 : 0;
+  const double t0 = now_ms();
+  const bool shown = g.rs.present(g_frame_polls, t0);
+  host_slow_spin(now_ms() - t0);
+  return shown ? 1 : 0;
 }
 
 // Development (P1): the presentation trace on or off, and its records since

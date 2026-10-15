@@ -109,6 +109,9 @@ export interface RunOptions {
   digest?: boolean;    // development (P2): the renderer digest per VI field, in each stats window's `digest`
   digestDetail?: number[];  // development (P2): VI fields [from, to] whose draws get a digest line each
   rtTune?: number[];   // development (P2): the render thread's waiting (mvp_render_tune: us, ms, KiB, sync fences)
+  audioRing?: boolean; // Q2: false = the frames go to the worklet as messages even where memory can be shared
+  hostSlow?: number;   // development (Q2): simulate a machine this many times slower (mvp_host_slow) ...
+  hostSlowFrom?: number;  // ... from this VI field on
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }
 

@@ -56,6 +56,12 @@ bool render_thread_running();
 // ...), 0: only where a guest write meets memory the render thread still reads
 // (the default); -1: unchanged.
 void render_tune(double fence_spin_us, double render_spin_ms, int publish_kib, int sync_fences);
+// Development (Q2): a slower machine, simulated: after each stretch of work the
+// render thread spins (factor - 1) times as long (1: off).
+void render_host_slow(double factor);
+// The emulation thread's time spent waiting for the render thread so far (write
+// waits, lag waits, fences), ms.
+double render_waited_ms();
 
 // From the emulation, in order (each appends to the ring).
 void render_memory(const std::uint8_t* mem, std::uint32_t size);

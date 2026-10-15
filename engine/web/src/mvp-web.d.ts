@@ -28,6 +28,7 @@ export interface MvpEngine {
   _mvp_threaded(): number;
   _mvp_digest(on: number, detailFrom: number, detailTo: number): void;
   _mvp_render_tune(fenceSpinUs: number, renderSpinMs: number, publishKib: number, syncFences: number): void;
+  _mvp_host_slow(factor: number): void;  // Q2 (development): a slower machine, simulated
   _mvp_digest_take(): number;
   _mvp_set_pad(port: number, connected: number, buttons: number, sx: number, sy: number, cx: number, cy: number,
                tl: number, tr: number): void;
