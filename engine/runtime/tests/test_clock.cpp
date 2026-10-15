@@ -110,11 +110,12 @@ TEST_CASE("decrementer interrupts are delivered at safe points while EE is set")
   } catch (const StopRun&) {
   }
   u32 count = be32(m.mem1() + 0x1000);
-  // 200,000 instructions = 33,333 time-base ticks; the decrementer fires every
-  // 1,201 ticks plus the handler's own run time: 27 interrupts.
+  // At the default charge (CLK2, 1.25 cycles) 200,000 instructions = 20,833
+  // time-base ticks; the decrementer fires every 1,201 ticks plus the handler's
+  // own run time: 17 interrupts (27 at E0b-CLK1's 2 cycles).
   CHECK(count == h.decrementer_interrupts);
-  CHECK(count >= 26);
-  CHECK(count <= 28);
+  CHECK(count >= 16);
+  CHECK(count <= 18);
   CHECK(h.idle_skips == 0);
   CHECK((c.pc == 0x80003100 || c.pc == 0x80003104));
   CHECK((c.msr & ppc::msr::EE) != 0);  // restored by rfi
@@ -151,9 +152,9 @@ TEST_CASE("the idle skip jumps virtual time to the next interrupt") {
   CHECK(h.decrementer_interrupts == 3);
   // The pass that leaves the loop (r4 == 3 already) skips nothing.
   CHECK(h.idle_skips == 3);
-  // Three waits of 1,201 time-base ticks (7,206 instructions each) passed with
-  // only a few dozen instructions actually run.
-  CHECK(c.ticks >= 3 * 7206);
+  // Three waits of 1,201 time-base ticks (11,530 instructions each at the default
+  // 1.25 cycles) passed with only a few dozen instructions actually run.
+  CHECK(c.ticks >= 3 * 11530);
   CHECK(g_interpreted - interpreted < 100);
   CHECK(h.idle_ticks_skipped + (g_interpreted - interpreted) == c.ticks);
   g_safe.set(idle, 0);

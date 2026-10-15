@@ -59,7 +59,7 @@ struct Identity {
   std::array<u8, 20> disc{};    // disc identity (net/identity.h: GV4E69 rev 0, main.dol, FST)
   std::array<u8, 32> packset{}; // ordered pack-set hash (MODDING.md §10)
   std::string settings;         // canonical engine settings, "key=value;..." (net/identity.h)
-  u32 cpi_milli = 2000;         // CPU cycles per guest instruction, in thousandths (rt::ClockConfig;
+  u32 cpi_milli = 1250;         // CLK2: CPU cycles per guest instruction, in thousandths (rt::ClockConfig;
                                 // E0b-CLK1 builds sent whole cycles, 2, so they refuse these)
   u32 di_latency_tb = 40500;    // DVD1: command latency, time-base ticks
   u32 di_tb_per_kib = 13184;    // DVD1: transfer time, time-base ticks per KiB

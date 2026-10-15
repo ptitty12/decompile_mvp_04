@@ -23,10 +23,12 @@ class Hardware;
 
 // The charge per guest instruction, in thousandths of a CPU cycle: the time base
 // advances ticks * cpi_milli / 12000 (12 CPU cycles per time-base tick). Part of
-// the netplay handshake. E0b-CLK1 charged 2 cycles (2000).
+// the netplay handshake. E0b-CLK1 charged 2 cycles (2000); CLK2 charges 1.25
+// (388.8 million instructions per guest second), with which the game's heaviest
+// play still fits a 60 Hz frame (docs/engine/CLK2_LOG.md).
 struct ClockConfig {
   static constexpr std::uint32_t kMilliPerTb = 12000;  // thousandths of a CPU cycle per time-base tick
-  std::uint32_t cpi_milli = 2000;
+  std::uint32_t cpi_milli = 1250;
 };
 
 class SystemHooks : public ppc::Hooks {
