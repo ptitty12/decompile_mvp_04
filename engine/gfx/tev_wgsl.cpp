@@ -16,6 +16,7 @@ struct U {
   ind_mtx: array<vec4i, 6>,
   fog: array<vec4f, 2>,
   dst_alpha: vec4i,
+  lod_bias: array<vec4f, 2>,
 };
 @group(0) @binding(0) var<uniform> u: U;
 @group(1) @binding(0) var tex0: texture_2d<f32>;
@@ -304,8 +305,10 @@ std::string generate_wgsl(const PipelineConfig& c) {
         s += str("    let tex = to8(textureSample(tex%u, samp%u, fixst(tevcoord, %uu)))%s;\n", st.texmap, st.texmap,
                  st.texmap, swizzle(c.swap[bits(ae, 2, 2)]).c_str());
       else
-        s += str("    let tex = to8(textureSample(tex%u, samp%u, tc(in.t%u, %uu, %uu)))%s;\n", st.texmap, st.texmap,
-                 st.texcoord, st.texcoord, st.texmap, swizzle(c.swap[bits(ae, 2, 2)]).c_str());
+        // Q1: the map's LOD bias (TX_SETMODE0; samplers have none in WebGPU).
+        s += str("    let tex = to8(textureSampleBias(tex%u, samp%u, tc(in.t%u, %uu, %uu), u.lod_bias[%u][%u]))%s;\n",
+                 st.texmap, st.texmap, st.texcoord, st.texcoord, st.texmap, st.texmap / 4, st.texmap % 4,
+                 swizzle(c.swap[bits(ae, 2, 2)]).c_str());
     } else {
       s += "    let tex = vec4i(0);\n";
     }
