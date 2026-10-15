@@ -351,6 +351,15 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/p1-disc
 
+- 2026-10-15 | **P1-gfx: flashing fixed, smoother pacing** (lead, under the owner's delegation; docs/engine/P1_LOG.md).
+  - **P1-G1, presentation:** the game alternates HUD elements every field and relies on the console's 480i output to blend them. Scan-out now shows the last field's XFB frame, except that pixels alternating A, B, A over the last three fields show the mean of the last two.
+    - Flashing events in human play dropped from 41 to 2. Captures still read the XFB itself.
+  - **P1-G2, chase pacing:** while behind, the browser runs the next batch immediately in its own task, not at the next animation frame. Present p95 in a match went from 60-64 ms to 27-33 ms, at 1.0× real time.
+  - Guest state is unchanged (hashes equal native); 44/44 native and 38/38 Emscripten tests pass.
+  - **Next:** a render thread (wasm threads plus COOP/COEP), a faster vertex path and faster memory helpers. Open renderer bug: the half-scale EFB copy at 0x01797180 is sampled as 256x256.
+
+  | | merge of engine/p1-gfx
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
