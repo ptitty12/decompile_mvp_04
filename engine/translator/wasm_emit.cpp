@@ -116,11 +116,13 @@ bool is_inline(Op op, Insn i) {
     case Op::psq_stx: case Op::psq_stux:
       return true;
     case Op::mfspr: case Op::mtspr: {
-      // Every SPR but the decrementer and the time base (runtime hooks): LR and
-      // CTR are locals, XER is SO and CA locals plus the Cpu struct, the rest are
-      // plain Cpu::spr words (sem::read_spr / write_spr).
+      // Every SPR but the decrementer, the time base and WPAR (runtime hooks; a
+      // WPAR write resets the write-gather pipe): LR and CTR are locals, XER is
+      // SO and CA locals plus the Cpu struct, the rest are plain Cpu::spr words
+      // (sem::read_spr / write_spr).
       const u32 n = i.spr();
       if (n == ppc::spr::DEC || n == ppc::spr::TBL_W || n == ppc::spr::TBU_W) return false;
+      if (op == Op::mtspr && n == ppc::spr::WPAR) return false;
       return op == Op::mtspr || (n != ppc::spr::TBL_R && n != ppc::spr::TBU_R);
     }
     case Op::mfmsr:
@@ -293,6 +295,7 @@ class FuncGen {
   void jump(int seg);        // to a code segment, from the current position
   void cond_expr(const InsnInfo& x);
   void cr0_from(int r);      // CR0 from the value in register local r (record forms)
+  void cmp_bits(bool is_signed, const std::function<void()>& x, const std::function<void()>& y);
   void set_cr_field(u32 field, const std::function<void()>& bits);
   void ea_d(Insn i);         // (rA|0) + d
   void ea_x(Insn i);         // (rA|0) + rB
@@ -629,17 +632,52 @@ void FuncGen::cond_expr(const InsnInfo& x) {
 }
 
 void FuncGen::cr0_from(int r) {
+  // CR0 = LT GT EQ SO of r against 0 (sem::set_cr0), inline.
+  Fn& b = *body_;
   reg_get(reg::CR);
-  body_->i32c(0x0FFFFFFFu);
-  body_->op(op::i32_and);
+  b.i32c(0x0FFFFFFFu);
+  b.op(op::i32_and);
   reg_get(r);
-  body_->i32c(0);
+  b.i32c(0x80000000u);
+  b.op(op::i32_and);
+  b.op(op::i32_or);
+  reg_get(r);
+  b.i32c(0);
+  b.op(op::i32_gt_s);
+  b.i32c(30);
+  b.op(op::i32_shl);
+  b.op(op::i32_or);
+  reg_get(r);
+  b.op(op::i32_eqz);
+  b.i32c(29);
+  b.op(op::i32_shl);
+  b.op(op::i32_or);
   reg_get(reg::SO);
-  body_->call(hCmps);
-  body_->i32c(28);
-  body_->op(op::i32_shl);
-  body_->op(op::i32_or);
+  b.i32c(28);
+  b.op(op::i32_shl);
+  b.op(op::i32_or);
   reg_set(reg::CR);
+}
+
+// LT GT EQ SO for a comparison of the values `x` and `y` push (sem::cmp_bits).
+void FuncGen::cmp_bits(bool is_signed, const std::function<void()>& x, const std::function<void()>& y) {
+  Fn& b = *body_;
+  auto rel = [&](u8 opc, u32 sh) {
+    x();
+    y();
+    b.op(opc);
+    if (sh) {
+      b.i32c(sh);
+      b.op(op::i32_shl);
+    }
+  };
+  rel(is_signed ? op::i32_lt_s : op::i32_lt_u, 3);
+  rel(is_signed ? op::i32_gt_s : op::i32_gt_u, 2);
+  b.op(op::i32_or);
+  rel(op::i32_eq, 1);
+  b.op(op::i32_or);
+  reg_get(reg::SO);
+  b.op(op::i32_or);
 }
 
 void FuncGen::set_cr_field(u32 field, const std::function<void()>& bits) {
@@ -870,16 +908,16 @@ void FuncGen::emit_inline(const InsnInfo& x) {
     case Op::addic_rc: wide(rA_, simm, 0); cr0_from(rD); return;
     case Op::subfic: wide(nrA, simm, 1); return;
     case Op::cmp:
-      set_cr_field(i.crfD(), [&] { G(rA); G(rB); G(reg::SO); b.call(hCmps); });
+      set_cr_field(i.crfD(), [&] { cmp_bits(true, rA_, rB_); });
       return;
     case Op::cmpi:
-      set_cr_field(i.crfD(), [&] { G(rA); b.i32c(i.simm()); G(reg::SO); b.call(hCmps); });
+      set_cr_field(i.crfD(), [&] { cmp_bits(true, rA_, [&] { b.i32c(i.simm()); }); });
       return;
     case Op::cmpl:
-      set_cr_field(i.crfD(), [&] { G(rA); G(rB); G(reg::SO); b.call(hCmpu); });
+      set_cr_field(i.crfD(), [&] { cmp_bits(false, rA_, rB_); });
       return;
     case Op::cmpli:
-      set_cr_field(i.crfD(), [&] { G(rA); b.i32c(i.uimm()); G(reg::SO); b.call(hCmpu); });
+      set_cr_field(i.crfD(), [&] { cmp_bits(false, rA_, [&] { b.i32c(i.uimm()); }); });
       return;
     case Op::and_: G(rS); G(rB); bin(op::i32_and); S(rA); rc(rA); return;
     case Op::andc: G(rS); G(rB); not_(); bin(op::i32_and); S(rA); rc(rA); return;

@@ -120,6 +120,11 @@ struct Fn : Buf {
     byte(kI32);
     return depth++;
   }
+  int block_i64() {
+    byte(op::block);
+    byte(kI64);
+    return depth++;
+  }
   void else_() { byte(op::else_); }
   void end() {
     byte(op::end);
