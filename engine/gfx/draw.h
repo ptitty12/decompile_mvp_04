@@ -74,6 +74,7 @@ struct DrawUniforms {
   std::int32_t ind_mtx[6][4] = {};
   float fog[8] = {};                  // a, b magnitude, b shift, c; color r g b (0..255), unused
   std::int32_t dst_alpha[4] = {};     // enable, value
+  float lod_bias[8] = {};             // Q1: texture map n's LOD bias (TX_SETMODE0), added to the sampled level of detail
 };
 
 // A texture as the draw samples it: where it is in guest memory and how to

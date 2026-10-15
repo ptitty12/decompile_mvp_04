@@ -133,6 +133,15 @@ void hle_frame_poll(Cpu& c, GuestFn) {
   if (g_frame_hook) g_frame_hook(c, frame);
 }
 
+// ---- the data cache, for the GP's view of memory (Q1, gfx/gp_memory.h) ----
+
+// DCFlushRange / DCStoreRange (and the NoSync forms) (void* addr, u32 nBytes):
+// before the guest's own dcbf/dcbst loop runs, the host learns which lines it
+// writes back. Nothing in the guest changes.
+void hle_dc_flush(Cpu& c, GuestFn) {
+  if (g_dc_flush_hook && c.gpr[4]) g_dc_flush_hook(c.gpr[3], c.gpr[4]);
+}
+
 }  // namespace
 
 void (*g_report)(const std::string& line) = &default_report;
@@ -140,6 +149,7 @@ std::uint64_t g_report_count = 0;
 InputQueue* g_input = nullptr;
 void (*g_frame_hook)(Cpu& c, std::uint64_t frame) = nullptr;
 std::uint64_t g_frame_polls = 0, g_pad_reads = 0;
+void (*g_dc_flush_hook)(u32 ea, u32 len) = nullptr;
 
 std::string format_guest(Cpu& c, u32 fmt_addr, int first_gpr) {
   std::string fmt = read_cstring(c, fmt_addr);
@@ -221,6 +231,13 @@ const std::vector<HleEntry>& hle_table() {
       {"PADRead", &hle_pad_read, "returns the frame's input from the input queue (runtime/input.h)"},
       {"frame poll", &hle_frame_poll, "consumes one frame's input at the frame loop's controller poll",
        0x8014865Cu, HleKind::Before},
+      // Q1: what the GP sees of memory follows the game's cache write-backs (host side only).
+      {"DCFlushRange", &hle_dc_flush, "tells the renderer which lines reach memory for the GP", 0, HleKind::Before},
+      {"DCStoreRange", &hle_dc_flush, "tells the renderer which lines reach memory for the GP", 0, HleKind::Before},
+      {"DCFlushRangeNoSync", &hle_dc_flush, "tells the renderer which lines reach memory for the GP", 0,
+       HleKind::Before},
+      {"DCStoreRangeNoSync", &hle_dc_flush, "tells the renderer which lines reach memory for the GP", 0,
+       HleKind::Before},
   };
   return t;
 }

@@ -36,6 +36,13 @@
       <button type="button" id="fullscreen" title="Fullscreen (F, or double-click the game)">Fullscreen</button>
       <button type="button" id="sound" title="Turn the sound on or off (M)">Sound: off</button>
       <button type="button" id="pause" title="Pause or resume (P); hiding the tab pauses too">Pause</button>
+      <label class="picture" title="Internal resolution: how many times the console's pixels the game is drawn at. Auto picks by the size of the picture on screen.">Picture
+        <select id="picture">
+          <option value="auto">Auto</option>
+          <option value="1">1x (console)</option>
+          <option value="2">2x</option>
+          <option value="3">3x</option>
+        </select></label>
       <button type="button" id="pad-chip" class="chip" data-state="none" title="Controllers and keys: open the Controls panel">No controller (keyboard)</button>
       <span id="hint" class="hint" hidden></span>
     </div>

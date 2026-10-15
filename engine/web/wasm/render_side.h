@@ -13,6 +13,7 @@
 
 #include "gfx/digest_tap.h"
 #include "gfx/draw.h"
+#include "gfx/gp_memory.h"
 #include "gfx/gx_processor.h"
 #include "gfx/wgpu/gpu.h"
 #include "gfx/wgpu/renderer.h"
@@ -50,6 +51,17 @@ class RenderSide {
   void gx(const std::uint8_t* cmd, std::size_t len) {
     if (proc_) proc_->command(cmd, len);
   }
+  // Q1: what the GP sees of memory (gfx/gp_memory.h). Inline: the game flushed
+  // [addr, addr + len) (taken from memory now). On the render thread: the
+  // flushed range and the contents of the lines that changed, as the emulation
+  // thread took them. Memory written without the cache.
+  void gp_flush(std::uint32_t addr, std::uint32_t len) { gp_.flush(addr, len); }
+  void gp_activate(std::uint32_t addr, std::uint32_t len) { gp_.activate(addr, len); }
+  void gp_set_lines(std::uint32_t first_line, std::uint32_t lines, const std::uint8_t* data) {
+    gp_.set_lines(first_line, lines, data);
+  }
+  void gp_write_through(std::uint32_t addr, std::uint32_t len) { gp_.write_through(addr, len); }
+  const gfx::GpMemory& gp_memory() const { return gp_; }
   // A VI field ended; `xfb` is the frame buffer the VI scans.
   void vi_field(std::uint64_t field, std::uint32_t xfb);
   // Shows the frame the VI scans out. `frame_polls` is for the trace. True if drawn.
@@ -58,6 +70,9 @@ class RenderSide {
     if (renderer_) renderer_->flush();
   }
   void resize(int width, int height);
+  // Q1: the internal resolution, 1-3 times the console's (gfx/wgpu/renderer.h);
+  // it takes effect with the next frame the game starts.
+  void set_scale(int s);
 
   void set_trace(bool on) { tap_.on = on; }
   std::string trace_take();      // the records since the last call, as a JSON array
@@ -81,6 +96,7 @@ class RenderSide {
  private:
   const std::uint8_t* mem_ = nullptr;
   std::uint32_t mem_size_ = 0;
+  gfx::GpMemory gp_;  // Q1: memory as the GP sees it; the processor, the renderer and the digest read it
   std::unique_ptr<gfx::Renderer> renderer_;
   std::unique_ptr<gfx::GxProcessor> proc_;
   gfx::DigestTap digest_;
@@ -89,6 +105,7 @@ class RenderSide {
   std::uint64_t detail_from_ = 1, detail_to_ = 0;
   std::uint32_t xfb_ = 0;
   std::uint64_t presents_ = 0, last_presented_ = 0, copies_at_present_ = 0, resizes_ = 0;
+  int scale_ = 1;
 };
 
 }  // namespace mvp::web

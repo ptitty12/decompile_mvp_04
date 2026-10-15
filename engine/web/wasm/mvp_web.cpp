@@ -248,6 +248,7 @@ struct Observer : GfxObserver {
   void gx_command(const std::uint8_t* cmd, std::size_t len) override;
   void vi_field(std::uint64_t field, std::uint32_t xfb) override;
   void gp_sync() override;  // P2: the render thread catches up (threaded only)
+  void gp_write_through(std::uint32_t addr, std::uint32_t len) override;  // Q1 (gfx/gp_memory.h)
 };
 
 struct Engine {
@@ -331,6 +332,31 @@ void Observer::gp_sync() {
 #ifdef MVP_WEB_THREADS
   if (e->threaded) web::render_sync();
 #endif
+}
+
+// Q1: what the GP sees of memory (gfx/gp_memory.h): written without the cache,
+// or written back from it by the game (rt::g_dc_flush_hook).
+bool g_gp_view = true;  // development (Q1): false = the renderer reads memory as it is (mvp_gp_view)
+
+void Observer::gp_write_through(std::uint32_t addr, std::uint32_t len) {
+  if (!g_gp_view) return;
+#ifdef MVP_WEB_THREADS
+  if (e->threaded) {
+    web::render_gp_write_through(addr, len);
+    return;
+  }
+#endif
+  e->rs.gp_write_through(addr, len);
+}
+
+void dc_flush_hook(std::uint32_t ea, std::uint32_t len) {
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    web::render_gp_flush(ea, len);
+    return;
+  }
+#endif
+  g.rs.gp_flush(ea, len);
 }
 
 void Observer::vi_field(std::uint64_t field, std::uint32_t xfb) {
@@ -675,6 +701,7 @@ EMSCRIPTEN_KEEPALIVE int mvp_boot(const char* script, int len, double stop_field
   }
   g_input = g.input.get();
   g_frame_hook = &frame_hook;
+  g_dc_flush_hook = g_gp_view ? &dc_flush_hook : nullptr;
   attach_renderer();
   apply_audio();
   return 1;
@@ -843,6 +870,22 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_trace_take() {
   g_text = g.rs.trace_take();
   return g_text.c_str();
 }
+
+// Q1: the renderer's internal resolution, 1-3 times the console's (the page's
+// Picture setting); it applies from the next frame the game starts.
+EMSCRIPTEN_KEEPALIVE void mvp_render_scale(int scale) {
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    if (web::render_thread_running()) web::render_scale(scale);
+    return;
+  }
+#endif
+  g.rs.set_scale(scale);
+}
+
+// Development (Q1), before mvp_boot: 0 = the renderer reads guest memory as it
+// is, without the model of the CPU's data cache (gfx/gp_memory.h), for comparisons.
+EMSCRIPTEN_KEEPALIVE void mvp_gp_view(int on) { g_gp_view = on != 0; }
 
 // Development (P2): the renderer digest (gfx/digest_tap.h) on or off, and its
 // "field digest draws" lines since the last call. Equal lines from the inline

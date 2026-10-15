@@ -47,6 +47,8 @@ button { font: inherit; padding: 0.3rem 0.8rem; border-radius: 6px; border: 1px 
   background: var(--panel); color: var(--fg); cursor: pointer; }
 button:disabled { opacity: 0.5; cursor: default; }
 .hint { color: var(--accent); }
+.picture select { font: inherit; padding: 0.25rem 0.4rem; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--panel); color: var(--fg); }
 .operator { margin: 1.5rem 0 0; font-size: 0.8rem; color: var(--muted); }
 .operator a { color: var(--muted); }
 pre { white-space: pre-wrap; font-size: 0.85rem; color: var(--muted); margin: 0.5rem 0; }

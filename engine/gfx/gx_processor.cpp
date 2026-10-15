@@ -857,6 +857,7 @@ void GxProcessor::snapshot(DrawCall& d) const {
     u.tex_scale[m][3] = t.height;
     u.tex_scale[m][0] = static_cast<float>(bits(bp_[bp::kSuSSize + 2 * m], 0, 16) + 1);
     u.tex_scale[m][1] = static_cast<float>(bits(bp_[bp::kSuTSize + 2 * m], 0, 16) + 1);
+    u.lod_bias[m] = 0;
     if (!map_used[static_cast<std::size_t>(m)]) continue;
     t.valid = true;
     t.format = static_cast<u8>(bits(img0, 20, 4));
@@ -873,6 +874,7 @@ void GxProcessor::snapshot(DrawCall& d) const {
     t.mag_linear = static_cast<u8>(bits(mode0, 4, 1));
     t.min_filter = static_cast<u8>(bits(mode0, 5, 3));
     t.lod_bias = static_cast<float>(static_cast<std::int8_t>(bits(mode0, 9, 8))) / 32.0f;
+    u.lod_bias[m] = t.lod_bias;  // Q1: WebGPU samplers have no bias; the shader adds it (textureSampleBias)
     t.min_lod = static_cast<float>(bits(mode1, 0, 8)) / 16.0f;
     t.max_lod = static_cast<float>(bits(mode1, 8, 8)) / 16.0f;
     t.levels = 1;
