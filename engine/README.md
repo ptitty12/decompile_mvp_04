@@ -14,7 +14,10 @@ and the VPS services.
 input, AX voices) done; E2 groundwork done (the engine builds for WebAssembly,
 and the WebAssembly emitter boots the DOL with the native SDK-log hash); E2 done
 (the player picks their disc in Chrome, Edge or Firefox, the page translates it
-and the title screen renders through WebGPU: `web/`). Build instructions and
+and the title screen renders through WebGPU: `web/`); E5 netplay in progress
+(lockstep in `net/`, the VPS server in `server/`, two browsers in lockstep through
+the lobby: [`../docs/engine/NETPLAY.md`](../docs/engine/NETPLAY.md),
+[`../docs/engine/E5_LOG.md`](../docs/engine/E5_LOG.md)). Build instructions and
 measurements:
 [`../docs/engine/E0B_LOG.md`](../docs/engine/E0B_LOG.md),
 [`../docs/engine/E0C_LOG.md`](../docs/engine/E0C_LOG.md),

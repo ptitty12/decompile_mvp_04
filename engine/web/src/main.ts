@@ -23,6 +23,7 @@ import { AudioOut, type AudioState } from './audio.js';
 import { findServerDisc } from './disc.js';
 import { GamepadPanel } from './gamepad-ui.js';
 import { HostInput } from './input.js';
+import { Online, type OnlineState } from './netplay.js';
 import type { CacheReport, DiscSource, FromWorker, Pad, RunOptions, Status, ToWorker } from './protocol.js';
 
 interface PageState {
@@ -46,6 +47,7 @@ interface PageState {
   pad?: Pad;
   log: string[];
   audioProbe: () => { rms: number; peak: number } | null;
+  net?: OnlineState;  // online play (E5, netplay.ts)
 }
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -63,6 +65,8 @@ const errorEl = $<HTMLElement>('error');
 const fullscreenBtn = $<HTMLButtonElement>('fullscreen');
 const soundBtn = $<HTMLButtonElement>('sound');
 const pauseBtn = $<HTMLButtonElement>('pause');
+const startBox = $<HTMLElement>('start-box');
+const playBtn = $<HTMLButtonElement>('play');
 
 const params = new URLSearchParams(location.search);
 const options: RunOptions = {
@@ -88,6 +92,15 @@ const state: PageState = {
   audioProbe: () => audio?.probe() ?? null,
 };
 (window as unknown as { mvp: PageState }).mvp = state;
+
+// Online play (E5): the lobby panel, when the page comes from the netplay server.
+const onlineEl = document.getElementById('online');
+const online = onlineEl ? new Online(onlineEl, params) : null;
+let onlineReady: Promise<void> = Promise.resolve();
+if (online) {
+  state.net = online.state;
+  onlineReady = online.init().catch(() => {});
+}
 
 const hasWebGPU = 'gpu' in navigator;
 const hasOffscreen = typeof canvas.transferControlToOffscreen === 'function';
@@ -251,6 +264,12 @@ function onWorker(msg: FromWorker): void {
     case 'error':
       showError(msg.stage, msg.message);
       break;
+    case 'net-send':
+      online?.send(msg.data);
+      break;
+    case 'net':
+      online?.engineStatus(msg.status, msg.windows, msg.diagnostic);
+      break;
   }
 }
 
@@ -261,6 +280,7 @@ function startEngine(disc: DiscSource): void {
   errorEl.hidden = true;
   picker.disabled = true;
   pickerBox.hidden = disc.kind === 'url';
+  startBox.hidden = true;
   setStatus(disc.kind === 'file' ? `Reading ${disc.file.name}...` : 'Loading the disc from the server...');
   worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
   worker.onmessage = (ev: MessageEvent<FromWorker>) => onWorker(ev.data);
@@ -273,10 +293,17 @@ function startEngine(disc: DiscSource): void {
     canvas.height = height;
     off = canvas.transferControlToOffscreen();
   }
-  send({ type: 'start', disc, canvas: off, width, height, options }, off ? [off] : []);
+  // In an online game (E5) the Worker boots only after the handshake with the other player.
+  const netplay = online?.netOptions();
+  send({ type: 'start', disc, canvas: off, width, height, options: { ...options, netplay } }, off ? [off] : []);
   if (pendingAudioPort) {
     send({ type: 'audio-port', port: pendingAudioPort }, [pendingAudioPort]);
     pendingAudioPort = null;
+  }
+  if (online && netplay) {
+    online.onDatagram = (data) => send({ type: 'net-recv', data }, [data]);
+    online.whenOpen().then(() => send({ type: 'net-open' })).catch(() => {});
+    window.addEventListener('pagehide', () => send({ type: 'net-quit' }));
   }
   input.poll();
   new ResizeObserver(() => {
@@ -356,9 +383,12 @@ async function init(): Promise<void> {
   }
   setStatus('Looking for the disc...');
   const found = await findServerDisc(location.href);
+  await onlineReady;
   if (found.kind === 'url') {
     log(`disc: from the server (${new URL(found.url).pathname})`);
-    startEngine({ kind: 'url', url: found.url });
+    const disc: DiscSource = { kind: 'url', url: found.url };
+    if (online?.state.available) offerStart(disc);
+    else startEngine(disc);
   } else if (found.kind === 'error') {
     pickerBox.hidden = true;
     showError('server', found.message);
@@ -368,4 +398,20 @@ async function init(): Promise<void> {
     setStatus('Pick your disc image to start.');
   }
 }
+// With the lobby (E5) on the page and the disc on the server: Play starts a
+// game alone at once; creating or joining an online game starts the engine as
+// soon as this page has its player number (the Worker then waits for the
+// other player's handshake before it boots).
+function offerStart(disc: DiscSource): void {
+  startBox.hidden = false;
+  setStatus('The disc is on this server. Press Play, or create or join an online game.');
+  playBtn.addEventListener('click', () => startEngine(disc), { once: true });
+  const waitForRoom = () => {
+    if (worker) return;
+    if (online?.netOptions()) startEngine(disc);
+    else setTimeout(waitForRoom, 250);
+  };
+  waitForRoom();
+}
+
 void init();

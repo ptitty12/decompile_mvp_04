@@ -54,7 +54,16 @@ never committed):
   sound non-silent (RMS up to 0.17), the same guest line as Chrome and Firefox at 800 fields
   (`MEM1 41a3f60e...`).
 
-**Tests:** `ctest --preset emscripten -LE local`: 25 of 25 (new: `test_web_cache`, 5 cases;
+- **E5's real server** (after merging origin/main with E5's netplay and `engine/server`; its
+  built server from E5's worktree, run locally with a throwaway password and the disc
+  configured): Chrome logged in through the form, pressed Play (the lobby is on the page), loaded
+  the disc from `/config.json` and `/api/disc/image`, played sound; cold 728 ms, warm 329 ms;
+  `MEM1 eef70ba3...` at 700 fields. E5's `netplay_check` on the merged shell: two pages, the
+  `menus` script to frame 400, identical guest lines (`MEM1 92cab63f...`), no desync; and the
+  same with the disc on the server instead of the file inputs (both engines started on joining
+  the room): the same line, no desync.
+
+**Tests:** `ctest --preset emscripten -LE local`: 25 of 25 before the merge, 28 of 28 after (new: `test_web_cache`, 5 cases;
 `test_web_shell`, 17 node tests). No native code changed (only `engine/web/`).
 
 ## What was built
@@ -176,9 +185,9 @@ after a warm start (no translator peak at all).
    list of blocks the boot read (offsets only, in its own storage) and fetches them in parallel
    from the start of the next visit, during the translation; most of the 1.9 s boot wait at
    30 ms would go. Persisting the blocks themselves needs the owner (above).
-2. **The real server (E5):** run the browser check against `engine/server` once it exists
-   (`/config.json`, login cookie, Range); the page needs no change if the contract holds. The
-   deployment must be HTTPS (WebGPU, AudioWorklet and OPFS need a secure context) and serve
+2. **The real server (E5):** tested locally (above); next on the VPS. E5's lobby text says "Then
+   pick your disc", which on the deployment (disc on the server) should say that the game starts
+   when both have joined (netplay.ts is E5's). The deployment must be HTTPS (WebGPU, AudioWorklet and OPFS need a secure context) and serve
    `.js` as `text/javascript`. The Worker's `start` message now carries `disc` (a `File` or a
    URL) instead of `file`: shell changes on other branches merge against that.
 3. **A real controller:** try an Xbox and a PlayStation pad in Chrome and Firefox (the

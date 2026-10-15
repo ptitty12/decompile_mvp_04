@@ -61,8 +61,10 @@ Everything below is run by agents; the owner never runs commands.
    `--audio-latency MS`, `--pad F:button:I,F:axis:I:V` (a fake standard gamepad
    behind `navigator.getGamepads()`), `--runs N` with `--clear-cache` (cold and
    warm starts in one profile) or `--no-cache`, `--hide F:MS` (the tab hidden for
-   MS ms), `--trace-disc` (the picked image's read offsets and sizes) and
-   `--disc-cache PARAMS`. It starts the server, opens the page with Playwright,
+   MS ms), `--trace-disc` (the picked image's read offsets and sizes),
+   `--disc-cache PARAMS`, and `--real-server MAIN_JS` (E5's server, built,
+   instead of the mock: a throwaway password, the check logs in through its
+   form, the disc configured; with the lobby there the check presses Play). It starts the server, opens the page with Playwright,
    and writes `summary-BROWSER[-TAG].json` and the screenshots to `--out`
    (default `build/engine/web-check`; screenshots are game-derived and stay under
    `build/`). It lists every request the page made. Chrome and Edge run with
@@ -91,9 +93,13 @@ Everything below is run by agents; the owner never runs commands.
 ```
 
 - **The page** (`src/main.ts`) holds no engine state. On load it asks for
-  `/config.json` (`src/disc.ts`): with a `disc` URL it starts at once with the
-  server's image; otherwise it shows the picker and hands the Worker the picked
-  `File`. It also gives the Worker the canvas as an `OffscreenCanvas` and the
+  `/config.json` (`src/disc.ts`): with a `disc` URL the server's image is used
+  and no picker is shown; otherwise it shows the picker and hands the Worker
+  the picked `File`. With the server's image and E5's lobby on the page (the
+  deployment: `docs/engine/NETPLAY.md`), a Play button starts a game alone, and
+  creating or joining an online game starts the engine as soon as the page has
+  its player number (the Worker then waits for the other player's handshake);
+  without the lobby the game starts at once. It also gives the Worker the canvas as an `OffscreenCanvas` and the
   controller state, shows the status line and a progress bar while loading
   (posted by the Worker, also from inside the translation), the phases, the
   frame statistics and errors, and publishes them as `window.mvp` for the
@@ -342,8 +348,10 @@ native build that does not yield.
   later visits, but the server says `no-store`: an owner decision (E2C_LOG.md).
 - **Gamepads** were tested with unit tests and a fake `getGamepads()`, not yet
   with a real controller.
-- **The real server** (E5, `engine/server/`) is not tested yet; the page follows
-  the contract in §2 and was tested against the mock.
+- **The real server** (E5, `engine/server/`) was tested locally (Chrome: login,
+  the disc from `/config.json`, sound, the cache; and an online game of two
+  pages that both read the server's image, in lockstep with no desync), not yet
+  on the VPS.
 - Before hosting on the VPS: serve the site over **HTTPS** (WebGPU, AudioWorklet
   and the origin private file system exist only in secure contexts; localhost
   counts as one), with `.js` as `text/javascript` (the worklet is a module),

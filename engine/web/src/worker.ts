@@ -15,10 +15,12 @@
 import createMvpEngine, { type MvpEngine } from './mvp-web.js';
 import { probeDiscUrl } from './disc.js';
 import { cacheKey, clearCache, readCached, writeCached } from './module-cache.js';
-import type { CacheReport, DiscSource, FromWorker, Pad, RunOptions, Status, ToWorker, WorkletIn } from './protocol.js';
+import type {
+  CacheReport, DiscSource, FromWorker, NetOptions, NetStatus, Pad, RunOptions, Status, ToWorker, WorkletIn,
+} from './protocol.js';
 
 interface WorkerScope {
-  postMessage(msg: FromWorker): void;
+  postMessage(msg: FromWorker, transfer?: Transferable[]): void;
   onmessage: ((ev: MessageEvent<ToWorker>) => void) | null;
   requestAnimationFrame?: (cb: (now: number) => void) => number;
 }
@@ -44,8 +46,88 @@ let discSize = 0;
 let prefetching = 0;
 let storeKey: string | null = null;
 
-function post(msg: FromWorker): void {
-  scope.postMessage(msg);
+function post(msg: FromWorker, transfer: Transferable[] = []): void {
+  scope.postMessage(msg, transfer);
+}
+
+// ---- Netplay (E5) ----
+// The page owns the WebRTC data channel; datagrams cross as messages. The
+// session (wasm/net_web.cpp) is pumped every few milliseconds, and the run
+// loop runs only while the next frame's input is known (mvp_run_fields stops
+// early otherwise: `gated`). A datagram that arrives while gated retries at
+// once instead of waiting for the next animation frame.
+let net: NetOptions | undefined;
+let gated = false;
+let netTimer = 0;
+let netLastReport = 0;
+let netReportedEnd = false;
+let channelOpen!: () => void;
+const channelOpened = new Promise<void>((resolve) => (channelOpen = resolve));
+
+function netStatus(): NetStatus {
+  return JSON.parse(cstr(M!._mvp_net_status())) as NetStatus;
+}
+
+function reportNet(final: boolean): void {
+  const status = netStatus();
+  const ended = status.state !== 'handshake' && status.state !== 'running';
+  post({
+    type: 'net',
+    status,
+    windows: final || ended ? cstr(M!._mvp_net_windows()) : undefined,
+    diagnostic: ended ? cstr(M!._mvp_net_diagnostic()) : undefined,
+  });
+}
+
+function pumpNet(): void {
+  if (!M) return;
+  const state = M._mvp_net_pump();
+  if (running && gated && !paused) runPaced(performance.now());
+  const now = performance.now();
+  const ended = state >= 2;
+  if (now - netLastReport >= 500 || (ended && !netReportedEnd)) {
+    netLastReport = now;
+    if (ended) netReportedEnd = true;
+    reportNet(false);
+  }
+}
+
+async function buildId(parts: Uint8Array[]): Promise<string> {
+  const all = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+  let at = 0;
+  for (const p of parts) {
+    all.set(p, at);
+    at += p.length;
+  }
+  const h = new Uint8Array(await crypto.subtle.digest('SHA-256', all));
+  return 'web-' + Array.from(h.slice(0, 12), (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Starts the session once the channel is open and waits for the handshake's end.
+async function startNetplay(o: NetOptions, symbols: Uint8Array): Promise<boolean> {
+  const fetchBytes = async (name: string) =>
+    new Uint8Array(await (await fetch(new URL(name, import.meta.url))).arrayBuffer());
+  // The engine build id: the engine module, its JS glue and the symbol map
+  // (function boundaries are safe points): both players must run the same.
+  const build = await buildId([await fetchBytes('mvp-web.wasm'), await fetchBytes('mvp-web.js'), symbols]);
+  M!.mvpNetSend = (d: Uint8Array) => {
+    const copy = d.slice().buffer;
+    post({ type: 'net-send', data: copy }, [copy]);
+  };
+  await channelOpened;
+  const r = crypto.getRandomValues(new Uint32Array(2));
+  const nonce = r[0]! * 2 ** 21 + (r[1]! & 0x1fffff);  // 53 bits, exact in a double
+  const ok = withBytes(new TextEncoder().encode(build), (p, n) => M!._mvp_net_begin(o.player, o.delay, o.hashEvery, p, n, nonce));
+  if (!ok) return false;
+  netTimer = setInterval(pumpNet, 4) as unknown as number;
+  for (;;) {
+    const state = M!._mvp_net_pump();
+    if (state !== 0) {
+      reportNet(false);
+      return state === 1;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 5));
+  }
 }
 
 function cstr(ptr: number): string {
@@ -214,6 +296,8 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   post({ type: 'disc', info });
 
   // The translation: this browser's cache, else the translator.
+  const fetchSymbols = async () => new Uint8Array(await (await fetch(new URL('symbols.txt', import.meta.url))).arrayBuffer());
+  let symbols: Uint8Array | null = null;
   const report: CacheReport = { key: null, hit: false };
   t = performance.now();
   if (options.cache) report.key = await cacheKey(info.dol_sha1, new URL('build-id.json', import.meta.url));
@@ -223,7 +307,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
     // symbols.txt is repository metadata served with the engine.
     t = performance.now();
     post({ type: 'progress', text: 'Translating: fetching the symbol map', step: 0, steps: 5 });
-    const symbols = new Uint8Array(await (await fetch(new URL('symbols.txt', import.meta.url))).arrayBuffer());
+    symbols = await fetchSymbols();
     phase('symbols-fetch', t);
     t = performance.now();
     if (report.key) M._mvp_keep_module(1);
@@ -236,6 +320,18 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
     storeKey = report.key;
   }
   post({ type: 'cache', report });
+
+  if (options.netplay) {
+    net = options.netplay;
+    t = performance.now();
+    // The netplay build id hashes symbols.txt too (a warm start did not fetch it).
+    if (!(await startNetplay(options.netplay, symbols ?? (await fetchSymbols())))) {
+      const st = netStatus();
+      post({ type: 'error', stage: 'netplay', message: st.reason || 'the online game could not start' });
+      return;
+    }
+    phase('netplay-handshake', t);
+  }
 
   t = performance.now();
   post({ type: 'progress', text: 'Booting', step: 5, steps: 5 });
@@ -289,6 +385,7 @@ function afterRun(ran: number, ms: number): boolean {
     running = false;
     const discTrace = opts?.traceDisc ? cstr(M!._mvp_disc_trace()) : undefined;
     post({ type: 'stopped', status: status(), guestLine: cstr(M!._mvp_guest_line()), discTrace });
+    if (net) reportNet(true);
     return false;
   }
   return true;
@@ -308,6 +405,7 @@ function runPaced(now: number): void {
   const t0 = performance.now();
   const ran = M._mvp_run_fields(due);
   pacedFields += Math.max(0, ran);
+  gated = !!net && ran >= 0 && ran < due;
   afterRun(ran, performance.now() - t0);
 }
 
@@ -333,6 +431,7 @@ function fastLoop(): void {
       break;
     }
     ran += r;
+    if (net && r === 0) break;  // waiting for the other player: let datagrams in
   }
   if (afterRun(ran, performance.now() - t0)) setTimeout(fastLoop, 0);
 }
@@ -353,6 +452,24 @@ scope.onmessage = (ev: MessageEvent<ToWorker>) => {
       break;
     case 'resize':
       M?._mvp_canvas_resize(msg.width, msg.height);
+      break;
+    case 'net-open':
+      channelOpen();
+      break;
+    case 'net-recv':
+      if (M) {
+        withBytes(new Uint8Array(msg.data), (p, n) => M!._mvp_net_recv(p, n));
+        if (running && gated && !paused) {
+          M._mvp_net_pump();
+          runPaced(performance.now());
+        }
+      }
+      break;
+    case 'net-quit':
+      if (M && net) {
+        M._mvp_net_quit();
+        clearInterval(netTimer);
+      }
       break;
     case 'pause':
       paused = msg.paused;

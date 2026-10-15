@@ -11,7 +11,7 @@
 //        [--js-flags FLAGS] [--tag NAME]
 //        [--server-disc [--login] [--latency MS] [--rate MBPS]] [--audio | --no-audio] [--audible]
 //        [--audio-latency MS] [--pad F:button:I,F:axis:I:V,...] [--runs N] [--clear-cache] [--no-cache]
-//        [--hide F:MS] [--trace-disc] [--disc-cache PARAMS] [--hold MS]
+//        [--hide F:MS] [--trace-disc] [--disc-cache PARAMS] [--hold MS] [--real-server MAIN_JS]
 //
 //   --disc     the image (default: $MVP_DISC). It goes to the page's file input
 //              locally (or, with --server-disc, to the mock server on 127.0.0.1)
@@ -30,6 +30,9 @@
 //              image in /config.json and loads it without the picker. --login:
 //              the mock's API wants a login (expect the login error); --latency,
 //              --rate: a slow server
+//   --real-server  E5's server (engine/server, built: dist/src/main.js) instead of
+//              the mock, with a throwaway password (the check logs in through its
+//              form) and the disc configured
 //   --audio    click the page first (the user gesture that starts audio), then
 //              sample the worklet's output through the page's AnalyserNode tap.
 //              The browser's output is muted (--audible: not muted)
@@ -50,6 +53,7 @@
 // 1 otherwise, 77 without a disc.
 
 import { spawn } from 'node:child_process';
+import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -76,7 +80,8 @@ const render = !flag('--no-render');
 const timeoutS = Number(opt('--timeout', '600'));
 const jsFlags = opt('--js-flags', '');
 const tag = opt('--tag', '');
-const serverDisc = flag('--server-disc');
+const realServer = opt('--real-server', '');  // E5's server: engine/server/dist/src/main.js
+const serverDisc = flag('--server-disc') || !!realServer;
 const login = flag('--login');
 const latency = opt('--latency', '');
 const rate = opt('--rate', '');
@@ -110,19 +115,32 @@ if (!disc || !existsSync(disc)) {
 }
 mkdirSync(out, { recursive: true });
 
-// The server, on a free port.
-const serverArgs = [join(here, 'serve.mjs'), '--port', '0'];
-if (serverDisc) {
-  serverArgs.push('--disc', disc);
-  if (login) serverArgs.push('--login');
-  if (latency) serverArgs.push('--latency', latency);
-  if (rate) serverArgs.push('--rate', rate);
+// The server, on a free port: serve.mjs (with --server-disc its mock of the
+// deployment), or with --real-server E5's server (engine/server, built) with a
+// throwaway password and the disc configured.
+const site = resolve(repo, 'build', 'engine', 'emscripten', 'web', 'site');
+const password = randomBytes(18).toString('base64url');
+let server;
+if (realServer) {
+  server = spawn(process.execPath, [realServer], {
+    env: { ...process.env, MVP_PASSWORD: password, MVP_SITE: site, MVP_PORT: '0', MVP_HOST: '127.0.0.1',
+           MVP_DISC_IMAGE: disc },
+    stdio: ['ignore', 'pipe', 'inherit'],
+  });
+} else {
+  const serverArgs = [join(here, 'serve.mjs'), '--port', '0'];
+  if (serverDisc) {
+    serverArgs.push('--disc', disc);
+    if (login) serverArgs.push('--login');
+    if (latency) serverArgs.push('--latency', latency);
+    if (rate) serverArgs.push('--rate', rate);
+  }
+  server = spawn(process.execPath, serverArgs, { stdio: ['ignore', 'pipe', 'inherit'] });
 }
-const server = spawn(process.execPath, serverArgs, { stdio: ['ignore', 'pipe', 'inherit'] });
 const base = await new Promise((resolveUrl, reject) => {
   server.stdout.on('data', (d) => {
-    const m = /serving (http:\/\/\S+)/.exec(String(d));
-    if (m) resolveUrl(m[1]);
+    const m = /(?:serving|listening on) (http:\/\/[^\s;]+)/.exec(String(d));
+    if (m) resolveUrl(m[1].endsWith('/') ? m[1] : `${m[1]}/`);
   });
   server.on('exit', (code) => reject(new Error(`server exited ${code}`)));
 });
@@ -189,6 +207,11 @@ async function runOnce(context, run) {
   if (audioLatency) q.set('audioLatency', audioLatency);
   if (traceDisc) q.set('traceDisc', '1');
   for (const [k, v] of new URLSearchParams(discParams)) q.set(k, v);
+  if (realServer && run === 1) {  // log in through the form, as a player would
+    await page.goto(base);
+    await page.fill('input[name=password]', password);
+    await Promise.all([page.waitForURL(base), page.click('button[type=submit]')]);
+  }
   const t0 = Date.now();
   await page.goto(`${base}?${q}`);
   if (run === 1 && clearCache) {
@@ -201,6 +224,12 @@ async function runOnce(context, run) {
   // The user gesture that starts audio: a real click on the page.
   if (audio) await page.mouse.click(5, 5);
   if (!serverDisc) await page.setInputFiles('#disc', disc);
+  else {
+    // With the lobby on the page (E5), the server's disc waits for Play (or a room).
+    await page.waitForFunction(() => window.mvp.source || window.mvp.error ||
+                                     !document.getElementById('start-box')?.hidden, null, { timeout: 30000 });
+    if (await page.locator('#play').isVisible()) await page.click('#play');
+  }
 
   const deadline = t0 + timeoutS * 1000;
   const mvp = () => page.evaluate(() => {
@@ -296,7 +325,7 @@ async function runOnce(context, run) {
   const origin = new URL(base).origin;
   summary.foreignRequests = requests.filter((u) => !u.startsWith(origin) && !u.startsWith('blob:') && !u.startsWith('data:'));
   summary.requests = [...new Set(requests.map((u) => u.replace(origin, '').replace(/\?.*$/, '?...')))];
-  if (serverDisc) summary.mockServer = await (await fetch(`${base}_stats`)).json();
+  if (serverDisc && !realServer) summary.mockServer = await (await fetch(`${base}_stats`)).json();
   await page.close();
   const ok = state.firstFrameMs !== undefined || (!render && state.stopped);
   summary.ok = ok && !state.error && (!(fields || frames) || !!state.stopped);

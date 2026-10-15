@@ -11,6 +11,7 @@
 <body>
   <main>
     <h1>MVP Baseball 2005 <span>browser engine, development build</span></h1>
+    <section id="online" class="online" hidden></section>
     <div id="picker" hidden>
       <p class="note">
         Pick your own disc image of MVP Baseball 2005 for GameCube (USA, GV4E69). The page reads it on this
@@ -20,6 +21,7 @@
         <input type="file" id="disc" accept=".iso,.ciso,.gcm">
       </label>
     </div>
+    <p id="start-box" hidden><button type="button" id="play">Play</button></p>
     <p id="status" role="status"></p>
     <progress id="progress" max="1" hidden></progress>
     <p id="error" class="error" role="alert" hidden></p>

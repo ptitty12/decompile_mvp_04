@@ -43,11 +43,21 @@ export interface MvpEngine {
   _mvp_audio_ptr(): number;
   _mvp_audio_rate(): number;
 
+  // Netplay (E5, wasm/net_web.cpp).
+  _mvp_net_begin(player: number, delay: number, hashEvery: number, build: number, buildLen: number, nonce: number): number;
+  _mvp_net_recv(data: number, len: number): void;
+  _mvp_net_pump(): number;
+  _mvp_net_quit(): void;
+  _mvp_net_status(): number;
+  _mvp_net_windows(): number;
+  _mvp_net_diagnostic(): number;
+
   // Set by the Worker before the calls that use them.
   mvpDisc?: File;
   mvpDiscUrl?: string;
   mvpOnGfx?: (ok: number, message: string) => void;
   mvpOnProgress?: (text: string, step: number, steps: number) => void;
+  mvpNetSend?: (datagram: Uint8Array) => void;
 }
 
 export interface MvpEngineOptions {
