@@ -342,11 +342,44 @@ void Renderer::begin_pass() {
   ++pass_serial_;
   vdata_.clear();
   udata_.clear();
+  bound_pipeline_ = bound_textures_ = nullptr;
+  bound_uoff_ = ~0u;
+  bound_scissor_[0] = bound_scissor_[1] = bound_scissor_[2] = bound_scissor_[3] = ~0u;
+  bound_vbuf_ = false;
   ++stats_.passes;
+}
+
+void Renderer::emit_pending() {
+  if (!pending_.active) return;
+  pending_.active = false;
+  if (bound_pipeline_ != pending_.pipeline.Get()) {
+    pass_.SetPipeline(pending_.pipeline);
+    bound_pipeline_ = pending_.pipeline.Get();
+  }
+  if (bound_uoff_ != pending_.uoff) {
+    pass_.SetBindGroup(0, uniform_group_, 1, &pending_.uoff);
+    bound_uoff_ = pending_.uoff;
+  }
+  if (bound_textures_ != pending_.textures.Get()) {
+    pass_.SetBindGroup(1, pending_.textures);
+    bound_textures_ = pending_.textures.Get();
+  }
+  if (!bound_vbuf_) {
+    pass_.SetVertexBuffer(0, vbuf_, 0, kVertexCapacity);
+    bound_vbuf_ = true;
+  }
+  if (std::memcmp(bound_scissor_, pending_.scissor, sizeof bound_scissor_) != 0) {
+    pass_.SetScissorRect(pending_.scissor[0], pending_.scissor[1], pending_.scissor[2] - pending_.scissor[0],
+                         pending_.scissor[3] - pending_.scissor[1]);
+    std::memcpy(bound_scissor_, pending_.scissor, sizeof bound_scissor_);
+  }
+  pass_.Draw(pending_.count, 1, pending_.first, 0);
+  ++stats_.encoded;
 }
 
 void Renderer::flush() {
   if (!pass_open_) return;
+  emit_pending();
   pass_.End();
   pass_ = nullptr;
   if (!vdata_.empty()) gpu_.queue().WriteBuffer(vbuf_, 0, vdata_.data(), vdata_.size());
@@ -607,20 +640,41 @@ void Renderer::draw(const DrawCall& d) {
   }
 
   begin_pass();
-  const std::uint32_t uoff = static_cast<std::uint32_t>(udata_.size());
-  udata_.resize(udata_.size() + kUniformSlot, 0);
-  std::memcpy(udata_.data() + uoff, &u, sizeof u);
   const std::uint64_t voff = vdata_.size();
+  const std::uint32_t n = static_cast<std::uint32_t>(d.verts.size());
+  ++stats_.draws;
+  // The same state as the recorded draw, whose vertices end where these begin:
+  // one draw for both.
+  if (pending_.active && pending_.pipeline.Get() == p.Get() && pending_.textures.Get() == tg.Get() &&
+      std::memcmp(pending_.scissor, d.scissor, sizeof pending_.scissor) == 0 &&
+      std::memcmp(&pending_.u, &u, sizeof u) == 0 &&
+      static_cast<std::uint64_t>(pending_.first + pending_.count) * sizeof(OutVertex) == voff) {
+    vdata_.resize(vdata_.size() + vbytes);
+    std::memcpy(vdata_.data() + voff, d.verts.data(), vbytes);
+    pending_.count += n;
+    ++stats_.merged;
+    return;
+  }
+  emit_pending();
+  // A new uniform slot unless the constants are those of the draw before.
+  std::uint32_t uoff;
+  if (!udata_.empty() && std::memcmp(udata_.data() + (udata_.size() - kUniformSlot), &u, sizeof u) == 0) {
+    uoff = static_cast<std::uint32_t>(udata_.size() - kUniformSlot);
+  } else {
+    uoff = static_cast<std::uint32_t>(udata_.size());
+    udata_.resize(udata_.size() + kUniformSlot, 0);
+    std::memcpy(udata_.data() + uoff, &u, sizeof u);
+  }
   vdata_.resize(vdata_.size() + vbytes);
   std::memcpy(vdata_.data() + voff, d.verts.data(), vbytes);
-
-  pass_.SetPipeline(p);
-  pass_.SetBindGroup(0, uniform_group_, 1, &uoff);
-  pass_.SetBindGroup(1, tg);
-  pass_.SetVertexBuffer(0, vbuf_, voff, vbytes);
-  pass_.SetScissorRect(d.scissor[0], d.scissor[1], d.scissor[2] - d.scissor[0], d.scissor[3] - d.scissor[1]);
-  pass_.Draw(static_cast<std::uint32_t>(d.verts.size()));
-  ++stats_.draws;
+  pending_.active = true;
+  pending_.pipeline = p;
+  pending_.textures = tg;
+  pending_.uoff = uoff;
+  pending_.first = static_cast<std::uint32_t>(voff / sizeof(OutVertex));
+  pending_.count = n;
+  std::memcpy(pending_.scissor, d.scissor, sizeof pending_.scissor);
+  pending_.u = u;
 }
 
 void Renderer::clear_efb(const EfbCopy& c) {

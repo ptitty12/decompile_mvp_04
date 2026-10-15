@@ -522,12 +522,13 @@ int main(int argc, char** argv) {
               ull(ps.commands), ull(ps.draws), ull(ps.vertices), ull(ps.triangles), ull(ps.copies), ull(ps.xfb_copies),
               ull(ps.tlut_loads), ull(ps.unknown));
   const auto& rs = renderer->stats();
-  std::printf("renderer: %llu draws (%llu skipped), %llu passes, %llu pipelines, %llu textures decoded, %llu hits, "
+  std::printf("renderer: %llu draws (%llu skipped, %llu merged into the one before; %llu encoded), %llu passes, "
+              "%llu pipelines, %llu textures decoded, %llu hits, "
               "%llu EFB-copy textures used, %llu texture copies, %llu clears; %llu unknown formats, "
               "%llu indirect draws, %llu fog draws\n",
-              ull(rs.draws), ull(rs.skipped), ull(rs.passes), ull(rs.pipelines), ull(rs.textures_decoded),
-              ull(rs.texture_hits), ull(rs.copy_textures_used), ull(rs.tex_copies), ull(rs.clears),
-              ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws));
+              ull(rs.draws), ull(rs.skipped), ull(rs.merged), ull(rs.encoded), ull(rs.passes), ull(rs.pipelines),
+              ull(rs.textures_decoded), ull(rs.texture_hits), ull(rs.copy_textures_used), ull(rs.tex_copies),
+              ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws));
   std::printf("display: %llu presents, %llu captures%s%s; WebGPU errors %llu\n", ull(play.presents), ull(play.captures),
               play.capture_dir.empty() ? "" : " in ", play.capture_dir.c_str(), ull(gpu->errors()));
   if (gpu->errors() || ps.xfb_copies == 0) rc = 1;

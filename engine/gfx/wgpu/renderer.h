@@ -57,6 +57,7 @@ class Renderer : public Backend {
     std::uint64_t draws = 0, skipped = 0, passes = 0, pipelines = 0, textures_decoded = 0, texture_hits = 0;
     std::uint64_t copy_textures_used = 0, xfb_copies = 0, tex_copies = 0, clears = 0;
     std::uint64_t unknown_formats = 0, indirect_draws = 0, fog_draws = 0;
+    std::uint64_t merged = 0, encoded = 0;  // draws appended to the previous one; WebGPU draws encoded
   };
   const Stats& stats() const { return stats_; }
 
@@ -69,6 +70,7 @@ class Renderer : public Backend {
   };
 
   void begin_pass();
+  void emit_pending();
   wgpu::RenderPipeline pipeline(const PipelineConfig& c);
   wgpu::TextureView texture(const TextureDesc& t, std::uint32_t* w, std::uint32_t* h);
   wgpu::Sampler sampler(const TextureDesc& t);
@@ -96,6 +98,23 @@ class Renderer : public Backend {
   bool pass_open_ = false;
   std::uint64_t pass_serial_ = 0;
   std::vector<std::uint8_t> vdata_, udata_;
+  // The last draw, recorded but not encoded yet: a next draw with the same
+  // pipeline, textures, constants and scissor appends its vertices to it (the
+  // game sends thousands of small primitives with one state).
+  struct Pending {
+    bool active = false;
+    wgpu::RenderPipeline pipeline;
+    wgpu::BindGroup textures;
+    std::uint32_t uoff = 0, first = 0, count = 0;
+    std::uint32_t scissor[4] = {};
+    DrawUniforms u;
+  } pending_;
+  // What the open pass has bound, to skip repeated state.
+  const void* bound_pipeline_ = nullptr;
+  const void* bound_textures_ = nullptr;
+  std::uint32_t bound_uoff_ = ~0u;
+  std::uint32_t bound_scissor_[4] = {};
+  bool bound_vbuf_ = false;
 
   std::unordered_map<PipelineConfig, wgpu::RenderPipeline, CfgHash> pipelines_;
   std::unordered_map<std::string, wgpu::ShaderModule> modules_;

@@ -402,22 +402,80 @@ InVertex GxProcessor::load_vertex(int fmt, const u8* p) const {
   return v;
 }
 
+void GxProcessor::setup_transform(XformSetup& x) const {
+  for (int k = 0; k < 6; ++k) x.pr[k] = xf_float(xf::kProjection + static_cast<u32>(k));
+  x.ortho = xf_word(xf::kProjection + 6) != 0;
+  x.wd = xf_float(xf::kViewport);
+  x.ht = xf_float(xf::kViewport + 1);
+  x.zr = xf_float(xf::kViewport + 2);
+  x.xo = xf_float(xf::kViewport + 3);
+  x.yo = xf_float(xf::kViewport + 4);
+  x.zf = xf_float(xf::kViewport + 5);
+  x.ox = static_cast<float>(bits(bp_[bp::kScissorOffset], 0, 10) * 2);
+  x.oy = static_cast<float>(bits(bp_[bp::kScissorOffset], 10, 10) * 2);
+  x.nchan = xf_word(xf::kNumColors) & 3;
+  u32 lights = 0;
+  for (u32 ch = 0; ch < 2 && ch < x.nchan; ++ch)
+    for (int is_alpha = 0; is_alpha < 2; ++is_alpha) {
+      XformSetup::Chan& c = x.chan[ch][is_alpha];
+      c.ctl = xf_word(xf::kColor0Cntrl + ch + (is_alpha ? 2u : 0u));
+      unpack_rgba8(xf_word(xf::kMaterial0 + ch), c.mat);
+      unpack_rgba8(xf_word(xf::kAmbient0 + ch), c.amb);
+      if (bits(c.ctl, 1, 1)) lights |= bits(c.ctl, 2, 4) | bits(c.ctl, 11, 4) << 4;
+    }
+  for (u32 l = 0; l < 8; ++l) {
+    if (!(lights & (1u << l))) continue;
+    XformSetup::Light& L = x.lights[l];
+    const u32 base = xf::kLights + l * 16;
+    unpack_rgba8(xf_word(base + 3), L.col);
+    for (u32 k = 0; k < 3; ++k) {
+      L.cosatt[k] = xf_float(base + 4 + k);
+      L.distatt[k] = xf_float(base + 7 + k);
+      L.pos[k] = xf_float(base + 10 + k);
+      L.dir[k] = xf_float(base + 13 + k);
+    }
+  }
+  x.ngen = xf_word(xf::kNumTexGens) & 15;
+  x.dual = xf_word(xf::kDualTex) & 1;
+  for (u32 i = 0; i < x.ngen && i < 8; ++i) {
+    x.texgen[i] = xf_word(xf::kTexGen + i);
+    if (x.dual) {
+      x.post[i] = xf_word(xf::kPostInfo + i);
+      const u32 pm2 = xf::kPostMtx + (bits(x.post[i], 0, 6) * 4u);
+      for (int k = 0; k < 12; ++k) x.postmtx[i][k] = xf_float(pm2 + static_cast<u32>(k));
+    }
+  }
+  x.have_pos = x.have_nrm = 0;
+}
+
 OutVertex GxProcessor::transform(const InVertex& v) const {
+  XformSetup x;
+  setup_transform(x);
+  return transform(v, x);
+}
+
+OutVertex GxProcessor::transform(const InVertex& v, XformSetup& x) const {
   OutVertex o{};
+  // A 3x4 matrix at XF memory index * 4 (position and texture matrices).
+  auto mtx34 = [&](u32 index) -> const float* {
+    index &= 0x3F;
+    if (!(x.have_pos >> index & 1)) {
+      const u32 at = index * 4u;
+      for (int k = 0; k < 12; ++k) x.pos[index][k] = xf_float(xf::kPosMtx + ((at + static_cast<u32>(k)) & 0xFF));
+      x.have_pos |= 1ull << index;
+    }
+    return x.pos[index];
+  };
   // Position: model-view (3x4 at index * 4), projection, viewport, then the
   // EFB's clip space.
-  const u32 pm = (v.pnmtx & 0x3F) * 4u;
-  float m[12];
-  for (int k = 0; k < 12; ++k) m[k] = xf_float(xf::kPosMtx + ((pm + static_cast<u32>(k)) & 0xFF));
+  const float* m = mtx34(v.pnmtx);
   const float* p = v.pos;
   float view[3];
   for (int r = 0; r < 3; ++r) view[r] = m[4 * r] * p[0] + m[4 * r + 1] * p[1] + m[4 * r + 2] * p[2] + m[4 * r + 3];
 
-  float pr[6];
-  for (int k = 0; k < 6; ++k) pr[k] = xf_float(xf::kProjection + static_cast<u32>(k));
-  bool ortho = xf_word(xf::kProjection + 6) != 0;
+  const float* pr = x.pr;
   float cx, cy, cz, cw;
-  if (ortho) {
+  if (x.ortho) {
     cx = pr[0] * view[0] + pr[1];
     cy = pr[2] * view[1] + pr[3];
     cz = pr[4] * view[2] + pr[5];
@@ -428,25 +486,27 @@ OutVertex GxProcessor::transform(const InVertex& v) const {
     cz = pr[4] * view[2] + pr[5];
     cw = -view[2];
   }
-  const float wd = xf_float(xf::kViewport), ht = xf_float(xf::kViewport + 1), zr = xf_float(xf::kViewport + 2);
-  const float xo = xf_float(xf::kViewport + 3), yo = xf_float(xf::kViewport + 4), zf = xf_float(xf::kViewport + 5);
-  const float ox = static_cast<float>(bits(bp_[bp::kScissorOffset], 0, 10) * 2);
-  const float oy = static_cast<float>(bits(bp_[bp::kScissorOffset], 10, 10) * 2);
   const float hw = static_cast<float>(kEfbWidth) / 2, hh = static_cast<float>(kEfbHeight) / 2;
   // Window x = cx / cw * wd + xo - ox; EFB clip x = (window x / hw - 1) * cw.
-  o.pos[0] = (cx * wd + cw * (xo - ox)) / hw - cw;
+  o.pos[0] = (cx * x.wd + cw * (x.xo - x.ox)) / hw - cw;
   // Window y grows downwards; the EFB clip space's y grows upwards.
-  o.pos[1] = cw - (cy * ht + cw * (yo - oy)) / hh;
+  o.pos[1] = cw - (cy * x.ht + cw * (x.yo - x.oy)) / hh;
   // Depth: window z = cz / cw * zrange + zfar, in 24-bit units.
-  o.pos[2] = (cz * zr + cw * zf) / 16777215.0f;
+  o.pos[2] = (cz * x.zr + cw * x.zf) / 16777215.0f;
   o.pos[3] = cw;
 
-  // Normal (3x3 at 0x400 + (index & 31) * 3).
+  // Normal (3x3 at 0x400 + (index & 31) * 3), only when lighting needs it.
   float n[3] = {v.nrm[0], v.nrm[1], v.nrm[2]};
-  {
-    const u32 nm = xf::kNrmMtx + (v.pnmtx & 31u) * 3u;
-    float q[9];
-    for (int k = 0; k < 9; ++k) q[k] = xf_float(nm + static_cast<u32>(k));
+  bool lit = false;
+  for (u32 ch = 0; ch < 2 && ch < x.nchan; ++ch) lit = lit || bits(x.chan[ch][0].ctl, 1, 1) || bits(x.chan[ch][1].ctl, 1, 1);
+  if (lit) {
+    const u32 ni = v.pnmtx & 31u;
+    if (!(x.have_nrm >> ni & 1)) {
+      const u32 nm = xf::kNrmMtx + ni * 3u;
+      for (int k = 0; k < 9; ++k) x.nrm[ni][k] = xf_float(nm + static_cast<u32>(k));
+      x.have_nrm |= 1ull << ni;
+    }
+    const float* q = x.nrm[ni];
     float t[3];
     for (int r = 0; r < 3; ++r) t[r] = q[3 * r] * v.nrm[0] + q[3 * r + 1] * v.nrm[1] + q[3 * r + 2] * v.nrm[2];
     n[0] = t[0];
@@ -456,35 +516,26 @@ OutVertex GxProcessor::transform(const InVertex& v) const {
   }
 
   // Lighting: color channels 0 and 1, color and alpha separately.
-  const u32 nchan = xf_word(xf::kNumColors) & 3;
-  for (u32 ch = 0; ch < 2 && ch < nchan; ++ch) {
+  for (u32 ch = 0; ch < 2 && ch < x.nchan; ++ch) {
     for (int is_alpha = 0; is_alpha < 2; ++is_alpha) {
-      const u32 ctl = xf_word(xf::kColor0Cntrl + ch + (is_alpha ? 2u : 0u));
+      const XformSetup::Chan& cs = x.chan[ch][is_alpha];
+      const u32 ctl = cs.ctl;
       float mat[4], amb[4];
       if (bits(ctl, 0, 1)) std::memcpy(mat, v.color[ch], sizeof mat);
-      else unpack_rgba8(xf_word(xf::kMaterial0 + ch), mat);
+      else std::memcpy(mat, cs.mat, sizeof mat);
       float out[4];
       std::memcpy(out, mat, sizeof out);
       if (bits(ctl, 1, 1)) {
         if (bits(ctl, 6, 1)) std::memcpy(amb, v.color[ch], sizeof amb);
-        else unpack_rgba8(xf_word(xf::kAmbient0 + ch), amb);
+        else std::memcpy(amb, cs.amb, sizeof amb);
         float acc[4];
         std::memcpy(acc, amb, sizeof acc);
         const u32 mask = bits(ctl, 2, 4) | bits(ctl, 11, 4) << 4;
         const u32 diffuse = bits(ctl, 7, 2), attn_fn = bits(ctl, 9, 2);
         for (u32 l = 0; l < 8; ++l) {
           if (!(mask & (1u << l))) continue;
-          const u32 base = xf::kLights + l * 16;
-          float lcol[4];
-          unpack_rgba8(xf_word(base + 3), lcol);
-          float cosatt[3], distatt[3], lpos[3], ldir_l[3];
-          for (u32 k = 0; k < 3; ++k) {
-            cosatt[k] = xf_float(base + 4 + k);
-            distatt[k] = xf_float(base + 7 + k);
-            lpos[k] = xf_float(base + 10 + k);
-            ldir_l[k] = xf_float(base + 13 + k);
-          }
-          float ldir[3] = {lpos[0] - view[0], lpos[1] - view[1], lpos[2] - view[2]};
+          const XformSetup::Light& L = x.lights[l];
+          float ldir[3] = {L.pos[0] - view[0], L.pos[1] - view[1], L.pos[2] - view[2]};
           float attn = 1.0f;
           if (attn_fn == 3) {  // spot
             float dist2 = dot3(ldir, ldir), dist = std::sqrt(dist2);
@@ -493,16 +544,16 @@ OutVertex GxProcessor::transform(const InVertex& v) const {
               ldir[1] /= dist;
               ldir[2] /= dist;
             }
-            float c = std::max(0.0f, dot3(ldir, ldir_l));
-            float num = std::max(0.0f, cosatt[0] + cosatt[1] * c + cosatt[2] * c * c);
-            float den = distatt[0] + distatt[1] * dist + distatt[2] * dist2;
+            float c = std::max(0.0f, dot3(ldir, L.dir));
+            float num = std::max(0.0f, L.cosatt[0] + L.cosatt[1] * c + L.cosatt[2] * c * c);
+            float den = L.distatt[0] + L.distatt[1] * dist + L.distatt[2] * dist2;
             attn = den != 0 ? num / den : 0.0f;
           } else if (attn_fn == 1) {  // specular
             normalize3(ldir);
-            float c = dot3(n, ldir) >= 0 ? std::max(0.0f, dot3(n, ldir_l)) : 0.0f;
-            float da[3] = {distatt[0], distatt[1], distatt[2]};
+            float c = dot3(n, ldir) >= 0 ? std::max(0.0f, dot3(n, L.dir)) : 0.0f;
+            float da[3] = {L.distatt[0], L.distatt[1], L.distatt[2]};
             if (diffuse != 0) normalize3(da);
-            float num = std::max(0.0f, cosatt[0] + cosatt[1] * c + cosatt[2] * c * c);
+            float num = std::max(0.0f, L.cosatt[0] + L.cosatt[1] * c + L.cosatt[2] * c * c);
             float den = da[0] + da[1] * c + da[2] * c * c;
             attn = den != 0 ? num / den : 0.0f;
           } else {
@@ -511,7 +562,7 @@ OutVertex GxProcessor::transform(const InVertex& v) const {
           float d = 1.0f;
           if (diffuse == 1) d = dot3(ldir, n);
           else if (diffuse == 2) d = std::max(0.0f, dot3(ldir, n));
-          for (int k = 0; k < 4; ++k) acc[k] += attn * d * lcol[k];
+          for (int k = 0; k < 4; ++k) acc[k] += attn * d * L.col[k];
         }
         for (int k = 0; k < 4; ++k) out[k] = mat[k] * std::clamp(acc[k], 0.0f, 1.0f);
       }
@@ -525,10 +576,8 @@ OutVertex GxProcessor::transform(const InVertex& v) const {
   }
 
   // Texture coordinate generation.
-  const u32 ngen = xf_word(xf::kNumTexGens) & 15;
-  const bool dual = xf_word(xf::kDualTex) & 1;
-  for (u32 i = 0; i < ngen && i < 8; ++i) {
-    const u32 info = xf_word(xf::kTexGen + i);
+  for (u32 i = 0; i < x.ngen && i < 8; ++i) {
+    const u32 info = x.texgen[i];
     const u32 type = bits(info, 4, 3), row = bits(info, 7, 5);
     float out[3] = {0, 0, 1};
     if (type == 0) {
@@ -547,9 +596,7 @@ OutVertex GxProcessor::transform(const InVertex& v) const {
           break;
       }
       if (!bits(info, 2, 1)) src[2] = 1.0f;  // AB11
-      const u32 tm = (v.texmtx[i] & 0x3F) * 4u;
-      float mtx[12];
-      for (int k = 0; k < 12; ++k) mtx[k] = xf_float(xf::kPosMtx + ((tm + static_cast<u32>(k)) & 0xFF));
+      const float* mtx = mtx34(v.texmtx[i]);
       bool stq = bits(info, 1, 1);
       for (int r = 0; r < (stq ? 3 : 2); ++r)
         out[r] = mtx[4 * r] * src[0] + mtx[4 * r + 1] * src[1] + mtx[4 * r + 2] * src[2] + mtx[4 * r + 3] * src[3];
@@ -562,12 +609,10 @@ OutVertex GxProcessor::transform(const InVertex& v) const {
       out[1] = col[1];
       out[2] = 1.0f;
     }
-    if (dual && type == 0) {
-      const u32 post = xf_word(xf::kPostInfo + i);
+    if (x.dual && type == 0) {
+      const u32 post = x.post[i];
       if (bits(post, 8, 1)) normalize3(out);
-      const u32 pm2 = xf::kPostMtx + (bits(post, 0, 6) * 4u);
-      float mtx[12];
-      for (int k = 0; k < 12; ++k) mtx[k] = xf_float(pm2 + static_cast<u32>(k));
+      const float* mtx = x.postmtx[i];
       float r3[3];
       for (int r = 0; r < 3; ++r)
         r3[r] = mtx[4 * r] * out[0] + mtx[4 * r + 1] * out[1] + mtx[4 * r + 2] * out[2] + mtx[4 * r + 3];
@@ -737,9 +782,12 @@ void GxProcessor::primitive(u8 op, const u8* data, u32 count) {
   const u32 vsize = vertex_size(fmt);
   stats_.vertices += count;
   if (count == 0) return;
-  std::vector<OutVertex> vs;
+  std::vector<OutVertex>& vs = vs_;
+  vs.clear();
   vs.reserve(count);
-  for (u32 k = 0; k < count; ++k) vs.push_back(transform(load_vertex(fmt, data + static_cast<std::size_t>(k) * vsize)));
+  setup_transform(xs_);
+  for (u32 k = 0; k < count; ++k)
+    vs.push_back(transform(load_vertex(fmt, data + static_cast<std::size_t>(k) * vsize), xs_));
 
   prim_info_.op = op;
   prim_info_.count = count;
@@ -761,7 +809,9 @@ void GxProcessor::primitive(u8 op, const u8* data, u32 count) {
   }
   prim_info_.first_vertex.assign(data, data + vsize);
 
-  DrawCall d;
+  DrawCall& d = draw_;
+  d.verts.clear();
+  d.u = DrawUniforms{};
   snapshot(d);
   auto tri = [&](u32 a, u32 b, u32 c) {
     d.verts.push_back(vs[a]);

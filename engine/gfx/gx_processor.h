@@ -33,6 +33,33 @@ struct InVertex {
   float tex[8][2] = {};
 };
 
+// What the transform unit reads from XF registers and memory for one primitive,
+// unpacked once (the state cannot change inside a primitive), and the matrices it
+// fetched so far by index.
+struct XformSetup {
+  bool ortho = false;
+  float pr[6] = {};
+  float wd = 0, ht = 0, zr = 0, xo = 0, yo = 0, zf = 0, ox = 0, oy = 0;
+  struct Light {
+    float col[4], cosatt[3], distatt[3], pos[3], dir[3];
+  };
+  struct Chan {
+    u32 ctl = 0;
+    float mat[4] = {}, amb[4] = {};
+  };
+  u32 nchan = 0;
+  Chan chan[2][2];  // [channel][color, alpha]
+  Light lights[8];
+  u32 ngen = 0;
+  bool dual = false;
+  u32 texgen[8] = {}, post[8] = {};
+  float postmtx[8][12] = {};
+  // Matrices by 6-bit index: position/texture (3x4 at index * 4) and normal (3x3).
+  std::uint64_t have_pos = 0, have_nrm = 0;
+  float pos[64][12];
+  float nrm[64][9];
+};
+
 class GxProcessor {
  public:
   explicit GxProcessor(Backend* backend) : backend_(backend) { reset(); }
@@ -62,6 +89,9 @@ class GxProcessor {
   InVertex load_vertex(int fmt, const u8* p) const;
   // The transform unit for one vertex.
   OutVertex transform(const InVertex& v) const;
+  // The same with the state unpacked once per primitive.
+  void setup_transform(XformSetup& x) const;
+  OutVertex transform(const InVertex& v, XformSetup& x) const;
   // The pipeline configuration, uniforms and textures for a draw now.
   void snapshot(DrawCall& d) const;
 
@@ -110,6 +140,10 @@ class GxProcessor {
   std::vector<u8> tlut_;  // TMEM's palette half: 512 KiB
   Stats stats_;
   PrimInfo prim_info_;
+  // Reused per primitive (no allocation per draw).
+  XformSetup xs_;
+  std::vector<OutVertex> vs_;
+  DrawCall draw_;
 };
 
 }  // namespace mvp::gfx
