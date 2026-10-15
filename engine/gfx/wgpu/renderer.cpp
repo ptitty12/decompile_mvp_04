@@ -163,6 +163,16 @@ struct Renderer::CopyEntry {
   std::uint32_t w = 0, h = 0;
   std::uint32_t bytes = 0;
   std::uint64_t mem_hash = 0, epoch = 0;
+  std::uint64_t serial = 0;  // bumped by every copy to it
+  // P2: the copy as part of a taller texture of the same width (tall_copy()).
+  struct Tall {
+    wgpu::Texture tex;
+    wgpu::TextureView view;
+    std::uint32_t h = 0;
+    std::uint8_t format = 0xFF;
+    std::uint64_t copy_serial = 0, tail_hash = 0, pass = 0;
+  };
+  std::unique_ptr<Tall> tall;
 };
 
 std::size_t Renderer::CfgHash::operator()(const PipelineConfig& c) const {
@@ -566,6 +576,14 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
       ++stats_.copy_textures_used;
       return e.view;
     }
+    // P2: sampled taller than the copy, at the same width (the game samples a
+    // 256 x 224 half-scale copy as a 256 x 256 texture): the hardware reads the
+    // rows the copy wrote and, below them, whatever memory holds.
+    if (ci != copies_.end() && e.w == t.width && e.h < t.height && t.levels == 1 && !t.tlut &&
+        texture_format_known(t.format)) {
+      wgpu::TextureView v = tall_copy(e, t);
+      if (v) return v;
+    }
     if (ci != copies_.end()) ++stats_.copy_size_misses;
   }
   if (!texture_format_known(t.format)) {
@@ -631,6 +649,67 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
   slot->pass = pass_open_ ? pass_serial_ : pass_serial_ + 1;
   ++stats_.textures_decoded;
   return slot->view;
+}
+
+// A texture taller than the EFB copy at its address, of the same width (P2):
+// the copy's rows on top, the rest decoded from memory after the bytes the copy
+// covers (in the texture's format the copy's rows take whole block rows, so the
+// rows below start right after them). Rebuilt when the copy is copied again or
+// that memory changes. Null if the texture lies outside memory.
+wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
+  const std::uint32_t a = t.addr & 0x01FFFFFFu;
+  const std::uint32_t bytes = texture_level_size(t.format, t.width, t.height);
+  const std::uint32_t covered = std::min(texture_level_size(t.format, t.width, e.h), bytes);
+  if (!mem_ || a > mem_size_ || bytes > mem_size_ - a) return nullptr;
+  const std::uint64_t tail = hash_bytes(mem_ + a + covered, bytes - covered, t.format + 1u);
+  std::unique_ptr<CopyEntry::Tall>& c = e.tall;
+  const bool fresh = !c || c->h != t.height;
+  if (fresh) {
+    c = std::make_unique<CopyEntry::Tall>();
+    wgpu::TextureDescriptor td{};
+    td.size = {t.width, t.height, 1};
+    td.format = wgpu::TextureFormat::RGBA8Unorm;
+    td.usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::CopyDst;
+    td.label = "efb copy (tall)";
+    c->tex = gpu_.device().CreateTexture(&td);
+    c->view = c->tex.CreateView();
+    c->h = t.height;
+  }
+  const bool new_tail = fresh || c->tail_hash != tail || c->format != t.format;
+  if (new_tail || c->copy_serial != e.serial) {
+    // The open pass may already sample the old contents: submit it first.
+    if (!fresh && pass_open_ && c->pass == pass_serial_) flush();
+    if (new_tail) {
+      std::vector<std::uint8_t> rgba(static_cast<std::size_t>(t.width) * t.height * 4);
+      decode_texture(t.format, t.width, t.height, mem_ + a, rgba.data(), nullptr, 0, 0);
+      const std::uint32_t rows = t.height - e.h;
+      wgpu::TexelCopyTextureInfo dst{};
+      dst.texture = c->tex;
+      dst.origin = {0, e.h, 0};
+      wgpu::TexelCopyBufferLayout lay{};
+      lay.bytesPerRow = t.width * 4;
+      lay.rowsPerImage = rows;
+      wgpu::Extent3D ext{t.width, rows, 1};
+      gpu_.queue().WriteTexture(&dst, rgba.data() + static_cast<std::size_t>(e.h) * t.width * 4,
+                                static_cast<std::size_t>(rows) * t.width * 4, &lay, &ext);
+      c->tail_hash = tail;
+      c->format = t.format;
+    }
+    wgpu::CommandEncoder enc = gpu_.device().CreateCommandEncoder();
+    wgpu::TexelCopyTextureInfo src{};
+    src.texture = e.tex;
+    wgpu::TexelCopyTextureInfo dst{};
+    dst.texture = c->tex;
+    wgpu::Extent3D ext{e.w, e.h, 1};
+    enc.CopyTextureToTexture(&src, &dst, &ext);
+    wgpu::CommandBuffer cb = enc.Finish();
+    gpu_.queue().Submit(1, &cb);
+    c->copy_serial = e.serial;
+  }
+  c->pass = pass_open_ ? pass_serial_ : pass_serial_ + 1;
+  ++stats_.copy_textures_used;
+  ++stats_.copy_tall;
+  return c->view;
 }
 
 // A preloaded texture (E3c): its texels come from TMEM, which only preloads
@@ -886,6 +965,7 @@ void Renderer::copy_to_texture(const EfbCopy& c) {
   e->bytes = texture_level_size(sample_fmt, w, h);
   e->mem_hash = hash_memory(addr, e->bytes);
   e->epoch = epoch_;
+  e->serial = ++copy_serial_;
 
   std::int32_t params[8] = {static_cast<std::int32_t>(c.src_x), static_cast<std::int32_t>(c.src_y),
                             c.half_scale ? 1 : 0, c.pixel_format == 3 ? 1 : 0,
