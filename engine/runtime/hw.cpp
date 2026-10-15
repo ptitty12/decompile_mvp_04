@@ -218,6 +218,13 @@ u32 Hardware::cp_status() const {
 }
 
 void Hardware::wgp_write(u32 value, int size) {
+  if (gather_n_ + static_cast<u32>(size) <= 32) {  // P1: the whole value fits (always, for aligned stores)
+    u8* g = gather_ + gather_n_;
+    for (int k = 0; k < size; ++k) g[k] = static_cast<u8>(value >> (8 * (size - 1 - k)));
+    gather_n_ += static_cast<u32>(size);
+    if (gather_n_ == 32) wgp_burst();
+    return;
+  }
   for (int k = 0; k < size; ++k) {
     gather_[gather_n_++] = static_cast<u8>(value >> (8 * (size - 1 - k)));
     if (gather_n_ == 32) wgp_burst();

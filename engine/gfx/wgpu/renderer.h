@@ -50,12 +50,34 @@ class Renderer : public Backend {
   const Frame* latest_xfb() const { return latest_; }
   // Reads a frame back as RGBA8 rows (blocks; flushes first).
   std::vector<std::uint8_t> read_frame(const Frame& f);
+
+  // ---- What the video interface scanned out (P1) ----
+  // The console sends 480i: each VI field shows every other line of the XFB as it
+  // is at that field, and the game sometimes draws two different pictures on
+  // alternate fields (a highlight or panel on one field, not on the next: a
+  // 30 Hz alternation). An interlaced TV shows such pixels as a steady mix of
+  // both; shown as whole frames, one after the other, they flash (and strobe
+  // when frames are skipped). scan_field() records, at every VI field, the XFB
+  // the VI scans (by address, else the latest copy); scanout() is the picture to
+  // show now: the frame of the last field, except that pixels alternating over
+  // the last three fields (A, B, A) show the mean of the last two. Frames that do
+  // not alternate are shown exactly as copied. Captures read the XFB itself.
+  void scan_field(std::uint32_t addr);
+  const Frame* scanout();
+  bool scan_mix = true;  // false: scanout() is always the last field's frame (comparisons)
+  bool is_mixed(const Frame* f) const { return f == &mixed_; }
+  struct ScanStats {
+    std::uint64_t fields = 0, new_frames = 0, mixed = 0;  // fields seen, new XFB frames, presents composed
+  };
+  const ScanStats& scan_stats() const { return scan_stats_; }
   // Reads the EFB color back (640 x 528 RGBA8).
   std::vector<std::uint8_t> read_efb();
 
   struct Stats {
     std::uint64_t draws = 0, skipped = 0, passes = 0, pipelines = 0, textures_decoded = 0, texture_hits = 0;
     std::uint64_t copy_textures_used = 0, xfb_copies = 0, tex_copies = 0, clears = 0;
+    std::uint64_t copies_dropped = 0;    // EFB-copy textures dropped: their memory changed since the copy
+    std::uint64_t copy_size_misses = 0;  // a texture at an EFB copy's address with another size
     std::uint64_t unknown_formats = 0, indirect_draws = 0, fog_draws = 0;
     std::uint64_t merged = 0, encoded = 0;  // draws appended to the previous one; WebGPU draws encoded
     std::uint64_t same_state = 0;           // draws that reused the previous draw's resolved state
@@ -159,6 +181,15 @@ class Renderer : public Backend {
 
   std::map<std::uint32_t, Frame> frames_;
   const Frame* latest_ = nullptr;
+  // The scan-out history: three frame textures; the slot and XFB serial of the
+  // frame at the last field ([0]) and the two before.
+  Frame scan_[3];
+  int scan_slot_[3] = {-1, -1, -1};
+  std::uint64_t scan_serial_[3] = {};
+  Frame mixed_;
+  std::uint64_t mixed_key_ = ~0ull;
+  wgpu::RenderPipeline mix_pipe_;
+  ScanStats scan_stats_;
   std::uint64_t serial_ = 0;
   Stats stats_;
 };

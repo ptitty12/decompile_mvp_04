@@ -119,6 +119,7 @@ class GxProcessor {
   // The same with the state unpacked once per primitive.
   void setup_transform(XformSetup& x) const;
   OutVertex transform(const InVertex& v, XformSetup& x) const;
+  void transform(const InVertex& v, XformSetup& x, OutVertex& out) const;  // the same, into `out`
   // The pipeline configuration, uniforms and textures for a draw now.
   void snapshot(DrawCall& d) const;
 
@@ -152,6 +153,7 @@ class GxProcessor {
   void efb_copy();
   void load_tlut();
   void preload();
+  void xf_written(u32 addr);  // drops what xs_ holds of XF word `addr`
   const u8* phys(u32 addr, u32 len) const {  // null if outside memory
     addr &= 0x01FFFFFFu;
     if (!mem_ || addr > mem_size_ || len > mem_size_ - addr) return nullptr;
@@ -185,8 +187,12 @@ class GxProcessor {
   // Bumped by every write that snapshot() depends on (BP registers, TLUT loads);
   // a draw with the serial of the last snapshot reuses it (E3c).
   std::uint64_t state_serial_ = 1, snap_serial_ = 0;
-  // Reused per primitive (no allocation per draw).
+  // Reused per primitive (no allocation per draw). P1: kept across primitives while
+  // nothing it was built from changed: XF registers, lights and post matrices, the
+  // scissor offset (xs_valid_); its cached matrices are dropped one by one when
+  // their XF words are written (xf_written).
   XformSetup xs_;
+  bool xs_valid_ = false;
   std::vector<OutVertex> vs_;
   DrawCall draw_;
 };

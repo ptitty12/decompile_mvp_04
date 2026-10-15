@@ -361,6 +361,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
     return;
   }
   booted = true;
+  if (options.tracePresent) M._mvp_trace(1);
   enableAudio();
   phase('boot', t);
 
@@ -373,7 +374,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   pacedStart = performance.now();
   pacedFields = 0;
   winWall = performance.now();
-  if (options.fast) setTimeout(fastLoop, 0);
+  if (options.fast || options.fastUntil) setTimeout(fastLoop, 0);
   else if (scope.requestAnimationFrame) scope.requestAnimationFrame(frame);
   // else: the page sends 'tick' messages from its own animation frames.
 }
@@ -394,7 +395,8 @@ function afterRun(ran: number, ms: number): boolean {
   }
   const now = performance.now();
   if (now - winWall >= 500) {
-    post({ type: 'stats', status: status(), window: { fields: winFields, ms: winMs, wallMs: now - winWall } });
+    const trace = opts?.tracePresent ? JSON.parse(cstr(M!._mvp_trace_take())) as unknown[] : undefined;
+    post({ type: 'stats', status: status(), window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace } });
     winFields = 0;
     winMs = 0;
     winWall = now;
@@ -411,6 +413,24 @@ function afterRun(ran: number, ms: number): boolean {
 }
 
 // Paced: run the fields the wall clock asks for, then present once.
+//
+// P1 (chase, the default): a field that takes longer than the display's refresh
+// used to cost a whole refresh (its frame showed only at the animation frame
+// after the next), and the animation frame after that ran two to four fields at
+// once: in heavy scenes the picture moved in jumps of 33-67 ms. Now at most two
+// fields run per batch (two only when two are due), and while the clock is
+// still ahead of the run the next batch runs in its own task at once, without
+// waiting for an animation frame; each batch's frame is presented when its task
+// ends. Ahead of the clock the loop waits for animation frames as before.
+// pacing=raf (URL) keeps the earlier batches of up to four fields per animation frame.
+const CHASE_FIELDS = 2;
+const chase = new MessageChannel();
+let chasePending = false;
+chase.port1.onmessage = () => {
+  chasePending = false;
+  runPaced(performance.now());
+};
+
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
   let due = Math.floor((now - pacedStart) / FIELD_MS) - pacedFields;
@@ -419,13 +439,19 @@ function runPaced(now: number): void {
     pacedStart = now - pacedFields * FIELD_MS;
     due = 1;
   }
-  due = Math.min(due, MAX_FIELDS_PER_FRAME);
+  const rafOnly = opts?.pacing === 'raf';
+  due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : due >= 3 ? CHASE_FIELDS : 1);
   if (due <= 0) return;
   const t0 = performance.now();
   const ran = M._mvp_run_fields(due);
   pacedFields += Math.max(0, ran);
   gated = !!net && ran >= 0 && ran < due;
-  afterRun(ran, performance.now() - t0);
+  if (!afterRun(ran, performance.now() - t0) || rafOnly || gated) return;
+  // Still behind: the next batch now, in its own task (this one's frame is presented when it ends).
+  if (!chasePending && Math.floor((performance.now() - pacedStart) / FIELD_MS) - pacedFields >= 1) {
+    chasePending = true;
+    chase.port2.postMessage(0);
+  }
 }
 
 function frame(now: number): void {
@@ -452,7 +478,15 @@ function fastLoop(): void {
     ran += r;
     if (net && r === 0) break;  // waiting for the other player: let datagrams in
   }
-  if (afterRun(ran, performance.now() - t0)) setTimeout(fastLoop, 0);
+  if (!afterRun(ran, performance.now() - t0)) return;
+  if (!opts?.fast && opts?.fastUntil && status().fields >= opts.fastUntil) {
+    // Development (fastUntil): from here on paced, as a player runs it.
+    pacedStart = performance.now();
+    pacedFields = 0;
+    if (scope.requestAnimationFrame) scope.requestAnimationFrame(frame);
+    return;
+  }
+  setTimeout(fastLoop, 0);
 }
 
 scope.onmessage = (ev: MessageEvent<ToWorker>) => {
@@ -467,7 +501,7 @@ scope.onmessage = (ev: MessageEvent<ToWorker>) => {
       break;
     case 'tick':
       // Only without the Worker's own animation frames; this Worker's clock, not the page's.
-      if (opts && !opts.fast && !scope.requestAnimationFrame) runPaced(performance.now());
+      if (opts && !opts.fast && !opts.fastUntil && !scope.requestAnimationFrame) runPaced(performance.now());
       break;
     case 'resize':
       M?._mvp_canvas_resize(msg.width, msg.height);

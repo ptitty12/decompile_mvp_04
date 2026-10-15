@@ -115,6 +115,14 @@ const clearCache = flag('--clear-cache');
 const noCache = flag('--no-cache');
 const traceDisc = flag('--trace-disc');
 const discParams = opt('--disc-cache', '');  // e.g. discBlock=256&discRun=8&discAhead=8
+// P1 (development): the presentation trace in each stats window; unpaced up to a field, then paced;
+// the composited page as Chrome shows it (CDP screencast, Chromium only) from field F, N frames.
+const tracePresent = flag('--trace-present');
+const fastUntil = Number(opt('--fast-until', '0'));
+const screencast = opt('--screencast', '') ? opt('--screencast', '').split(':').map(Number) : null;
+// --trace F:MS (Chromium): a Chrome performance trace (V8's sampling profiler in every thread, the GPU
+// process's tasks) from field F for MS ms, written to OUT/trace-LABEL.json (summarize: trace_summary.mjs).
+const traceAt = opt('--trace', '') ? opt('--trace', '').split(':').map(Number) : null;
 const discDir = opt('--disc-dir', '');
 const throttle = opt('--throttle', '') ? opt('--throttle', '').split(',').map(Number) : null;
 const ioLog = flag('--io-log');
@@ -126,7 +134,10 @@ const fallback = flag('--fallback');
 const pageParams = opt('--params', '');
 const label = tag ? `${browserName}-${tag}` : browserName;
 const chromiumArgs = ['--enable-unsafe-webgpu', ...(audible ? [] : ['--mute-audio']),
-                      ...(jsFlags ? [`--js-flags=${jsFlags}`] : [])];
+                      ...(jsFlags ? [`--js-flags=${jsFlags}`] : []),
+                      // --chrome-args 'A B': more switches (e.g. --disable-gpu-vsync --disable-frame-rate-limit,
+                      // animation frames as fast as the browser can, like a high-refresh display)
+                      ...opt('--chrome-args', '').split(' ').filter(Boolean)];
 const packPaths = opt('--packs', '').split(',').filter(Boolean).map((p) => resolve(p));
 const shots = opt('--shots', '').split(',').filter(Boolean).map(Number).sort((a, b) => a - b);
 const keys = opt('--keys', '').split(',').filter(Boolean).map((k) => {
@@ -149,6 +160,7 @@ mkdirSync(out, { recursive: true });
 // The server, on a free port: serve.mjs (with --server-disc its mock of the
 // deployment), or with --real-server E5's server (engine/server, built) with a
 // throwaway password and the disc configured.
+// --site DIR: another build's site (e.g. a profiling build with function names).
 const site = resolve(opt('--site', join(repo, 'build', 'engine', 'emscripten', 'web', 'site')));
 const password = randomBytes(18).toString('base64url');
 let server;
@@ -262,6 +274,8 @@ async function runOnce(context, run) {
   if (noCache) q.set('cache', '0');
   if (audioLatency) q.set('audioLatency', audioLatency);
   if (traceDisc) q.set('traceDisc', '1');
+  if (tracePresent) q.set('tracePresent', '1');
+  if (fastUntil) q.set('fastUntil', String(fastUntil));
   if (ioLog) q.set('ioLog', '1');
   for (const [k, v] of new URLSearchParams(discParams)) q.set(k, v);
   for (const [k, v] of new URLSearchParams(pageParams)) q.set(k, v);
@@ -350,6 +364,53 @@ async function runOnce(context, run) {
   let lastWindow = '', state = await mvp(), shotIndex = 0, keyIndex = 0, padIndex = 0, hidden = null;
   summary.keysPressed = [];
   summary.padEvents = [];
+  // --screencast F:N: every frame Chrome composites (it sends one only when the page changed), with the
+  // wall time and the last field the page reported, until N frames.
+  let cast = null;
+  const castFrames = [];
+  const startCast = async () => {
+    cast = await page.context().newCDPSession(page);
+    cast.on('Page.screencastFrame', (f) => {
+      if (castFrames.length < screencast[1]) {
+        const i = castFrames.length;
+        const path = join(out, `${label}-r${run}-cast-${String(i).padStart(5, '0')}.png`);
+        writeFileSync(path, Buffer.from(f.data, 'base64'));
+        castFrames.push({ i, t: f.metadata.timestamp, field: lastField });
+      }
+      cast.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => undefined);
+    });
+    await cast.send('Page.startScreencast', { format: 'png', everyNthFrame: 1 });
+    console.log(`screencast started at field ${lastField}`);
+  };
+  let lastField = 0;
+  // --trace: the browser-wide tracing session (it records the Worker's thread too).
+  let tracing = null, traceStart = 0;
+  const startTrace = async () => {
+    tracing = await page.context().browser().newBrowserCDPSession();
+    await tracing.send('Tracing.start', {
+      transferMode: 'ReturnAsStream',
+      traceConfig: { includedCategories: ['disabled-by-default-v8.cpu_profiler', 'v8.execute', 'v8', 'gpu',
+                                          'devtools.timeline', 'disabled-by-default-devtools.timeline', 'toplevel'] },
+    });
+    traceStart = Date.now();
+    console.log(`trace started at field ${lastField}`);
+  };
+  const stopTrace = async () => {
+    const done = new Promise((r) => tracing.once('Tracing.tracingComplete', r));
+    await tracing.send('Tracing.end');
+    const { stream } = await done;
+    const chunks = [];
+    for (;;) {
+      const r = await tracing.send('IO.read', { handle: stream, size: 1 << 22 });
+      chunks.push(r.base64Encoded ? Buffer.from(r.data, 'base64') : Buffer.from(r.data));
+      if (r.eof) break;
+    }
+    await tracing.send('IO.close', { handle: stream });
+    const path = join(out, `trace-${label}-r${run}.json`);
+    writeFileSync(path, Buffer.concat(chunks));
+    summary.trace = { path, fromField: traceAt[0], toField: lastField, ms: Date.now() - traceStart };
+    console.log(`trace written at field ${lastField}: ${path}`);
+  };
   while (Date.now() < deadline) {
     state = await mvp();
     if (state.error) break;
@@ -360,6 +421,15 @@ async function runOnce(context, run) {
                      audio: w ? { fill: w.fill, underruns: w.underruns, skipped: w.skipped } : undefined });
     }
     const field = state.stats?.status.fields ?? 0;
+    lastField = field;
+    if (screencast && !cast && field >= screencast[0]) await startCast();
+    if (traceAt && !tracing && field >= traceAt[0]) await startTrace();
+    if (tracing && !summary.trace && Date.now() - traceStart >= traceAt[1]) await stopTrace();
+    if (cast && castFrames.length >= screencast[1] && !summary.screencast) {
+      await cast.send('Page.stopScreencast').catch(() => undefined);
+      summary.screencast = castFrames;
+      console.log(`screencast: ${castFrames.length} frames`);
+    }
     if (state.probe) {
       ++audioSamples.n;
       audioSamples.maxRms = Math.max(audioSamples.maxRms, state.probe.rms);
@@ -412,9 +482,12 @@ async function runOnce(context, run) {
     const wantStop = fields || frames;
     if (wantStop ? state.stopped
                  : (state.firstFrameMs !== undefined && shotIndex >= shots.length && keyIndex >= keys.length &&
-                    padIndex >= pads.length && (!hide || hidden) && (!audio || audioSamples.nonsilent > 0))) break;
+                    padIndex >= pads.length && (!hide || hidden) && (!audio || audioSamples.nonsilent > 0) &&
+                    (!screencast || summary.screencast) && (!traceAt || summary.trace))) break;
     await page.waitForTimeout(200);
   }
+  if (cast && !summary.screencast) summary.screencast = castFrames;
+  if (tracing && !summary.trace) await stopTrace();
   if (state.discTrace) writeFileSync(join(out, `disc-trace-${label}-r${run}.txt`), state.discTrace);
   delete state.discTrace;
   if (state.ioLog) {
@@ -449,19 +522,21 @@ const all = { browser: browserName, tag: tag || null, jsFlags: jsFlags || null, 
 let rc = 1;
 let browser;
 try {
+  // --viewport WxH (default 1100x1100): the page's size, e.g. a full-screen window on this machine's display.
+  const [vw, vh] = opt('--viewport', '1100x1100').split('x').map(Number);
   let context;
   if (profile) {
     // A profile on disk: what the browser keeps between visits, with its real storage quota.
     if (!['chrome', 'msedge', 'chromium'].includes(browserName)) throw new Error('--profile: Chromium browsers only');
     context = await chromium.launchPersistentContext(resolve(profile), {
       channel: browserName === 'chromium' ? undefined : browserName, headless: !headed, args: chromiumArgs,
-      viewport: { width: 1100, height: 1100 } });
+      viewport: { width: vw, height: vh } });
     browser = { close: () => context.close() };
     all.version = context.browser()?.version() ?? null;
   } else {
     browser = await launchers[browserName]();
     all.version = browser.version();
-    context = await browser.newContext({ viewport: { width: 1100, height: 1100 } });
+    context = await browser.newContext({ viewport: { width: vw, height: vh } });
   }
   for (let run = 1; run <= runs; ++run) {
     const s = await runOnce(context, run);

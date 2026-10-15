@@ -44,6 +44,15 @@ inline float read_comp(const u8* p, u32 fmt, float scale) {
   }
 }
 
+// n / 255.0f for n = 0..255, computed once (the same division, looked up: P1).
+struct Div255 {
+  float v[256];
+  Div255() {
+    for (int n = 0; n < 256; ++n) v[n] = static_cast<float>(n) / 255.0f;
+  }
+};
+const Div255 kDiv255;
+
 inline void read_color(const u8* p, u32 fmt, float out[4]) {
   u32 r = 0, g = 0, b = 0, a = 255;
   switch (fmt) {
@@ -71,17 +80,17 @@ inline void read_color(const u8* p, u32 fmt, float out[4]) {
       r = p[0]; g = p[1]; b = p[2]; a = p[3];
       break;
   }
-  out[0] = static_cast<float>(r) / 255.0f;
-  out[1] = static_cast<float>(g) / 255.0f;
-  out[2] = static_cast<float>(b) / 255.0f;
-  out[3] = static_cast<float>(a) / 255.0f;
+  out[0] = kDiv255.v[r];
+  out[1] = kDiv255.v[g];
+  out[2] = kDiv255.v[b];
+  out[3] = kDiv255.v[a];
 }
 
 inline void unpack_rgba8(u32 v, float out[4]) {
-  out[0] = static_cast<float>(v >> 24) / 255.0f;
-  out[1] = static_cast<float>((v >> 16) & 0xFF) / 255.0f;
-  out[2] = static_cast<float>((v >> 8) & 0xFF) / 255.0f;
-  out[3] = static_cast<float>(v & 0xFF) / 255.0f;
+  out[0] = kDiv255.v[v >> 24];
+  out[1] = kDiv255.v[(v >> 16) & 0xFF];
+  out[2] = kDiv255.v[(v >> 8) & 0xFF];
+  out[3] = kDiv255.v[v & 0xFF];
 }
 
 // Texture coordinate count bit and format position for coordinate k in VAT A/B/C.
@@ -120,6 +129,7 @@ void GxProcessor::reset() {
   tlut_.assign(512 * 1024, 0);
   tmem_.assign(kTmemSize, 0);
   fmt_valid_ = 0;
+  xs_valid_ = false;
   stats_ = {};
   ++state_serial_;
   // Power-on state that matters before the game's GXInit: one TEV stage,
@@ -180,12 +190,30 @@ void GxProcessor::load_cp(u8 reg, u32 v) {
   else if ((reg & 0xF0) == cp::kArrayStride) array_stride_[reg & 15] = v & 0xFF;
 }
 
+void GxProcessor::xf_written(u32 a) {
+  if (!xs_valid_) return;  // the next primitive rebuilds everything
+  if (a < 0x100) {
+    // Position/texture matrix i reads words (4i .. 4i + 11) & 0xFF: word a is in i = q, q - 1, q - 2.
+    const u32 q = a >> 2;
+    xs_.have_pos &= ~(1ull << q | 1ull << ((q - 1) & 63) | 1ull << ((q - 2) & 63));
+  } else if (a < xf::kNrmMtx) {
+    // Not read by the transform unit.
+  } else if (a < xf::kPostMtx) {
+    // Normal matrix n reads words kNrmMtx + 3n .. + 8 (n < 32).
+    const u32 w = a - xf::kNrmMtx;
+    for (u32 n = w >= 8 ? (w - 6) / 3 : 0; n <= w / 3 && n < 32; ++n) xs_.have_nrm &= ~(1ull << n);
+  } else {
+    xs_valid_ = false;  // post matrices, lights, registers
+  }
+}
+
 void GxProcessor::load_xf(u32 addr, u32 count, const u8* data) {
   for (u32 k = 0; k < count; ++k) {
     u32 a = addr + k;
     u32 v = be32_at(data + 4 * k);
     if (a < xf::kMemSize) xf_mem_[a] = v;
     else if (a >= xf::kRegBase && a < xf::kRegBase + xf::kRegCount) xf_regs_[a - xf::kRegBase] = v;
+    xf_written(a);
   }
 }
 
@@ -197,7 +225,10 @@ void GxProcessor::load_xf_indexed(int array, u32 v) {
   const u8* p = phys(array_base_[array] + index * array_stride_[array], 4 * count);
   if (!p) return;
   for (u32 k = 0; k < count; ++k)
-    if (addr + k < xf::kMemSize) xf_mem_[addr + k] = be32_at(p + 4 * k);
+    if (addr + k < xf::kMemSize) {
+      xf_mem_[addr + k] = be32_at(p + 4 * k);
+      xf_written(addr + k);
+    }
 }
 
 void GxProcessor::load_bp(u32 value) {
@@ -212,6 +243,7 @@ void GxProcessor::load_bp(u32 value) {
   v = (bp_[reg] & ~bp_mask_) | (v & bp_mask_);
   bp_mask_ = 0xFFFFFF;
   bp_[reg] = v;
+  if (reg == bp::kScissorOffset) xs_valid_ = false;  // the transform's window offset
   if (reg >= bp::kTevReg && reg < bp::kTevReg + 8) {
     int r = (reg - bp::kTevReg) >> 1;
     bool konst = (v >> 23) & 1;
@@ -518,6 +550,14 @@ OutVertex GxProcessor::transform(const InVertex& v) const {
 
 OutVertex GxProcessor::transform(const InVertex& v, XformSetup& x) const {
   OutVertex o{};
+  transform(v, x, o);
+  return o;
+}
+
+void GxProcessor::transform(const InVertex& v, XformSetup& x, OutVertex& o) const {
+  // Every member is written below or zeroed here (the channels not computed) and
+  // after the texture coordinates (the ones not generated): as from OutVertex{}.
+  for (u32 ch = std::min<u32>(x.nchan, 2); ch < 2; ++ch) std::memset(o.color[ch], 0, sizeof o.color[ch]);
   // A 3x4 matrix at XF memory index * 4 (position and texture matrices).
   auto mtx34 = [&](u32 index) -> const float* {
     index &= 0x3F;
@@ -575,7 +615,13 @@ OutVertex GxProcessor::transform(const InVertex& v, XformSetup& x) const {
     normalize3(n);
   }
 
-  // Lighting: color channels 0 and 1, color and alpha separately.
+  // Lighting: color channels 0 and 1, color and alpha separately. A light's
+  // factor (attenuation times diffuse term) depends only on the light, the
+  // vertex and the two functions: computed once per vertex and reused by the
+  // other passes that use the light with the same functions (P1).
+  float lf[8];
+  u8 lf_fn[8];
+  u32 lf_have = 0;
   for (u32 ch = 0; ch < 2 && ch < x.nchan; ++ch) {
     for (int is_alpha = 0; is_alpha < 2; ++is_alpha) {
       const XformSetup::Chan& cs = x.chan[ch][is_alpha];
@@ -592,9 +638,17 @@ OutVertex GxProcessor::transform(const InVertex& v, XformSetup& x) const {
         std::memcpy(acc, amb, sizeof acc);
         const u32 mask = bits(ctl, 2, 4) | bits(ctl, 11, 4) << 4;
         const u32 diffuse = bits(ctl, 7, 2), attn_fn = bits(ctl, 9, 2);
+        const u8 fn = static_cast<u8>(diffuse << 2 | attn_fn);
         for (u32 l = 0; l < 8; ++l) {
           if (!(mask & (1u << l))) continue;
           const XformSetup::Light& L = x.lights[l];
+          if ((lf_have >> l & 1) && lf_fn[l] == fn) {
+            const float f = lf[l];
+            if (is_alpha) acc[3] += f * L.col[3];
+            else
+              for (int k = 0; k < 3; ++k) acc[k] += f * L.col[k];
+            continue;
+          }
           float ldir[3] = {L.pos[0] - view[0], L.pos[1] - view[1], L.pos[2] - view[2]};
           float attn = 1.0f;
           if (attn_fn == 3) {  // spot
@@ -622,9 +676,18 @@ OutVertex GxProcessor::transform(const InVertex& v, XformSetup& x) const {
           float d = 1.0f;
           if (diffuse == 1) d = dot3(ldir, n);
           else if (diffuse == 2) d = std::max(0.0f, dot3(ldir, n));
-          for (int k = 0; k < 4; ++k) acc[k] += attn * d * L.col[k];
+          const float f = attn * d;
+          lf[l] = f;
+          lf_fn[l] = fn;
+          lf_have |= 1u << l;
+          if (is_alpha) acc[3] += f * L.col[3];
+          else
+            for (int k = 0; k < 3; ++k) acc[k] += f * L.col[k];
         }
-        for (int k = 0; k < 4; ++k) out[k] = mat[k] * std::clamp(acc[k], 0.0f, 1.0f);
+        // Only the components this pass writes (rgb for color, a for alpha).
+        if (is_alpha) out[3] = mat[3] * std::clamp(acc[3], 0.0f, 1.0f);
+        else
+          for (int k = 0; k < 3; ++k) out[k] = mat[k] * std::clamp(acc[k], 0.0f, 1.0f);
       }
       if (is_alpha) o.color[ch][3] = out[3];
       else {
@@ -680,7 +743,7 @@ OutVertex GxProcessor::transform(const InVertex& v, XformSetup& x) const {
     }
     std::memcpy(o.tex[i], out, sizeof out);
   }
-  return o;
+  for (u32 i = std::min<u32>(x.ngen, 8); i < 8; ++i) std::memset(o.tex[i], 0, sizeof o.tex[i]);
 }
 
 void GxProcessor::snapshot(DrawCall& d) const {
@@ -864,11 +927,14 @@ void GxProcessor::primitive(u8 op, const u8* data, u32 count) {
   // Each vertex is loaded and transformed once; assembly below only indexes them.
   std::vector<OutVertex>& vs = d.verts;
   vs.resize(count);
-  setup_transform(xs_);
+  if (!xs_valid_) {
+    setup_transform(xs_);
+    xs_valid_ = true;
+  }
   for (u32 k = 0; k < count; ++k) {
     InVertex in;
     load_vertex(vf, data + static_cast<std::size_t>(k) * vsize, in);
-    vs[k] = transform(in, xs_);
+    transform(in, xs_, vs[k]);
   }
 
   if (keep_prim_info_) {

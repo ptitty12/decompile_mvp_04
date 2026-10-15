@@ -80,6 +80,12 @@ EMSCRIPTEN_KEEPALIVE void mvp_rt_write16(Cpu* c, u32 ea, u32 v, u32 pc, std::uin
 EMSCRIPTEN_KEEPALIVE void mvp_rt_write32(Cpu* c, u32 ea, u32 v, u32 pc, std::uint64_t t) {
   c->pc = pc;
   c->ticks = t;
+  // P1: the write-gather pipe (the GX FIFO, thousands of stores per field) straight
+  // to the hardware model, as slow_write would send it (an unmapped page).
+  if (ea - 0xCC008000u < 0x1000u && c->mem->io && !c->mem->page[ea >> ppc::Memory::kPageShift]) {
+    c->mem->io->write(ea, v, 4);
+    return;
+  }
   ppc::write32(*c, ea, v);
 }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_exec(Cpu* c, u32 w, u32 pc, std::uint64_t t) {

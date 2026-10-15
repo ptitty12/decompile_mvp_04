@@ -21,6 +21,14 @@ target_include_directories(test_gx_processor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 # The runtime's hook (runtime/gx_fifo.h) feeding the processor.
 engine_test(test_gfx_hook SOURCES tests/test_gfx_hook.cpp LIBS engine_gfx engine_runtime)
 target_include_directories(test_gfx_hook PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+# Development (P1): the GX processor's cost per primitive and vertex on a
+# synthetic in-play stream (tools/gx_bench.cpp); under Node with the Emscripten preset.
+add_executable(mvp-gx-bench tools/gx_bench.cpp)
+target_link_libraries(mvp-gx-bench PRIVATE engine_gfx)
+target_compile_options(mvp-gx-bench PRIVATE ${ENGINE_WARN})
+if(EMSCRIPTEN)
+  target_link_options(mvp-gx-bench PRIVATE --profiling-funcs)  # names in V8's profiler (node --cpu-prof)
+endif()
 
 # ---- WebGPU backend (Dawn + SDL3) ----
 # Pinned versions (docs/engine/TOOLCHAIN.md). The defaults point at the pinned
