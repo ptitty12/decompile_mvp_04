@@ -265,23 +265,38 @@ void Session::compare(u32 frame, u64 local, u64 remote) {
 
 bool Session::ready(u64 frame, u64 now_ms) {
   if (state_ != State::Running) return false;
+  // With a delay, the local input of frame + delay is sampled only when this
+  // frame can run: a peer that waits for the other samples its pad when the
+  // wait ends, so its input latency stays the delay (the other peer already
+  // has our inputs up to frame + delay - 1, so it never waits for this one).
+  // Without a delay the input must go out before waiting, or both would wait
+  // forever.
+  if (delay_ > 0 && frame >= remote_horizon()) return false;
   bool fresh = false;
   while (local_horizon() <= frame + delay_) {
     PadState p = local_source_ ? local_source_(local_horizon() - delay_) : neutral_pad();
     p.connected = true;
     local_.push_back(p);
+    local_ms_.push_back(now_ms);
     fresh = true;
   }
   if (fresh) send_input(now_ms);
   return frame < remote_horizon();
 }
 
-rt::FrameInput Session::take(u64 frame) {
+rt::FrameInput Session::take(u64 frame, std::optional<u64> now_ms) {
   rt::FrameInput in = rt::neutral_input(0x3);
   if (frame != next_take_ || frame >= remote_horizon() || frame >= local_horizon()) return in;  // misuse
   if (frame >= delay_) {
-    in.pad[local_port()] = local_[static_cast<std::size_t>(frame - local_base_)];
+    const std::size_t k = static_cast<std::size_t>(frame - local_base_);
+    in.pad[local_port()] = local_[k];
     in.pad[remote_port()] = remote_[static_cast<std::size_t>(frame - remote_base_)];
+    if (now_ms && *now_ms >= local_ms_[k]) {
+      const u64 lat = *now_ms - local_ms_[k];
+      stats_.latency_sum += lat;
+      ++stats_.latency_samples;
+      stats_.latency_max = std::max(stats_.latency_max, lat);
+    }
   }
   ++next_take_;
   recent_.emplace_back(frame, in);
@@ -315,6 +330,7 @@ void Session::prune() {
   const u64 keep_local = std::min<u64>(peer_ack_frame_, next_take_);
   while (local_base_ < keep_local && !local_.empty()) {
     local_.pop_front();
+    local_ms_.pop_front();
     ++local_base_;
   }
   while (remote_base_ < next_take_ && !remote_.empty()) {
@@ -345,6 +361,8 @@ std::string Session::diagnostic() const {
        ull(stats_.bytes_sent), ull(stats_.packets_received), ull(stats_.bytes_received), ull(stats_.bad_packets));
   line("rtt ms: last %u min %u avg %.1f max %u (%llu samples)", stats_.rtt_last, stats_.rtt_min, stats_.rtt_avg(),
        stats_.rtt_max, ull(stats_.rtt_samples));
+  line("input latency ms: avg %.1f max %llu (%llu samples)", stats_.latency_avg(), ull(stats_.latency_max),
+       ull(stats_.latency_samples));
   line("identity: build %s, disc %s, packset %s, settings %s", mine_.id.build.c_str(), hex(mine_.id.disc.data(), 20).c_str(),
        hex(mine_.id.packset.data(), 32).c_str(), mine_.id.settings.c_str());
   for (const auto& [f, in] : recent_) {

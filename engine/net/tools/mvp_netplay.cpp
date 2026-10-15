@@ -306,6 +306,8 @@ int run(const xlat::Inputs& in, const Args& a) {
                 static_cast<ull>(s.packets_sent), static_cast<ull>(s.bytes_sent), static_cast<ull>(s.packets_received),
                 static_cast<ull>(s.bytes_received), static_cast<double>(s.bytes_sent) / wall, s.rtt_min, s.rtt_max,
                 s.rtt_avg());
+    say("input latency: avg %.1f ms, max %llu ms (from sampling the pad to the frame that uses it)\n",
+        s.latency_avg(), static_cast<ull>(s.latency_max));
     say("lockstep: %llu stalls, %llu ms stalled (longest %llu), %llu early yields, %llu gate misses; "
                 "%llu yields\n",
                 static_cast<ull>(driver->stalls), static_cast<ull>(driver->stall_ms),

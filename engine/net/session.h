@@ -68,6 +68,12 @@ struct SessionStats {
   u32 rtt_last = 0, rtt_min = 0, rtt_max = 0;
   u64 rtt_sum = 0, rtt_samples = 0;
   double rtt_avg() const { return rtt_samples ? static_cast<double>(rtt_sum) / static_cast<double>(rtt_samples) : 0.0; }
+  // Input latency: host time from sampling the local pad (ready()) to the frame
+  // poll that uses it (take() with a time). The delay's cost, stalls included.
+  u64 latency_sum = 0, latency_samples = 0, latency_max = 0;
+  double latency_avg() const {
+    return latency_samples ? static_cast<double>(latency_sum) / static_cast<double>(latency_samples) : 0.0;
+  }
 };
 
 struct Mismatch {
@@ -101,12 +107,14 @@ class Session {
   int remote_port() const { return 2 - cfg_.player; }
   const SessionConfig& config() const { return cfg_; }
 
-  // Generates the local inputs up to frame + delay (each new one is sent at
-  // once), then reports whether both ports' inputs for `frame` are known.
-  // False while not running.
+  // Whether both ports' inputs for `frame` are known; when they are, the local
+  // inputs up to frame + delay are generated (sampled from the LocalSource) and
+  // each new one is sent at once. With delay 0 the local input of `frame` is
+  // generated before the check. False while not running.
   bool ready(u64 frame, u64 now_ms);
-  // The input of frame `frame`, which must be next_frame() and ready.
-  rt::FrameInput take(u64 frame);
+  // The input of frame `frame`, which must be next_frame() and ready. With
+  // `now_ms`, the input latency statistics are updated.
+  rt::FrameInput take(u64 frame, std::optional<u64> now_ms = std::nullopt);
   u64 next_frame() const { return next_take_; }
 
   // The local state hash of a window that closed at `frame` (same frames on both
@@ -155,6 +163,7 @@ class Session {
   // Local inputs local_base_ .. local_horizon()-1; peer inputs remote_base_ ..
   // remote_horizon()-1.
   std::deque<PadState> local_, remote_;
+  std::deque<u64> local_ms_;  // when each local input was sampled
   u64 local_base_ = 0, remote_base_ = 0;
   u64 next_take_ = 0;
   u32 peer_ack_frame_ = 0;  // the peer has our inputs before this

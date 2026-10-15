@@ -110,7 +110,7 @@ struct Sim {
     }
     // The other peer must already have produced its input for this frame.
     if (other.s.local_horizon() <= me.frame && me.frame >= me.s.delay()) order_ok = false;
-    rt::FrameInput in = me.s.take(me.frame);
+    rt::FrameInput in = me.s.take(me.frame, now);
     me.taken.push_back(in);
     std::vector<u8> w = rt::encode_frame(in);
     me.run_hash = xxh64(w.data(), w.size(), me.run_hash);
@@ -181,6 +181,11 @@ TEST_CASE("clean link: identical streams, the delay rule, no stalls once running
   CHECK(sim.b.stalled_ms < 100);
   CHECK(sim.a.s.stats().rtt_avg() >= 30.0);
   CHECK(sim.a.s.stats().rtt_avg() <= 50.0);
+  // Without stalls the input latency is the delay: 3 frames of 16 ms, on both sides.
+  for (const Peer* p : {&sim.a, &sim.b}) {
+    CHECK(p->s.stats().latency_avg() >= 47.0);
+    CHECK(p->s.stats().latency_avg() <= 50.0);
+  }
 }
 
 TEST_CASE("lossy, jittery, duplicating link: identical streams") {
@@ -212,6 +217,10 @@ TEST_CASE("different speeds and loading hitches: the faster peer waits") {
   sim.run(1200, 600000);
   sim.check_streams(1200);
   CHECK(sim.a.stalled_ms > sim.b.stalled_ms);
+  // The waiting peer samples its pad when the wait ends: its input latency is
+  // the delay at the slower peer's pace (2 x 21 ms), not the delay plus its waits.
+  MESSAGE("latency: fast peer " << sim.a.s.stats().latency_avg() << " ms, slow peer " << sim.b.s.stats().latency_avg() << " ms");
+  CHECK(sim.a.s.stats().latency_avg() < 2 * 21 + 12);
 }
 
 TEST_CASE("desync: a wrong state hash stops both peers at that window") {

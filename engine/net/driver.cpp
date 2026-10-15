@@ -58,7 +58,7 @@ rt::FrameInput NetplayDriver::input_for(std::uint64_t frame) {
     }
     end_stall(now);
   }
-  return s_.take(frame);
+  return s_.take(frame, now);
 }
 
 void NetplayDriver::after_poll(std::uint64_t frame) {
