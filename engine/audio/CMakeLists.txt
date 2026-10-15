@@ -26,3 +26,15 @@ if(MVP_SDL3_DIR AND EXISTS "${MVP_SDL3_DIR}/cmake/SDL3Config.cmake")
 else()
   message(STATUS "audio: SDL3 not found; no playback (the mixer and WAV dumps still build)")
 endif()
+
+# ---- Local only (the disc): the mixer must not change the guest ----
+# mvp-boot runs to frame FRAMES with START taps (the intro's music and the first
+# sound effects), once mixing into a WAV under build/ and once without a mixer;
+# everything but the audio line must be identical (SDK call log, frame log,
+# MEM1 hash, clock).
+if(TARGET mvp-boot)
+  add_test(NAME local_audio_determinism
+           COMMAND ${CMAKE_COMMAND} -DBOOT=$<TARGET_FILE:mvp-boot> -DWORK=${CMAKE_BINARY_DIR} -DFRAMES=800
+                   -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/audio_twice.cmake)
+  set_tests_properties(local_audio_determinism PROPERTIES SKIP_RETURN_CODE 77 LABELS local TIMEOUT 3600)
+endif()
