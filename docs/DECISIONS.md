@@ -276,6 +276,16 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | Convenience for two players who both own the game; keeps the public repository clean. | owner reply in chat
 
+- 2026-10-14 | **E2 closed: the game boots in the browser** (lead, under the owner's delegation; docs/engine/WEB.md, E2_LOG.md; decisions E2-W3..W5 are in E2_LOG).
+  - In Chrome 155, Edge 155 and Firefox 157, the page loads the disc image and checks its identity (GV4E69 rev 0 SHA-1). A Worker translates the DOL in about 0.5 s and WebGPU renders on an OffscreenCanvas.
+  - Shown so far: the loading screen, EA logo, licence screen, title screen, memory-card dialog and main menu. Keyboard input works.
+  - Pick to first frame takes 0.67-1.09 s. Everything except the intro movie holds 59.94 fields/s.
+  - Guest-state hashes equal native at every checkpoint (Chrome, Edge, Firefox; WebKit without WebGPU).
+  - `rt::run()` returns to the host at each VI field without the guest being able to tell.
+  - The page only requested the engine's own files.
+
+  Safari itself is unmeasured (needs a Mac). | Exit of ROADMAP E2. | merge a6239996 (E2b plus E3b, 34/34 native and 31/31 Node tests)
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
