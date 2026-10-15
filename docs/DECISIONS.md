@@ -315,6 +315,16 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/e2d
 
+- 2026-10-15 | **E6: roster packs in the engine** (lead, under the owner's delegation; docs/engine/E6_LOG.md).
+  - In both the native and browser builds, the example pack turns Anaheim into the 'Harbor City Lanterns', with the pack's players in the in-match lineup.
+  - The larger, recompressed database.big boots and plays (answers MODDING.md §14 question 1).
+  - **E6-M1:** `engine/mods` stays byte-compatible with `tools/rosters/pack.py`, enforced by `mods_crosscheck` (65 scenarios, 0 differences).
+  - **E6-V1:** a virtual-disc overlay layout with end padding.
+  - **E6-N1:** the netplay disc identity is taken from the unpatched disc. The pack-set hash is a separate handshake field, and a mismatch refuses the game on both sides.
+  - **Known bug (not packs):** netplay stops with a gate miss when the match starts loading (about frame 3,300); a fix is in progress.
+
+  | | merge of engine/e6
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
