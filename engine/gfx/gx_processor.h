@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "gfx/draw.h"
+#include "gfx/gp_memory.h"
 #include "gfx/gx_regs.h"
 
 namespace mvp::gfx {
@@ -88,6 +89,9 @@ class GxProcessor {
     mem_ = mem;
     mem_size_ = size;
   }
+  // Q1: read memory as the GP sees it (gfx/gp_memory.h) instead of directly.
+  // Null: directly (tests, tools).
+  void set_gp_memory(GpMemory* g) { gpm_ = g; }
 
   void reset();
 
@@ -155,6 +159,7 @@ class GxProcessor {
   void preload();
   void xf_written(u32 addr);  // drops what xs_ holds of XF word `addr`
   const u8* phys(u32 addr, u32 len) const {  // null if outside memory
+    if (gpm_) return gpm_->view(addr, len, 0);
     addr &= 0x01FFFFFFu;
     if (!mem_ || addr > mem_size_ || len > mem_size_ - addr) return nullptr;
     return mem_ + addr;
@@ -163,6 +168,7 @@ class GxProcessor {
   Backend* backend_;
   const u8* mem_ = nullptr;
   u32 mem_size_ = 0;
+  GpMemory* gpm_ = nullptr;
 
   std::array<u32, 256> bp_{};
   u32 bp_mask_ = 0xFFFFFF;

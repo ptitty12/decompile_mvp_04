@@ -29,6 +29,7 @@ export interface MvpEngine {
   _mvp_digest(on: number, detailFrom: number, detailTo: number): void;
   _mvp_render_tune(fenceSpinUs: number, renderSpinMs: number, publishKib: number, syncFences: number): void;
   _mvp_digest_take(): number;
+  _mvp_gp_view(on: number): void;  // Q1 (development): the renderer's model of the data cache on or off
   _mvp_set_pad(port: number, connected: number, buttons: number, sx: number, sy: number, cx: number, cy: number,
                tl: number, tr: number): void;
   _mvp_status(): number;

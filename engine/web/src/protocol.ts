@@ -109,6 +109,7 @@ export interface RunOptions {
   digest?: boolean;    // development (P2): the renderer digest per VI field, in each stats window's `digest`
   digestDetail?: number[];  // development (P2): VI fields [from, to] whose draws get a digest line each
   rtTune?: number[];   // development (P2): the render thread's waiting (mvp_render_tune: us, ms, KiB, sync fences)
+  gpView?: boolean;    // development (Q1): false = the renderer reads guest memory as it is (gfx/gp_memory.h)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }
 

@@ -76,6 +76,11 @@ extern InputQueue* g_input;
 // frame budgets). Host side only.
 extern void (*g_frame_hook)(Cpu& c, std::uint64_t frame);
 extern std::uint64_t g_frame_polls, g_pad_reads;
+// Q1: DCFlushRange, DCStoreRange and their NoSync forms are about to write the
+// data cache's lines over [ea, ea + len) back to memory (hooks before them; the
+// guest functions run unchanged). The host's model of what the GP reads follows
+// (gfx/gp_memory.h). Host side only; null: nothing.
+extern void (*g_dc_flush_hook)(u32 ea, u32 len);
 
 // printf-style formatting of a guest format string with the PowerPC EABI
 // variadic arguments of the current call (r3 = format when first_gpr = 3).

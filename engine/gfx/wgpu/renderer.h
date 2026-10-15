@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "gfx/draw.h"
+#include "gfx/gp_memory.h"
 
 namespace mvp::gfx {
 
@@ -33,6 +34,9 @@ class Renderer : public Backend {
   void draw(const DrawCall& d) override;
   void efb_copy(const EfbCopy& c) override;
   void invalidate_textures() override { ++epoch_; }
+
+  // Q1: read guest memory as the GP sees it (gfx/gp_memory.h). Null: directly.
+  void set_gp_memory(GpMemory* g) { gpm_ = g; }
 
   // Ends the open render pass (if any) and submits it.
   void flush();
@@ -108,11 +112,14 @@ class Renderer : public Backend {
   wgpu::TextureView tall_copy(CopyEntry& e, const TextureDesc& t);
   void clear_efb(const EfbCopy& c);
   void copy_to_texture(const EfbCopy& c);
-  std::uint64_t hash_memory(std::uint32_t addr, std::uint32_t size) const;
+  std::uint64_t hash_memory(std::uint32_t addr, std::uint32_t size);
+  // [addr, addr + size) of guest memory as the GP sees it, null if outside.
+  const std::uint8_t* guest(std::uint32_t addr, std::uint32_t size);
 
   Gpu& gpu_;
   const std::uint8_t* mem_;
   std::uint32_t mem_size_;
+  GpMemory* gpm_ = nullptr;
 
   wgpu::Texture efb_color_, efb_depth_;
   wgpu::TextureView efb_color_view_, efb_depth_view_;

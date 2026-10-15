@@ -37,6 +37,11 @@ class GfxObserver {
   // the emulation (on its own thread) must have read that memory by now; an
   // inline renderer has nothing to do. Nothing here changes guest state.
   virtual void gp_sync() {}
+  // Q1: memory over [addr, addr + len) (physical) was written without the data
+  // cache (DMA from the drive, ARAM or EXI; the write-gather pipe), so the GP
+  // sees it at once (gfx/gp_memory.h; the cache's write-backs come through
+  // rt::g_dc_flush_hook). Nothing here changes guest state.
+  virtual void gp_write_through(std::uint32_t /*addr*/, std::uint32_t /*len*/) {}
 };
 
 class GxFifo {

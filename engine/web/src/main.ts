@@ -26,6 +26,7 @@
 //   bitmaps=0       threaded: the render thread draws into the page's canvas instead of sending ImageBitmaps
 //   digest=1        a renderer digest per VI field (window.mvp.digest; digestDetail=F1-F2: per draw)
 //   rtTune=US,MS,KIB,SYNC   the render thread's waiting (fence poll, record poll, publish step, sync fences)
+//   gpview=0        the renderer reads guest memory as it is, without the data-cache model (Q1 comparisons)
 // The page publishes its state as `window.mvp` for the browser check.
 
 import { AudioOut, type AudioState } from './audio.js';
@@ -115,6 +116,7 @@ const options: RunOptions = {
   digest: params.get('digest') === '1',
   digestDetail: params.has('digestDetail') ? (params.get('digestDetail') ?? '').split('-').map(Number) : undefined,
   rtTune: params.has('rtTune') ? (params.get('rtTune') ?? '').split(',').map(Number) : undefined,
+  gpView: params.get('gpview') !== '0',
   discCache: {
     blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
     maxRun: Number(params.get('discRun') ?? 0) || undefined,

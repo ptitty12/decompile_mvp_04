@@ -9,7 +9,7 @@
 # in docs/engine/TOOLCHAIN.md; without them the backend is skipped and the rest
 # of the engine builds as before.
 
-add_library(engine_gfx STATIC png.cpp gx_processor.cpp texture_decode.cpp tev_wgsl.cpp render_ring.cpp gp_reads.cpp)
+add_library(engine_gfx STATIC png.cpp gx_processor.cpp texture_decode.cpp tev_wgsl.cpp render_ring.cpp gp_reads.cpp gp_memory.cpp)
 target_link_libraries(engine_gfx PUBLIC engine_common)
 target_compile_options(engine_gfx PRIVATE ${ENGINE_WARN})
 # P2: the render thread's command ring (render_ring.h), with a producer and a
@@ -26,6 +26,9 @@ engine_test(test_gx_processor SOURCES tests/test_gx_processor.cpp LIBS engine_gf
 target_include_directories(test_gx_processor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # P2: the memory each command makes the renderer read (gp_reads.h).
 engine_test(test_gp_reads SOURCES tests/test_gp_reads.cpp LIBS engine_gfx)
+# Q1: what the GP reads of memory, after the data cache (gp_memory.h).
+engine_test(test_gp_memory SOURCES tests/test_gp_memory.cpp LIBS engine_gfx)
+target_include_directories(test_gp_memory PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(test_gp_reads PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # The runtime's hook (runtime/gx_fifo.h) feeding the processor.
 engine_test(test_gfx_hook SOURCES tests/test_gfx_hook.cpp LIBS engine_gfx engine_runtime)

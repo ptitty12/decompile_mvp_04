@@ -409,6 +409,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   t = performance.now();
   post({ type: 'progress', text: 'Booting', step: 5, steps: 5 });
   if (options.ioLog) M._mvp_io_log_enable();
+  if (options.gpView === false) M._mvp_gp_view(0);  // Q1 (development): no data-cache model for the renderer
   const script = new TextEncoder().encode(options.script);
   const ok = withBytes(script, (p, n) => M!._mvp_boot(p, options.script ? n : 0, options.stopFields,
                                                       options.stopFrames));

@@ -528,10 +528,16 @@ const Renderer::Pipeline& Renderer::pipeline(const PipelineConfig& c) {
   return pipelines_.emplace(c, std::move(info)).first->second;
 }
 
-std::uint64_t Renderer::hash_memory(std::uint32_t addr, std::uint32_t size) const {
+const std::uint8_t* Renderer::guest(std::uint32_t addr, std::uint32_t size) {
+  if (gpm_) return gpm_->view(addr, size, 1);
   addr &= 0x01FFFFFFu;
-  if (!mem_ || addr > mem_size_ || size > mem_size_ - addr) return 0;
-  return hash_bytes(mem_ + addr, size);
+  if (!mem_ || addr > mem_size_ || size > mem_size_ - addr) return nullptr;
+  return mem_ + addr;
+}
+
+std::uint64_t Renderer::hash_memory(std::uint32_t addr, std::uint32_t size) {
+  const std::uint8_t* p = guest(addr, size);
+  return p ? hash_bytes(p, size) : 0;
 }
 
 wgpu::Sampler Renderer::sampler(const TextureDesc& t) {
@@ -602,15 +608,15 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
     slot->pass = pass_open_ ? pass_serial_ : pass_serial_ + 1;
     return slot->view;
   }
-  const std::uint64_t mh = hash_memory(t.addr, bytes);
+  const std::uint8_t* src = guest(t.addr, bytes);  // Q1: memory as the GP sees it
+  const std::uint64_t mh = src ? hash_bytes(src, bytes) : 0;
   if (slot && slot->mem_hash == mh) {
     slot->epoch = epoch_;
     slot->pass = pass_open_ ? pass_serial_ : pass_serial_ + 1;
     ++stats_.texture_hits;
     return slot->view;
   }
-  const std::uint32_t a = t.addr & 0x01FFFFFFu;
-  if (!mem_ || a > mem_size_ || bytes > mem_size_ - a) return dummy_view_;
+  if (!src) return dummy_view_;
   // The open pass may already sample this texture's old contents: submit it
   // before the upload replaces them.
   if (slot && pass_open_ && slot->pass == pass_serial_) flush();
@@ -631,7 +637,7 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
   std::vector<std::uint8_t> rgba;
   for (std::uint32_t l = 0; l < t.levels; ++l) {
     rgba.resize(static_cast<std::size_t>(lw) * lh * 4);
-    decode_texture(t.format, lw, lh, mem_ + a + off, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
+    decode_texture(t.format, lw, lh, src + off, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
     wgpu::TexelCopyTextureInfo dst{};
     dst.texture = slot->tex;
     dst.mipLevel = l;
@@ -657,10 +663,10 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
 // rows below start right after them). Rebuilt when the copy is copied again or
 // that memory changes. Null if the texture lies outside memory.
 wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
-  const std::uint32_t a = t.addr & 0x01FFFFFFu;
   const std::uint32_t bytes = texture_level_size(t.format, t.width, t.height);
   const std::uint32_t covered = std::min(texture_level_size(t.format, t.width, e.h), bytes);
-  if (!mem_ || a > mem_size_ || bytes > mem_size_ - a) return nullptr;
+  const std::uint8_t* src = guest(t.addr, bytes);  // Q1: memory as the GP sees it
+  if (!src) return nullptr;
   std::unique_ptr<CopyEntry::Tall>& c = e.tall;
   const bool fresh = !c || c->h != t.height;
   if (fresh) {
@@ -678,7 +684,7 @@ wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
   // texture's is (the threaded engine relies on it: gfx/gp_reads.h).
   std::uint64_t tail = c->tail_hash;
   if (fresh || c->epoch != epoch_ || c->format != t.format) {
-    tail = hash_bytes(mem_ + a + covered, bytes - covered, t.format + 1u);
+    tail = hash_bytes(src + covered, bytes - covered, t.format + 1u);
     c->epoch = epoch_;
   }
   const bool new_tail = fresh || c->tail_hash != tail || c->format != t.format;
@@ -687,7 +693,7 @@ wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
     if (!fresh && pass_open_ && c->pass == pass_serial_) flush();
     if (new_tail) {
       std::vector<std::uint8_t> rgba(static_cast<std::size_t>(t.width) * t.height * 4);
-      decode_texture(t.format, t.width, t.height, mem_ + a, rgba.data(), nullptr, 0, 0);
+      decode_texture(t.format, t.width, t.height, src, rgba.data(), nullptr, 0, 0);
       const std::uint32_t rows = t.height - e.h;
       wgpu::TexelCopyTextureInfo dst{};
       dst.texture = c->tex;
@@ -702,12 +708,12 @@ wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
       c->format = t.format;
     }
     wgpu::CommandEncoder enc = gpu_.device().CreateCommandEncoder();
-    wgpu::TexelCopyTextureInfo src{};
-    src.texture = e.tex;
-    wgpu::TexelCopyTextureInfo dst{};
-    dst.texture = c->tex;
+    wgpu::TexelCopyTextureInfo csrc{};
+    csrc.texture = e.tex;
+    wgpu::TexelCopyTextureInfo cdst{};
+    cdst.texture = c->tex;
     wgpu::Extent3D ext{e.w, e.h, 1};
-    enc.CopyTextureToTexture(&src, &dst, &ext);
+    enc.CopyTextureToTexture(&csrc, &cdst, &ext);
     wgpu::CommandBuffer cb = enc.Finish();
     gpu_.queue().Submit(1, &cb);
     c->copy_serial = e.serial;

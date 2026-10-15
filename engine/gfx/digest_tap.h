@@ -21,6 +21,7 @@
 #include <unordered_set>
 
 #include "gfx/draw.h"
+#include "gfx/gp_memory.h"
 #include "gfx/texture_decode.h"
 
 namespace mvp::gfx {
@@ -40,6 +41,7 @@ class DigestTap final : public Backend {
     mem_ = mem;
     mem_size_ = size;
   }
+  void set_gp_memory(GpMemory* g) { gpm_ = g; }  // Q1: memory as the GP sees it
   // All parts in one value.
   std::uint64_t digest() const {
     std::uint64_t h = 0;
@@ -121,7 +123,11 @@ class DigestTap final : public Backend {
       const std::uint32_t a = t.addr & 0x01FFFFFFu;
       const std::uint32_t size = texture_size(t.format, t.width, t.height, t.levels);
       if (!seen_.insert(key(a, size)).second) continue;
-      if (mem_ && a <= mem_size_ && size <= mem_size_ - a) fold(kTexMem, mem_ + a, size);
+      if (gpm_) {
+        if (const std::uint8_t* p = gpm_->view(a, size, 1)) fold(kTexMem, p, size);
+      } else if (mem_ && a <= mem_size_ && size <= mem_size_ - a) {
+        fold(kTexMem, mem_ + a, size);
+      }
     }
     if (detail) {
       char b[160];
@@ -142,6 +148,7 @@ class DigestTap final : public Backend {
 
   const std::uint8_t* mem_ = nullptr;
   std::uint32_t mem_size_ = 0;
+  GpMemory* gpm_ = nullptr;
   std::uint64_t h_[kParts] = {0xCBF29CE484222325ull, 0xCBF29CE484222325ull, 0xCBF29CE484222325ull,
                               0xCBF29CE484222325ull, 0xCBF29CE484222325ull};
   std::uint64_t draws_ = 0;
