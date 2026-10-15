@@ -364,6 +364,18 @@ Everything below is run by agents; the owner never runs commands.
   native only. One renderer fix applied to both: the EFB pass's depth clear value
   is set (browsers reject webgpu.h's NaN default even when the load op is Load).
   Fullscreen (the button, F, or a double click) shows the canvas at 4:3 on black.
+  Q1 (`docs/engine/Q1_LOG.md`): the renderer reads guest memory as the GP sees
+  it after the CPU's data cache (`gfx/gp_memory.h`: lines the game flushes are
+  snapshot until the next VI field; the threaded engine sends the changed lines
+  through the ring), which ended the front end's flashing; it draws at 1x, 2x
+  or 3x the console's pixels (the page's **Picture** setting: Auto, 1x, 2x,
+  3x, kept in `localStorage["mvp.picture.v1"]`; Auto draws at least as many
+  pixels as the canvas shows, up to 3x, and follows fullscreen; a software
+  adapter stays at 1x), shows the 640 x 448 frame at 4:3 (the game's 3D
+  cameras are 4:3), scales it to the canvas with an area filter (larger) or
+  sharp bilinear (smaller), and samples textures with the game's LOD bias. URL
+  parameters: `scale=1|2|3` (instead of the setting), `gpview=0` (no
+  data-cache model, for comparisons).
 - **Errors** say what to do: no WebGPU (which browsers have it), a GPU that
   cannot be used, the wrong disc (above), not logged in, a server that does not
   answer Range requests, a failed engine Worker.
