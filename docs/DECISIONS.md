@@ -269,6 +269,13 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   `local_audio_determinism` (mixer on vs off) gives an identical SDK log, MEM1 and frame log. | Keeps retail code retail and keeps audio fully outside the netplay contract. | commits c9bb883d..7055f22c
 
+- 2026-10-14 | **Private deployment may serve the owner's disc image.** Owner, in chat: "since i already have my own copy and this is just for me and my brother ... who also has his own disk image we don't need to worry about the user proving a disk since it's a private url anyway".
+  - The owner's deployment may serve the owner's own disc image to the owner and invited players who own the game. The page loads it from the server instead of the file picker, and translation still runs in each browser.
+  - The lead adds a password gate in front of the whole site; a secret URL alone leaks through history, logs and link previews.
+  - Unchanged: the public repo never contains game data or anything derived from it; nothing game-derived is served anywhere other than that private deployment; the disc-identity check stays.
+
+  | Convenience for two players who both own the game; keeps the public repository clean. | owner reply in chat
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:

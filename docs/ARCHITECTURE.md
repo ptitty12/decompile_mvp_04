@@ -52,9 +52,9 @@ Mods are never written against decomp source layout or placeholder names. A
 hook can carry the decomp's name for its address as a label, but the address is
 what binds.
 
-## 3. What stays on the player's machine
+## 3. What stays private
 
-- **Never committed, never hosted:**
+- **Never committed, never published:**
   - the disc image and anything read or derived from it: translated code, extracted
     or converted files, decompressed overlays;
   - memory dumps, save states, and screenshots or recordings of the game.
@@ -62,6 +62,10 @@ what binds.
   keeps them in its own storage (OPFS). Development builds do the same in `build/`.
 - **The VPS serves only:**
   - the engine (our code);
+  - on the owner's private deployment only (owner, 2026-10-14), the owner's disc image,
+    behind a password, to the owner and invited players who own the game. The page then
+    loads the disc from there instead of the file picker. The picker remains for any other
+    setup;
   - the lobby, signaling and TURN relay;
   - mod packs that contain authored content or deltas, never copies of retail files.
 - The engine checks the disc's identity (GV4E69 rev 0) by hash before it runs anything.
