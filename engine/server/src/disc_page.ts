@@ -3,7 +3,7 @@
 // chunks (src/disc_store.ts), resuming where it stopped after a dropped
 // connection or a reload (choose the same file again). The server keeps the
 // image only if it is GV4E69 revision 0; afterwards /config.json names it and
-// every player's page loads it from the server.
+// every player's browser downloads it once and keeps it (P1: engine/web/src/disc-store.ts).
 //
 // The page is self-contained: its one style and one script are pinned by hash
 // in its Content-Security-Policy. Requests carry the page's CSRF token in the
@@ -53,10 +53,10 @@ export const DISC_PAGE_SCRIPT = `(function () {
       current.className = 'ok';
       current.textContent = 'The server has the disc: MVP Baseball 2005 (' + d.gameId + ', revision ' + d.revision + '), ' +
         d.format.toUpperCase() + ', ' + mb(d.size) + ', uploaded ' + new Date(d.uploadedAt).toLocaleString() +
-        '. Every player\\'s page loads it from the server.';
+        '. Players\\' browsers download it from here once and keep it.';
     } else {
       current.className = 'note';
-      current.textContent = 'The server has no disc yet. Until you upload one, each player picks their own image on the game page.';
+      current.textContent = 'The server has no disc yet. Until you upload one, the game page tells players that the disc is missing.';
     }
     var u = status && status.upload;
     pending.hidden = !u || uploading;
@@ -133,7 +133,7 @@ export const DISC_PAGE_SCRIPT = `(function () {
       if (await upload(file)) {
         bar.value = 1;
         progressText.textContent = '';
-        say('Done. The server now has the disc, and every player\\'s page loads it from there.', 'ok');
+        say('Done. The server keeps the disc; players\\' browsers download it from here once and keep it.', 'ok');
       } else {
         await refresh();
         var u = status && status.upload;

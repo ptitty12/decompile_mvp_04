@@ -4,8 +4,12 @@
 //   GET/POST /setup                          first-run password setup (src/setup.ts): open only
 //                                            while the server has no password; 404 once it has one
 //   GET  /healthz                            "ok" (no login; for monitoring)
-//   GET  /config.json                        {"disc":"/api/disc/image"} or {}; "discPage" with uploads
+//   GET  /config.json                        {"disc":"/api/disc/image"} or {}; "discPage" with uploads; with a
+//                                            disc also "discHash", "discSize" and "discManifest" (P1), or
+//                                            "discPreparing" while the image is being hashed
 //   GET/HEAD /api/disc/image                 the owner's disc image (src/files.ts)
+//   GET  /api/disc/manifest                  the image's piece hashes, for the players' one-time download
+//                                            into their own browser storage (src/disc_hash.ts)
 //   GET  /disc, /api/disc, /api/disc/uploads  the Server disc page and its chunked upload (deploy:
 //                                            src/disc_page.ts, src/disc_store.ts), with uploads on
 //   GET  /api/rooms                          open rooms (src/lobby.ts)
@@ -35,6 +39,7 @@ import {
 } from './auth.js';
 import type { ServerConfig } from './config.js';
 import { DISC_PAGE_CSP, discPage } from './disc_page.js';
+import { ManifestCache } from './disc_hash.js';
 import { DiscStore, type Answer } from './disc_store.js';
 import { serveDisc, serveStatic } from './files.js';
 import { Lobby } from './lobby.js';
@@ -74,6 +79,8 @@ export interface App {
   url: string;
   /** Where the password comes from now: the environment, the state file, or none yet (setup open or closed). */
   passwordMode(): PasswordMode;
+  /** Resolves when the served disc's manifest is computed (or cannot be): tests. */
+  discReady(): Promise<void>;
   close(): Promise<void>;
 }
 
@@ -144,12 +151,22 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
   });
   // The uploaded disc (deploy): only when a disc directory is configured.
   const store = cfg.discDir ? await DiscStore.open({ dir: cfg.discDir, expect: cfg.expectDisc, maxBytes: cfg.maxDiscBytes, now, log }) : null;
-  /** The image the disc route serves and its URL: an uploaded one, else the configured file. */
-  const servedDisc = (): { path: string; url: string; version: string } | null => {
+  /**
+   * The image the disc route serves, its URL and version: an uploaded one, else the configured file.
+   * `sidecar`: where its manifest is kept between restarts (uploads only).
+   */
+  const servedDisc = (): { path: string; url: string; version: string; sidecar?: string } | null => {
     const up = store?.current();
-    if (up) return { path: up.path, url: `/api/disc/image?v=${up.version}`, version: up.version };
+    if (up) return { path: up.path, url: `/api/disc/image?v=${up.version}`, version: up.version, sidecar: store!.manifestPath };
     return cfg.disc ? { path: cfg.disc, url: '/api/disc/image', version: '' } : null;
   };
+  // The served image's piece hashes (P1), computed in the background at start and after an upload.
+  const manifests = new ManifestCache(log);
+  const warmManifest = () => {
+    const d = servedDisc();
+    if (d) void manifests.get(d.path, d.sidecar);
+  };
+  warmManifest();
   // CSRF tokens of the Server disc page: bound to the session (a page elsewhere can neither read nor forge one).
   const discKey = randomBytes(32);
   const discToken = (session: string) => createHmac('sha256', discKey).update(`disc:${session}`).digest('base64url');
@@ -305,7 +322,9 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
       return;
     }
     if (parts.length === 2 && parts[1] === 'finish' && method === 'POST') {
-      sendJson(res, await store!.finish(id));
+      const a = await store!.finish(id);
+      if (a.status === 200) warmManifest();  // players' pages download the new image (P1)
+      sendJson(res, a);
       return;
     }
     if (parts.length === 1 && method === 'DELETE') {
@@ -422,9 +441,35 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
     }
     if (path === '/config.json') {
       const d = servedDisc();
-      const body: Record<string, string> = d ? { disc: d.url } : {};
+      const body: Record<string, string | number | boolean> = {};
+      if (d) {
+        body.disc = d.url;
+        // The image hash names the image: a page keeps one downloaded copy per hash (P1).
+        const m = await manifests.get(d.path, d.sidecar);
+        if (m === 'pending') body.discPreparing = true;
+        else if (m) {
+          body.discHash = m.hash;
+          body.discSize = m.size;
+          body.discManifest = d.version ? `/api/disc/manifest?v=${d.version}` : '/api/disc/manifest';
+        }
+      }
       if (store) body.discPage = '/disc';
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' }).end(JSON.stringify(body));
+      return;
+    }
+    if (path === '/api/disc/manifest') {
+      const d = servedDisc();
+      const v = url.searchParams.get('v');
+      const json = (status: number, body: unknown, extra: Record<string, string> = {}) =>
+        res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store', ...extra }).end(JSON.stringify(body));
+      if (!d || (v !== null && v !== d.version)) {
+        json(404, { error: d ? 'the disc image changed; reload the page' : 'no disc image' });
+        return;
+      }
+      const m = await manifests.get(d.path, d.sidecar);
+      if (m === 'pending') json(503, { error: 'the server is preparing the disc image; try again in a moment' }, { 'Retry-After': '2' });
+      else if (!m) json(404, { error: 'the disc image could not be hashed' });
+      else json(200, { version: d.version, ...m });
       return;
     }
     if (path === '/api/disc/image') {
@@ -511,6 +556,10 @@ export async function startServer(cfg: ServerConfig, opts: StartOptions = {}): P
     sessions,
     url: local,
     passwordMode: () => gate.mode,
+    discReady: async () => {
+      const d = servedDisc();
+      if (d) await manifests.ready(d.path, d.sidecar);
+    },
     close: () =>
       new Promise<void>((resolve) => {
         for (const ws of wss.clients) ws.terminate();

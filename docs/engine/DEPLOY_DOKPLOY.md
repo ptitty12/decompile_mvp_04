@@ -2,8 +2,10 @@
 
 How to put the game site on your VPS using only Dokploy's web pages. You don't
 need SSH and you don't type any commands. The repository and the Docker image
-hold no game data. You upload your disc image through the site after it is
-running, and it is kept in the app's private storage on your server.
+hold no game data. You upload your disc image through the site once, after it
+is running. It stays in the app's private storage on your server through every
+later deploy (section "Where the disc is kept"). Players never upload or pick a
+disc.
 
 Technical details for agents are in `deploy/docker-compose.yml`, `deploy/Dockerfile`
 and `docs/engine/NETPLAY.md`.
@@ -94,7 +96,8 @@ be uploaded.
 
 ## 7. Upload the disc
 
-1. On the game page, click **Server disc**, or open `https://<your domain>/disc`.
+1. Open `https://<your domain>/disc`. The game page also links to it: **Server
+   disc (site operator)**, in small print at the very bottom.
 2. Click **Choose file** and pick
    `C:\Users\Patrick Taylor\decompile_mvp_04\orig\GV4E69\MVP Baseball 2005 (USA).ciso`.
 3. Click **Upload** and keep the page open. The page shows the progress and the
@@ -105,24 +108,55 @@ be uploaded.
 
    If the upload stops (lost connection, closed page), choose the same file and
    click **Upload** again. It continues where it stopped.
-4. When it says **Done**, the server has the disc. Every player's page now loads it
-   from the server, with no file picker.
+4. When it says **Done**, the server has the disc, and you never upload it again.
+   The game page never shows a file picker or an upload button to players.
 
 ## 8. Play with your brother
 
-Send your brother the site address and, separately, the password. On the game
-page, either of you can:
+Send your brother the site address and, separately, the password.
+
+The first time a browser opens the game page, it downloads the game data from
+your server once, about 1.4 GB, with a progress bar ("Downloading the game data
+from the server, once: 34% ..."). The browser keeps it, so the game reads the
+disc from the player's own computer and never waits on the network while you
+play. Later visits start at once. If the download stops (a closed tab, a lost
+connection), reloading the page continues where it stopped.
+
+When the game is ready, either of you can:
 
 - press **Play** to play alone; or
 - **create a game** and send the invite link. The other player opens the link
   and joins.
 
+The browser needs about 1.5 GB of free disk space for this. In a private or
+incognito window it cannot keep the game data; the page then says so and offers
+to play while reading the disc from the server, which pauses while the game
+loads.
+
 ## Later
 
 - **Update:** click **Deploy** again. It rebuilds from `main`. The password and
-  the disc stay. Both players reload the page afterwards.
+  the disc stay. Both players reload the page afterwards. Right after the first
+  deploy of this version the page may say "The server is preparing the game data"
+  for a few seconds while the server checks the disc once. Players' browsers keep
+  their copy and download again only if you upload a different disc.
 - **Online game doesn't connect:** check the firewall ports (section 4), set
   `TURN_EXTERNAL_IP`, and if the domain is proxied, set `TURN_HOST`. Then deploy
   again.
 - **Removing everything:** deleting the app in Dokploy with its volumes also
   deletes the stored password and the uploaded disc.
+
+## Where the disc is kept
+
+The disc you uploaded, the password and the relay's secret are stored in the
+app's volume, `mvp-data` (Docker names it after the app: the app's name, then
+`_mvp-data`). It is not part of the code Dokploy downloads from GitHub, and
+Dokploy deploys the app under the same name every time, so every deploy uses the
+same volume:
+
+- **Kept:** Deploy, Redeploy, Rebuild, Stop and Start, automatic deploys,
+  restarting the VPS, and changes on the Environment or Domains tabs.
+- **Lost:** deleting the app with its volumes, and deleting the app and creating
+  a new one (a new app gets a new, empty volume: upload the disc again).
+- **Leave Randomize Compose off** (the app's Advanced tab). It gives the volume a
+  new name, so the app would start with an empty volume.

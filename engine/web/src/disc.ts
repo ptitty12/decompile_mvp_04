@@ -13,12 +13,22 @@
 // both carry Cache-Control: private, no-store; API calls without a login
 // answer 401.
 //
+// P1: the server also advertises "discHash", "discSize" and "discManifest" (the
+// image's piece hashes): the page then downloads the image once into this
+// browser's storage and the engine reads it locally (disc-store.ts), instead of
+// over the network during play. "discPreparing" means the server is still
+// hashing the image (once after an upload or an update): the page asks again.
+// "discPage" names the Server disc page (the operator's upload page).
+//
 // fetch is a parameter so the unit tests (tests/disc.test.mjs) run these
 // against fake responses.
 
+import type { DiscOffer } from './disc-store.js';
+
 export type ServerDisc =
-  | { kind: 'url'; url: string }
-  | { kind: 'none'; why: string }
+  | { kind: 'url'; url: string; offer?: DiscOffer; preparing?: boolean; discPage?: string }
+  // `deployment`: /config.json is there (the netplay server) but names no disc.
+  | { kind: 'none'; why: string; deployment?: boolean; discPage?: string }
   | { kind: 'error'; message: string; login?: boolean };
 
 type Fetch = (input: string, init?: RequestInit) => Promise<Response>;
@@ -40,8 +50,20 @@ export async function findServerDisc(base: string, fetchFn: Fetch = fetch): Prom
   } catch {
     return { kind: 'none', why: '/config.json is not JSON' };
   }
-  const disc = (cfg && typeof cfg === 'object') ? (cfg as Record<string, unknown>).disc : undefined;
-  if (typeof disc !== 'string' || !disc) return { kind: 'none', why: '/config.json names no disc' };
+  const c = (cfg && typeof cfg === 'object' ? cfg : {}) as Record<string, unknown>;
+  const sameOrigin = (v: unknown): string | null => {
+    if (typeof v !== 'string' || !v) return null;
+    try {
+      const u = new URL(v, base);
+      return u.origin === new URL(base).origin ? u.href : null;
+    } catch {
+      return null;
+    }
+  };
+  const discPage = sameOrigin(c.discPage) ?? undefined;
+  const disc = c.disc;
+  if (typeof disc !== 'string' || !disc)
+    return { kind: 'none', why: '/config.json names no disc', deployment: !!cfg && typeof cfg === 'object', discPage };
   let url: URL;
   try {
     url = new URL(disc, base);
@@ -50,7 +72,14 @@ export async function findServerDisc(base: string, fetchFn: Fetch = fetch): Prom
   }
   if (url.origin !== new URL(base).origin)
     return { kind: 'error', message: `/config.json: the disc must be on this site (${url.origin} is not)` };
-  return { kind: 'url', url: url.href };
+  const found: ServerDisc & { kind: 'url' } = { kind: 'url', url: url.href };
+  if (discPage) found.discPage = discPage;
+  const manifest = sameOrigin(c.discManifest);
+  if (typeof c.discHash === 'string' && /^[0-9a-f]{64}$/.test(c.discHash) && Number.isSafeInteger(c.discSize) &&
+      (c.discSize as number) > 0 && manifest)
+    found.offer = { url: url.href, manifest, hash: c.discHash, size: c.discSize as number };
+  else if (c.discPreparing === true) found.preparing = true;
+  return found;
 }
 
 export type DiscProbe = { ok: true; size: number } | { ok: false; message: string; login?: boolean };
@@ -91,21 +120,4 @@ export async function probeDiscUrl(url: string, fetchFn: Fetch = fetch): Promise
   if (!(size > 0) && m) size = Number(m[1]);
   if (!(size > 0)) return { ok: false, message: 'The server did not say how large the disc image is.' };
   return { ok: true, size };
-}
-
-// The deployment's "Server disc" page (upload the image to the server: the
-// Docker deployment, docs/engine/DEPLOY_DOKPLOY.md), when /config.json names
-// one on this same site; null anywhere else.
-export async function findDiscPage(base: string, fetchFn: Fetch = fetch): Promise<string | null> {
-  try {
-    const res = await fetchFn(new URL('/config.json', base).href, { credentials: 'same-origin', cache: 'no-store' });
-    if (!res.ok) return null;
-    const cfg: unknown = await res.json();
-    const page = cfg && typeof cfg === 'object' ? (cfg as Record<string, unknown>).discPage : undefined;
-    if (typeof page !== 'string' || !page) return null;
-    const url = new URL(page, base);
-    return url.origin === new URL(base).origin ? url.href : null;
-  } catch {
-    return null;
-  }
 }

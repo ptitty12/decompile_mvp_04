@@ -3,9 +3,11 @@
 //
 // The disc: on load the page asks for /config.json (disc.ts). On the owner's
 // private deployment it names the server's image and the game starts without a
-// picker; anywhere else the player picks their own image, which is handed to
-// the Worker as a File (a local handle, never uploaded). The page itself holds
-// no engine state.
+// picker: the first visit downloads the image once into this browser's storage
+// (disc-store.ts, P1) and every start reads it from there, locally; a server that
+// has no disc yet gets a note that its operator must upload one. Anywhere else
+// the player picks their own image, which is handed to the Worker as a File (a
+// local handle, never uploaded). The page itself holds no engine state.
 //
 // URL parameters (development and the local browser check, tools/browser_check.mjs):
 //   script=TEXT     an mvp-input script instead of live input (newlines as %0A)
@@ -17,18 +19,36 @@
 //   audioLatency=MS the worklet's buffer target (default 60)
 //   discBlock=KIB, discBlocks=N, discRun=N, discAhead=N   the server image's block cache
 //   traceDisc=1     record the picked image's reads (offsets and sizes) for tuning that cache
+//   ioLog=1         log every guest DVD read with its host timing (P1 measurements)
+//   store=0         read the server's image over the network instead of keeping it in this browser
+//   storeSpare=MB   free space the download must leave (tests of the storage-quota error)
 // The page publishes its state as `window.mvp` for the browser check.
 
 import { AudioOut, type AudioState } from './audio.js';
-import { findDiscPage, findServerDisc } from './disc.js';
+import { findServerDisc } from './disc.js';
+import { DownloadError, canStore, downloadDisc, progressText, storedDisc, type DiscOffer } from './disc-store.js';
 import { GamepadPanel } from './gamepad-ui.js';
 import { HostInput } from './input.js';
 import { Online, type OnlineState } from './netplay.js';
 import { PackPanel, type PacksState } from './packs.js';
 import type { CacheReport, DiscSource, FromWorker, Pad, RunOptions, Status, ToWorker } from './protocol.js';
 
+// The server's image in this browser's storage (P1): found there, or downloaded now.
+interface DownloadState {
+  state: 'checking' | 'waiting' | 'downloading' | 'stored' | 'done' | 'error';
+  done: number;
+  total: number;
+  bytesPerS: number;
+  ms?: number;           // the download's duration
+  fetched?: number;      // bytes this download fetched
+  resumedFrom?: number;  // bytes already stored when it started
+  kind?: string;         // the error's kind (DownloadError)
+  error?: string;
+}
+
 interface PageState {
-  source?: 'file' | 'url';
+  source?: 'file' | 'url' | 'stored';
+  download?: DownloadState;
   startedAt: number;           // performance.now() when the disc was chosen (picked, or named by the server)
   phases: Record<string, number>;
   translate?: unknown;
@@ -39,6 +59,7 @@ interface PageState {
   stats?: { status: Status; window: { fields: number; ms: number; wallMs: number } };
   stopped?: { status: Status; guestLine: string };
   discTrace?: string;
+  ioLog?: string;              // every guest DVD read: "field at_ms offset size ms" lines (ioLog=1)
   error?: { stage: string; message: string };
   progress?: { text: string; step: number; steps: number };
   cache?: CacheReport;
@@ -68,6 +89,7 @@ const fullscreenBtn = $<HTMLButtonElement>('fullscreen');
 const soundBtn = $<HTMLButtonElement>('sound');
 const pauseBtn = $<HTMLButtonElement>('pause');
 const startBox = $<HTMLElement>('start-box');
+const streamBox = $<HTMLElement>('stream-box');
 const playBtn = $<HTMLButtonElement>('play');
 
 const params = new URLSearchParams(location.search);
@@ -80,6 +102,7 @@ const options: RunOptions = {
   audio: params.get('audio') !== '0',
   cache: params.get('cache') !== '0',
   traceDisc: params.get('traceDisc') === '1',
+  ioLog: params.get('ioLog') === '1',
   discCache: {
     blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
     maxRun: Number(params.get('discRun') ?? 0) || undefined,
@@ -103,11 +126,13 @@ if (packPanel) state.packs = packPanel.state;
 // Online play (E5): the lobby panel, when the page comes from the netplay server.
 const onlineEl = document.getElementById('online');
 const online = onlineEl ? new Online(onlineEl, params) : null;
-let onlineReady: Promise<void> = Promise.resolve();
-if (online) {
-  state.net = online.state;
-  onlineReady = online.init().catch(() => {});
-}
+if (online) state.net = online.state;
+// The lobby opens once the game can start (after the one-time download): a game
+// joined earlier would make the other player wait past the session's timeout.
+let onlineReady: Promise<void> | null = null;
+const initOnline = (): Promise<void> => (onlineReady ??= online ? online.init().catch(() => {}) : Promise.resolve());
+const storeDisc = params.get('store') !== '0';
+const storeSpare = params.has('storeSpare') ? Number(params.get('storeSpare')) * 1048576 : undefined;
 
 const hasWebGPU = 'gpu' in navigator;
 const hasOffscreen = typeof canvas.transferControlToOffscreen === 'function';
@@ -135,7 +160,9 @@ function showError(stage: string, message: string): void {
   const reason =
     stage === 'disc' ? `This image cannot be used. The engine runs MVP Baseball 2005 for GameCube, USA (GV4E69), ` +
                        `revision 0 only. (${message})`
-    : stage === 'server' ? message
+    : stage === 'server' || stage === 'download' ? message
+    : stage === 'no-disc' ? 'This server has no game disc yet. Only the site\'s operator can add it, on the Server disc ' +
+                            'page (the link at the bottom of this page). Reload this page afterwards.'
     : stage === 'webgpu' ? message
     : stage === 'packs' ? `The roster packs cannot be used with this disc, so the game did not start: ${message}. ` +
                           'Reload the page to change the packs.'
@@ -146,7 +173,7 @@ function showError(stage: string, message: string): void {
   errorEl.textContent = reason;
   errorEl.hidden = false;
   progressEl.hidden = true;
-  if (stage !== 'gfx') setStatus('Stopped.');
+  if (stage !== 'gfx') setStatus(stage === 'no-disc' ? '' : 'Stopped.');
 }
 
 function showPhases(): void {
@@ -268,12 +295,14 @@ function onWorker(msg: FromWorker): void {
         `${w.fields} fields in ${(w.wallMs / 1000).toFixed(2)} s (${(w.fields / (w.wallMs / 1000)).toFixed(1)}/s), ` +
         `${perField.toFixed(2)} ms per field | draws ${s.draws ?? 0}, GPU errors ${s.gpu_errors ?? 0}` +
         (a ? ` | sound ${(a.fill / a.inRate * 1000).toFixed(0)} ms buffered, ${a.underruns} underruns` : '') +
-        (s.net ? ` | server reads ${s.net.requests} (+${s.net.prefetched} ahead), waited ${s.net.blocked_ms.toFixed(0)} ms` : '');
+        (s.net ? ` | server reads ${s.net.requests} (+${s.net.prefetched} ahead), waited ${s.net.blocked_ms.toFixed(0)} ms` : '') +
+        (s.io ? ` | disc reads ${s.io.reads}, ${s.io.ms.toFixed(0)} ms in all, longest ${s.io.max_ms.toFixed(0)} ms` : '');
       break;
     }
     case 'stopped':
       state.stopped = { status: msg.status, guestLine: msg.guestLine };
       state.discTrace = msg.discTrace;
+      state.ioLog = msg.ioLog;
       setStatus(`Stopped: ${msg.status.why ?? ''}`);
       log(msg.guestLine);
       break;
@@ -291,13 +320,17 @@ function onWorker(msg: FromWorker): void {
 
 function startEngine(disc: DiscSource): void {
   if (worker) return;
-  state.source = disc.kind;
+  const stored = disc.kind === 'file' && !!disc.stored;
+  state.source = stored ? 'stored' : disc.kind;
   state.startedAt = performance.now();
   errorEl.hidden = true;
+  state.error = undefined;  // e.g. a download error, when the player chose to play without keeping the data
+  streamBox.hidden = true;
   picker.disabled = true;
-  pickerBox.hidden = disc.kind === 'url';
+  pickerBox.hidden = disc.kind === 'url' || stored;
   startBox.hidden = true;
-  setStatus(disc.kind === 'file' ? `Reading ${disc.file.name}...` : 'Loading the disc from the server...');
+  setStatus(stored ? 'Starting the game...' : disc.kind === 'file' ? `Reading ${disc.file.name}...`
+                                                                   : 'Loading the disc from the server...');
   worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
   worker.onmessage = (ev: MessageEvent<FromWorker>) => onWorker(ev.data);
   worker.onerror = (ev) => showError('worker', ev.message || 'the engine Worker failed to start (out of memory?)');
@@ -397,12 +430,6 @@ requestAnimationFrame(tick);
 // ---- where the disc comes from ----
 
 async function init(): Promise<void> {
-  // The Docker deployment's Server disc page (upload the image to the server), when there is one.
-  void findDiscPage(location.href).then((url) => {
-    if (!url) return;
-    $<HTMLAnchorElement>('server-disc-link').href = url;
-    $<HTMLElement>('server-disc').hidden = false;
-  });
   if (options.render && !hasWebGPU) {
     pickerBox.hidden = true;
     showError('webgpu', NO_WEBGPU);
@@ -410,28 +437,123 @@ async function init(): Promise<void> {
   }
   setStatus('Looking for the disc...');
   const found = await findServerDisc(location.href);
-  await onlineReady;
-  if (found.kind === 'url') {
-    log(`disc: from the server (${new URL(found.url).pathname})`);
-    const disc: DiscSource = { kind: 'url', url: found.url };
-    if (online?.state.available) offerStart(disc);
-    else startEngine(disc);
-  } else if (found.kind === 'error') {
+  // The Docker deployment's Server disc page (the operator uploads the image there): a small link at the bottom.
+  if (found.kind !== 'error' && found.discPage) {
+    $<HTMLAnchorElement>('server-disc-link').href = found.discPage;
+    $<HTMLElement>('operator').hidden = false;
+  }
+  if (found.kind === 'error') {
     pickerBox.hidden = true;
     showError('server', found.message);
-  } else {
+    return;
+  }
+  if (found.kind === 'none') {
+    if (found.discPage) {
+      // The deployment, before its operator uploaded the disc: players never pick or upload one.
+      pickerBox.hidden = true;
+      setStatus('');
+      showError('no-disc', '');
+      return;
+    }
     log(`disc: pick one (${found.why})`);
+    await initOnline();
     pickerBox.hidden = false;
     setStatus('Pick your disc image to start.');
+    return;
+  }
+  if (found.preparing) {
+    // The server is hashing a new image (once after an upload or an update): ask again shortly.
+    setStatus('The server is preparing the game data (once after an update)...');
+    progressEl.hidden = false;
+    progressEl.removeAttribute('value');
+    setTimeout(() => void init(), 2000);
+    return;
+  }
+  log(`disc: from the server (${new URL(found.url).pathname})`);
+  const streamed: DiscSource = { kind: 'url', url: found.url };
+  if (found.offer && storeDisc && canStore()) {
+    const kept = await keepDisc(found.offer, streamed);
+    if (kept) await ready(kept);
+    return;
+  }
+  await ready(streamed);
+}
+
+// The server's image in this browser's storage: the copy kept from an earlier
+// visit, else downloaded now with a progress bar. On failure the error says what
+// to do, and the player may still play with the image read from the server.
+async function keepDisc(offer: DiscOffer, streamed: DiscSource): Promise<DiscSource | null> {
+  const total = offer.size;
+  const have = await storedDisc(offer.hash, total);
+  if (have) {
+    state.download = { state: 'stored', done: total, total, bytesPerS: 0 };
+    log(`disc: the game data stored in this browser (${offer.hash.slice(0, 12)}...)`);
+    return { kind: 'file', file: have, stored: true };
+  }
+  state.download = { state: 'checking', done: 0, total, bytesPerS: 0 };
+  progressEl.hidden = false;
+  progressEl.removeAttribute('value');
+  setStatus('Getting ready to download the game data...');
+  try {
+    const r = await downloadDisc(offer, (p) => {
+      state.download = { state: p.phase, done: p.done, total: p.total, bytesPerS: p.bytesPerS };
+      if (p.phase === 'waiting') {
+        setStatus('Another tab of this browser is downloading the game data; waiting for it...');
+        return;
+      }
+      if (p.phase === 'checking') return;
+      progressEl.value = p.done / p.total;
+      setStatus(`Downloading the game data from the server, once: ${Math.floor((100 * p.done) / p.total)}% ` +
+                `(${progressText(p.done, p.total, p.bytesPerS)}). Later visits start at once.`);
+    }, storeSpare);
+    state.download = { state: 'done', done: total, total, bytesPerS: r.ms ? (r.fetched * 1000) / r.ms : 0, ms: r.ms,
+                       fetched: r.fetched, resumedFrom: r.resumedFrom };
+    progressEl.hidden = true;
+    log(`disc: downloaded ${Math.round(r.fetched / 1048576)} MB in ${(r.ms / 1000).toFixed(1)} s` +
+        (r.resumedFrom ? ` (resumed at ${Math.round(r.resumedFrom / 1048576)} MB)` : '') + '; kept in this browser');
+    return { kind: 'file', file: r.file, stored: true };
+  } catch (e) {
+    const err = e instanceof DownloadError ? e : new DownloadError('storage', String(e));
+    state.download = { ...(state.download ?? { done: 0, total, bytesPerS: 0 }), state: 'error', kind: err.kind, error: err.message };
+    const mb = `${Math.round(total / 1048576).toLocaleString('en-US')} MB`;
+    const text: Record<DownloadError['kind'], string> = {
+      quota: `This browser cannot keep the game data (${mb}): ${err.message}. Free some disk space, and use a normal ` +
+             'window (not a private or incognito one), then reload the page.',
+      login: 'You are not logged in (or your login expired). Log in on this site, then reload the page.',
+      changed: 'The game disc on the server was replaced during the download. Reload the page to download the new one.',
+      network: `The game data could not be downloaded (${err.message}). Reload the page: the download continues where it stopped.`,
+      corrupt: `The downloaded game data did not match the server's checksums (${err.message}). Reload the page to try again.`,
+      storage: `This browser could not store the game data (${err.message}). Reload the page to try again, or use another browser.`,
+    };
+    showError('download', text[err.kind]);
+    if (err.kind !== 'login' && err.kind !== 'changed') {
+      // Still playable: the engine reads the image from the server (it may pause while the game loads).
+      streamBox.hidden = false;
+      $<HTMLButtonElement>('stream').addEventListener('click', () => {
+        streamBox.hidden = true;
+        void ready(streamed);
+      }, { once: true });
+    }
+    return null;
   }
 }
+
+// The disc is ready: the lobby opens (E5) or the game starts.
+async function ready(disc: DiscSource): Promise<void> {
+  await initOnline();
+  if (online?.state.available) offerStart(disc);
+  else startEngine(disc);
+}
+
 // With the lobby (E5) on the page and the disc on the server: Play starts a
 // game alone at once; creating or joining an online game starts the engine as
 // soon as this page has its player number (the Worker then waits for the
 // other player's handshake before it boots).
 function offerStart(disc: DiscSource): void {
   startBox.hidden = false;
-  setStatus('The disc is on this server. Press Play, or create or join an online game.');
+  errorEl.hidden = true;
+  state.error = undefined;
+  setStatus('The game is ready. Press Play, or create or join an online game.');
   playBtn.addEventListener('click', () => startEngine(disc), { once: true });
   const waitForRoom = () => {
     if (worker) return;

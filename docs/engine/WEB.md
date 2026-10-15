@@ -1,14 +1,16 @@
 # The browser build (E2, E2c)
 
 How the engine runs in a browser: the page gets the disc image (the player picks
-their own, or, on the owner's private deployment, the server serves the owner's
-image behind its login), translates the game to WebAssembly inside the browser
+their own, or, on the owner's private deployment, the browser downloads the
+owner's image from behind the server's login once and keeps it: P1), translates
+the game to WebAssembly inside the browser
 (or loads the translation it cached on an earlier visit), draws the frames on a
 canvas through WebGPU, plays the sound through an AudioWorklet, and reads the
 keyboard and a gamepad. Nothing game-derived is ever sent from the browser.
 Working logs and evidence: `docs/engine/E2_LOG.md` (E2: browser boot) and
 `docs/engine/E2C_LOG.md` (E2c: sound, gamepad, the disc from the server, caching,
-polish). Toolchain versions: `docs/engine/TOOLCHAIN.md`.
+polish) and `docs/engine/P1_LOG.md` (P1: the disc downloaded once into the browser;
+remote-read stalls measured). Toolchain versions: `docs/engine/TOOLCHAIN.md`.
 
 ## 1. Build and serve (agents)
 
@@ -33,7 +35,7 @@ Everything below is run by agents; the owner never runs commands.
    | File | What |
    |---|---|
    | `index.html`, `style.css` | the page (`engine/web/static/`) |
-   | `main.js`, `worker.js`, `protocol.js`, `input.js`, `gamepad.js`, `gamepad-ui.js`, `audio.js`, `audio-worklet.js`, `resampler.js`, `disc.js`, `module-cache.js`, `packs.js`, `packs-core.js` | the shell, compiled from `engine/web/src/*.ts` by `tsc` |
+   | `main.js`, `worker.js`, `protocol.js`, `input.js`, `gamepad.js`, `gamepad-ui.js`, `audio.js`, `audio-worklet.js`, `resampler.js`, `disc.js`, `disc-store.js`, `disc-download.js`, `module-cache.js`, `packs.js`, `packs-core.js` | the shell, compiled from `engine/web/src/*.ts` by `tsc` |
    | `mvp-packs.js`, `mvp-packs.wasm` (0.6 MB) | the roster-pack checker for the page's panel (E6): `engine/mods` alone, loaded only when packs are picked |
    | `mvp-web.js`, `mvp-web.wasm` (0.6 MB) | the engine: translator, runtime, interpreter, renderer, mixer (`engine/web/wasm/`) |
    | `build-id.json` | the SHA-256 of `mvp-web.wasm` and of `symbols.txt` (the key of the browser's translation cache) |
@@ -66,7 +68,14 @@ Everything below is run by agents; the owner never runs commands.
    `--disc-cache PARAMS`, `--packs P1,P2` (E6: roster pack folders or zips through the
    page's panel, before the disc), and `--real-server MAIN_JS` (E5's server, built,
    instead of the mock: a throwaway password, the check logs in through its
-   form, the disc configured; with the lobby there the check presses Play). It starts the server, opens the page with Playwright,
+   form, the disc configured; with the lobby there the check presses Play;
+   `--disc-dir DIR` gives it the Docker deployment's disc directory instead of a
+   file). P1 adds `--throttle RTT_MS,MBIT` (Chrome's network conditions through
+   CDP, which also slow the page's Workers), `--io-log` (every guest DVD read with
+   its host wait, summarized), `--clear-disc`, `--store-off` (read the server's
+   image over the network as before P1), `--interrupt-download PCT`, `--fallback`,
+   `--params Q`, `--profile DIR` (a profile on disk) and `--site DIR`; `netplay_check.mjs
+   --server-disc` runs E5's two-page check the deployment's way. It starts the server, opens the page with Playwright,
    and writes `summary-BROWSER[-TAG].json` and the screenshots to `--out`
    (default `build/engine/web-check`; screenshots are game-derived and stay under
    `build/`). It lists every request the page made. Chrome and Edge run with
@@ -74,7 +83,7 @@ Everything below is run by agents; the owner never runs commands.
 6. **Unit tests** (data-free, in `ctest --preset emscripten`): `test_web_shell`
    runs `node --test` on `engine/web/tests/*.test.mjs` against the compiled
    shell (the gamepad mapping, the audio resampler, the disc's server
-   contract); `test_web_cache` tests the server image's block cache and the
+   contract, the one-time download's manifest check); `test_web_cache` tests the server image's block cache and the
    translation cache's blob. `mvp-web-cache-sim TRACE` (development) replays a
    `--trace-disc` trace through the block cache over a modelled network.
 
@@ -83,7 +92,9 @@ Everything below is run by agents; the owner never runs commands.
 ```
  page (main thread)                          engine Worker (module)
  ------------------                          ----------------------
- /config.json -> {"disc": url}, or a picked File -> Module.mvpDiscUrl (Range XHRs) / Module.mvpDisc (FileReaderSync)
+ /config.json -> {"disc", "discHash", ...}: the image, downloaded once into OPFS (disc-download Worker),
+   or a picked File  ----------------------> Module.mvpDisc (FileReaderSync: local reads)
+   (no OPFS, or store=0) -------------------> Module.mvpDiscUrl (Range XHRs, block cache)
  <canvas> -- transferControlToOffscreen ---> specialHTMLTargets['#mvp-canvas']
  keyboard, Gamepad API -- pad state -------> mvp_set_pad (latched until the next frame poll)
  requestAnimationFrame -- tick (fallback) --> paced loop: mvp_run_fields(n), mvp_present()
@@ -96,8 +107,11 @@ Everything below is run by agents; the owner never runs commands.
 
 - **The page** (`src/main.ts`) holds no engine state. On load it asks for
   `/config.json` (`src/disc.ts`): with a `disc` URL the server's image is used
-  and no picker is shown; otherwise it shows the picker and hands the Worker
-  the picked `File`. With the server's image and E5's lobby on the page (the
+  and no picker is shown (P1: downloaded once into this browser and read from
+  there, below); a deployment whose operator has not uploaded the disc yet shows
+  that the operator must upload it (no picker, no upload in the main flow; the
+  Server disc page is a small "site operator" link at the bottom); anywhere else
+  it shows the picker and hands the Worker the picked `File`. With the server's image and E5's lobby on the page (the
   deployment: `docs/engine/NETPLAY.md`), a Play button starts a game alone, and
   creating or joining an online game starts the engine as soon as the page has
   its player number (the Worker then waits for the other player's handshake);
@@ -107,7 +121,8 @@ Everything below is run by agents; the owner never runs commands.
   frame statistics and errors, and publishes them as `window.mvp` for the
   browser check. URL parameters for tests: `script`, `fields`, `frames`,
   `fast=1`, `render=0`, `audio=0`, `cache=0`, `audioLatency=MS`, `traceDisc=1`,
-  `discBlock`/`discBlocks`/`discRun`/`discAhead`.
+  `discBlock`/`discBlocks`/`discRun`/`discAhead`, and (P1) `ioLog=1`, `store=0`,
+  `storeSpare=MB`.
 - **The Worker** (`src/worker.ts`) loads `mvp-web.js` (an Emscripten ES module,
   `-sENVIRONMENT=worker -sMODULARIZE -sEXPORT_ES6`) and calls its exports in
   order:
@@ -195,7 +210,35 @@ Everything below is run by agents; the owner never runs commands.
   (COOP/COEP headers) on every server that serves the page, and would not lower
   the latency, which the Worker's batches (one animation frame) and the device
   set. Nothing goes back from the worklet to the Worker.
-- **The disc from the server** (`src/disc.ts`, engine `wasm/web_disc.*`,
+- **The disc from the server, kept in the browser** (P1: `src/disc-store.ts`,
+  `src/disc-download.ts`; the server's `src/disc_hash.ts`). The server advertises
+  its image in `/config.json` with `discHash` (the image hash: SHA-256 over the
+  SHA-256 of each 8 MiB piece), `discSize` and `discManifest` (the piece list,
+  `/api/disc/manifest?v=`); it hashes the image once after an upload or at the first
+  start (0.6 s for the 1.38 GB CISO on this PC with the file cached; a small VPS reads the disk first) and keeps the result next to it
+  (`GV4E69.manifest.json`); meanwhile `/config.json` says `discPreparing` and the
+  page asks again every 2 s. The first visit downloads the whole image into the
+  origin private file system: a dedicated Worker (only Workers get synchronous
+  OPFS handles, which write each piece in place) checks the manifest against the
+  advertised hash, checks `navigator.storage.estimate()` and sizes the file to
+  the whole image before fetching anything (a small quota or a full disk fails
+  at once, with a message), then fetches 4 pieces at a time by Range GETs, checks
+  each piece's SHA-256 before writing it, and flushes and records the written
+  pieces about once a second (`mvp-disc/<hash>.part.json`), so a reload continues
+  where it stopped; the last write is `<hash>.ok`. The page shows "Downloading
+  the game data from the server, once: 34% (470 of 1,316 MB, 11.8 MB/s, about
+  72 s left)". A Web Lock keeps a second tab waiting instead of downloading
+  twice; `navigator.storage.persist()` asks the browser to keep the copy. The
+  engine then gets the stored file as a `File` and reads it exactly like a picked
+  file (FileReaderSync): every guest DVD read is local and synchronous. Later
+  visits find `<hash>.ok` and start at once; a different image hash (the operator
+  uploaded another image) downloads again and removes the old copy first. The
+  identity check (GV4E69 rev 0, the DOL's SHA-1) still runs on every start. The
+  lobby (E5) opens only once the copy is complete. On a download error the page
+  says what to do (free space and a normal window, log in again, reload to
+  resume) and offers to play with the image read from the server as before.
+- **The disc from the server, read over the network** (the fallback, and servers
+  without `discHash`; `src/disc.ts`, engine `wasm/web_disc.*`,
   `wasm/block_cache.*`). The deployment's contract (E5): `GET /config.json`
   `{"disc": "<url>"}`; the URL is on the same origin (anything else is refused)
   and answers HEAD with the size and a ranged GET with 206, both with
@@ -209,7 +252,12 @@ Everything below is run by agents; the owner never runs commands.
   a sequential stream also asks for the next 8 blocks ahead, which the Worker
   fetches asynchronously between batches. Failed reads retry twice; a read that
   still fails stops the run with the reason. Nothing is kept after the page
-  closes.
+  closes. Over the internet this stalls the game (P1, §3).
+- **The drive's reads, timed** (P1, `wasm/mvp_web.cpp` `TimedSource`): every
+  guest DVD read the drive model makes is timed on the host clock; `mvp_status`
+  reports `io` (reads, host ms, the longest, and how many took longer than a
+  field, 50 ms and 100 ms) and the page shows it in the stats line; `ioLog=1`
+  keeps a per-read log (field, time, offset, size, wait).
 - **Roster packs** (E6; `src/packs.ts`, `src/packs-core.ts`, engine `wasm/packs_web.*`;
   format: `docs/MODDING.md`). The Roster packs panel, above the disc picker, takes pack
   folders (a directory picker) and `.zip` files, in the order the player puts them (Up,
@@ -246,7 +294,8 @@ Everything below is run by agents; the owner never runs commands.
   answer Range requests, a failed engine Worker.
 - **What the server sends:** the files of §1 (the page, the shell, the engine,
   `build-id.json`, `symbols.txt`; `symbols.txt` not on a warm start), and on the
-  owner's deployment `/config.json` and the image. The browser check records
+  owner's deployment `/config.json`, the manifest and the image (on the first visit
+  only, P1). The browser check records
   every request; no run made a request outside the local origin.
 
 ## 3. Measurements
@@ -363,6 +412,26 @@ Mbit/s, 3.5 s at 30 ms / 200 Mbit/s (the longest stall 124 ms), 8 s at 50 ms /
 100 Mbit/s, almost all of it during the boot loading screen and the load before
 the licence screen.
 
+**The server image over the internet (P1, 2026-10-15; details in P1_LOG.md).** The
+real server with the Docker deployment's disc directory, Chrome 155 with CDP network
+conditions on the page and its Workers, E3a's path into the match as an input
+script (E3A_LOG.md §2, "Menu path"; to the poll of frame 5,200: 13,071 VI fields,
+the first pitch), paced, sound on. Every
+guest DVD read timed (2,094 reads, 31.2 MB):
+
+| | read wait in all | reads > 50 ms | > 100 ms | longest | worst second | during play (fields 10,500+) |
+|---|---:|---:|---:|---:|---:|---:|
+| before, 60 ms / 100 Mbit/s | 18.6 s | 169 | 126 | 209 ms | 1,047 ms of reads | 2.9 s, 29 reads > 50 ms |
+| before, 80 ms / 50 Mbit/s | 27.3 s | 173 | 173 | 352 ms | 1,036 ms | 4.2 s, 29 > 50 ms |
+| after (kept in the browser), 60 ms / 100 Mbit/s | 0.86 s | 0 | 0 | 1.7 ms | 112 ms | 0.09 s, 0 > 16.7 ms |
+| before, 60 ms / 100 Mbit/s, machine loaded (20 busy threads and a disk writer) | 20.4 s | 170 | 127 | 1,416 ms | 1,417 ms | 3.0 s, 29 > 50 ms |
+| after, the same load | 1.90 s | 0 | 0 | 5.0 ms | 237 ms | 0.18 s, 0 > 16.7 ms |
+
+The one-time download took 112 s at 60 ms / 100 Mbit/s (12.3 MB/s, the link's
+rate; 114 s with the machine loaded), 57 s at 40 ms / 200 Mbit/s, 223 s at 80 ms /
+50 Mbit/s, 4.8 s on localhost. The disc check before the boot fell from 1,240 ms to
+24 ms. The guest line at frame 5,200 is the same either way (`MEM1 8d79a7b5...`).
+
 ## 4. Determinism
 
 The browser's guest line (`mvp_guest_line`: instructions, time base, frame
@@ -388,9 +457,9 @@ and the browsers with E2d's emitter, with sound on, unpaced:
 
 | Run | Guest line | Matches |
 |---|---|---|
-| 700 fields, no input | 2,845,943,121 instructions, time base 474,323,853, 94 polls, MEM1 `73e856d4...` | native, Chrome 155, Firefox 157 |
-| 2,400 fields, START at 280/430/580/730 | 9,737,828,100, 1,622,971,350, 966 polls, MEM1 `c70ca6c5...` | native, Chrome, Firefox |
-| 3,600 fields, the `menus` script | 14,602,688,100, 2,433,781,350, 2,117 polls, MEM1 `5e150b6c...` | native, Chrome (paced and unpaced), Firefox (paced and unpaced); `mvp-boot-wasm` under Node |
+| 700 fields, no input | 2,845,943,121 instructions, time base 474,323,853, 94 polls, MEM1 `73e856d4...` | native, Chrome 155, Firefox 157; Chrome from the image kept in the browser (P1) |
+| 2,400 fields, START at 280/430/580/730 | 9,737,828,100, 1,622,971,350, 966 polls, MEM1 `c70ca6c5...` | native, Chrome, Firefox; Chrome from the kept image (P1) |
+| 3,600 fields, the `menus` script | 14,602,688,100, 2,433,781,350, 2,117 polls, MEM1 `5e150b6c...` | native, Chrome (paced and unpaced), Firefox (paced and unpaced); `mvp-boot-wasm` under Node; Chrome from the kept image, unpaced (P1) |
 
 ## 5. Limits and next steps
 
@@ -402,11 +471,10 @@ and the browsers with E2d's emitter, with sound on, unpaced:
   unpaced) and the main menu uses about a third of the frame budget in Chrome and
   Firefox (§3, "Frame time, E2d"). What is left and what was tried:
   `docs/engine/E2D_LOG.md` §5.
-- **Remote play:** each missed block of the server image costs a round trip; the
-  boot waits about 2 s at 30 ms. Next: keep the boot's read plan (offsets only)
-  in the browser after the first visit and prefetch it in parallel during the
-  translation. Keeping the image's bytes in the browser would remove the wait on
-  later visits, but the server says `no-store`: an owner decision (E2C_LOG.md).
+- **Remote play:** done in P1: the image is downloaded once into the browser
+  (DECISIONS 2026-10-14 allows it) and read locally; the game never waits on the
+  network. The first visit waits for the download (about 1.4 GB: 112 s at 100
+  Mbit/s). Reading over the network remains only as the fallback.
 - **Gamepads** were tested with unit tests and a fake `getGamepads()`, not yet
   with a real controller.
 - **The real server** (E5, `engine/server/`) was tested locally (Chrome: login,

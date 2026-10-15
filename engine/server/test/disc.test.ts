@@ -22,6 +22,7 @@ import {
   type ExpectedDisc,
   type Reader,
 } from '../src/disc_image.js';
+import { ManifestCache, PIECE_BYTES, hashImage, imageHash } from '../src/disc_hash.js';
 import { DISC_PAGE_CSP } from '../src/disc_page.js';
 import { CHUNK_MAX } from '../src/disc_store.js';
 import type { ServerMsg } from '../src/lobby_protocol.js';
@@ -369,7 +370,8 @@ describe('Server disc upload', () => {
     r = await o.api('HEAD', cfg2.disc);
     assert.equal(r.status, 200);
     assert.equal(r.headers.get('content-length'), String(good.iso.length));
-    assert.deepEqual(readdirSync(discDir).sort(), ['GV4E69.img', 'upload']);
+    await app.discReady();
+    assert.deepEqual(readdirSync(discDir).sort(), ['GV4E69.img', 'GV4E69.manifest.json', 'upload']);
 
     // A restart keeps the disc (checked again at start).
     await app.close();
@@ -431,6 +433,72 @@ describe('Server disc upload', () => {
     assert.equal((await o.put(a, 0, good.iso.subarray(0, 10))).status, 404);
     assert.equal((await o.finish(b)).status, 409);  // not complete
     assert.equal((await o.api('PUT', `/api/disc/uploads/${b}`, Buffer.alloc(4), 'application/octet-stream')).status, 411);
+  });
+
+  it('advertises the image hash and its pieces for the players\' one-time download (P1)', async () => {
+    const discDir = join(dir, 'manifest');
+    let app = await start({ discDir });
+    let o = await Owner.open(app);
+    const file = toCiso(good.iso, 576);
+    const id = ((await (await o.create(file)).json()) as { upload: { id: string } }).upload.id;
+    assert.equal((await o.send(id, file, 0, 65536)).status, 200);
+    assert.equal((await o.finish(id)).status, 200);
+    await app.discReady();
+    const cfg = (await (await o.api('GET', '/config.json')).json()) as Record<string, any>;
+    const pieces = [createHash('sha256').update(file).digest('hex')];  // under 8 MiB: one piece
+    assert.equal(cfg.discHash, imageHash(pieces));
+    assert.equal(cfg.discSize, file.length);
+    assert.match(cfg.disc, /^\/api\/disc\/image\?v=/);
+    assert.equal(cfg.discManifest, cfg.disc.replace('/image', '/manifest'));
+    let r = await o.api('GET', cfg.discManifest);
+    assert.equal(r.status, 200);
+    assert.equal(r.headers.get('cache-control'), 'private, no-store');
+    const m = (await r.json()) as Record<string, any>;
+    assert.deepEqual({ ...m, version: undefined }, { version: undefined, size: file.length, pieceBytes: PIECE_BYTES, pieces, hash: cfg.discHash });
+    assert.equal((await o.api('GET', '/api/disc/manifest?v=old')).status, 404);
+    assert.equal((await fetch(`${app.url}${cfg.discManifest}`)).status, 401);  // behind the login
+
+    // Kept next to the image: a restart reads it instead of hashing the image again.
+    await app.close();
+    const logs: string[] = [];
+    app = await startServer(config({ discDir }), { log: (l) => logs.push(l) });
+    running.push(app);
+    await app.discReady();
+    o = await Owner.open(app);
+    assert.equal(((await (await o.api('GET', '/config.json')).json()) as Record<string, any>).discHash, cfg.discHash);
+    assert.ok(!logs.some((l) => l.includes('hashing')), logs.join('\n'));
+  });
+});
+
+describe('disc image hash (P1)', () => {
+  it('hashes pieces, and their digests into the image hash', async () => {
+    const path = join(dir, 'pieces.bin');
+    const bytes = filler('pieces', 200_000);
+    writeFileSync(path, bytes);
+    const m = await hashImage(path, 65536);
+    const want = [0, 1, 2, 3].map((k) => createHash('sha256').update(bytes.subarray(k * 65536, (k + 1) * 65536)).digest('hex'));
+    assert.deepEqual(m.pieces, want);
+    assert.equal(m.size, bytes.length);
+    assert.equal(m.hash, createHash('sha256').update(Buffer.concat(want.map((h) => Buffer.from(h, 'hex')))).digest('hex'));
+  });
+
+  it('computes in the background, keeps the result, and starts over when the file changes', async () => {
+    const path = join(dir, 'cached.bin'), sidecar = join(dir, 'cached.manifest.json');
+    writeFileSync(path, filler('cached', 50_000));
+    const cache = new ManifestCache();
+    assert.equal(await cache.get(path, sidecar), 'pending');
+    const first = await cache.ready(path, sidecar);
+    assert.ok(first && first.size === 50_000);
+    assert.equal(await cache.get(path, sidecar), first);
+    assert.ok(existsSync(sidecar));
+    // A new cache (a restart) takes the stored manifest at once.
+    assert.deepEqual(await new ManifestCache().get(path, sidecar), first);
+    // Another file at the same path: hashed again.
+    writeFileSync(path, filler('changed', 50_001));
+    assert.equal(await cache.get(path, sidecar), 'pending');
+    const second = await cache.ready(path, sidecar);
+    assert.notEqual(second?.hash, first?.hash);
+    assert.equal(await cache.get(join(dir, 'missing.bin')), null);
   });
 });
 
