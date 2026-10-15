@@ -296,6 +296,17 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/e2c
 
+- 2026-10-14 | **E3a: the engine reaches a game** (lead, under the owner's delegation; docs/engine/E3A_LOG.md).
+  - Driven by script natively from power-on to an exhibition game (Cardinals at Red Sox, Fenway): pre-game, the first pitch with the pitch meter, the first ball in play.
+  - Speed (guest time per host time): intro movie 1.2×, menus 5.8×, in-game 0.9× with rendering and 1.4× without.
+  - **E3a-FP1:** the floating-point-unavailable exception (0x800) is part of the CPU model. It was the root cause of the movie specks: the OS's lazy FPU switch had let threads share FP registers.
+  - **E3a-FP2:** FP runs through host doubles only where the result provably equals the exact model (`fp::ref`; `test_fp` checks 21M cases per run).
+  - **E3a-WG1:** writing WPAR empties the write-gather pipe, and a redirected FIFO end keeps bit 26. Both bugs crashed the game after the loading screen.
+  - **E3a-B1:** translated code builds at /O2 by default (`MVP_GAME_OPT`), except functions with straight runs over 1,024 instructions. Guest state is identical at /Od and /O2.
+  - **Known gap:** the WebAssembly emitter doesn't have FP1 yet (E2d is adding it; `test_wasm_lockstep` is DISABLED until then). The browser build doesn't match native until it does.
+
+  | Determinism kept: 40/40 native tests, identical hashes at /Od and /O2. | merge 4f61815f
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
