@@ -344,5 +344,9 @@ native build that does not yield.
   with a real controller.
 - **The real server** (E5, `engine/server/`) is not tested yet; the page follows
   the contract in §2 and was tested against the mock.
-- Before hosting on the VPS: serve `licenses/` with the engine, and decide the
-  production headers (a Content-Security-Policy, caching) and compression.
+- Before hosting on the VPS: serve the site over **HTTPS** (WebGPU, AudioWorklet
+  and the origin private file system exist only in secure contexts; localhost
+  counts as one), with `.js` as `text/javascript` (the worklet is a module),
+  `.wasm` as `application/wasm` and `.json` as JSON; serve `licenses/` with the
+  engine, and decide the production headers (a Content-Security-Policy, caching)
+  and compression.

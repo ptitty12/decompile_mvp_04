@@ -50,6 +50,10 @@ never committed):
   | warm (cache) | 280-330 | 344-363 | 399-439 | 380-418 |
   | translate phase cold / warm | 491 / 76-114 | 514 / 103-116 | 641 / 174-182 | 658 / 172-189 |
 
+- **Edge 155** (headless, the server image, sound, 800 fields): cold 1,073 ms, warm 312 ms,
+  sound non-silent (RMS up to 0.17), the same guest line as Chrome and Firefox at 800 fields
+  (`MEM1 41a3f60e...`).
+
 **Tests:** `ctest --preset emscripten -LE local`: 25 of 25 (new: `test_web_cache`, 5 cases;
 `test_web_shell`, 17 node tests). No native code changed (only `engine/web/`).
 
@@ -173,7 +177,10 @@ after a warm start (no translator peak at all).
    from the start of the next visit, during the translation; most of the 1.9 s boot wait at
    30 ms would go. Persisting the blocks themselves needs the owner (above).
 2. **The real server (E5):** run the browser check against `engine/server` once it exists
-   (`/config.json`, login cookie, Range); the page needs no change if the contract holds.
+   (`/config.json`, login cookie, Range); the page needs no change if the contract holds. The
+   deployment must be HTTPS (WebGPU, AudioWorklet and OPFS need a secure context) and serve
+   `.js` as `text/javascript`. The Worker's `start` message now carries `disc` (a `File` or a
+   URL) instead of `file`: shell changes on other branches merge against that.
 3. **A real controller:** try an Xbox and a PlayStation pad in Chrome and Firefox (the
    standard mapping is the browsers' job); the mapping UI covers the rest.
 4. **Speed (E3a):** the intro movie's sound underruns until the movie decodes at full speed.
