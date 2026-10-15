@@ -12,9 +12,12 @@
 // Hooks (kind Before): the function is translated as usual and calls
 // rt::hle_before right after its entry (prologue and entry safe point), before
 // its first instruction; resuming inside the function does not run it. A hook
-// changes host state only (the input queue, logs), never guest state. Game
-// functions are keyed by address: the retail binary's addresses are a stable
-// contract, their placeholder names are not.
+// changes host state only (the input queue, logs), never guest state. A hook may
+// also stop the run there (YieldingHooks::stop_before, runtime/host_yield.h: the
+// frame poll does when netplay waits for an input): the translated function
+// returns at once, unwinding, and is entered afresh, hook included, when the run
+// continues. Game functions are keyed by address: the retail binary's addresses
+// are a stable contract, their placeholder names are not.
 //
 // Replacements read their arguments from the guest registers and memory and
 // must change guest state only as the original would (determinism invariant).

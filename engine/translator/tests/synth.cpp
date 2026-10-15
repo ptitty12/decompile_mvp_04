@@ -1,6 +1,7 @@
 #include "synth.h"
 
 #include <cstring>
+#include <iterator>
 #include <map>
 
 #include "../../ppc/tests/encode.h"
@@ -17,6 +18,7 @@ namespace {
 constexpr u32 kText = 0x80003100;
 constexpr u32 kTable = 0x80200000;   // data section: the jump table
 constexpr u32 kResults = 0x80300000;  // plain RAM
+constexpr u32 kPoll = 0x8014865C;     // the frame poll's retail address (runtime/hle.h hooks it)
 
 // A tiny assembler with label fixups.
 struct Asm {
@@ -135,6 +137,13 @@ Program make() {
   a.w(D(14, 3, 0, 10));
   a.bl("fact");
   store_result(a, 13);
+  // Four frame polls in a row (the frame loop's poll, hooked at its retail
+  // address, runtime/hle.h), with no safe point between them where the runtime
+  // stops: an input source that waits must stop the run at the poll (E5c).
+  a.w(D(14, 22, 0, 0));                // li r22, 0
+  for (int k = 0; k < 4; ++k) a.bl("poll");
+  a.w(X(31, 22, 3, 22, 444));          // mr r3, r22
+  store_result(a, 18);
   a.w(D(15, 3, 0, static_cast<s32>(kTable >> 16)));      // r3 = the format string (data + 0x10)
   a.w(D(14, 3, 3, static_cast<s32>((kTable + 0x10) & 0xFFFF)));
   a.w(D(14, 4, 0, 42));
@@ -354,25 +363,35 @@ Program make() {
   a.w(X(19, 20, 0, 0, 16));
   a.fn("end");  // marks the end of the text
 
+  // ---- poll: at the frame poll's retail address (a second text section); the
+  // runtime hooks it (runtime/hle.h). Counts its calls in r22.
+  const u32 poll[] = {
+      D(14, 22, 22, 1),    // addi r22, r22, 1
+      X(19, 20, 0, 0, 16), // blr
+  };
+  a.labels["poll"] = kPoll;
+
   a.resolve();
 
-  // DOL: text at kText, data (the jump table) at kTable.
+  // DOL: text at kText and kPoll, data (the jump table) at kTable.
   std::vector<u32> data;
   for (int k = 0; k < 4; ++k) data.push_back(a.labels.at("case" + std::to_string(k)));
   data.push_back(0x783D2564);  // "x=%d", then a newline and NUL
   data.push_back(0x0A000000);
-  std::size_t text_bytes = 4 * a.words.size(), data_bytes = 4 * data.size();
-  std::vector<std::uint8_t> d(0x100 + text_bytes + data_bytes, 0);
+  std::size_t text_bytes = 4 * a.words.size(), data_bytes = 4 * data.size(), poll_bytes = sizeof poll;
+  std::vector<std::uint8_t> d(0x100 + text_bytes + data_bytes + poll_bytes, 0);
   auto set = [&](int slot, u32 off, u32 addr, u32 size) {
     put_be32(&d[4 * slot], off);
     put_be32(&d[0x48 + 4 * slot], addr);
     put_be32(&d[0x90 + 4 * slot], size);
   };
   set(0, 0x100, kText, static_cast<u32>(text_bytes));
+  set(1, static_cast<u32>(0x100 + text_bytes + data_bytes), kPoll, static_cast<u32>(poll_bytes));
   set(7, static_cast<u32>(0x100 + text_bytes), kTable, static_cast<u32>(data_bytes));
   put_be32(&d[0xE0], kText);  // entry
   for (std::size_t k = 0; k < a.words.size(); ++k) put_be32(&d[0x100 + 4 * k], a.words[k]);
   for (std::size_t k = 0; k < data.size(); ++k) put_be32(&d[0x100 + text_bytes + 4 * k], data[k]);
+  for (std::size_t k = 0; k < std::size(poll); ++k) put_be32(&d[0x100 + text_bytes + data_bytes + 4 * k], poll[k]);
 
   std::string syms;
   char line[160];
@@ -381,6 +400,8 @@ Program make() {
                   a.functions[k].second, a.functions[k + 1].second - a.functions[k].second);
     syms += line;
   }
+  std::snprintf(line, sizeof line, "poll = .text:0x%08X; // type:function size:0x%zX\n", kPoll, poll_bytes);
+  syms += line;
   for (const auto& [n, at] : a.code_labels) {
     std::snprintf(line, sizeof line, "%s = .text:0x%08X; // type:label\n", n.c_str(), at);
     syms += line;
@@ -395,7 +416,7 @@ std::vector<std::uint32_t> expected_results() {
   float q = 30.0f / 9.0f;
   u32 qbits;
   std::memcpy(&qbits, &q, 4);
-  return {120, 12, 55, 7, 7, 30, qbits, 7, 0x11, 0x45, 0x56, 0x77, 7, 3628800, 0x5A, 0x44, 0x65, 0x66};
+  return {120, 12, 55, 7, 7, 30, qbits, 7, 0x11, 0x45, 0x56, 0x77, 7, 3628800, 0x5A, 0x44, 0x65, 0x66, 4};
 }
 
 }  // namespace mvp::xlat::synth

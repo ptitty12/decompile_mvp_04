@@ -6,7 +6,8 @@
 // emitter): same results, same unwinds, in-frame resumes, resume entries and
 // interpreted instructions. Both helper modes run: inline code, and every
 // non-branch instruction through the runtime. A second program checks the
-// inline floating-point moves and conversions on edge-case values.
+// inline floating-point moves and conversions on edge-case values. The synthetic
+// program also runs with stops at its frame polls (poll_stop.h, E5c).
 #include <doctest/doctest.h>
 
 #include <cstdio>
@@ -15,6 +16,7 @@
 #include "../../ppc/tests/encode.h"
 #include "../../translator/tests/synth.h"
 #include "common/bytes.h"
+#include "poll_stop.h"
 #include "runtime/hle.h"
 #include "runtime/lockstep.h"
 #include "runtime/wasm_host.h"
@@ -115,6 +117,39 @@ TEST_CASE("wasm-emitted synthetic program matches the interpreter in lockstep (i
 
 TEST_CASE("wasm-emitted synthetic program matches the interpreter in lockstep (runtime helpers only)") {
   run_case(false);
+}
+
+// E5c: in wasm-emitted code too, the frame poll stops the run before it consumes
+// anything, and the guest runs exactly as without the stops (poll_stop.h).
+TEST_CASE("wasm-emitted frame poll that must wait for its input stops the run there, invisibly") {
+  xlat::synth::Program prog = xlat::synth::make();
+  auto syms = xlat::SymbolTable::parse(prog.symbols);
+  auto dol = vfs::Dol::parse(prog.dol);
+  REQUIRE(dol);
+  xlat::ProgramCfg cfg = xlat::build_cfg(*dol, syms);
+  REQUIRE(cfg.errors == 0);
+  xlat::WasmEmitOptions opt;
+  const auto& table = hle_table();
+  for (std::size_t k = 0; k < table.size(); ++k)
+    opt.hle.push_back({table[k].name, table[k].address, static_cast<int>(k), table[k].kind == HleKind::Before});
+  xlat::WasmModule mod;
+  std::string err;
+  REQUIRE_MESSAGE(xlat::emit_wasm(cfg, opt, &mod, &err), err);
+  WasmLoadStats ls;
+  REQUIRE_MESSAGE(load_wasm_module(mod, &ls, &err), err);
+  poll_stop::Outcome plain = poll_stop::run(*dol, prog.results, false);
+  poll_stop::Outcome stopped = poll_stop::run(*dol, prog.results, true);
+  CHECK(plain.runs == 0);
+  CHECK(plain.frames == 4);
+  CHECK(plain.results == xlat::synth::expected_results());
+  CHECK(stopped.stops == 4);
+  CHECK(stopped.runs == 4);
+  CHECK(stopped.unwinds == plain.unwinds + 4);
+  CHECK(stopped.polls == plain.polls);
+  CHECK(stopped.ticks == plain.ticks);
+  CHECK(stopped.regs == plain.regs);
+  CHECK(stopped.results == plain.results);
+  CHECK_FALSE(g_unwinding);
 }
 
 // The emitter's inline floating-point moves and conversions (lfs's single to

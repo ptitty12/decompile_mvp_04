@@ -28,4 +28,18 @@ void YieldingHooks::safepoint(ppc::Cpu& c) {
   yield_run();
 }
 
+bool YieldingHooks::stop_before(ppc::Cpu& c) {
+  if (g_exception_depth > 0 || g_unwinding) return false;
+  want_ = false;
+  ++yields;
+  ++stops;
+  // The re-entered function's entry safe point, at this PC and instruction
+  // count, is the one the stopped call already passed.
+  armed_ = true;
+  pc_ = c.pc;
+  ticks_ = c.ticks;
+  yield_run();
+  return true;
+}
+
 }  // namespace mvp::rt
