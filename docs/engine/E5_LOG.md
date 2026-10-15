@@ -16,6 +16,7 @@ Design: `docs/ARCHITECTURE.md` §8. Protocol and deployment: `docs/engine/NETPLA
 | 3 | `engine/server/` (TypeScript): password gate, disc route, lobby, signaling, TURN config | Done |
 | 4 | Browser: data channel transport, lobby UI, two-browser lockstep test, latency and bandwidth | Done (local) |
 | 5 | `docs/engine/NETPLAY.md`; deploy package | Done; deployment waits for VPS access |
+| 6 | First-run password setup (E5b): the owner creates the site password in the browser, agents never handle it | Done |
 
 ## How to build and run (agents)
 
@@ -139,7 +140,52 @@ as agreed with E2c (`/config.json` gives `{"disc":"/api/disc/image"}` or `{}`;
 `GET`/`HEAD /api/disc/image` with ranges and `Cache-Control: private, no-store`), the
 static site with a CSP, the lobby and WebRTC signaling over `/ws` (session and Origin
 checked), and coturn REST-API credentials. Templates for coturn, Caddy, systemd and the
-configuration, and `deploy/install.sh` (Debian 12 / Ubuntu 24.04). 19 Node tests.
+configuration, and `deploy/install.sh` (Debian 12 / Ubuntu 24.04). 19 Node tests (47 with E5b, below).
+
+### First-run password setup (E5b, `claude-side-e5b`, branch `engine/e5b`)
+
+The owner will deploy to a private VPS and the agents must never handle the site
+password, so the password is no longer an install input. Behavior and the security
+reasoning: NETPLAY.md §5 ("First-run password setup"); deployment: §6.
+
+- **Code** (`engine/server/src`): `password.ts` (scrypt N=2^17, r=8, p=1, 64-byte key,
+  32-byte salt; records carry their parameters and are validated on read), `state.ts`
+  (the state file: atomic write, 0600/0700, the window start), `setup.ts` (the gate:
+  env > stored > setup/closed; CSRF tokens, limiters, one-at-a-time scrypt queue, the
+  form and message pages), `server.ts` (`/setup` before the session check, so it is 404
+  once a password exists even for logged-out visitors; setup mode redirects pages
+  and answers API calls 503), `config.ts` (`stateFile`, `setupHours`; password optional).
+- **Tests** (`test/setup.test.ts`, 28 new, data-free, a temporary state file each; the
+  clock and the log are injected): setup mode redirects; mismatched confirmation,
+  short and long passwords fail; forged CSRF / foreign Origin / cross-site fail; the
+  token expires; a good setup stores a scrypt hash with the documented parameters,
+  logs in, leaves no plaintext in the file or the log and no temp file, mode 0600;
+  a second setup is 404 (also with a form fetched earlier); two simultaneous
+  submissions have one winner; a failed write keeps setup open; the window refuses
+  setup (also while hashing), is not extended by restarts, and reopens fresh after
+  the state file is deleted; restart with a stored hash requires login and keeps the
+  login limit; the environment password wins and leaves the file alone; a damaged
+  state file stops the server; request, submission and queue limits; NFKC and
+  character counting; `loadConfig` precedence. `npm test`: 47/47.
+- **By hand in a browser** (Chromium, a throwaway local server): the redirect to
+  `/setup`, the strength hint (the hash-pinned inline script runs under the CSP), a
+  mismatch error, then a good submission landed on the engine page logged in;
+  `/setup` was then 404; the state file and the log held no plaintext. That check
+  also showed the browser's form POST passes the Origin check under the setup pages'
+  `Referrer-Policy: same-origin`.
+- **Deploy**: `install.sh` refuses `MVP_PASSWORD`, no longer writes `/etc/mvp/password`
+  (an older install's file is kept as `MVP_PASSWORD_FILE` rather than silently opening
+  setup), reports the first-visit state at the end; the unit has
+  `StateDirectory=mvp` (`/var/lib/mvp`, 0700) and `UMask=0077`; `server.json.example`
+  has `stateFile` and `setupHours`. `node engine/server/tools/package.mjs` still
+  builds (checked with a stub site and the output under the scratchpad; the real
+  `mvp-web` site is not built in this worktree). `install.sh` itself was syntax-checked
+  and its argument/`MVP_PASSWORD` refusals run, but not run end to end (it needs a root
+  Debian VPS).
+- **Not done / for the lead**: nothing was run on a VPS; `engine/web/tools/netplay_check.mjs`
+  keeps working unchanged (it uses `MVP_PASSWORD`). Residual risk (first come, first
+  served during the window; the host name is public through certificate transparency)
+  is in NETPLAY.md; the install order puts the disc image after the first visit.
 
 ## 4. The browser (done locally)
 
@@ -214,11 +260,11 @@ outside the server. Data-free tests: `test_net_protocol`, `test_net_session`,
      and TCP) and 49160-49200/UDP reachable (the provider's firewall too);
    - a domain or subdomain with an A record pointing at the VPS (or the DNS login to
      create one);
-   - the site password the owner wants the two players to type (or accept a generated
-     one, which the agent hands over);
+   - nothing about the site password: the owner creates it in the browser on the first
+     visit (E5b; NETPLAY.md §6 step 3), so the agent never handles it;
    - consent to copy the owner's disc image to `/srv/mvp/disc/` on that VPS (the
-     2026-10-14 hosting rule allows it on the private deployment); the brother can
-     instead pick his own image.
+     2026-10-14 hosting rule allows it on the private deployment), done after the owner
+     has created the password; the brother can instead pick his own image.
 2. Then: the owner and his brother open the site, log in, one creates a game and sends
    the link, both pick the disc; netplay starts at power-on. To finish an exhibition game
    the engine must first reach and run one at full speed in the browser (E3a: speed and
@@ -244,3 +290,9 @@ outside the server. Data-free tests: `test_net_protocol`, `test_net_session`,
 - **E5-S1, VPS stack:** Node 24 + `ws` behind Caddy (TLS), coturn with time-limited
   REST-API credentials; one shared password, HttpOnly session cookie; the disc route
   `/config.json` + `/api/disc/image` as agreed with E2c.
+- **E5-S2, first-run password setup (E5b):** the site password is created by the owner in
+  the browser (`/setup`), never passed to install or handled by an agent. Salted scrypt
+  (N=2^17, r=8, p=1) in a state file; open for 48 h (configurable) after the server first
+  starts without a password, then closed until an operator deletes the state file; 404 for
+  ever once a password exists; `MVP_PASSWORD` still wins (tests, CI). Residual risk:
+  first come, first served in the window (NETPLAY.md §5).

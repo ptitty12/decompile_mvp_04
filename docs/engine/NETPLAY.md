@@ -188,6 +188,7 @@ TypeScript on Node 24 (D3), one dependency (`ws`), pinned in `package-lock.json`
 | Route | |
 |---|---|
 | `GET /login`, `POST /login`, `POST /logout` | the password gate: one shared password, an HttpOnly `SameSite=Lax` session cookie (`Secure` behind TLS), in-memory sessions (30 days), failed logins limited per address (10 per 15 min), no open redirects |
+| `GET /setup`, `POST /setup` | first-run password setup (below): the form while the server has no password and its window is open (every page request is sent here); 403 once the window has closed; **404 forever once a password exists** |
 | `GET /healthz` | `ok`, without a login (monitoring) |
 | `GET /config.json` | `{"disc":"/api/disc/image"}` when a disc image is configured, else `{}` |
 | `GET`/`HEAD /api/disc/image` | the owner's image: `Accept-Ranges: bytes`, single ranges (206, or 416), `Cache-Control: private, no-store` |
@@ -199,19 +200,104 @@ Without a session, a page load is sent to the login form and anything else gets
 401. Every response has `X-Content-Type-Options`, `Referrer-Policy: no-referrer`
 (invite links never leak through referrers) and `X-Frame-Options: DENY`; engine
 pages have a Content-Security-Policy (same origin only, plus `wasm-unsafe-eval` to
-compile the translated game). Secrets come only from the environment:
-`MVP_PASSWORD`/`MVP_PASSWORD_FILE` and `MVP_TURN_SECRET`/`MVP_TURN_SECRET_FILE`.
+compile the translated game). Secrets come only from the environment or from files
+outside the repository: `MVP_TURN_SECRET`/`MVP_TURN_SECRET_FILE`, and the site password
+(created in the browser on the first run, below, or `MVP_PASSWORD`/`MVP_PASSWORD_FILE`).
 Everything else: `MVP_SERVER_CONFIG` (JSON, `deploy/server.json.example`) or
 `MVP_*` variables (`src/config.ts`).
+
+### First-run password setup (E5b)
+
+The agents never handle the site password, so a server that has none waits for the
+owner to choose it in a browser.
+
+**Where the password comes from**, in this order (the first that exists wins):
+
+1. `MVP_PASSWORD` / `MVP_PASSWORD_FILE` (at least 8 characters): for tests and CI.
+   When set, first-run setup is off (`/setup` is 404), the state file is neither read
+   nor written, and any stored password is ignored. An empty `MVP_PASSWORD_FILE` is
+   an error, never "no password".
+2. The hash in the state file (`stateFile` in `server.json`, or `MVP_STATE_FILE`).
+3. Neither: **setup mode**. `stateFile` is then required (the server refuses to
+   start without a password source).
+
+**Setup mode.** Every page request (`/`, `/login`, anything that is not `/healthz`
+or `/setup`) is redirected to `/setup`; API calls and sockets get 503 and 401.
+`/setup` is a small form: password and confirmation (at least 12 and at most 128
+characters, NFKC-normalized, counted in characters) and a live strength hint (a rough
+guide only: the server enforces the length). On a good submission the server hashes
+the password, writes the state file, logs the owner in (the usual session cookie)
+and leaves setup mode. The password is never logged, never echoed back into a page,
+and never written anywhere but as the hash.
+
+**The state file** (`/var/lib/mvp/state.json` on the VPS): JSON, `version: 1`,
+`setupOpenedAt` (ms since the epoch: when the server first started without a
+password) and, after setup, `password`: `{kdf: "scrypt", N, r, p, keylen, salt, hash,
+setAt}` (salt and hash base64). Created on the first start without a password (mode
+0600, its directory 0700, where the OS has modes; on Windows the profile's ACLs
+apply) and replaced atomically (temporary file, fsync, rename). A file that exists
+but cannot be parsed or validated stops the server: it never falls back to "no
+password", which would reopen setup.
+
+**Hash.** scrypt (RFC 7914, Node's `crypto.scrypt`): N = 2^17, r = 8, p = 1 (OWASP's
+first scrypt recommendation: 128 MiB, about 0.2 s per hash), a 64-byte key, a random
+32-byte salt per password, verified in constant time. Each record carries its own
+parameters, so the cost can rise later without breaking old records; records with
+absurd parameters (a state file edited into a denial of service) are refused. Password
+checks and hashes run one at a time (a queue of eight; beyond that, 503) so a burst
+cannot exhaust a small VPS's memory. With the environment password, login compares
+SHA-256 digests as before.
+
+**Strangers cannot (easily) claim it.**
+
+- *A window.* Setup is open for `setupHours` (default 48; `MVP_SETUP_HOURS`) after the
+  server **first** starts without a password. The start is kept in the state file, so
+  restarts do not extend it. After it, `/setup` answers 403, pages answer 503 "not set
+  up", and the log says so once: `setup window closed ...: the server has no password
+  and needs an operator`.
+- *Rate limits* on the setup endpoints, per sliding 15 minutes (a refused request is
+  not counted): 30 requests and 10 form submissions per client address, and 100
+  submissions in all (429 with `Retry-After`). Behind Caddy the address is the
+  proxy's last `X-Forwarded-For` entry (`trustProxy`).
+- *CSRF.* The form carries a token bound to an HttpOnly `SameSite=Strict` cookie
+  (`mvp_setup`, path `/setup`): `<expiry>.<HMAC-SHA256(per-process key, id.expiry)>`,
+  valid 30 minutes, stateless. A submission also has to be same-origin: a present
+  `Sec-Fetch-Site` must say `same-origin`, a present `Origin` must be the site's own
+  (the setup pages send `Referrer-Policy: same-origin`, because under the site-wide
+  `no-referrer` browsers send `Origin: null` for form posts). The page's CSP pins its
+  one style and one script by hash.
+- *Exactly one winner.* Two simultaneous submissions: one is stored, the other gets
+  503 or 404.
+
+**Residual risk.** Setup is first come, first served: whoever submits a valid form
+first while the window is open owns the password, and with it the site, the lobby and
+(on the private deployment) the owner's disc image. The limits and the window make
+abuse harder; they do not prove the visitor is the owner. The deploy URL is
+unpublished, but the host name appears in the public certificate-transparency logs as
+soon as Caddy obtains its certificate, and scanners watch those logs, so assume a
+stranger can find the form within hours. Therefore: make the first visit right after
+installing; if it shows the **login** form instead of the setup form, someone else
+created the password: reset (below) and treat the VPS as exposed; copy the disc image
+to the VPS only after the password exists (§6); keep `setupHours` short where the
+window can be. The password travels over HTTPS (Caddy); on plain HTTP it would not be
+protected, so use setup only behind TLS (`secureCookies`).
+
+**Changing the password later** is an operator action, there is no admin UI: stop
+`mvp-server`, delete the state file (`/var/lib/mvp/state.json`), start it. The server
+is then in setup mode again with a fresh window (and every session is gone); the owner
+makes a new first visit. The same reopens setup after a window that closed unused.
+The server reads the file at start, so it must be restarted.
 
 **TURN.** coturn runs in its "TURN REST API" mode (`use-auth-secret`): the server
 hands each page credentials derived from the shared secret (username
 `<expiry>:mvp`, password base64 HMAC-SHA1), valid for 24 hours. No accounts are
 stored, and leaked credentials expire.
 
-Tests: `npm test` in `engine/server` (19 tests: the gate, sessions and limits, the
-static site, the disc route, the lobby, signaling, TURN credentials), also run by
-ctest as `server_node_tests`.
+Tests: `npm test` in `engine/server` (47 tests: the gate, sessions and limits, the
+static site, the disc route, the lobby, signaling, TURN credentials, and first-run
+setup: setup mode redirects, form validation and CSRF, the stored hash and its file,
+the window, restarts, the environment override, limits), also run by ctest as
+`server_node_tests`.
 
 ## 6. Deploying on a VPS
 
@@ -229,16 +315,35 @@ ports: 80/tcp and 443/tcp (Caddy, HTTPS), 3478/udp and 3478/tcp (TURN), 49160-49
 
 **Install** (an agent with SSH access does this; the owner runs nothing):
 1. Copy `mvp-netplay.tar.gz` to the VPS and unpack it.
-2. Copy the owner's disc image to `/srv/mvp/disc/GV4E69.ciso` (private deployment only).
-3. `MVP_PASSWORD='<the password the owner chose>' ./deploy/install.sh <domain>` as root.
-   It installs Caddy and coturn (distribution packages) and Node.js 24.18.0 (the
-   official build, checksum verified), creates the `mvp` user and
-   `/opt/mvp/{site,server}`, writes `/etc/mvp/{password,turn-secret,server.json,server.env}`
+2. `./deploy/install.sh <domain>` as root. There is no password to pass (the script
+   refuses `MVP_PASSWORD`): a fresh install starts in setup mode with **no
+   password**. It installs Caddy and coturn (distribution packages) and Node.js
+   24.18.0 (the official build, checksum verified), creates the `mvp` user and
+   `/opt/mvp/{site,server}`, writes `/etc/mvp/{turn-secret,server.json,server.env}`
    (mode 0640, root:mvp), `/etc/caddy/Caddyfile`, `/etc/turnserver.conf` and the
-   `mvp-server` systemd unit, opens the ports with ufw when present, and starts
-   everything. Running it again updates the engine and keeps the secrets.
-4. Check: `https://<domain>/` shows the login form; after logging in, "Create a
-   game" gives an invite link; `curl https://<domain>/healthz` says `ok`.
+   `mvp-server` systemd unit (whose `StateDirectory` is `/var/lib/mvp`), opens the
+   ports with ufw when present, and starts everything. It ends by saying what the
+   first visit will find. Running it again updates the engine and keeps the secrets
+   and the password. (An install from before first-run setup keeps its
+   `/etc/mvp/password`.)
+3. **First visit: create the site password.** The agent tells the owner the address
+   and asks them to open it right away (see the residual risk above: the window is
+   48 hours, but the host name is findable within hours). `https://<domain>/` goes to
+   `/setup`; the owner types the password twice and is logged in. The agent never
+   sees the password. To confirm without it: `curl -s -o /dev/null -w '%{http_code}'
+   https://<domain>/setup` says 404 (a password exists) and the service log has
+   `setup: the site password was created`; the owner confirms they saw the form (a
+   login form on the first visit means someone else got there first: reset, below).
+4. Only now, for the private deployment, copy the owner's disc image to
+   `/srv/mvp/disc/GV4E69.ciso` and run `./deploy/install.sh <domain>` again (it
+   adds the image to `server.json`), so the image is never behind a password
+   a stranger could have chosen.
+5. Check: `https://<domain>/` shows the login form when logged out; after logging
+   in, "Create a game" gives an invite link; `curl https://<domain>/healthz` says `ok`.
+
+**Resetting the password** (operator action; the owner runs nothing): `systemctl
+stop mvp-server`, delete `/var/lib/mvp/state.json`, `systemctl start mvp-server`;
+setup is open again for a fresh window (step 3).
 
 **Updating the engine** later: build, package, copy, run `install.sh` again (both
 players must reload the page: the build id changes).
