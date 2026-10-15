@@ -103,6 +103,7 @@ export interface RunOptions {
   traceDisc?: boolean; // development: record the picked image's reads (offsets and sizes)
   tracePresent?: boolean;  // development (P1): what each present showed, in each stats window's `trace`
   fastUntil?: number;  // development (P1): run unpaced up to this VI field, then paced
+  pacing?: 'chase' | 'raf';  // P1: 'raf' = batches of up to 4 fields per animation frame (the earlier loop)
   ioLog?: boolean;     // development: log every guest DVD read with its host timing (P1)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }

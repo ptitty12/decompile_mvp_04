@@ -413,6 +413,24 @@ function afterRun(ran: number, ms: number): boolean {
 }
 
 // Paced: run the fields the wall clock asks for, then present once.
+//
+// P1 (chase, the default): a field that takes longer than the display's refresh
+// used to cost a whole refresh (its frame showed only at the animation frame
+// after the next), and the animation frame after that ran two to four fields at
+// once: in heavy scenes the picture moved in jumps of 33-67 ms. Now at most two
+// fields run per batch (two only when two are due), and while the clock is
+// still ahead of the run the next batch runs in its own task at once, without
+// waiting for an animation frame; each batch's frame is presented when its task
+// ends. Ahead of the clock the loop waits for animation frames as before.
+// pacing=raf (URL) keeps the earlier batches of up to four fields per animation frame.
+const CHASE_FIELDS = 2;
+const chase = new MessageChannel();
+let chasePending = false;
+chase.port1.onmessage = () => {
+  chasePending = false;
+  runPaced(performance.now());
+};
+
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
   let due = Math.floor((now - pacedStart) / FIELD_MS) - pacedFields;
@@ -421,13 +439,19 @@ function runPaced(now: number): void {
     pacedStart = now - pacedFields * FIELD_MS;
     due = 1;
   }
-  due = Math.min(due, MAX_FIELDS_PER_FRAME);
+  const rafOnly = opts?.pacing === 'raf';
+  due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : due >= 3 ? CHASE_FIELDS : 1);
   if (due <= 0) return;
   const t0 = performance.now();
   const ran = M._mvp_run_fields(due);
   pacedFields += Math.max(0, ran);
   gated = !!net && ran >= 0 && ran < due;
-  afterRun(ran, performance.now() - t0);
+  if (!afterRun(ran, performance.now() - t0) || rafOnly || gated) return;
+  // Still behind: the next batch now, in its own task (this one's frame is presented when it ends).
+  if (!chasePending && Math.floor((performance.now() - pacedStart) / FIELD_MS) - pacedFields >= 1) {
+    chasePending = true;
+    chase.port2.postMessage(0);
+  }
 }
 
 function frame(now: number): void {
