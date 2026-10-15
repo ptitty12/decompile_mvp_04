@@ -166,3 +166,18 @@ These were read for hardware facts and design, and no code was copied:
 | [encounter/aurora](https://github.com/encounter/aurora) at `51797212b9283e91cc03c273854d63b2421d8490` | MIT | Design of the TEV-to-WGSL generator, pipeline cache and register decoding (`lib/gx/shader.cpp`, `regs.cpp`, `gx.cpp`: BP cull encoding and front face); its texture converter was judged too tied to its own buffers to vendor |
 | Dolphin (VideoCommon) | GPL-2.0+ (read only) | Hardware behaviour: CMPR's 5/8-3/8 interpolation, indirect texturing (formats, bias, matrix scale, wraps), the TEV fixed-point lerp and compare modes, fog and lighting formulas, EFB copy register fields |
 | YAGCD and the Dolphin SDK's GX macros | public documentation | Register layouts and command lengths |
+
+### Compiled in, not vendored: the browser build (`engine/web/`, E2)
+
+Nothing new is copied into the tree. The browser engine (`mvp-web.js`/`.wasm`)
+compiles in third-party code from SDKs outside the repository
+(`docs/engine/TOOLCHAIN.md`); the build copies their notices into the served
+site's `licenses/` directory:
+
+| Code | License | In the served engine as |
+|---|---|---|
+| emdawnwebgpu, Dawn release `v20261013.193955` (`webgpu.cpp`, `webgpu_cpp.h`, `library_webgpu*.js`) | BSD-3-Clause (Dawn & Tint authors); its JS bindings under Emscripten's MIT/NCSA | `webgpu.h` for the renderer (`licenses/dawn-emdawnwebgpu.txt`) |
+| Emscripten 6.0.12 runtime and system libraries (JS glue, libc, libc++, libc++abi) | MIT/NCSA; libc++ Apache-2.0 with LLVM exception; musl MIT | everything (`licenses/emscripten.txt`) |
+
+Dev tools only, never served: TypeScript 6.0.3 (Apache-2.0) compiles the shell;
+Playwright 1.64.0 (Apache-2.0) drives the local browser check.

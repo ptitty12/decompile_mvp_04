@@ -1,10 +1,15 @@
-# E2 log: browser groundwork
+# E2 log: browser groundwork and browser boot
 
-Working log for the E2 groundwork session (`claude-side-e2`): the engine builds
-for WebAssembly, a baseline of the C++-emitted DOL in wasm, the WebAssembly
-emitter, and the in-browser translate-and-compile budget (`docs/engine/E0_SURVEY.md`
-§7, E2 risk #2). Results and the verdict: `docs/engine/E2_SPIKE.md`.
-Toolchain versions: `docs/engine/TOOLCHAIN.md` ("Browser: Emscripten").
+Working log for milestone E2. Steps 1-4: the groundwork session (`claude-side-e2`):
+the engine builds for WebAssembly, a baseline of the C++-emitted DOL in wasm, the
+WebAssembly emitter, and the in-browser translate-and-compile budget
+(`docs/engine/E0_SURVEY.md` §7, E2 risk #2; verdict in `docs/engine/E2_SPIKE.md`).
+Steps 5-9: the browser boot session (`claude-side-e2b`): the page, the Worker, the
+renderer in the browser, measurements in four browsers (`docs/engine/WEB.md`).
+Toolchain versions: `docs/engine/TOOLCHAIN.md` ("Browser: Emscripten" and
+"Browser: WebGPU, the web shell and browser checks").
+
+**E2's exit is met (2026-10-14):** see section 4.
 
 ## Status
 
@@ -14,6 +19,11 @@ Toolchain versions: `docs/engine/TOOLCHAIN.md` ("Browser: Emscripten").
 | 2 | Baseline: C++-emitted whole DOL compiled with Emscripten (dev path) | Done |
 | 3 | WebAssembly emitter (`translator/wasm_emit.*`) | Done (subset + runtime fallback = whole DOL) |
 | 4 | `docs/engine/E2_SPIKE.md` (numbers, verdict on risk #2) | Done |
+| 5 | Renderer in the browser (emdawnwebgpu, canvas surface, async device) | Done |
+| 6 | Host yields: `rt::run()` returns at every VI field, invisibly to the guest | Done (native and browser checks) |
+| 7 | Web shell: page, Worker, disc picker, identity check, pacing, keyboard and gamepad | Done (OPFS cache not done: optional) |
+| 8 | Local dev server and Playwright browser check | Done |
+| 9 | Measurements and determinism in Chrome, Edge, Firefox, WebKit; `docs/engine/WEB.md` | Done (Safari itself needs a Mac) |
 
 ## How to build and run (agents)
 
@@ -36,6 +46,10 @@ Toolchain versions: `docs/engine/TOOLCHAIN.md` ("Browser: Emscripten").
 - Native comparison builds: the `msvc` preset (translated code at `/Od`) and the
   same preset in `build/engine/msvc-o2` with `-DMVP_GAME_OPT=-O2` (new cache
   variable; `/O2` is mangled by Git Bash's path conversion, `-O2` is not).
+- **The browser build** (E2b): target `mvp-web` of the same preset, the site in
+  `build/engine/emscripten/web/site/`, `engine/web/tools/serve.mjs` to serve it and
+  `engine/web/tools/browser_check.mjs` to drive Chrome, Edge, Firefox or WebKit:
+  `docs/engine/WEB.md` §1.
 
 ## 1. The engine builds for wasm (done)
 
@@ -165,6 +179,84 @@ remaining mfspr/mtspr, sraw.
 
 Numbers (translate, compile, run): `docs/engine/E2_SPIKE.md`.
 
+## 4. Browser boot (E2b, `claude-side-e2b`, 2026-10-14): exit met
+
+**E2's exit is met:** in Chrome (and Edge and Firefox), the player picks their
+own disc image, the page translates it in the browser, and the title screen
+renders through WebGPU on a canvas; the server holds and sends no game data.
+Design, build, measurements: `docs/engine/WEB.md`.
+
+**What was built:**
+- **Renderer in the browser** (`engine/gfx`, window/surface layer and build only):
+  emdawnwebgpu from the native Dawn's release as an Emscripten local port;
+  `Gpu::create_async` (adapter and device without blocking); `Window` on a canvas
+  selector (no explicit Present in the browser); read-backs native only. One
+  renderer line: the EFB pass sets its depth clear value (browsers reject
+  webgpu.h's NaN default). The `emscripten` preset now builds the renderer.
+- **Host yields** (`runtime/host_yield.h`, `rt::yield_run`, `rt::g_yield`):
+  `rt::run()` returns at every VI field by an unwind like a thread switch's, and
+  the safe point the yield interrupted is not repeated when the guest continues
+  there. `mvp-play --yield` uses it natively; `local_play_determinism` now also
+  runs 700 fields with `--yield` and requires the same guest line (PASS). Natively
+  with the START script: 2,400 fields, 2,399 yields, 1,290 repeated safe points
+  skipped, guest line identical to the run without yields.
+- **Engine module** `mvp-web` (`engine/web/wasm/mvp_web.cpp`): a Worker ES module
+  with exports for the disc (FileReaderSync on the picked File, CISO or ISO,
+  identity by the DOL's SHA-1), translation, boot, renderer start, running whole
+  VI fields, present, pad state, status and the guest line. Live input latches
+  presses until the game's next frame poll.
+- **Web shell** (`engine/web/src`, TypeScript 6.0.3, compiled by `tsc` in the
+  build): page, Worker, keyboard and Gamepad API input, pacing from
+  requestAnimationFrame (whole VI fields at 59.94/s, at most 4 per frame, debt
+  dropped when far behind).
+- **Dev server** `engine/web/tools/serve.mjs` (the site directory only, localhost)
+  and **browser check** `engine/web/tools/browser_check.mjs` (Playwright 1.64.0).
+
+**Exit evidence** (screenshots of the canvas under `build/engine/web-check/`,
+never committed; looked at with the Read tool):
+- Chrome 155, headless, `menus` script, paced: field 6 onwards the boot loading
+  screen (baseball photo, EA SPORTS MVP Baseball 2005 badge, "Loading..." bar);
+  about field 650 the intro movie's EA logo, 700 the EA SPORTS ring (with E1's
+  known movie specks); 1741 the licence screen (MLB and Players Choice logos, "Team
+  Rosters Current as of 01/12/05"); **2124 the title screen: the Red Sox batter
+  photo, "MVP Baseball 2005" and the copyright line, and the "PRESS START" box**;
+  2305 the "No Memory Card found in Slot A." dialog over the title; 3005 the main
+  menu (Play Now, Game Modes, My MVP, ...) under the user-profile dialog. 0 WebGPU
+  errors, 98,608 draws, 2,138 XFB copies, 5 pipelines, 1,001 textures.
+- Edge 155 (headless) and Firefox 157 (headed) show the same screens (Edge's title
+  shot caught the PRESS START box over the fading background).
+- Live keyboard (Chrome, no script): Enter at fields 803 and 1000 skipped the
+  intro movie (licence screen at 1526), further presses reached the memory card
+  dialog (2707).
+- Identity: a random file gives "GCM: bad disc magic at 0x1C"; a synthetic GCM
+  claiming GV4E69 rev 0 with a made-up DOL gives "main.dol SHA-1 056ef58c... is not
+  GV4E69 rev 0"; the page shows both under "This image cannot be used...".
+- Requests: the page fetched only `/`, `style.css`, `main.js`, `input.js`,
+  `worker.js`, `mvp-web.js`, `mvp-web.wasm`, `symbols.txt`; nothing outside the
+  local origin, in every run.
+
+**Measurements** (WEB.md §3): cold start from the pick to the first frame 0.67-0.79 s
+in Chrome, 1.09 s in Edge, 0.82-0.86 s in Firefox; translation 0.50-0.53 s
+(Firefox 0.67 s: its compile of the 49.5 MB module takes 0.15 s against V8's
+0.02 s); title 1.2-1.4 ms per field, main menu 8-13 ms per field, all at
+59.94 fields/s; the intro movie at 12-18 fields/s (FP through the interpreter).
+
+**Determinism** (WEB.md §4): the guest line at 700, 2,400 and 3,600 fields equals
+native `mvp-play` in Chrome, Edge, Firefox and WebKit (MEM1 `eef70ba3...`,
+`4df06af1...`, `95f5c597...`).
+
+**Tests:** native `ctest --preset msvc`: 22 data-free pass; local tests pass
+(`local_play_determinism` with the new yield run, `local_boot_twice`,
+`local_input_start`, `local_lockstep`, `local_boot_main`, `local_cfg`, `local_disc`;
+`local_disasm` skipped, no dtk listing). `ctest --preset emscripten -LE local`:
+21 pass under Node.
+
+**Problems met:** browsers reject a NaN depth clear value (fixed); emdawnwebgpu
+aborts on `wgpuSurfacePresent` and on `WaitAny` without Asyncify (the browser path
+uses neither); headless Firefox has no WebGPU adapter (run headed); Playwright's
+Windows WebKit has no WebGPU at all (ran without rendering); quick live taps fell
+between the game's frame polls during the slow intro movie (latched now).
+
 ## Decisions to record (for the lead)
 
 - E2-W1: the browser backend emits one wasm module directly from the CFG, with
@@ -173,10 +265,34 @@ Numbers (translate, compile, run): `docs/engine/E2_SPIKE.md`.
   wasm-emitted and C++-emitted functions are interchangeable table entries.
 - E2-W2: the engine's own wasm build uses native wasm exceptions only to end a
   run (GuestFault, StopRun); the translated module uses none.
+- E2-W3 (E2b): the browser gets control back between VI fields by host yields:
+  an unwind at the end of a safe point (the same mechanism as a thread switch),
+  with the interrupted safe point not repeated on re-entry. No Asyncify, no JSPI,
+  no second thread; the guest runs the same instructions with or without them
+  (checked natively and in four browsers).
+- E2-W4 (E2b): the browser engine runs in one dedicated module Worker that owns
+  the disc File (read with FileReaderSync), the translator, the runtime and the
+  OffscreenCanvas; the page only forwards input and shows status. No
+  SharedArrayBuffer, so no COOP/COEP headers. `symbols.txt` is served with the
+  engine as repository metadata.
+- E2-W5 (E2b): live input is applied at the game's frame polls, and a button
+  pressed since the previous poll counts as pressed at the next one (a latch), so
+  taps shorter than the game's frame survive; what each poll returned is the only
+  host input in guest state.
 
 ## Next step
 
-See E2_SPIKE.md §6. In short: move the translator and runtime into a browser
-page (worker, OPFS cache) and measure on Chrome, Firefox and Safari; inline the
-FP arithmetic through the integer softfloat; shrink the module (spill/reload
-sharing, smaller memory-access sites).
+E2 is done. Suggested follow-ups:
+
+1. **Speed** (E3a's area): the intro movie runs at 20-30% of real time in the
+   browser and the main menu takes 8-13 ms of each 16.7 ms field; inline the FP
+   and paired-single arithmetic (E2_SPIKE §6 item 3), then profile game code
+   against the runtime in the main menu.
+2. **Safari** on a Mac (WebGPU and JavaScriptCore's tiers with this module);
+   Playwright's Windows WebKit has no WebGPU.
+3. **Audio in the browser** (E3b): an AudioWorklet fed from the Worker.
+4. Optional: cache the translated module and the image handle in OPFS; an
+   input recorder in the page (export the per-frame inputs as an mvp-input
+   script) for bug reports and the netplay work.
+5. Before the VPS: production headers (CSP, caching, compression) and serving
+   `licenses/` with the engine.

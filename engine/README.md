@@ -12,12 +12,15 @@ and the VPS services.
 
 **Status (2026-10-14):** E0b (native boot spike) done; E0c (unwinds, controller
 input, AX voices) done; E2 groundwork done (the engine builds for WebAssembly,
-and the WebAssembly emitter boots the DOL with the native SDK-log hash). Build
-instructions and measurements:
+and the WebAssembly emitter boots the DOL with the native SDK-log hash); E2 done
+(the player picks their disc in Chrome, Edge or Firefox, the page translates it
+and the title screen renders through WebGPU: `web/`). Build instructions and
+measurements:
 [`../docs/engine/E0B_LOG.md`](../docs/engine/E0B_LOG.md),
 [`../docs/engine/E0C_LOG.md`](../docs/engine/E0C_LOG.md),
-[`../docs/engine/E2_LOG.md`](../docs/engine/E2_LOG.md) and
-[`../docs/engine/E2_SPIKE.md`](../docs/engine/E2_SPIKE.md).
+[`../docs/engine/E2_LOG.md`](../docs/engine/E2_LOG.md),
+[`../docs/engine/E2_SPIKE.md`](../docs/engine/E2_SPIKE.md) and
+[`../docs/engine/WEB.md`](../docs/engine/WEB.md) (the browser build).
 
 Three rules matter most here:
 
