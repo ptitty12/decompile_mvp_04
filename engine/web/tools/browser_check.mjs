@@ -13,6 +13,7 @@
 //        [--audio-latency MS] [--pad F:button:I,F:axis:I:V,...] [--runs N] [--clear-cache] [--no-cache]
 //        [--hide F:MS] [--trace-disc] [--disc-cache PARAMS] [--hold MS] [--real-server MAIN_JS [--disc-dir DIR]]
 //        [--throttle RTT_MS,MBIT] [--io-log] [--clear-disc] [--store-off] [--profile DIR]
+//        [--threads 0] [--no-isolation] [--digest] [--cast-size WxH]   (P2; see below)
 //
 //   --disc     the image (default: $MVP_DISC). It goes to the page's file input
 //              locally (or, with --server-disc, to the mock server on 127.0.0.1)
@@ -118,8 +119,19 @@ const discParams = opt('--disc-cache', '');  // e.g. discBlock=256&discRun=8&dis
 // P1 (development): the presentation trace in each stats window; unpaced up to a field, then paced;
 // the composited page as Chrome shows it (CDP screencast, Chromium only) from field F, N frames.
 const tracePresent = flag('--trace-present');
+// P2: --threads 0: the single-threaded renderer even where the threaded engine could run (threads=0);
+// --no-isolation: the server sends no cross-origin isolation headers (the page cannot share memory, so
+// the Worker falls back to the single-threaded engine); --digest: the renderer digest per VI field
+// (digest=1) into OUT/digest-LABEL-rN.txt, to compare the threaded and the inline renderer.
+const threadsOff = opt('--threads', '') === '0';
+const noIsolation = flag('--no-isolation');
+const digest = flag('--digest');
 const fastUntil = Number(opt('--fast-until', '0'));
 const screencast = opt('--screencast', '') ? opt('--screencast', '').split(':').map(Number) : null;
+// P2: --cast-size WxH: screencast frames as small JPEGs, acknowledged before they are written (default: PNGs of
+// the whole page, acknowledged after). Chrome sends the next frame only after the acknowledgement, so large PNGs
+// cap the capture below 60 frames per second on a busy machine; small JPEGs keep up (timing measurements).
+const castSize = opt('--cast-size', '') ? opt('--cast-size', '').split('x').map(Number) : null;
 // --trace F:MS (Chromium): a Chrome performance trace (V8's sampling profiler in every thread, the GPU
 // process's tasks) from field F for MS ms, written to OUT/trace-LABEL.json (summarize: trace_summary.mjs).
 const traceAt = opt('--trace', '') ? opt('--trace', '').split(':').map(Number) : null;
@@ -172,6 +184,7 @@ if (realServer) {
   });
 } else {
   const serverArgs = [join(here, 'serve.mjs'), '--port', '0', '--root', site];
+  if (noIsolation) serverArgs.push('--no-isolation');
   if (serverDisc) {
     serverArgs.push('--disc', disc);
     if (login) serverArgs.push('--login');
@@ -275,6 +288,8 @@ async function runOnce(context, run) {
   if (audioLatency) q.set('audioLatency', audioLatency);
   if (traceDisc) q.set('traceDisc', '1');
   if (tracePresent) q.set('tracePresent', '1');
+  if (threadsOff) q.set('threads', '0');
+  if (digest) q.set('digest', '1');
   if (fastUntil) q.set('fastUntil', String(fastUntil));
   if (ioLog) q.set('ioLog', '1');
   for (const [k, v] of new URLSearchParams(discParams)) q.set(k, v);
@@ -298,6 +313,7 @@ async function runOnce(context, run) {
   const t0 = Date.now();
   await page.goto(`${base}?${q}`);
   summary.webgpu = await page.evaluate(() => 'gpu' in navigator);
+  summary.crossOriginIsolated = await page.evaluate(() => self.crossOriginIsolated === true);  // P2
   // The user gesture that starts audio: a real click on the page.
   if (audio) await page.mouse.click(5, 5);
   // Roster packs (E6): through the panel's inputs, as a player picks them, before the disc.
@@ -371,15 +387,18 @@ async function runOnce(context, run) {
   const startCast = async () => {
     cast = await page.context().newCDPSession(page);
     cast.on('Page.screencastFrame', (f) => {
+      if (castSize) cast.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => undefined);
       if (castFrames.length < screencast[1]) {
         const i = castFrames.length;
-        const path = join(out, `${label}-r${run}-cast-${String(i).padStart(5, '0')}.png`);
+        const path = join(out, `${label}-r${run}-cast-${String(i).padStart(5, '0')}.${castSize ? 'jpg' : 'png'}`);
         writeFileSync(path, Buffer.from(f.data, 'base64'));
         castFrames.push({ i, t: f.metadata.timestamp, field: lastField });
       }
-      cast.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => undefined);
+      if (!castSize) cast.send('Page.screencastFrameAck', { sessionId: f.sessionId }).catch(() => undefined);
     });
-    await cast.send('Page.startScreencast', { format: 'png', everyNthFrame: 1 });
+    await cast.send('Page.startScreencast', castSize
+      ? { format: 'jpeg', quality: 50, maxWidth: castSize[0], maxHeight: castSize[1], everyNthFrame: 1 }
+      : { format: 'png', everyNthFrame: 1 });
     console.log(`screencast started at field ${lastField}`);
   };
   let lastField = 0;
@@ -490,6 +509,8 @@ async function runOnce(context, run) {
   if (tracing && !summary.trace) await stopTrace();
   if (state.discTrace) writeFileSync(join(out, `disc-trace-${label}-r${run}.txt`), state.discTrace);
   delete state.discTrace;
+  if (state.digest) writeFileSync(join(out, `digest-${label}-r${run}.txt`), state.digest);
+  delete state.digest;
   if (state.ioLog) {
     writeFileSync(join(out, `io-${label}-r${run}.txt`), state.ioLog);
     summary.io = summarizeIo(state.ioLog, state.firstFrameField ?? 0);

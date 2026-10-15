@@ -11,8 +11,16 @@
 // many fields run, never what happens inside one: guest state depends on the
 // disc and the per-frame pad inputs alone. Audio goes one way, Worker ->
 // worklet, after each batch; nothing about its timing comes back.
+//
+// P2: where the page is cross-origin isolated (SharedArrayBuffer available) the
+// Worker loads the threaded engine, mvp-web-mt.js: the GX processor and the
+// WebGPU renderer run on a render thread (wasm/render_thread.h), to which this
+// Worker hands the page's frame port (the page shows each frame as an
+// ImageBitmap) or its canvas. Elsewhere, or with threads=0, it loads mvp-web.js
+// and renders inline as before (into its own canvas and the frame port when the
+// page gave one).
 
-import createMvpEngine, { type MvpEngine } from './mvp-web.js';
+import type { MvpEngine, MvpEngineOptions } from './mvp-web.js';
 import { probeDiscUrl } from './disc.js';
 import { cacheKey, clearCache, readCached, writeCached } from './module-cache.js';
 import { feedPacks, readReport, summarize } from './packs-core.js';
@@ -33,6 +41,9 @@ const FAST_BUDGET_MS = 40;       // unpaced mode: run this long, then let the ca
 const MAX_PREFETCH = 2;          // read-ahead requests in flight (server image)
 
 let M: MvpEngine | null = null;
+let mt = false;  // the threaded engine (P2)
+let vsync: SharedArrayBuffer | null = null;  // the page's display refreshes (P2), for the render thread
+let frames: MessagePort | null = null;       // P2: the page shows the frames sent here (instead of a canvas)
 let opts: RunOptions | null = null;
 let running = false, paused = false, firstFrame = false, booted = false;
 let pacedStart = 0, pacedFields = 0;
@@ -135,13 +146,41 @@ function cstr(ptr: number): string {
   return M ? M.UTF8ToString(ptr) : '';
 }
 
+// The engine's memory as bytes. The threaded engine's memory is shared and can be
+// grown by the render thread, which leaves this thread's HEAPU8 too short: a
+// fresh view then (P2).
+function heap(): Uint8Array {
+  const h = M!.HEAPU8, mem = M!.wasmMemory;
+  return mem && h.buffer !== mem.buffer ? new Uint8Array(mem.buffer) : h;
+}
+
+// The engine module: the threaded one where this Worker may share memory with
+// threads (cross-origin isolated) and the page did not ask for threads=0, else
+// the single-threaded one.
+async function loadEngine(threads: boolean, o: MvpEngineOptions): Promise<MvpEngine> {
+  const canShare = (self as unknown as { crossOriginIsolated?: boolean }).crossOriginIsolated === true &&
+                   typeof SharedArrayBuffer !== 'undefined';
+  if (threads && canShare) {
+    try {
+      const m = await import('./mvp-web-mt.js');
+      const engine = await m.default(o);
+      mt = true;
+      return engine;
+    } catch (e) {
+      post({ type: 'log', text: `mvp: the threaded engine did not load (${String(e)}); single-threaded`, error: true });
+    }
+  }
+  const m = await import('./mvp-web.js');
+  return m.default(o);
+}
+
 function status(): Status {
   return JSON.parse(cstr(M!._mvp_status())) as Status;
 }
 
 function withBytes<T>(bytes: Uint8Array, f: (ptr: number, len: number) => T): T {
   const ptr = M!._malloc(Math.max(1, bytes.length));
-  M!.HEAPU8.set(bytes, ptr);
+  heap().set(bytes, ptr);
   try {
     return f(ptr, bytes.length);
   } finally {
@@ -180,7 +219,7 @@ async function loadCached(key: string, report: CacheReport): Promise<boolean> {
   let ptr = 0;
   const n = await readCached(key, (size) => {
     ptr = M!._malloc(size);
-    return M!.HEAPU8.subarray(ptr, ptr + size);
+    return heap().subarray(ptr, ptr + size);
   });
   if (!n) {
     if (ptr) M!._free(ptr);
@@ -207,8 +246,8 @@ async function storeModule(key: string): Promise<void> {
   // A copy outside the engine's heap (which can grow while the write awaits).
   const bytes = new Uint8Array(n);
   const hp = M!._mvp_module_blob_ptr(), bp = M!._mvp_module_bytes_ptr();
-  bytes.set(M!.HEAPU8.subarray(hp, hp + head), 0);
-  bytes.set(M!.HEAPU8.subarray(bp, bp + len), head);
+  bytes.set(heap().subarray(hp, hp + head), 0);
+  bytes.set(heap().subarray(bp, bp + len), head);
   M!._mvp_module_release();
   const r = await writeCached(key, bytes);
   post({ type: 'cache', report: { key, hit: false, bytes: n, ...('ms' in r ? { storedMs: r.ms } : { error: r.error }) } });
@@ -227,7 +266,8 @@ function pumpAudio(): void {
   const n = M._mvp_audio_take();
   if (!n) return;
   const ptr = M._mvp_audio_ptr();
-  const data = new Int16Array(M.HEAPU8.buffer.slice(ptr, ptr + 4 * n));
+  // A copy in its own (never shared) buffer, to transfer.
+  const data = new Int16Array(heap().slice(ptr, ptr + 4 * n).buffer);
   const msg: WorkletIn = { type: 'pcm', rate: M._mvp_audio_rate(), data };
   audioPort.postMessage(msg, [data.buffer]);
 }
@@ -259,18 +299,32 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
 
   let t = performance.now();
   post({ type: 'progress', text: 'Loading the engine', step: 0, steps: 0 });
-  M = await createMvpEngine({
+  M = await loadEngine(options.threads !== false, {
     print: (text) => post({ type: 'log', text, error: false }),
     printErr: (text) => post({ type: 'log', text, error: true }),
   });
   M.mvpOnProgress = (text, step, steps) => post({ type: 'progress', text, step, steps });
-  phase('engine', t);
+  phase('engine', t, { threads: mt });
 
   // Ask for the GPU first: the adapter and device requests complete while
   // the DOL is translated.
   let gfxReady: Promise<boolean> = Promise.resolve(false);
-  if (options.render && canvas && 'gpu' in navigator) {
-    M.specialHTMLTargets['#mvp-canvas'] = canvas;
+  if (options.render && (canvas || frames) && 'gpu' in navigator) {
+    // P2: with a frame port the engine draws into a canvas of its own and sends
+    // each frame to the page as an ImageBitmap; else into the page's canvas.
+    if (frames && !mt) {
+      M.specialHTMLTargets['#mvp-canvas'] = new OffscreenCanvas(width, height);
+      M.mvpFrames = frames;
+    } else if (canvas) {
+      M.specialHTMLTargets['#mvp-canvas'] = canvas;
+    }
+    // P2: the render thread takes the canvas or the frame port (the engine posts it there).
+    if (mt) {
+      M.mvpCanvas = canvas;
+      M.mvpFrames = frames;
+      M.mvpVsync = vsync;
+      M._mvp_set_threaded(1);
+    }
     const tg = performance.now();
     gfxReady = new Promise<boolean>((resolve) => {
       M!.mvpOnGfx = (ok, message) => {
@@ -317,7 +371,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   let symbols: Uint8Array | null = null;
   const report: CacheReport = { key: null, hit: false };
   t = performance.now();
-  if (options.cache) report.key = await cacheKey(info.dol_sha1, new URL('build-id.json', import.meta.url));
+  if (options.cache) report.key = await cacheKey(info.dol_sha1, new URL('build-id.json', import.meta.url), mt);
   if (report.key && (await loadCached(report.key, report))) {
     phase('translate', t, JSON.parse(cstr(M._mvp_translate_info())));
   } else {
@@ -362,6 +416,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   }
   booted = true;
   if (options.tracePresent) M._mvp_trace(1);
+  if (options.digest) M._mvp_digest(1);
   enableAudio();
   phase('boot', t);
 
@@ -396,13 +451,19 @@ function afterRun(ran: number, ms: number): boolean {
   const now = performance.now();
   if (now - winWall >= 500) {
     const trace = opts?.tracePresent ? JSON.parse(cstr(M!._mvp_trace_take())) as unknown[] : undefined;
-    post({ type: 'stats', status: status(), window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace } });
+    const digest = opts?.digest ? cstr(M!._mvp_digest_take()) : undefined;
+    post({ type: 'stats', status: status(),
+           window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace, digest } });
     winFields = 0;
     winMs = 0;
     winWall = now;
   }
   if (ran < 0) {
     running = false;
+    if (opts?.digest) {  // the last fields' digests (the render thread has drawn them by now, threaded or not)
+      const digest = cstr(M!._mvp_digest_take());
+      if (digest) post({ type: 'stats', status: status(), window: { fields: 0, ms: 0, wallMs: 0, digest } });
+    }
     const discTrace = opts?.traceDisc ? cstr(M!._mvp_disc_trace()) : undefined;
     const ioLog = opts?.ioLog ? cstr(M!._mvp_io_log()) : undefined;
     post({ type: 'stopped', status: status(), guestLine: cstr(M!._mvp_guest_line()), discTrace, ioLog });
@@ -493,6 +554,8 @@ scope.onmessage = (ev: MessageEvent<ToWorker>) => {
   const msg = ev.data;
   switch (msg.type) {
     case 'start':
+      vsync = msg.vsync ?? null;
+      frames = msg.frames ?? null;
       start(msg.disc, msg.canvas, msg.width, msg.height, msg.options).catch((e: unknown) =>
         post({ type: 'error', stage: 'worker', message: String(e) }));
       break;

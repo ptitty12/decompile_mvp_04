@@ -30,6 +30,11 @@
 // virtual disc between mvp_open_disc and mvp_boot.
 // P1 times the drive model's reads on the host ("io" in mvp_status;
 // mvp_io_log_enable / mvp_io_log for a per-read log).
+// P2: the threaded build (mvp-web-mt, MVP_WEB_THREADS) runs the GX processor
+// and the renderer on a render thread (render_thread.h) when the page asks for
+// it (mvp_set_threaded before mvp_gfx_init); otherwise, and in the
+// single-threaded build, they run inline (render_side.h). mvp_digest /
+// mvp_digest_take: the renderer digest per VI field, to compare the two.
 //
 // Determinism: guest state depends only on the disc and the per-frame inputs.
 // Wall time never reaches it: the shell decides *how many* fields to run per
@@ -71,6 +76,10 @@
 #include "web/wasm/web_disc.h"
 #include "web/wasm/net_web.h"
 #include "web/wasm/packs_web.h"
+#include "web/wasm/render_side.h"
+#ifdef MVP_WEB_THREADS
+#include "web/wasm/render_thread.h"
+#endif
 
 using namespace mvp;
 using namespace mvp::rt;
@@ -161,20 +170,6 @@ struct LiveInput : InputSource {
 
 struct Engine;
 
-// Presentation trace (P1, development): every VI field's frame buffer address,
-// every XFB copy and what each present showed, as JSON records the Worker
-// collects (mvp_trace_take). The tap sits between the GX processor and the
-// renderer and forwards everything unchanged.
-struct XfbTap : gfx::Backend {
-  gfx::Backend* next = nullptr;
-  bool on = false;
-  std::string log;
-  std::uint64_t copies = 0;  // XFB copies seen
-  void draw(const gfx::DrawCall& d) override { next->draw(d); }
-  void efb_copy(const gfx::EfbCopy& c) override;
-  void invalidate_textures() override { next->invalidate_textures(); }
-};
-
 // The guest's DVD reads as the host serves them (P1): every read the drive
 // model makes goes through here and is timed on the host clock, so a hitch from
 // a slow read shows up in mvp_status ("io") and, when enabled, in a per-read log
@@ -210,6 +205,7 @@ struct Observer : GfxObserver {
   Engine* e = nullptr;
   void gx_command(const std::uint8_t* cmd, std::size_t len) override;
   void vi_field(std::uint64_t field, std::uint32_t xfb) override;
+  void gp_sync() override;  // P2: the render thread catches up (threaded only)
 };
 
 struct Engine {
@@ -250,17 +246,10 @@ struct Engine {
   std::unique_ptr<audio::AxMixer> mixer;
   web::PendingAudio audio;
 
-  // Rendering.
-  std::unique_ptr<gfx::Gpu> gpu;
-  std::unique_ptr<gfx::Window> window;
-  std::unique_ptr<gfx::Renderer> renderer;
-  std::unique_ptr<gfx::GxProcessor> proc;
-  std::string gfx_error;
+  // Rendering: inline (rs), or on the render thread (threaded, P2).
+  web::RenderSide rs;
+  bool threaded = false;
   std::uint32_t xfb = 0;
-  std::uint64_t presents = 0, last_presented = 0;
-  XfbTap tap;
-  std::uint64_t copies_at_present = 0;
-  std::uint64_t resizes = 0;  // canvas size changes the page reported
 
   // Host time spent inside rt::run, for the frame-time numbers.
   double run_ms = 0, last_batch_ms = 0, max_field_ms = 0;
@@ -286,34 +275,27 @@ bool TimedSource::read(std::uint64_t off, void* dst, std::size_t n) {
 }
 
 void Observer::gx_command(const std::uint8_t* cmd, std::size_t len) {
-  if (e->proc) e->proc->command(cmd, len);
+#ifdef MVP_WEB_THREADS
+  if (e->threaded) {
+    web::render_gx(cmd, len);
+    return;
+  }
+#endif
+  e->rs.gx(cmd, len);
 }
 
-void XfbTap::efb_copy(const gfx::EfbCopy& c) {
-  if (c.to_xfb) {
-    ++copies;
-    if (on) {
-      char b[200];
-      std::snprintf(b, sizeof b,
-                    "{\"k\":\"c\",\"f\":%llu,\"d\":%u,\"x\":%u,\"y\":%u,\"w\":%u,\"h\":%u,\"ys\":%.4f,\"clr\":%d},",
-                    static_cast<unsigned long long>(g.hw->vi_fields()), c.dest, c.src_x, c.src_y, c.width, c.height,
-                    static_cast<double>(c.y_scale), c.clear ? 1 : 0);
-      log += b;
-    }
-  }
-  next->efb_copy(c);
+void Observer::gp_sync() {
+#ifdef MVP_WEB_THREADS
+  if (e->threaded) web::render_sync();
+#endif
 }
 
 void Observer::vi_field(std::uint64_t field, std::uint32_t xfb) {
-  if (e->renderer) {
-    e->renderer->flush();
-    e->renderer->scan_field(xfb);  // what the VI scans out at this field (P1)
-  }
-  if (e->tap.on && xfb != e->xfb) {
-    char b[80];
-    std::snprintf(b, sizeof b, "{\"k\":\"v\",\"f\":%llu,\"t\":%u},", static_cast<unsigned long long>(field), xfb);
-    e->tap.log += b;
-  }
+#ifdef MVP_WEB_THREADS
+  if (e->threaded) web::render_field(field, xfb);
+  else
+#endif
+    e->rs.vi_field(field, xfb);
   e->xfb = xfb;
   if (field >= e->stop_fields) throw StopRun{"ran " + std::to_string(e->stop_fields) + " VI fields"};
   e->hooks->request_yield();  // run() returns after this field's safe point
@@ -354,13 +336,17 @@ void apply_audio() {
 }
 
 // The renderer needs both the device and the machine's memory; whichever of
-// mvp_gfx_init's callback and mvp_boot comes second attaches it.
+// mvp_gfx_init's callback and mvp_boot comes second attaches it (inline), or
+// the render thread does once it has both (threaded).
 void attach_renderer() {
-  if (!g.gpu || !g.window || !g.m || g.renderer) return;
-  g.renderer = std::make_unique<gfx::Renderer>(*g.gpu, g.m->mem1(), Machine::kMem1Size);
-  g.tap.next = g.renderer.get();
-  g.proc = std::make_unique<gfx::GxProcessor>(&g.tap);
-  g.proc->set_memory(g.m->mem1(), Machine::kMem1Size);
+  if (!g.m) return;
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    if (web::render_thread_running()) web::render_memory(g.m->mem1(), Machine::kMem1Size);
+    return;
+  }
+#endif
+  g.rs.set_memory(g.m->mem1(), Machine::kMem1Size);
 }
 
 }  // namespace
@@ -515,6 +501,9 @@ EMSCRIPTEN_KEEPALIVE int mvp_translate(const char* text, int len) {
 #ifdef MVP_WEB_NAMES
     opt.names = true;  // profiling builds: guest symbols in the browser's profiler
 #endif
+#ifdef MVP_WEB_THREADS
+    opt.shared_memory = true;  // P2: the threaded engine's memory is shared
+#endif
     const auto& table = hle_table();
     for (std::size_t k = 0; k < table.size(); ++k)
       opt.hle.push_back({table[k].name, table[k].address, static_cast<int>(k), table[k].kind == HleKind::Before});
@@ -665,30 +654,66 @@ EMSCRIPTEN_KEEPALIVE int mvp_audio_rate() { return static_cast<int>(g.audio.rate
 // overlap the translation). The game runs without a renderer until then (or
 // for good if WebGPU is missing): rendering never changes guest state.
 EMSCRIPTEN_KEEPALIVE void mvp_gfx_init(const char* selector, int width, int height) {
+#ifdef MVP_WEB_THREADS
+  // P2: the render thread takes the canvas (Module.mvpCanvas) and the device.
+  if (g.threaded) {
+    if (web::render_thread_start(selector, width, height, [](int ok, const char* msg) {
+          if (!ok) g.rs.error = msg;
+          mvp_js_on_gfx(ok, msg);
+        })) {
+      attach_renderer();  // if the machine is already there
+      return;
+    }
+    g.threaded = false;  // no thread: render inline
+  }
+#endif
   std::string sel = selector;
   gfx::Gpu::create_async([sel, width, height](std::unique_ptr<gfx::Gpu> gpu, std::string err) {
     if (!gpu) {
-      g.gfx_error = err;
+      g.rs.error = err;
       mvp_js_on_gfx(0, err.c_str());
       return;
     }
-    g.gpu = std::move(gpu);
-    g.window = gfx::Window::open_canvas(sel.c_str(), width, height, &err);
-    if (!g.window || !g.window->attach(*g.gpu, &err)) {
-      g.gfx_error = err;
-      g.window.reset();
+    g.rs.gpu = std::move(gpu);
+    g.rs.window = gfx::Window::open_canvas(sel.c_str(), width, height, &err);
+    if (!g.rs.window || !g.rs.window->attach(*g.rs.gpu, &err)) {
+      g.rs.error = err;
+      g.rs.window.reset();
       mvp_js_on_gfx(0, err.c_str());
       return;
     }
-    attach_renderer();
-    std::string msg = g.gpu->adapter_name();
+    g.rs.attach();
+    std::string msg = g.rs.gpu->adapter_name();
     mvp_js_on_gfx(1, msg.c_str());
   });
 }
 
+// P2: 1 in the threaded build (mvp-web-mt). mvp_set_threaded(1) before
+// mvp_gfx_init runs the GX processor and the renderer on the render thread.
+EMSCRIPTEN_KEEPALIVE int mvp_threads_available() {
+#ifdef MVP_WEB_THREADS
+  return 1;
+#else
+  return 0;
+#endif
+}
+EMSCRIPTEN_KEEPALIVE void mvp_set_threaded(int on) {
+#ifdef MVP_WEB_THREADS
+  if (!web::render_thread_running()) g.threaded = on != 0;
+#else
+  (void)on;
+#endif
+}
+EMSCRIPTEN_KEEPALIVE int mvp_threaded() { return g.threaded ? 1 : 0; }
+
 EMSCRIPTEN_KEEPALIVE void mvp_canvas_resize(int width, int height) {
-  ++g.resizes;
-  if (g.window) g.window->resize(width, height);
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    web::render_resize(width, height);
+    return;
+  }
+#endif
+  g.rs.resize(width, height);
 }
 
 // Runs `n` VI fields (fewer if the run stops). Returns the fields run, or -1
@@ -698,6 +723,9 @@ EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
   const std::uint64_t start = g.hw->vi_fields(), target = start + static_cast<std::uint64_t>(n);
   if (g_tracing) g_trace.push_back({~0ull, static_cast<std::uint32_t>(start)});
   double t0 = now_ms();
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) web::render_batch_begin();
+#endif
   try {
     while (g.hw->vi_fields() < target) {
       if (web::net_active() && !web::net_may_run()) break;  // netplay: the next frame's input is not here yet
@@ -718,49 +746,71 @@ EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
   g.run_ms += g.last_batch_ms;
   const std::uint64_t ran = g.hw->vi_fields() - start;
   g.run_fields += ran;
-  if (g.renderer && g.stopped) g.renderer->flush();
+  if (g.stopped) {
+#ifdef MVP_WEB_THREADS
+    if (g.threaded) web::render_flush();
+    else
+#endif
+      g.rs.flush();
+  }
   return static_cast<int>(ran);
 }
 
 // Shows the frame the video interface scans out (the XFB copy at the VI's
 // address, else the latest copy). Returns 1 if a frame was drawn.
+// Threaded (P2): the render thread shows it once it has drawn the batch; 1 once
+// it has shown a frame.
 EMSCRIPTEN_KEEPALIVE int mvp_present() {
-  if (!g.renderer || !g.window) return 0;
-  // The picture the VI scanned out at the last fields (P1: field-alternating
-  // pixels mixed, as an interlaced display shows them), else the XFB copy at the
-  // VI's address, else the latest copy.
-  const gfx::Renderer::Frame* f = g.renderer->scanout();
-  const bool mixed = g.renderer->is_mixed(f);
-  const bool fallback = !f && !g.renderer->xfb(g.xfb);
-  if (!f) f = g.renderer->xfb(g.xfb);
-  if (!f) f = g.renderer->latest_xfb();
-  if (!f) return 0;
-  if (g.tap.on) {
-    char b[200];
-    std::snprintf(b, sizeof b,
-                  "{\"k\":\"p\",\"f\":%llu,\"fr\":%llu,\"t\":%u,\"a\":%u,\"s\":%llu,\"new\":%d,\"fb\":%d,"
-                  "\"n\":%llu,\"w\":%u,\"h\":%u,\"mix\":%d,\"ms\":%.2f},",
-                  static_cast<unsigned long long>(g.hw->vi_fields()), static_cast<unsigned long long>(g_frame_polls),
-                  g.xfb, f->addr, static_cast<unsigned long long>(f->serial), f->serial != g.last_presented ? 1 : 0,
-                  fallback ? 1 : 0, static_cast<unsigned long long>(g.tap.copies - g.copies_at_present), f->width,
-                  f->height, mixed ? 1 : 0, now_ms());
-    g.tap.log += b;
-  }
-  g.copies_at_present = g.tap.copies;
-  g.window->present(f->view, f->width, f->height);
-  ++g.presents;
-  g.last_presented = f->serial;
-  return 1;
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) return web::render_present(g_frame_polls) ? 1 : 0;
+#endif
+  return g.rs.present(g_frame_polls, now_ms()) ? 1 : 0;
 }
 
 // Development (P1): the presentation trace on or off, and its records since
 // the last call as a JSON array.
-EMSCRIPTEN_KEEPALIVE void mvp_trace(int on) { g.tap.on = on != 0; }
+EMSCRIPTEN_KEEPALIVE void mvp_trace(int on) {
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    web::render_trace(on != 0);
+    return;
+  }
+#endif
+  g.rs.set_trace(on != 0);
+}
 EMSCRIPTEN_KEEPALIVE const char* mvp_trace_take() {
-  std::string& l = g.tap.log;
-  if (!l.empty() && l.back() == ',') l.pop_back();
-  g_text = "[" + l + "]";
-  l.clear();
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    if (g.stopped) web::render_sync();  // the render thread has drawn everything by now
+    g_text = web::render_trace_take();
+    return g_text.c_str();
+  }
+#endif
+  g_text = g.rs.trace_take();
+  return g_text.c_str();
+}
+
+// Development (P2): the renderer digest (gfx/digest_tap.h) on or off, and its
+// "field digest draws" lines since the last call. Equal lines from the inline
+// and the threaded renderer mean the render thread read the same guest memory.
+EMSCRIPTEN_KEEPALIVE void mvp_digest(int on) {
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    web::render_digest(on != 0);
+    return;
+  }
+#endif
+  g.rs.set_digest(on != 0);
+}
+EMSCRIPTEN_KEEPALIVE const char* mvp_digest_take() {
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    if (g.stopped) web::render_sync();
+    g_text = web::render_digest_take();
+    return g_text.c_str();
+  }
+#endif
+  g_text = g.rs.digest_take();
   return g_text.c_str();
 }
 
@@ -789,6 +839,10 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_status() {
   if (!g.m) return "{}";
   ppc::Cpu& c = g.m->cpu();
   const double guest_s = static_cast<double>(g.hooks->time_base(c)) / 40500000.0;
+  std::uint64_t presents = g.rs.presents();
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) presents = web::render_presents();
+#endif
   char b[1024];
   int n = std::snprintf(
       b, sizeof b,
@@ -797,7 +851,7 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_status() {
       static_cast<unsigned long long>(g.hw->vi_fields()), static_cast<unsigned long long>(g_frame_polls),
       static_cast<unsigned long long>(c.ticks), guest_s, g.run_ms, static_cast<unsigned long long>(g.run_fields),
       g.last_batch_ms, g.max_field_ms, static_cast<unsigned long long>(g.hooks->yields),
-      static_cast<unsigned long long>(g.presents), g.stopped ? "true" : "false");
+      static_cast<unsigned long long>(presents), g.stopped ? "true" : "false");
   std::string s(b, static_cast<std::size_t>(n));
   s += ",\"heap_mb\":" + std::to_string(emscripten_get_heap_size() >> 20);
   if (g.stopped) s += ",\"why\":\"" + json_escape(g.why) + "\"";
@@ -838,24 +892,14 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_status() {
                   static_cast<unsigned long long>(g.audio.dropped()));
     s += b;
   }
-  s += ",\"resizes\":" + std::to_string(g.resizes);
   s += ",\"pad_last\":" + std::to_string(g.live.last_buttons) +
        ",\"pad_polls\":" + std::to_string(g.live.polls_with_buttons);
-  if (g.renderer) {
-    const auto& rs = g.renderer->stats();
-    const auto& ps = g.proc->stats();
-    std::snprintf(b, sizeof b,
-                  ",\"draws\":%llu,\"xfb_copies\":%llu,\"pipelines\":%llu,\"textures\":%llu,\"gpu_errors\":%llu,"
-                  "\"copies_dropped\":%llu,\"copy_size_misses\":%llu,\"scan_mixed\":%llu",
-                  static_cast<unsigned long long>(rs.draws), static_cast<unsigned long long>(ps.xfb_copies),
-                  static_cast<unsigned long long>(rs.pipelines), static_cast<unsigned long long>(rs.textures_decoded),
-                  static_cast<unsigned long long>(g.gpu->errors()), static_cast<unsigned long long>(rs.copies_dropped),
-                  static_cast<unsigned long long>(rs.copy_size_misses),
-                  static_cast<unsigned long long>(g.renderer->scan_stats().mixed));
-    s += b;
-  }
-  if (!g.gfx_error.empty()) s += ",\"gfx_error\":\"" + json_escape(g.gfx_error) + "\"";
-  s += "}";
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) s += web::render_status_json();  // the render thread's snapshot, and the ring's numbers
+  else
+#endif
+    s += ",\"resizes\":" + std::to_string(g.rs.resizes()) + g.rs.status_json();
+  s += g.threaded ? ",\"threaded\":true}" : ",\"threaded\":false}";
   g_text = s;
   return g_text.c_str();
 }

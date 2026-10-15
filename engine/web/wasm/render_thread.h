@@ -1,0 +1,62 @@
+// The threaded engine's render thread (P2; the mvp-web-mt build, Emscripten
+// pthreads). The emulation (the engine Worker, Emscripten's main runtime
+// thread) appends what the renderer must see to a command ring in shared
+// memory (gfx/render_ring.h): every GX command (copied), VI fields, presents,
+// canvas resizes. The render thread (a pthread, its own Worker) owns the WebGPU
+// device and the OffscreenCanvas and runs the GX processor and the renderer on
+// them (render_side.h), so the emulation does not wait for them.
+//
+// The emulation waits for the render thread only at the guest's GPU sync points
+// (runtime/gx_fifo.h, GfxObserver::gp_sync: draw done, PE tokens, reads of the
+// CP status, read pointer or distance, a CP breakpoint): before the guest can
+// learn that the graphics processor consumed its commands, the render thread
+// has finished them, so it has read every vertex array, matrix, palette and
+// texture they point at before the guest may rewrite them. The renderer only
+// reads guest memory, so guest state is the same as with the inline renderer.
+//
+// The render thread waits for records in place (Atomics.wait) while the
+// emulation runs a batch, so a fence is answered at once; between batches it
+// waits in its event loop and the emulation wakes it (a proxied call). It shows
+// at most one frame per display refresh (the page counts its animation frames in
+// shared memory: a Worker started by a Worker has none). Where the page gave a
+// frame port (main.ts, cross-origin isolated), the render thread draws into a
+// canvas of its own and posts each frame to the page as an ImageBitmap, which
+// the page's idle main thread shows: an OffscreenCanvas of the page drawn by
+// this thread reached the screen irregularly (its frames are committed only
+// between tasks, and this thread works inside long tasks).
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+#include <string>
+
+namespace mvp::web {
+
+// Starts the render thread: WebGPU device first, then the canvas the page
+// handed to this Worker (Module.mvpCanvas) or the page's frame port
+// (Module.mvpFrames, with Module.mvpVsync), transferred to the render thread,
+// which shows its canvas under `selector`. `on_gfx(ok, message)` runs later on this
+// thread when the renderer is ready or has failed. False if the thread could
+// not be created.
+bool render_thread_start(const char* selector, int width, int height, void (*on_gfx)(int ok, const char* msg));
+bool render_thread_running();
+
+// From the emulation, in order (each appends to the ring).
+void render_memory(const std::uint8_t* mem, std::uint32_t size);
+void render_gx(const std::uint8_t* cmd, std::size_t len);
+void render_field(std::uint64_t field, std::uint32_t xfb);
+void render_sync();          // the fence: returns when the render thread finished every record so far
+void render_batch_begin();   // a run batch starts (the render thread waits in place for records)
+bool render_present(std::uint64_t frame_polls);  // ends the batch; true once a frame has reached the canvas
+void render_flush();
+void render_resize(int width, int height);
+void render_trace(bool on);
+void render_digest(bool on);
+
+// For mvp_status and the tools (snapshots the render thread took at its last present).
+std::string render_trace_take();
+std::string render_digest_take();
+std::string render_status_json();
+std::uint64_t render_presents();
+
+}  // namespace mvp::web

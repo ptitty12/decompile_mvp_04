@@ -23,13 +23,16 @@ interface SyncHandle {
   close(): void;
 }
 
-export async function cacheKey(dolSha1: string, buildIdUrl: URL): Promise<string | null> {
+// `mt`: the threaded engine (P2; its translation imports a shared memory), keyed
+// by mvp-web-mt.wasm's hash.
+export async function cacheKey(dolSha1: string, buildIdUrl: URL, mt = false): Promise<string | null> {
   try {
     const res = await fetch(buildIdUrl, { cache: 'no-store' });
     if (!res.ok) return null;
-    const id = (await res.json()) as { engine?: string; symbols?: string };
-    if (!id.engine || !id.symbols || !/^[0-9a-f]{40}$/.test(dolSha1)) return null;
-    return `${dolSha1}-${id.engine.slice(0, 16)}-${id.symbols.slice(0, 16)}`;
+    const id = (await res.json()) as { engine?: string; engine_mt?: string; symbols?: string };
+    const engine = mt ? id.engine_mt : id.engine;
+    if (!engine || !id.symbols || !/^[0-9a-f]{40}$/.test(dolSha1)) return null;
+    return `${dolSha1}-${mt ? 'mt' : ''}${engine.slice(0, 16)}-${id.symbols.slice(0, 16)}`;
   } catch {
     return null;
   }
@@ -60,13 +63,17 @@ export async function readCached(key: string, alloc: (size: number) => Uint8Arra
     if (typeof sync === 'function') {
       const h = await sync.call(fh);
       try {
-        const dst = alloc(file.size);
+        const heap = alloc(file.size);
+        // The threaded engine's heap is shared (P2): read into a plain buffer, then copy.
+        const shared = typeof SharedArrayBuffer !== 'undefined' && heap.buffer instanceof SharedArrayBuffer;
+        const dst = shared ? new Uint8Array(file.size) : heap;
         let at = 0;
         while (at < file.size) {
           const n = h.read(dst.subarray(at), { at });
           if (n <= 0) return 0;
           at += n;
         }
+        if (shared) heap.set(dst);
       } finally {
         h.close();
       }

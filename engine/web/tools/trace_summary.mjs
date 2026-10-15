@@ -52,7 +52,7 @@ function bucketOf(cf) {
   if (fn === '(idle)') return 'idle';
   if (fn === '(root)') return 'root';
   const url = cf.url || '';
-  if (url.endsWith('mvp-web.wasm') || url.includes('mvp-web.wasm')) return 'engine';
+  if (/mvp-web(-mt)?\.wasm/.test(url)) return 'engine';  // P2: the threaded build too
   if (url.startsWith('wasm://')) return 'translated';
   if (url.endsWith('.js') || url.includes('.js')) return 'js';
   return cf.codeType === 'wasm' || /wasm-function/.test(fn) ? 'wasm?' : 'other';

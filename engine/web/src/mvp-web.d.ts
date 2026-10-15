@@ -1,8 +1,10 @@
-// The engine module that Emscripten builds from wasm/mvp_web.cpp (mvp-web.js).
-// Only what the Worker uses; pointers and sizes are numbers.
+// The engine module that Emscripten builds from wasm/mvp_web.cpp (mvp-web.js,
+// and P2's threaded build mvp-web-mt.js, which has the same exports plus
+// wasmMemory). Only what the Worker uses; pointers and sizes are numbers.
 
 export interface MvpEngine {
   HEAPU8: Uint8Array;
+  wasmMemory?: WebAssembly.Memory;  // the threaded build (P2): views made after another thread grew it
   UTF8ToString(ptr: number, maxBytes?: number): string;
   specialHTMLTargets: Record<string, unknown>;
   _malloc(size: number): number;
@@ -20,6 +22,12 @@ export interface MvpEngine {
   _mvp_present(): number;
   _mvp_trace(on: number): void;   // P1: the presentation trace (development)
   _mvp_trace_take(): number;
+  // P2: the render thread (the threaded build), and the renderer digest (development).
+  _mvp_threads_available(): number;
+  _mvp_set_threaded(on: number): void;
+  _mvp_threaded(): number;
+  _mvp_digest(on: number): void;
+  _mvp_digest_take(): number;
   _mvp_set_pad(port: number, connected: number, buttons: number, sx: number, sy: number, cx: number, cy: number,
                tl: number, tr: number): void;
   _mvp_status(): number;
@@ -68,6 +76,9 @@ export interface MvpEngine {
 
   // Set by the Worker before the calls that use them.
   mvpDisc?: File;
+  mvpCanvas?: OffscreenCanvas | null;  // P2: the canvas the render thread takes
+  mvpVsync?: SharedArrayBuffer | null;  // P2: the page's refresh counter, for the render thread
+  mvpFrames?: MessagePort | null;       // P2: where each frame goes as an ImageBitmap (the page shows it)
   mvpDiscUrl?: string;
   mvpOnGfx?: (ok: number, message: string) => void;
   mvpOnProgress?: (text: string, step: number, steps: number) => void;

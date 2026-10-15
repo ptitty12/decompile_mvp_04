@@ -222,6 +222,7 @@ try {
     packs: st.packs,
     guestLine: st.stopped?.guestLine ?? null,
     why: st.stopped?.status.why ?? null,
+    threaded: st.stopped?.status.threaded ?? null,  // P2: the render thread drew (the threaded engine)
     net: st.net ? { ...st.net, diagnostic: st.net.diagnostic ? st.net.diagnostic.slice(0, 4000) : undefined } : null,
     windowsCount: (st.windows ?? '').split('\n').filter(Boolean).length,
     consoleErrors: pages[k].errors.slice(0, 20),

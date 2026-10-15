@@ -54,6 +54,12 @@ class Window {
   // the canvas when the current task returns to the event loop.
   void present(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height);
 
+  // Configures the surface again (P2: a canvas whose picture was taken as an
+  // ImageBitmap may have lost its configuration).
+  void reconfigure() {
+    if (gpu_) configure();
+  }
+
  private:
   Window() = default;
   void configure();
