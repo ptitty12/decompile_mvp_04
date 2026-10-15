@@ -525,6 +525,7 @@ wgpu::Sampler Renderer::sampler(const TextureDesc& t) {
 wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std::uint32_t* h) {
   *w = t.width;
   *h = t.height;
+  if (t.tmem) return tmem_texture(t);
   // An EFB copy at this address (the copy lives only on the GPU).
   auto ci = copies_.find(t.addr & 0x01FFFFFFu);
   if (ci != copies_.end()) {
@@ -604,6 +605,56 @@ wgpu::TextureView Renderer::texture(const TextureDesc& t, std::uint32_t* w, std:
   slot->epoch = epoch_;
   slot->pass = pass_open_ ? pass_serial_ : pass_serial_ + 1;
   ++stats_.textures_decoded;
+  return slot->view;
+}
+
+// A preloaded texture (E3c): its texels come from TMEM, which only preloads
+// change, so it is cached by its content.
+wgpu::TextureView Renderer::tmem_texture(const TextureDesc& t) {
+  if (!texture_format_known(t.format)) {
+    ++stats_.unknown_formats;
+    return dummy_view_;
+  }
+  if (!gather_tmem_texture(t.tmem, t.tmem_even, t.tmem_odd, t.format, t.width, t.height, t.levels, tmem_buf_))
+    return dummy_view_;
+  std::uint64_t key = hash_bytes(tmem_buf_.data(), tmem_buf_.size(), 0x544D454Dull);
+  if (t.tlut) key ^= hash_bytes(t.tlut, static_cast<std::size_t>(t.tlut_entries) * 2, t.tlut_format + 1u);
+  key = mix64(key ^ (std::uint64_t(t.format) << 32) ^ (std::uint64_t(t.width) << 36) ^ (std::uint64_t(t.height) << 48) ^
+              (std::uint64_t(t.levels) << 60));
+  std::unique_ptr<TexEntry>& slot = tmem_textures_[key];
+  if (slot) {
+    ++stats_.texture_hits;
+    return slot->view;
+  }
+  slot = std::make_unique<TexEntry>();
+  wgpu::TextureDescriptor td{};
+  td.size = {t.width, t.height, 1};
+  td.format = wgpu::TextureFormat::RGBA8Unorm;
+  td.mipLevelCount = t.levels;
+  td.usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::CopyDst;
+  slot->tex = gpu_.device().CreateTexture(&td);
+  slot->view = slot->tex.CreateView();
+  slot->w = t.width;
+  slot->h = t.height;
+  std::uint32_t lw = t.width, lh = t.height, off = 0;
+  std::vector<std::uint8_t> rgba;
+  for (std::uint32_t l = 0; l < t.levels; ++l) {
+    rgba.resize(static_cast<std::size_t>(lw) * lh * 4);
+    decode_texture(t.format, lw, lh, tmem_buf_.data() + off, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
+    wgpu::TexelCopyTextureInfo dst{};
+    dst.texture = slot->tex;
+    dst.mipLevel = l;
+    wgpu::TexelCopyBufferLayout lay{};
+    lay.bytesPerRow = lw * 4;
+    lay.rowsPerImage = lh;
+    wgpu::Extent3D ext{lw, lh, 1};
+    gpu_.queue().WriteTexture(&dst, rgba.data(), rgba.size(), &lay, &ext);
+    off += texture_level_size(t.format, lw, lh);
+    lw = lw > 1 ? lw / 2 : 1;
+    lh = lh > 1 ? lh / 2 : 1;
+  }
+  ++stats_.textures_decoded;
+  ++stats_.tmem_textures;
   return slot->view;
 }
 

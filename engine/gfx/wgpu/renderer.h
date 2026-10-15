@@ -59,6 +59,7 @@ class Renderer : public Backend {
     std::uint64_t unknown_formats = 0, indirect_draws = 0, fog_draws = 0;
     std::uint64_t merged = 0, encoded = 0;  // draws appended to the previous one; WebGPU draws encoded
     std::uint64_t same_state = 0;           // draws that reused the previous draw's resolved state
+    std::uint64_t tmem_textures = 0;        // preloaded (TMEM) textures decoded
     std::uint64_t vertex_bytes = 0, index_bytes = 0;  // uploaded
   };
   const Stats& stats() const { return stats_; }
@@ -80,6 +81,7 @@ class Renderer : public Backend {
   const Pipeline& pipeline(const PipelineConfig& c);
   wgpu::TextureView texture(const TextureDesc& t, std::uint32_t* w, std::uint32_t* h);
   wgpu::Sampler sampler(const TextureDesc& t);
+  wgpu::TextureView tmem_texture(const TextureDesc& t);
   void clear_efb(const EfbCopy& c);
   void copy_to_texture(const EfbCopy& c);
   std::uint64_t hash_memory(std::uint32_t addr, std::uint32_t size) const;
@@ -140,6 +142,8 @@ class Renderer : public Backend {
   std::unordered_map<std::string, wgpu::ShaderModule> modules_;
   std::map<std::uint64_t, std::unique_ptr<TexEntry>> textures_;
   std::map<std::uint32_t, std::unique_ptr<CopyEntry>> copies_;  // EFB copies to textures, by address
+  std::map<std::uint64_t, std::unique_ptr<TexEntry>> tmem_textures_;  // preloaded textures, by content
+  std::vector<std::uint8_t> tmem_buf_;
   std::map<std::uint32_t, wgpu::Sampler> samplers_;
   std::map<std::array<const void*, 16>, wgpu::BindGroup> bind_groups_;
   std::uint64_t epoch_ = 1;

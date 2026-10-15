@@ -89,6 +89,11 @@ struct TextureDesc {
   u32 tlut_offset = 0;     // byte offset in TLUT memory
   const u8* tlut = nullptr;
   u32 tlut_entries = 0;
+  // Preloaded textures (E3c): the texels are in TMEM, not at `addr`. `tmem` points at
+  // the processor's 1 MiB TMEM (valid until the next preload); levels start in the
+  // even bank at `tmem_even` (RGBA8: AR tiles there, GB tiles at `tmem_odd`).
+  const u8* tmem = nullptr;
+  u32 tmem_even = 0, tmem_odd = 0;
   // Sampler state.
   u8 wrap_s = 0, wrap_t = 0;  // 0 clamp, 1 repeat, 2 mirror
   u8 mag_linear = 0, min_filter = 0;  // min: 0 near, 1 linear, 2-5 with mip modes

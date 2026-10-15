@@ -1,5 +1,7 @@
 #include "gfx/gx_processor.h"
 
+#include "gfx/texture_decode.h"
+
 #include <algorithm>
 #include <bit>
 #include <cmath>
@@ -116,6 +118,7 @@ void GxProcessor::reset() {
   std::memset(tev_regs_, 0, sizeof tev_regs_);
   std::memset(konst_, 0, sizeof konst_);
   tlut_.assign(512 * 1024, 0);
+  tmem_.assign(kTmemSize, 0);
   stats_ = {};
   ++state_serial_;
   // Power-on state that matters before the game's GXInit: one TEV stage,
@@ -241,6 +244,9 @@ void GxProcessor::load_bp(u32 value) {
     case bp::kLoadTlut1:
       load_tlut();
       break;
+    case bp::kPreloadMode:
+      if (v) preload();
+      break;
     case bp::kTexInvalidate:
       if (backend_) backend_->invalidate_textures();
       break;
@@ -259,6 +265,31 @@ void GxProcessor::load_tlut() {
   bytes = std::min<u32>(bytes, static_cast<u32>(tlut_.size()) - dst);
   const u8* p = phys(src, bytes);
   if (p) std::memcpy(tlut_.data() + dst, p, bytes);
+}
+
+// TMEM preload (GXPreLoadEntireTexture): 32-byte lines from memory to the even
+// bank; RGBA8 (type 3) sends each 64-byte tile's AR half to the even bank and
+// its GB half to the odd bank. Memory is read now, as the hardware does.
+void GxProcessor::preload() {
+  ++stats_.preloads;
+  const u32 v = bp_[bp::kPreloadMode];
+  const u32 lines = bits(v, 0, 15), type = bits(v, 15, 2);
+  const u32 src = (bp_[bp::kPreloadAddr] & 0xFFFFFF) << 5;
+  u32 even = bits(bp_[bp::kPreloadTmemEven], 0, 15) << 5, odd = bits(bp_[bp::kPreloadTmemOdd], 0, 15) << 5;
+  if (type != 3) {
+    u32 bytes = lines * 32;
+    if (even >= kTmemSize) return;
+    bytes = std::min(bytes, kTmemSize - even);
+    const u8* p = phys(src, bytes);
+    if (p) std::memcpy(tmem_.data() + even, p, bytes);
+    return;
+  }
+  const u8* p = phys(src, lines * 64);
+  if (!p) return;
+  for (u32 k = 0; k < lines && even + 32 <= kTmemSize && odd + 32 <= kTmemSize; ++k, even += 32, odd += 32) {
+    std::memcpy(tmem_.data() + even, p + 64 * k, 32);
+    std::memcpy(tmem_.data() + odd, p + 64 * k + 32, 32);
+  }
 }
 
 void GxProcessor::efb_copy() {
@@ -740,6 +771,12 @@ void GxProcessor::snapshot(DrawCall& d) const {
     t.valid = true;
     t.format = static_cast<u8>(bits(img0, 20, 4));
     t.addr = (bp_[bp::tex_reg(bp::kTexImage3, m)] & 0xFFFFFF) << 5;
+    const u32 img1 = bp_[bp::tex_reg(bp::kTexImage1, m)];
+    if (bits(img1, 21, 1)) {  // preloaded: the texels are in TMEM
+      t.tmem = tmem_.data();
+      t.tmem_even = bits(img1, 0, 15) << 5;
+      t.tmem_odd = bits(bp_[bp::tex_reg(bp::kTexImage2, m)], 0, 15) << 5;
+    }
     const u32 mode0 = bp_[bp::tex_reg(bp::kTexMode0, m)], mode1 = bp_[bp::tex_reg(bp::kTexMode1, m)];
     t.wrap_s = static_cast<u8>(bits(mode0, 0, 2));
     t.wrap_t = static_cast<u8>(bits(mode0, 2, 2));

@@ -8,6 +8,10 @@
 //
 //   --input, --ports  controller input, as mvp-boot (runtime/input.h scripts)
 //   --frames N        stop at the frame poll of frame N; --fields N: after N VI fields
+//   --stop-file F     (E3c) stop at the first frame poll that is a multiple of 60 once
+//                     file F exists (for long unattended runs; host-side only)
+//   --hash-every N    (E3c) print the SHA-1 of MEM1, the instruction count and the time
+//                     base at every Nth frame poll (determinism checkpoints)
 //   --max-ticks N     instruction budget (default: none)
 //   --headless        no window: render off-screen only (captures still work)
 //   --no-render       no renderer at all (the guest runs alone; for the determinism check)
@@ -22,6 +26,8 @@
 //                     only frames that changed since the last capture
 //   --draw-log FILE   one line per draw and EFB copy (state, textures) from VI field
 //                     --draw-log-from N (default 0) to --draw-log-to N
+//   --gx-log FILE     (E3c) every GX command with the guest PC that delivered it, from VI
+//                     field --gx-log-from N to --gx-log-to N
 //   --dump-textures DIR at VI field --dump-field N: every texture each draw
 //                     samples, decoded from guest memory, as DIR/tex_F_D_M.png
 //                     (--dump-to M: every field from N to M)
@@ -56,6 +62,7 @@
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <map>
 #include <set>
 #include <string>
@@ -110,9 +117,16 @@ struct DrawLog : gfx::Backend {
       if (!t.valid || !gfx::texture_format_known(t.format)) continue;
       const std::uint32_t a = t.addr & 0x01FFFFFFu;
       const std::uint32_t bytes = gfx::texture_level_size(t.format, t.width, t.height);
-      if (a > mem_size || bytes > mem_size - a) continue;
+      const std::uint8_t* src = mem + a;
+      std::vector<std::uint8_t> tm;
+      if (t.tmem) {  // preloaded: from TMEM
+        if (!gfx::gather_tmem_texture(t.tmem, t.tmem_even, t.tmem_odd, t.format, t.width, t.height, 1, tm)) continue;
+        src = tm.data();
+      } else if (a > mem_size || bytes > mem_size - a) {
+        continue;
+      }
       std::vector<std::uint8_t> rgba(static_cast<std::size_t>(t.width) * t.height * 4);
-      gfx::decode_texture(t.format, t.width, t.height, mem + a, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
+      gfx::decode_texture(t.format, t.width, t.height, src, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
       char name[96];
       std::snprintf(name, sizeof name, "/tex_%llu_%llu_%d.png", static_cast<unsigned long long>(*field),
                     static_cast<unsigned long long>(dump_draw), m);
@@ -151,9 +165,11 @@ struct DrawLog : gfx::Backend {
       for (int m = 0; m < 8; ++m) {
         const gfx::TextureDesc& t = d.tex[static_cast<std::size_t>(m)];
         if (!t.valid) continue;
-        std::fprintf(f, "  map %d addr %08X fmt %u %ux%u levels %u wrap %u/%u filter %u/%u tlut %u@%X\n", m, t.addr,
+        std::fprintf(f, "  map %d addr %08X fmt %u %ux%u levels %u wrap %u/%u filter %u/%u tlut %u@%X", m, t.addr,
                      t.format, t.width, t.height, t.levels, t.wrap_s, t.wrap_t, t.mag_linear, t.min_filter,
                      t.tlut_format, t.tlut_offset);
+        if (t.tmem) std::fprintf(f, " tmem %05X/%05X", t.tmem_even, t.tmem_odd);
+        std::fprintf(f, "\n");
       }
       for (int r = 0; r < 4; ++r)
         std::fprintf(f, "  reg%d %d %d %d %d konst %d %d %d %d\n", r, d.u.tev_regs[r][0], d.u.tev_regs[r][1],
@@ -188,6 +204,10 @@ struct Play : GfxObserver {
   audio::SdlAudioOut* audio_out = nullptr;
   std::uint64_t present_every = 1, max_fields = ~0ull;
   std::string capture_dir;
+  std::string stop_file;  // --stop-file
+  std::uint64_t hash_every = 0;  // --hash-every
+  const std::uint8_t* mem1 = nullptr;
+  std::uint32_t mem1_size = 0;
   std::uint64_t capture_every = 60, capture_from = 0;
   std::set<std::uint64_t> capture_at;
   std::uint64_t last_capture_serial = 0, captures = 0, fields = 0, presents = 0;
@@ -204,11 +224,37 @@ struct Play : GfxObserver {
     const double guest = static_cast<double>(hooks->time_base(*cpu)) / 40500000.0;
     std::printf("perf: field %llu frame %llu guest %.3f s host %.3f s\n", static_cast<unsigned long long>(field),
                 static_cast<unsigned long long>(frames), guest, host);
+    std::fflush(stdout);  // long runs are watched while they run
   }
 
   // Without a renderer (--no-render) the observer only counts fields.
   void gx_command(const std::uint8_t* cmd, std::size_t len) override {
+    if (gx_log && fields >= gx_log_from && fields <= gx_log_to) log_command(cmd, len);
     if (proc) proc->command(cmd, len);
+  }
+  // --gx-log FILE (E3c): every GX command the GP executes, with the guest PC of
+  // the store that delivered it, from VI field --gx-log-from to --gx-log-to.
+  std::FILE* gx_log = nullptr;
+  std::uint64_t gx_log_from = 0, gx_log_to = ~0ull;
+  void log_command(const std::uint8_t* c, std::size_t len) {
+    auto be32 = [](const std::uint8_t* p) {
+      return std::uint32_t(p[0]) << 24 | std::uint32_t(p[1]) << 16 | std::uint32_t(p[2]) << 8 | p[3];
+    };
+    std::fprintf(gx_log, "%llu pc %08X ", static_cast<unsigned long long>(fields), cpu ? cpu->pc : 0u);
+    const std::uint8_t op = c[0];
+    if (op == 0x61 && len >= 5) std::fprintf(gx_log, "BP %02X %06X", c[1], be32(c + 1) & 0xFFFFFF);
+    else if (op == 0x08 && len >= 6) std::fprintf(gx_log, "CP %02X %08X", c[1], be32(c + 2));
+    else if (op == 0x10 && len >= 5) {
+      const std::uint32_t w = be32(c + 1);
+      std::fprintf(gx_log, "XF %04X x%u", w & 0xFFFF, (w >> 16) + 1);
+      for (std::size_t k = 0; k < ((w >> 16) + 1) && k < 4 && 5 + 4 * k + 4 <= len; ++k)
+        std::fprintf(gx_log, " %08X", be32(c + 5 + 4 * k));
+    } else if (op >= 0x20 && op < 0x40 && len >= 5) std::fprintf(gx_log, "XF indexed %02X %08X", op, be32(c + 1));
+    else if (op >= 0x80 && op < 0xC0 && len >= 3) {
+      std::fprintf(gx_log, "DRAW %02X x%u", op, std::uint32_t(c[1]) << 8 | c[2]);
+      for (std::size_t k = 3; k < len && k < 3 + 24; ++k) std::fprintf(gx_log, " %02X", c[k]);
+    } else std::fprintf(gx_log, "op %02X len %zu", op, len);
+    std::fprintf(gx_log, "\n");
   }
 
   void vi_field(std::uint64_t field, std::uint32_t xfb) override {
@@ -244,9 +290,22 @@ struct Play : GfxObserver {
 };
 Play* g_play = nullptr;
 
-void frame_hook(ppc::Cpu&, std::uint64_t frame) {
+void frame_hook(ppc::Cpu& c, std::uint64_t frame) {
   g_play->frames = frame;
   if (frame >= g_play->max_frames) throw StopRun{"ran " + std::to_string(frame) + " frames (--frames)"};
+  // --hash-every N: the guest state at every Nth frame poll (compare two runs line by line).
+  if (g_play->hash_every && frame % g_play->hash_every == 0) {
+    Sha1 h;
+    h.update(g_play->mem1, g_play->mem1_size);
+    std::printf("hash: frame %llu instructions %llu time base %llu MEM1 sha1 %s\n",
+                static_cast<unsigned long long>(frame), static_cast<unsigned long long>(c.ticks),
+                static_cast<unsigned long long>(g_play->hooks->time_base(c)), Sha1::hex(h.finish()).c_str());
+    std::fflush(stdout);
+  }
+  // --stop-file: checked every 60 frames; the run then ends at a frame poll,
+  // so `--frames` with the reported count reproduces the same stopping point.
+  if (!g_play->stop_file.empty() && frame % 60 == 0 && std::filesystem::exists(g_play->stop_file))
+    throw StopRun{"ran " + std::to_string(frame) + " frames (--stop-file)"};
 }
 
 // --trace-entry ADDR[,ADDR...] (debugging): at each translated entry of those
@@ -375,6 +434,11 @@ int main(int argc, char** argv) {
     else if (a == "--capture-every") play.capture_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
     else if (a == "--capture-at") capture_at = next();
     else if (a == "--capture-from") play.capture_from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--stop-file") play.stop_file = next();
+    else if (a == "--gx-log") play.gx_log = std::fopen(next().c_str(), "w");
+    else if (a == "--gx-log-from") play.gx_log_from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--gx-log-to") play.gx_log_to = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--hash-every") play.hash_every = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--draw-log") draw_log_path = next();
     else if (a == "--draw-log-from") draw_log_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--draw-log-to") draw_log_to = std::strtoull(next().c_str(), nullptr, 10);
@@ -396,7 +460,7 @@ int main(int argc, char** argv) {
     else if (a == "--pack") packs.push_back(next());
     else {
       std::fprintf(stderr,
-                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
+                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--stop-file F] [--hash-every N] [--max-ticks N] "
                    "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-from N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
                    "[--perf-every N] [--profile N] [--host-profile N] [--profile-from F] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
@@ -550,6 +614,8 @@ int main(int argc, char** argv) {
   const auto t0 = std::chrono::steady_clock::now();
   play.t0 = t0;
   play.hooks = &hooks;
+  play.mem1 = m.mem1();
+  play.mem1_size = Machine::kMem1Size;
   play.cpu = &m.cpu();
   std::string why;
   int rc = 0;
@@ -579,6 +645,7 @@ int main(int argc, char** argv) {
     gpu->wait_idle();
   }
   if (draw_log.f) std::fclose(draw_log.f);
+  if (play.gx_log) std::fclose(play.gx_log);
 
   auto ull = [](std::uint64_t v) { return static_cast<unsigned long long>(v); };
   const double guest = static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0;
@@ -619,18 +686,18 @@ int main(int argc, char** argv) {
   if (!renderer) return rc;
   const auto& ps = proc.stats();
   std::printf("gx: %llu commands, %llu draws, %llu vertices, %llu triangles, %llu EFB copies (%llu to the XFB), "
-              "%llu TLUT loads, %llu unknown; %llu state snapshots\n",
+              "%llu TLUT loads, %llu unknown; %llu state snapshots, %llu TMEM preloads\n",
               ull(ps.commands), ull(ps.draws), ull(ps.vertices), ull(ps.triangles), ull(ps.copies), ull(ps.xfb_copies),
-              ull(ps.tlut_loads), ull(ps.unknown), ull(ps.snapshots));
+              ull(ps.tlut_loads), ull(ps.unknown), ull(ps.snapshots), ull(ps.preloads));
   const auto& rs = renderer->stats();
   std::printf("renderer: %llu draws (%llu skipped, %llu merged into the one before; %llu encoded), %llu passes, "
               "%llu pipelines, %llu textures decoded, %llu hits, "
               "%llu EFB-copy textures used, %llu texture copies, %llu clears; %llu unknown formats, "
-              "%llu indirect draws, %llu fog draws; %llu with the previous draw's state; uploaded %.1f MB of vertices, "
+              "%llu indirect draws, %llu fog draws; %llu with the previous draw's state; %llu preloaded textures; uploaded %.1f MB of vertices, "
               "%.1f MB of indices\n",
               ull(rs.draws), ull(rs.skipped), ull(rs.merged), ull(rs.encoded), ull(rs.passes), ull(rs.pipelines),
               ull(rs.textures_decoded), ull(rs.texture_hits), ull(rs.copy_textures_used), ull(rs.tex_copies),
-              ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws), ull(rs.same_state),
+              ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws), ull(rs.same_state), ull(rs.tmem_textures),
               static_cast<double>(rs.vertex_bytes) / 1e6, static_cast<double>(rs.index_bytes) / 1e6);
   std::printf("display: %llu presents, %llu captures%s%s; WebGPU errors %llu\n", ull(play.presents), ull(play.captures),
               play.capture_dir.empty() ? "" : " in ", play.capture_dir.c_str(), ull(gpu->errors()));

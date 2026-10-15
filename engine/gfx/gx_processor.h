@@ -82,6 +82,7 @@ class GxProcessor {
   u32 xf_word(u32 addr) const;
   float xf_float(u32 addr) const;
   const u8* tlut_memory() const { return tlut_.data(); }
+  const u8* tmem() const { return tmem_.data(); }
 
   // Vertex size in bytes for format `fmt` under the current VCD/VAT.
   u32 vertex_size(int fmt) const;
@@ -99,6 +100,7 @@ class GxProcessor {
     std::uint64_t commands = 0, draws = 0, vertices = 0, triangles = 0, copies = 0, xfb_copies = 0;
     std::uint64_t tlut_loads = 0, xf_indexed = 0, unknown = 0;
     std::uint64_t snapshots = 0;  // draws whose pixel state was rebuilt (the others reuse the last one)
+    std::uint64_t preloads = 0;   // TMEM preloads (BP 0x63)
   };
   const Stats& stats() const { return stats_; }
 
@@ -123,6 +125,7 @@ class GxProcessor {
   void primitive(u8 op, const u8* data, u32 count);
   void efb_copy();
   void load_tlut();
+  void preload();
   const u8* phys(u32 addr, u32 len) const;  // null if outside memory
 
   Backend* backend_;
@@ -141,6 +144,7 @@ class GxProcessor {
   std::int32_t tev_regs_[4][4] = {};
   std::int32_t konst_[4][4] = {};
   std::vector<u8> tlut_;  // TMEM's palette half: 512 KiB
+  std::vector<u8> tmem_;  // TMEM as preloads fill it (E3c): 1 MiB
   Stats stats_;
   PrimInfo prim_info_;
   bool keep_prim_info_ = false;
