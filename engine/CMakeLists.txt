@@ -72,6 +72,7 @@ add_subdirectory(translator)
 add_subdirectory(runtime)
 add_subdirectory(gfx)
 add_subdirectory(audio)
+add_subdirectory(net)
 # The browser build (E2): the engine as a Worker module and the web shell.
 if(EMSCRIPTEN)
   add_subdirectory(web)
