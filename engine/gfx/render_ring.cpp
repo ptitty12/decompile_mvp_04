@@ -111,8 +111,8 @@ double RenderRing::wait_read(std::uint32_t pos, double spin_us) {
   if (finished(pos)) return 0;
   const auto t0 = Clock::now();
   const double spin_ms = spin_us / 1000.0;
-  while (!finished(pos)) {
-    if (ms_since(t0) < spin_ms) continue;  // the consumer is usually in the middle of a record
+  for (unsigned n = 1; !finished(pos); ++n) {
+    if (n % 64 || ms_since(t0) < spin_ms) continue;  // the consumer is usually in the middle of a record
     prod_wait_.store(1, std::memory_order_seq_cst);
     const std::uint32_t seen = rd_.load(std::memory_order_seq_cst);
     if (static_cast<std::int32_t>(seen - pos) >= 0) break;

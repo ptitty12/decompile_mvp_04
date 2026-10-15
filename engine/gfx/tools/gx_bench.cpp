@@ -8,6 +8,9 @@
 //
 //   mvp-gx-bench [--prims N] [--reps N] [--pack] [--no-light] [--no-texgen] [--no-skin] [--alpha-lit]
 //
+// It also prints a hash of every vertex and index it produced (P2): changes to
+// the processor's arithmetic must keep it.
+//
 // --pack adds a backend that packs each draw's vertices and indices the way the
 // WebGPU renderer does (without a GPU), to time that part too. Build it with
 // the Emscripten preset and run it under Node to see the browser's costs.
@@ -33,6 +36,20 @@ struct NullBackend : Backend {
   void draw(const DrawCall& d) override {
     ++draws;
     verts += d.verts.size();
+  }
+  void efb_copy(const EfbCopy&) override {}
+};
+
+// A hash of every draw's vertices and indices (P2: optimizations must keep it).
+struct HashBackend : Backend {
+  std::uint64_t h = 0xCBF29CE484222325ull;
+  void fold(const void* p, std::size_t n) {
+    const auto* b = static_cast<const std::uint8_t*>(p);
+    for (std::size_t i = 0; i < n; ++i) h = (h ^ b[i]) * 0x100000001B3ull;
+  }
+  void draw(const DrawCall& d) override {
+    fold(d.verts.data(), d.verts.size() * sizeof(OutVertex));
+    fold(d.index.data(), d.index.size() * sizeof(std::uint32_t));
   }
   void efb_copy(const EfbCopy&) override {}
 };
@@ -180,6 +197,14 @@ int main(int argc, char** argv) {
     body.run(proc);
     const double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
     if (ms < best) best = ms;
+  }
+  {
+    HashBackend hb;
+    GxProcessor hp(&hb);
+    hp.set_memory(mem.data(), static_cast<std::uint32_t>(mem.size()));
+    s.run(hp);
+    body.run(hp);
+    std::printf("gx-bench output hash %016llx\n", static_cast<unsigned long long>(hb.h));
   }
   std::printf("gx-bench%s: %d primitives, %llu vertices: best %.3f ms (%.1f ns per primitive, %.1f ns per vertex)\n",
               pack ? " (with packing)" : "", prims, static_cast<unsigned long long>(vertices), best,

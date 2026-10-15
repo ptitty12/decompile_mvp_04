@@ -170,7 +170,7 @@ struct Renderer::CopyEntry {
     wgpu::TextureView view;
     std::uint32_t h = 0;
     std::uint8_t format = 0xFF;
-    std::uint64_t copy_serial = 0, tail_hash = 0, pass = 0;
+    std::uint64_t copy_serial = 0, tail_hash = 0, pass = 0, epoch = 0;
   };
   std::unique_ptr<Tall> tall;
 };
@@ -661,7 +661,6 @@ wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
   const std::uint32_t bytes = texture_level_size(t.format, t.width, t.height);
   const std::uint32_t covered = std::min(texture_level_size(t.format, t.width, e.h), bytes);
   if (!mem_ || a > mem_size_ || bytes > mem_size_ - a) return nullptr;
-  const std::uint64_t tail = hash_bytes(mem_ + a + covered, bytes - covered, t.format + 1u);
   std::unique_ptr<CopyEntry::Tall>& c = e.tall;
   const bool fresh = !c || c->h != t.height;
   if (fresh) {
@@ -674,6 +673,13 @@ wgpu::TextureView Renderer::tall_copy(CopyEntry& e, const TextureDesc& t) {
     c->tex = gpu_.device().CreateTexture(&td);
     c->view = c->tex.CreateView();
     c->h = t.height;
+  }
+  // The memory below the copy is read once per texture cache epoch, as every
+  // texture's is (the threaded engine relies on it: gfx/gp_reads.h).
+  std::uint64_t tail = c->tail_hash;
+  if (fresh || c->epoch != epoch_ || c->format != t.format) {
+    tail = hash_bytes(mem_ + a + covered, bytes - covered, t.format + 1u);
+    c->epoch = epoch_;
   }
   const bool new_tail = fresh || c->tail_hash != tail || c->format != t.format;
   if (new_tail || c->copy_serial != e.serial) {

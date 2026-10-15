@@ -71,6 +71,11 @@ class RenderRing {
   bool finished(std::uint32_t pos) const {
     return static_cast<std::int32_t>(rd_.load(std::memory_order_acquire) - pos) >= 0;
   }
+  // Bytes before `pos` the consumer has not finished (0 if none).
+  std::uint32_t behind(std::uint32_t pos) const {
+    const std::int32_t d = static_cast<std::int32_t>(pos - rd_.load(std::memory_order_acquire));
+    return d > 0 ? static_cast<std::uint32_t>(d) : 0;
+  }
 
   // ---- consumer ----
   struct Record {
