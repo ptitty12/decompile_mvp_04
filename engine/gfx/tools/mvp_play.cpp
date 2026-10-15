@@ -40,6 +40,10 @@
 //   --trace-entry A,B registers and memory at r3/r4 at each entry of those functions (hex
 //                     addresses), from VI field --trace-from to --trace-to, to --trace-file;
 //                     --trace-peek O1,O2: also the words at r3 + those (hex) offsets
+//   --record-input F  (E3c) write port 1's input, as the guest received it, as an input
+//                     script (with a window: the keyboard merged in; Enter START,
+//                     X A, Z B, C X, V Y, arrows, I/J/K/L stick, Q L, E R, Space Z)
+//   --pacing-from N   (E3c) frame pacing statistics (window) from VI field N on
 //   --audio-wav FILE  (E3b) the AX mix as a 16-bit stereo WAV, exactly as virtual
 //                     time produced it (keep it under build/; never commit it)
 //   --no-audio        no playback (default: SDL3 playback when a window is open)
@@ -60,6 +64,7 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
@@ -68,6 +73,8 @@
 #include <string>
 #include <thread>
 #include <vector>
+
+#include <SDL3/SDL_keyboard.h>
 
 #include "audio/mixer.h"
 #include "audio/sdl_out.h"
@@ -196,6 +203,78 @@ struct DrawLog : gfx::Backend {
   void invalidate_textures() override { next->invalidate_textures(); }
 };
 
+// Port 1 from the keyboard in the window (E3c), mapped as the browser maps it
+// (web/src/input.ts): Enter = START, X = A, Z = B, C = X, V = Y, arrows = D-pad,
+// I/J/K/L = main stick, Q = L, E = R, Space = Z. Read at each VI field after the
+// window's events; it reaches the guest only through the frame poll.
+PadState keyboard_pad() {
+  int n = 0;
+  const bool* k = SDL_GetKeyboardState(&n);
+  auto on = [&](SDL_Scancode s) { return k && static_cast<int>(s) < n && k[s]; };
+  PadState p;
+  p.connected = true;
+  const struct {
+    SDL_Scancode key;
+    u16 bit;
+  } map[] = {{SDL_SCANCODE_RETURN, pad::kStart}, {SDL_SCANCODE_X, pad::kA},     {SDL_SCANCODE_Z, pad::kB},
+             {SDL_SCANCODE_C, pad::kX},          {SDL_SCANCODE_V, pad::kY},     {SDL_SCANCODE_UP, pad::kUp},
+             {SDL_SCANCODE_DOWN, pad::kDown},    {SDL_SCANCODE_LEFT, pad::kLeft}, {SDL_SCANCODE_RIGHT, pad::kRight},
+             {SDL_SCANCODE_Q, pad::kL},          {SDL_SCANCODE_E, pad::kR},     {SDL_SCANCODE_SPACE, pad::kZ}};
+  for (const auto& m : map)
+    if (on(m.key)) p.buttons = static_cast<u16>(p.buttons | m.bit);
+  int sx = 0, sy = 0;
+  if (on(SDL_SCANCODE_I)) sy += 100;
+  if (on(SDL_SCANCODE_K)) sy -= 100;
+  if (on(SDL_SCANCODE_J)) sx -= 100;
+  if (on(SDL_SCANCODE_L)) sx += 100;
+  p.stick_x = static_cast<s8>(sx);
+  p.stick_y = static_cast<s8>(sy);
+  if (p.buttons & pad::kL) p.trigger_l = 255;
+  if (p.buttons & pad::kR) p.trigger_r = 255;
+  return p;
+}
+
+// The script's input with the keyboard merged into port 1 (window mode), and
+// optionally every change of port 1 written as an input script (--record-input),
+// so a window session replays headless.
+struct HostInputSource : InputSource {
+  InputSource* base = nullptr;
+  bool keyboard = false;
+  PadState host;  // the latest keyboard state
+  std::FILE* rec = nullptr;
+  PadState last;
+  bool have_last = false;
+  FrameInput input_for(u64 frame) override {
+    FrameInput in = base->input_for(frame);
+    PadState& p = in.pad[0];
+    if (keyboard && p.connected) {
+      p.buttons = static_cast<u16>(p.buttons | host.buttons);
+      p.stick_x = static_cast<s8>(std::clamp(p.stick_x + host.stick_x, -128, 127));
+      p.stick_y = static_cast<s8>(std::clamp(p.stick_y + host.stick_y, -128, 127));
+      p.trigger_l = std::max(p.trigger_l, host.trigger_l);
+      p.trigger_r = std::max(p.trigger_r, host.trigger_r);
+    }
+    if (rec) record(frame, p);
+    return in;
+  }
+  void record(u64 frame, const PadState& p) {
+    static const char* names[] = {"LEFT", "RIGHT", "DOWN", "UP", "Z", "R", "L", "", "A", "B", "X", "Y", "START"};
+    const PadState prev = have_last ? last : PadState{true};
+    const unsigned long long f = static_cast<unsigned long long>(frame);
+    for (int b = 0; b < 13; ++b) {
+      if (!names[b][0]) continue;
+      const bool now = p.buttons >> b & 1, was = prev.buttons >> b & 1;
+      if (now != was) std::fprintf(rec, "%llu 1 %s %s\n", f, now ? "press" : "release", names[b]);
+    }
+    if (p.stick_x != prev.stick_x || p.stick_y != prev.stick_y)
+      std::fprintf(rec, "%llu 1 stick %d %d\n", f, p.stick_x, p.stick_y);
+    if (p.trigger_l != prev.trigger_l || p.trigger_r != prev.trigger_r)
+      std::fprintf(rec, "%llu 1 trigger %u %u\n", f, p.trigger_l, p.trigger_r);
+    last = p;
+    have_last = true;
+  }
+};
+
 struct Play : GfxObserver {
   YieldingHooks* yield_hooks = nullptr;  // --yield
   gfx::GxProcessor* proc = nullptr;
@@ -205,6 +284,11 @@ struct Play : GfxObserver {
   std::uint64_t present_every = 1, max_fields = ~0ull;
   std::string capture_dir;
   std::string stop_file;  // --stop-file
+  HostInputSource* host_input = nullptr;  // window mode: the keyboard on port 1
+  // Frame pacing (window mode): host time between presents.
+  std::vector<double> present_ms;
+  std::uint64_t pacing_from = 0;  // --pacing-from
+  std::chrono::steady_clock::time_point last_present;
   std::uint64_t hash_every = 0;  // --hash-every
   const std::uint8_t* mem1 = nullptr;
   std::uint32_t mem1_size = 0;
@@ -271,9 +355,14 @@ struct Play : GfxObserver {
     if (window && field % present_every == 0) {
       if (audio_out) audio_out->throttle();  // keep the host near real time (host pacing only)
       if (!window->pump()) throw StopRun{"window closed"};
+      if (host_input) host_input->host = keyboard_pad();
       if (f) {
         window->present(f->view, f->width, f->height);
         ++presents;
+        const auto now = std::chrono::steady_clock::now();
+        if (presents > 1 && field >= pacing_from)
+          present_ms.push_back(std::chrono::duration<double, std::milli>(now - last_present).count());
+        last_present = now;
       }
     }
     if (!capture_dir.empty() && f && f->serial != last_capture_serial &&
@@ -407,7 +496,7 @@ int main(int argc, char** argv) {
   std::setvbuf(stdout, nullptr, _IOLBF, 1 << 16);
   std::string input_path, capture_at, draw_log_path;
   std::uint64_t draw_log_from = 0, draw_log_to = ~0ull, dump_field = ~0ull, dump_to = 0;
-  std::string dump_dir, audio_wav;
+  std::string dump_dir, audio_wav, record_input;
   bool no_audio = false;
   std::uint32_t audio_latency = 100;
   std::uint64_t max_ticks = ~0ull;
@@ -435,6 +524,8 @@ int main(int argc, char** argv) {
     else if (a == "--capture-at") capture_at = next();
     else if (a == "--capture-from") play.capture_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--stop-file") play.stop_file = next();
+    else if (a == "--record-input") record_input = next();
+    else if (a == "--pacing-from") play.pacing_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--gx-log") play.gx_log = std::fopen(next().c_str(), "w");
     else if (a == "--gx-log-from") play.gx_log_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--gx-log-to") play.gx_log_to = std::strtoull(next().c_str(), nullptr, 10);
@@ -460,7 +551,7 @@ int main(int argc, char** argv) {
     else if (a == "--pack") packs.push_back(next());
     else {
       std::fprintf(stderr,
-                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--stop-file F] [--hash-every N] [--max-ticks N] "
+                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--stop-file F] [--hash-every N] [--record-input F] [--pacing-from N] [--max-ticks N] "
                    "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-from N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
                    "[--perf-every N] [--profile N] [--host-profile N] [--profile-from F] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
@@ -506,7 +597,19 @@ int main(int argc, char** argv) {
     return 2;
   }
   InputQueue input(boot_input);
-  input.set_source(&*script);
+  HostInputSource host_input;
+  host_input.base = &*script;
+  host_input.keyboard = !headless;
+  if (!record_input.empty()) {
+    host_input.rec = std::fopen(record_input.c_str(), "w");
+    if (!host_input.rec) {
+      std::fprintf(stderr, "mvp-play: cannot write %s\n", record_input.c_str());
+      return 2;
+    }
+    std::fprintf(host_input.rec, "mvp-input 1\n# recorded by mvp-play (port 1)\n");
+  }
+  input.set_source(&host_input);
+  if (!headless) play.host_input = &host_input;
 
   // Renderer.
   std::unique_ptr<gfx::Window> window;
@@ -646,6 +749,7 @@ int main(int argc, char** argv) {
   }
   if (draw_log.f) std::fclose(draw_log.f);
   if (play.gx_log) std::fclose(play.gx_log);
+  if (host_input.rec) std::fclose(host_input.rec);
 
   auto ull = [](std::uint64_t v) { return static_cast<unsigned long long>(v); };
   const double guest = static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0;
@@ -699,6 +803,21 @@ int main(int argc, char** argv) {
               ull(rs.textures_decoded), ull(rs.texture_hits), ull(rs.copy_textures_used), ull(rs.tex_copies),
               ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws), ull(rs.same_state), ull(rs.tmem_textures),
               static_cast<double>(rs.vertex_bytes) / 1e6, static_cast<double>(rs.index_bytes) / 1e6);
+  if (!play.present_ms.empty()) {
+    std::vector<double> v = play.present_ms;
+    std::sort(v.begin(), v.end());
+    double sum = 0, sq = 0;
+    for (double x : v) sum += x;
+    const double mean = sum / static_cast<double>(v.size());
+    for (double x : v) sq += (x - mean) * (x - mean);
+    auto pct = [&](double q) { return v[std::min(v.size() - 1, static_cast<std::size_t>(q * static_cast<double>(v.size())))]; };
+    std::size_t late = 0;
+    for (double x : v) late += x > 25.0 ? 1 : 0;
+    std::printf("pacing: %zu present intervals: mean %.3f ms (%.2f per second), sd %.3f ms, p1 %.2f, p50 %.2f, p99 %.2f, "
+                "max %.2f ms; %zu over 25 ms\n",
+                v.size(), mean, mean > 0 ? 1000.0 / mean : 0.0, std::sqrt(sq / static_cast<double>(v.size())), pct(0.01),
+                pct(0.5), pct(0.99), v.back(), late);
+  }
   std::printf("display: %llu presents, %llu captures%s%s; WebGPU errors %llu\n", ull(play.presents), ull(play.captures),
               play.capture_dir.empty() ? "" : " in ", play.capture_dir.c_str(), ull(gpu->errors()));
   if (gpu->errors() || ps.xfb_copies == 0) rc = 1;
