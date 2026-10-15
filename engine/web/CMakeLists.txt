@@ -15,8 +15,8 @@
 set(MVP_WEB_SITE ${CMAKE_CURRENT_BINARY_DIR}/site)
 
 # ---- The engine module ----
-add_executable(mvp-web wasm/mvp_web.cpp)
-target_link_libraries(mvp-web PRIVATE engine_wasm_host)
+add_executable(mvp-web wasm/mvp_web.cpp wasm/net_web.cpp)
+target_link_libraries(mvp-web PRIVATE engine_wasm_host engine_net)
 target_compile_options(mvp-web PRIVATE ${ENGINE_WARN})
 if(TARGET engine_gfx_wgpu)
   target_link_libraries(mvp-web PRIVATE engine_gfx_wgpu)

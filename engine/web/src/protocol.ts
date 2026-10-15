@@ -14,7 +14,49 @@ export interface Pad {
   trigR: number;
 }
 
+// Netplay (E5): this page's role in an online game (engine/net, docs/engine/NETPLAY.md).
+export interface NetOptions {
+  player: 1 | 2;      // drives controller port 1 or 2
+  delay: number;      // proposed input delay in frames (the session uses the larger proposal)
+  hashEvery: number;  // frames per state-hash window (desync detection)
+}
+
+// What the Worker reports about the netplay session (wasm/net_web.cpp mvp_net_status).
+export interface NetStatus {
+  state: 'handshake' | 'running' | 'desynced' | 'disconnected' | 'rejected' | 'ended';
+  reason: string;
+  player: number;
+  delay: number;
+  frame: number;
+  peerFrame: number;
+  localHorizon: number;
+  remoteHorizon: number;
+  rttLast: number;
+  rttMin: number;
+  rttAvg: number;
+  rttMax: number;
+  packetsSent: number;
+  bytesSent: number;
+  packetsReceived: number;
+  bytesReceived: number;
+  badPackets: number;
+  hashesCompared: number;
+  stalls: number;
+  stallMs: number;
+  longestStallMs: number;
+  gateMisses: number;
+  earlyYields: number;
+  latencyAvg: number;  // ms from sampling the local pad to the frame that uses it
+  latencyMax: number;
+  latencySum: number;
+  latencySamples: number;
+  windows: number;
+  lastWindow: string;
+  desync: boolean;
+}
+
 export interface RunOptions {
+  netplay?: NetOptions;  // an online game: boot only after the handshake
   script: string;      // an mvp-input script (tests); empty: live keyboard/gamepad input
   stopFields: number;  // stop after this many VI fields (0: never)
   stopFrames: number;  // stop at the poll of this frame (0: never)
@@ -27,7 +69,10 @@ export type ToWorker =
   | { type: 'pad'; port: number; pad: Pad }
   | { type: 'tick'; now: number }  // the page's animation frame, when the Worker has no requestAnimationFrame
   | { type: 'resize'; width: number; height: number }
-  | { type: 'pause'; paused: boolean };
+  | { type: 'pause'; paused: boolean }
+  | { type: 'net-open' }                    // the data channel to the other player is open
+  | { type: 'net-recv'; data: ArrayBuffer }  // a datagram from the other player
+  | { type: 'net-quit' };                   // the page is leaving the game
 
 export interface Status {
   fields: number;
@@ -61,4 +106,6 @@ export type FromWorker =
   | { type: 'gfx'; ok: boolean; message: string }
   | { type: 'first-frame'; fields: number }
   | { type: 'stats'; status: Status; window: { fields: number; ms: number; wallMs: number } }
-  | { type: 'stopped'; status: Status; guestLine: string };
+  | { type: 'stopped'; status: Status; guestLine: string }
+  | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
+  | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string };

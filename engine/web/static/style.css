@@ -40,3 +40,13 @@ pre { white-space: pre-wrap; font-size: 0.85rem; color: var(--muted); margin: 0.
   background: var(--panel); border: 1px solid var(--border); padding: 0.5rem; }
 #log .err { color: var(--error-fg); }
 details { margin: 0.5rem 0; }
+/* Online play (E5, src/netplay.ts) */
+.online { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 0.8rem;
+  margin: 0.75rem 0; }
+.online h2 { font-size: 1rem; margin: 0 0 0.4rem; }
+.online-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.online-row .invite { flex: 1 1 18rem; min-width: 0; font: 0.85rem ui-monospace, Consolas, monospace; }
+.online-row input, .online-row select, .online-row button { font: inherit; padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--fg); }
+.online-status { margin: 0.4rem 0 0; color: var(--muted); }
+.online-status.err { color: var(--error-fg); }

@@ -23,9 +23,19 @@ export interface MvpEngine {
   _mvp_status(): number;
   _mvp_guest_line(): number;
 
+  // Netplay (E5, wasm/net_web.cpp).
+  _mvp_net_begin(player: number, delay: number, hashEvery: number, build: number, buildLen: number, nonce: number): number;
+  _mvp_net_recv(data: number, len: number): void;
+  _mvp_net_pump(): number;
+  _mvp_net_quit(): void;
+  _mvp_net_status(): number;
+  _mvp_net_windows(): number;
+  _mvp_net_diagnostic(): number;
+
   // Set by the Worker before the calls that use them.
   mvpDisc?: File;
   mvpOnGfx?: (ok: number, message: string) => void;
+  mvpNetSend?: (datagram: Uint8Array) => void;
 }
 
 export interface MvpEngineOptions {
