@@ -140,9 +140,9 @@ int main(int argc, char** argv) {
   if (cmd == "mount-check") {
     if (!image) return usage();
     // The original bytes of every file, then the same reads through the mounted overlay.
-    std::vector<std::pair<std::string, std::vector<std::uint8_t>>> before;
+    std::vector<std::pair<std::string, std::string>> before;  // path, SHA-256 of the original
     for (const auto& e : image->gcm.entries())
-      if (!e.is_dir) before.emplace_back(e.path, *image->gcm.read_file(*image->image, e.path));
+      if (!e.is_dir) before.emplace_back(e.path, sha256_hex(*image->gcm.read_file(*image->image, e.path)));
     std::optional<ApplyOutput> expect;
     try {
       Report scratch;
@@ -158,11 +158,11 @@ int main(int argc, char** argv) {
       return 1;
     }
     int bad = 0;
-    for (const auto& [path, bytes] : before) {
+    for (const auto& [path, digest] : before) {
       auto now = image->gcm.read_file(*image->image, path);
       auto it = expect->files.find(path);
-      const std::vector<std::uint8_t>& want = it != expect->files.end() ? it->second : bytes;
-      if (!now || *now != want) {
+      const std::string want = it != expect->files.end() ? sha256_hex(it->second) : digest;
+      if (!now || sha256_hex(*now) != want) {
         std::printf("MISMATCH %s\n", path.c_str());
         ++bad;
       }
