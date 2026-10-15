@@ -373,7 +373,7 @@ async function runOnce(context, run) {
              firstFrameMs: s.firstFrameMs, firstFrameField: s.firstFrameField, stats: s.stats, stopped: s.stopped,
              error: s.error, cache: s.cache, audio: s.audio, audioAttachedAtField: s.audioAttachedAtField,
              paused: s.paused, pad: s.pad, probe: s.audioProbe(), discTrace: s.discTrace,
-             packs: s.packs?.mounted ?? null, ioLog: s.ioLog };
+             packs: s.packs?.mounted ?? null, ioLog: s.ioLog, digest: s.digest };
   });
   const windows = [];
   const audioSamples = { n: 0, nonsilent: 0, maxRms: 0, maxPeak: 0, firstNonsilentField: null };
@@ -436,8 +436,11 @@ async function runOnce(context, run) {
     if (state.stats && JSON.stringify(state.stats) !== lastWindow) {
       lastWindow = JSON.stringify(state.stats);
       const w = state.audio?.worklet;
-      windows.push({ field: state.stats.status.fields, ...state.stats.window,
-                     audio: w ? { fill: w.fill, underruns: w.underruns, skipped: w.skipped } : undefined });
+      const st = state.stats.status;
+      windows.push({ field: st.fields, ...state.stats.window,
+                     audio: w ? { fill: w.fill, underruns: w.underruns, skipped: w.skipped } : undefined,
+                     // P2, threaded: the render thread's working time and the emulation's fence waits so far (ms)
+                     renderBusyMs: st.render?.busy_ms, fenceMs: st.thread?.fence_ms, fences: st.thread?.fences });
     }
     const field = state.stats?.status.fields ?? 0;
     lastField = field;

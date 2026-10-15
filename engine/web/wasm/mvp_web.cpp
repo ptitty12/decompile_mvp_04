@@ -614,6 +614,7 @@ EMSCRIPTEN_KEEPALIVE int mvp_boot(const char* script, int len, double stop_field
   g.m->load_dol(g.disc->dol);
   setup_boot_environment(*g.m, *g.disc);
   g.hw = std::make_unique<Hardware>(&g.m->cpu(), g.m->mem1(), Machine::kMem1Size);
+  g.hw->set_wgp_state(wasm_wgp_state());  // P2: the translated code appends to the write-gather pipe itself
   g.timed = std::make_unique<TimedSource>(g.disc->image.get());
   if (g_io_logging) g.timed->log = &g_io_log;
   g.hw->set_disc(g.timed.get());
@@ -705,6 +706,15 @@ EMSCRIPTEN_KEEPALIVE void mvp_set_threaded(int on) {
 #endif
 }
 EMSCRIPTEN_KEEPALIVE int mvp_threaded() { return g.threaded ? 1 : 0; }
+// Development (P2): the render thread's waiting (render_thread.h, render_tune).
+EMSCRIPTEN_KEEPALIVE void mvp_render_tune(double fence_spin_us, double render_spin_ms, int publish_kib,
+                                          int sync_fences) {
+#ifdef MVP_WEB_THREADS
+  web::render_tune(fence_spin_us, render_spin_ms, publish_kib, sync_fences);
+#else
+  (void)fence_spin_us, (void)render_spin_ms, (void)publish_kib, (void)sync_fences;
+#endif
+}
 
 EMSCRIPTEN_KEEPALIVE void mvp_canvas_resize(int width, int height) {
 #ifdef MVP_WEB_THREADS
@@ -793,14 +803,15 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_trace_take() {
 // Development (P2): the renderer digest (gfx/digest_tap.h) on or off, and its
 // "field digest draws" lines since the last call. Equal lines from the inline
 // and the threaded renderer mean the render thread read the same guest memory.
-EMSCRIPTEN_KEEPALIVE void mvp_digest(int on) {
+EMSCRIPTEN_KEEPALIVE void mvp_digest(int on, double detail_from, double detail_to) {
+  const auto from = static_cast<std::uint64_t>(detail_from), to = static_cast<std::uint64_t>(detail_to);
 #ifdef MVP_WEB_THREADS
   if (g.threaded) {
-    web::render_digest(on != 0);
+    web::render_digest(on != 0, from, to);
     return;
   }
 #endif
-  g.rs.set_digest(on != 0);
+  g.rs.set_digest(on != 0, from, to);
 }
 EMSCRIPTEN_KEEPALIVE const char* mvp_digest_take() {
 #ifdef MVP_WEB_THREADS
@@ -892,6 +903,7 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_status() {
                   static_cast<unsigned long long>(g.audio.dropped()));
     s += b;
   }
+  s += ",\"wgp_fast\":" + std::to_string(wasm_wgp_state()->fast_stores);  // P2: stores the translated code gathered itself
   s += ",\"pad_last\":" + std::to_string(g.live.last_buttons) +
        ",\"pad_polls\":" + std::to_string(g.live.polls_with_buttons);
 #ifdef MVP_WEB_THREADS

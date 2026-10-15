@@ -107,6 +107,8 @@ export interface RunOptions {
   ioLog?: boolean;     // development: log every guest DVD read with its host timing (P1)
   threads?: boolean;   // P2: false = the inline renderer even where the threaded engine could run
   digest?: boolean;    // development (P2): the renderer digest per VI field, in each stats window's `digest`
+  digestDetail?: number[];  // development (P2): VI fields [from, to] whose draws get a digest line each
+  rtTune?: number[];   // development (P2): the render thread's waiting (mvp_render_tune: us, ms, KiB, sync fences)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }
 

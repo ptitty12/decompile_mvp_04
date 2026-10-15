@@ -40,6 +40,12 @@ namespace mvp::web {
 // not be created.
 bool render_thread_start(const char* selector, int width, int height, void (*on_gfx)(int ok, const char* msg));
 bool render_thread_running();
+// Development: the fence's polling before it sleeps (us), the render thread's
+// polling for records (ms), the publishing step (KiB); negative or 0: unchanged.
+// `sync_fences` 1: also wait at the guest's GPU sync points (draw done, tokens,
+// ...), 0: only where a guest write meets memory the render thread still reads
+// (the default); -1: unchanged.
+void render_tune(double fence_spin_us, double render_spin_ms, int publish_kib, int sync_fences);
 
 // From the emulation, in order (each appends to the ring).
 void render_memory(const std::uint8_t* mem, std::uint32_t size);
@@ -51,7 +57,7 @@ bool render_present(std::uint64_t frame_polls);  // ends the batch; true once a 
 void render_flush();
 void render_resize(int width, int height);
 void render_trace(bool on);
-void render_digest(bool on);
+void render_digest(bool on, std::uint64_t detail_from, std::uint64_t detail_to);
 
 // For mvp_status and the tools (snapshots the render thread took at its last present).
 std::string render_trace_take();

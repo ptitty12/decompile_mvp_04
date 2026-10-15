@@ -109,6 +109,8 @@ const options: RunOptions = {
   ioLog: params.get('ioLog') === '1',
   threads: params.get('threads') !== '0',
   digest: params.get('digest') === '1',
+  digestDetail: params.has('digestDetail') ? (params.get('digestDetail') ?? '').split('-').map(Number) : undefined,
+  rtTune: params.has('rtTune') ? (params.get('rtTune') ?? '').split(',').map(Number) : undefined,
   discCache: {
     blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
     maxRun: Number(params.get('discRun') ?? 0) || undefined,

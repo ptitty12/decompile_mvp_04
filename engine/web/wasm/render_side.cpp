@@ -64,10 +64,21 @@ void RenderSide::vi_field(std::uint64_t field, std::uint32_t xfb) {
     tap_.log += b;
   }
   if (digest_.on) {
-    char b[80];
-    std::snprintf(b, sizeof b, "%llu %016llx %llu\n", static_cast<unsigned long long>(field),
-                  static_cast<unsigned long long>(digest_.digest()), static_cast<unsigned long long>(digest_.draws()));
+    using D = gfx::DigestTap;
+    char b[200];
+    std::snprintf(b, sizeof b, "%llu %016llx %016llx %016llx %016llx %016llx %016llx %llu\n",
+                  static_cast<unsigned long long>(field), static_cast<unsigned long long>(digest_.digest()),
+                  static_cast<unsigned long long>(digest_.part(D::kState)),
+                  static_cast<unsigned long long>(digest_.part(D::kVerts)),
+                  static_cast<unsigned long long>(digest_.part(D::kTex)),
+                  static_cast<unsigned long long>(digest_.part(D::kTexMem)),
+                  static_cast<unsigned long long>(digest_.part(D::kCopies)),
+                  static_cast<unsigned long long>(digest_.draws()));
+    digest_log_ += digest_.detail_log;
+    digest_.detail_log.clear();
     digest_log_ += b;
+    digest_.detail = detail_from_ <= field + 1 && field + 1 <= detail_to_;  // the draws of the next field
+    digest_.reset();  // one digest per field
   }
   xfb_ = xfb;
   tap_.field = field;
@@ -134,11 +145,11 @@ std::string RenderSide::status_json() const {
     char b[512];
     std::snprintf(b, sizeof b,
                   ",\"draws\":%llu,\"xfb_copies\":%llu,\"pipelines\":%llu,\"textures\":%llu,\"gpu_errors\":%llu,"
-                  "\"copies_dropped\":%llu,\"copy_size_misses\":%llu,\"scan_mixed\":%llu",
+                  "\"copies_dropped\":%llu,\"copy_size_misses\":%llu,\"copy_tall\":%llu,\"scan_mixed\":%llu",
                   static_cast<unsigned long long>(rs.draws), static_cast<unsigned long long>(ps.xfb_copies),
                   static_cast<unsigned long long>(rs.pipelines), static_cast<unsigned long long>(rs.textures_decoded),
                   static_cast<unsigned long long>(gpu->errors()), static_cast<unsigned long long>(rs.copies_dropped),
-                  static_cast<unsigned long long>(rs.copy_size_misses),
+                  static_cast<unsigned long long>(rs.copy_size_misses), static_cast<unsigned long long>(rs.copy_tall),
                   static_cast<unsigned long long>(renderer_->scan_stats().mixed));
     s += b;
   }

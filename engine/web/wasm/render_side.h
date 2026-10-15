@@ -62,9 +62,15 @@ class RenderSide {
   void set_trace(bool on) { tap_.on = on; }
   std::string trace_take();      // the records since the last call, as a JSON array
   std::string trace_take_raw();  // the same records, comma-terminated, without the brackets
-  // The renderer digest (gfx/digest_tap.h): on from the next command; one
-  // "field digest draws" line per VI field.
-  void set_digest(bool on) { digest_.on = on; }
+  // The renderer digest (gfx/digest_tap.h): on from the next command; one line
+  // per VI field: "field all state verts textures texture-memory copies draws".
+  // Fields detail_from..detail_to also get a "d ..." line per draw.
+  void set_digest(bool on, std::uint64_t detail_from = 1, std::uint64_t detail_to = 0) {
+    digest_.on = on;
+    detail_from_ = detail_from;
+    detail_to_ = detail_to;
+    digest_.detail = detail_from_ <= 1 && 1 <= detail_to_;
+  }
   std::string digest_take();
 
   // ",\"draws\":..." members for mvp_status (empty without a renderer).
@@ -80,6 +86,7 @@ class RenderSide {
   gfx::DigestTap digest_;
   XfbTap tap_;
   std::string digest_log_;
+  std::uint64_t detail_from_ = 1, detail_to_ = 0;
   std::uint32_t xfb_ = 0;
   std::uint64_t presents_ = 0, last_presented_ = 0, copies_at_present_ = 0, resizes_ = 0;
 };

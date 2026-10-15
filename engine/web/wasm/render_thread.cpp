@@ -13,7 +13,9 @@
 #include <memory>
 #include <mutex>
 
+#include "gfx/gp_reads.h"
 #include "gfx/render_ring.h"
+#include "ppc/mem_access.h"
 #include "web/wasm/render_side.h"
 
 // ---- JavaScript glue ----
@@ -97,8 +99,16 @@ enum : u32 {
 };
 
 constexpr u32 kRingBytes = 16u << 20;
-constexpr u32 kPublishBytes = 4u << 10;   // records become visible in batches of this size
-constexpr double kSpinMs = 0.2;           // the render thread polls this long before it sleeps
+// Tuning (mvp_render_tune): records become visible in batches of kPublishBytes;
+// at a fence the emulation polls kFenceSpinUs before it sleeps; while a batch
+// runs the render thread polls kSpinMs for records before it sleeps.
+u32 kPublishBytes = 4u << 10;
+double kFenceSpinUs = 300;
+double kSpinMs = 1.0;
+// The guest's GPU sync points (draw done, tokens, ...) as fences too. Off: the
+// writes to memory the render thread still reads wait instead (GpReads), which
+// covers every case the fences cover.
+bool kSyncFences = false;
 constexpr double kVsyncPollMs = 1.0;      // with a frame due, it looks at the refresh count this often
 constexpr double kVsyncStallMs = 50.0;    // a frame due this long shows even if the count did not move
 
@@ -113,6 +123,9 @@ struct Ref {
 struct Pair {
   u32 a, b;
 };
+
+void render_task_cb(void*);
+void mark(u32 addr, u32 size);
 
 struct Shared {
   gfx::RenderRing ring{kRingBytes};
@@ -138,23 +151,71 @@ struct Shared {
   u64 due_polls = 0;
   double due_at = 0;        // when the frame became due
   u64 tasks = 0, held = 0;  // tasks run; presents held for the next refresh
+  double busy_ms = 0;       // time spent working (not waiting for records)
 
   // Emulation thread only.
+  // The memory each command reads (gfx/gp_reads.h), marked in ppc::g_gp_pages
+  // with the ring position after the command (+1); the pages marked so far.
+  gfx::GpReads reads{[](u32 addr, u32 size) { mark(addr, size); }};
+  u32 mark_pos = 0;
+  std::vector<u32> marked;
+  u64 write_waits = 0, write_checks = 0;
+  double write_wait_ms = 0;
   u32 synced = 0;           // ring position of the last fence
   u32 present_pos[2] = {};  // ring positions after the last two presents
   u64 fences = 0, fence_waits = 0, lag_waits = 0, big = 0, resizes = 0;
+  u64 fence_hist[4] = {};   // fence waits under 20 us, 100 us, 500 us, longer
+  double fence_hist_ms[4] = {}, fence_behind_kb[4] = {};  // their time, and the ring bytes not finished at their start
   double fence_ms = 0, lag_ms = 0;
 };
 
 Shared* S = nullptr;
+
+// Emulation thread: the command being appended reads [addr, addr + size).
+void mark(u32 addr, u32 size) {
+  const u32 first = addr >> 12, last = (addr + size - 1) >> 12;
+  for (u32 p = first; p <= last; ++p) {
+    std::uint32_t& e = ppc::g_gp_pages[p & 0x1FFF];
+    if (!e) S->marked.push_back(p & 0x1FFF);
+    e = S->mark_pos + 1;
+  }
+}
+
+// Emulation thread: a guest write to [first, last] (ppc/mem_access.h, the
+// translated stores, the hardware's DMA): wait until the render thread has
+// finished every command that reads those pages.
+void gp_wait(u32 first, u32 last) {
+  ++S->write_checks;
+  for (u32 p = first >> 12; p <= (last >> 12); ++p) {
+    std::uint32_t& e = ppc::g_gp_pages[p & 0x1FFF];
+    if (!e) continue;
+    const u32 pos = e - 1;
+    if (!S->ring.finished(pos)) {
+      if (S->idle.load() == 1 && S->idle.exchange(0) == 1)
+        emscripten_proxy_async(emscripten_proxy_get_system_queue(), S->tid, render_task_cb, nullptr);
+      S->write_wait_ms += S->ring.wait_read(pos, kFenceSpinUs);
+      ++S->write_waits;
+    }
+    e = 0;
+  }
+}
+
+// Emulation thread, at each VI field: forget the pages whose commands are done.
+void sweep() {
+  std::size_t n = 0;
+  for (u32 p : S->marked) {
+    std::uint32_t& e = ppc::g_gp_pages[p];
+    if (e && S->ring.finished(e - 1)) e = 0;
+    if (e) S->marked[n++] = p;
+  }
+  S->marked.resize(n);
+}
 
 template <class T>
 void put(u32 type, const T& v) {
   std::memcpy(S->ring.reserve(type, sizeof v), &v, sizeof v);
   S->ring.commit();
 }
-
-void render_task_cb(void*);
 
 // Emulation thread: wake the render thread if it waits in its event loop (with
 // nothing due, between batches).
@@ -185,9 +246,9 @@ std::string json_escape(const std::string& in) {
 void snapshot() {
   std::string t = S->side.trace_take_raw(), d = S->side.digest_take(), s = S->side.status_json();
   char b[96];
-  std::snprintf(b, sizeof b, ",\"render\":{\"tasks\":%llu,\"held\":%llu,\"vsync\":%s}",
+  std::snprintf(b, sizeof b, ",\"render\":{\"tasks\":%llu,\"held\":%llu,\"vsync\":%s,\"busy_ms\":%.1f}",
                 static_cast<unsigned long long>(S->tasks), static_cast<unsigned long long>(S->held),
-                S->vsync ? "true" : "false");
+                S->vsync ? "true" : "false", S->busy_ms);
   s += b;
   std::lock_guard<std::mutex> lock(S->mu);
   S->trace += t;
@@ -298,12 +359,16 @@ void handle(const gfx::RenderRing::Record& r) {
       S->side.set_memory(v.p, v.n);
       return;
     }
-    case kTrace:
-    case kDigest: {
+    case kTrace: {
       u32 on;
       std::memcpy(&on, r.data, sizeof on);
-      if (r.type == kTrace) S->side.set_trace(on != 0);
-      else S->side.set_digest(on != 0);
+      S->side.set_trace(on != 0);
+      return;
+    }
+    case kDigest: {
+      u64 v[3];
+      std::memcpy(v, r.data, sizeof v);
+      S->side.set_digest(v[0] != 0, v[1], v[2]);
       return;
     }
     case kFlush:
@@ -318,9 +383,10 @@ void handle(const gfx::RenderRing::Record& r) {
 // Polls up to kSpinMs for records while the emulation produces them.
 bool spin_for_data() {
   const double t0 = emscripten_get_now();
-  while (emscripten_get_now() - t0 < kSpinMs) {
+  for (unsigned n = 1;; ++n) {
     if (S->ring.has_data()) return true;
     if (!S->emu_active.load(std::memory_order_relaxed)) break;
+    if (n % 64 == 0 && emscripten_get_now() - t0 >= kSpinMs) break;
   }
   return S->ring.has_data();
 }
@@ -337,9 +403,12 @@ bool spin_for_data() {
 void render_task() {
   ++S->tasks;
   S->idle.store(0, std::memory_order_seq_cst);
+  double busy_from = emscripten_get_now();  // the thread's working time (statistics), between waits
+  auto rest = [&] { S->busy_ms += emscripten_get_now() - busy_from; };
   for (;;) {
     if (may_show()) {
       show();
+      rest();
       mvp_js_render_soon();
       return;
     }
@@ -349,15 +418,23 @@ void render_task() {
       S->ring.done();
       continue;
     }
+    rest();
     const bool active = S->emu_active.load(std::memory_order_seq_cst) != 0;
-    if (active && spin_for_data()) continue;
+    if (active && spin_for_data()) {
+      busy_from = emscripten_get_now();
+      continue;
+    }
     if (active || S->frame_due) {
       S->ring.wait_data(S->frame_due ? kVsyncPollMs : 2.0);
+      busy_from = emscripten_get_now();
       continue;
     }
     S->idle.store(1, std::memory_order_seq_cst);
     std::atomic_thread_fence(std::memory_order_seq_cst);
-    if ((S->ring.has_data() || S->emu_active.load(std::memory_order_seq_cst)) && S->idle.exchange(0) == 1) continue;
+    if ((S->ring.has_data() || S->emu_active.load(std::memory_order_seq_cst)) && S->idle.exchange(0) == 1) {
+      busy_from = emscripten_get_now();
+      continue;
+    }
     return;
   }
 }
@@ -405,10 +482,18 @@ bool render_thread_start(const char* selector, int width, int height, void (*on_
     S = nullptr;
     return false;
   }
+  ppc::g_gp_wait_hook = gp_wait;  // guest writes to memory the render thread still reads wait for it
   return true;
 }
 
 bool render_thread_running() { return S != nullptr; }
+
+void render_tune(double fence_spin_us, double render_spin_ms, int publish_kib, int sync_fences) {
+  if (sync_fences >= 0) kSyncFences = sync_fences != 0;
+  if (fence_spin_us >= 0) kFenceSpinUs = fence_spin_us;
+  if (render_spin_ms >= 0) kSpinMs = render_spin_ms;
+  if (publish_kib > 0) kPublishBytes = static_cast<u32>(publish_kib) << 10;
+}
 
 void render_memory(const std::uint8_t* mem, std::uint32_t size) {
   put(kMemory, Ref{mem, size});
@@ -421,6 +506,8 @@ void render_gx(const std::uint8_t* cmd, std::size_t len) {
   if (n <= S->ring.max_payload()) {
     std::memcpy(S->ring.reserve(kGx, n), cmd, n);
     S->ring.commit();
+    S->mark_pos = S->ring.end();
+    S->reads.command(cmd, n);  // what it reads, so that guest writes there wait for it
     S->ring.publish_if(kPublishBytes);
     return;
   }
@@ -428,6 +515,8 @@ void render_gx(const std::uint8_t* cmd, std::size_t len) {
   // where it is, and the emulation waits until it has.
   put(kGxRef, Ref{cmd, n});
   ++S->big;
+  S->mark_pos = S->ring.end();
+  S->reads.command(cmd, n);
   kick();
   S->fence_ms += S->ring.wait_read(S->ring.end());
   S->synced = S->ring.end();
@@ -437,17 +526,24 @@ void render_field(std::uint64_t field, std::uint32_t xfb) {
   if (disabled()) return;
   put(kField, Field{field, xfb, 0});
   S->ring.publish();
+  sweep();
 }
 
 void render_sync() {
   const u32 end = S->ring.end();
-  if (end == S->synced) return;  // nothing new since the last fence
+  if (end == S->synced || !kSyncFences) return;  // nothing new since the last fence
   S->synced = end;
   ++S->fences;
   if (S->ring.finished(end)) return;
+  const u32 behind = S->ring.behind(end);
   kick();
-  S->fence_ms += S->ring.wait_read(end);
+  const double ms = S->ring.wait_read(end, kFenceSpinUs);
+  S->fence_ms += ms;
   ++S->fence_waits;
+  const int h = ms < 0.02 ? 0 : ms < 0.1 ? 1 : ms < 0.5 ? 2 : 3;
+  ++S->fence_hist[h];
+  S->fence_behind_kb[h] += behind / 1024.0;
+  S->fence_hist_ms[h] += ms;
 }
 
 void render_batch_begin() {
@@ -491,8 +587,11 @@ void render_trace(bool on) {
   publish_and_kick();
 }
 
-void render_digest(bool on) {
-  put(kDigest, u32{on ? 1u : 0u});
+void render_digest(bool on, std::uint64_t detail_from, std::uint64_t detail_to) {
+  struct {
+    u64 on, from, to;
+  } v{on ? 1u : 0u, detail_from, detail_to};
+  put(kDigest, v);
   publish_and_kick();
 }
 
@@ -519,12 +618,21 @@ std::string render_status_json() {
     std::lock_guard<std::mutex> lock(S->mu);
     s = S->status;
   }
-  char b[512];
+  char b[1024];
   std::snprintf(b, sizeof b,
-                ",\"resizes\":%llu,\"thread\":{\"fences\":%llu,\"fence_waits\":%llu,\"fence_ms\":%.1f,\"lag_waits\":%llu,"
+                ",\"resizes\":%llu,\"thread\":{\"fences\":%llu,\"fence_waits\":%llu,\"fence_ms\":%.1f,"
+                "\"fence_hist\":[%llu,%llu,%llu,%llu],\"fence_hist_ms\":[%.0f,%.0f,%.0f,%.0f],"
+                "\"fence_behind_kb\":[%.0f,%.0f,%.0f,%.0f],\"write_checks\":%llu,\"write_waits\":%llu,"
+                "\"write_wait_ms\":%.1f,\"pending_pages\":%zu,\"read_ranges\":%llu,\"lag_waits\":%llu,"
                 "\"lag_ms\":%.1f,\"records\":%llu,\"ring_mb\":%.1f,\"full_waits\":%llu,\"big\":%llu}",
                 static_cast<unsigned long long>(S->resizes), static_cast<unsigned long long>(S->fences),
                 static_cast<unsigned long long>(S->fence_waits), S->fence_ms,
+                static_cast<unsigned long long>(S->fence_hist[0]), static_cast<unsigned long long>(S->fence_hist[1]),
+                static_cast<unsigned long long>(S->fence_hist[2]), static_cast<unsigned long long>(S->fence_hist[3]),
+                S->fence_hist_ms[0], S->fence_hist_ms[1], S->fence_hist_ms[2], S->fence_hist_ms[3],
+                S->fence_behind_kb[0], S->fence_behind_kb[1], S->fence_behind_kb[2], S->fence_behind_kb[3],
+                static_cast<unsigned long long>(S->write_checks), static_cast<unsigned long long>(S->write_waits),
+                S->write_wait_ms, S->marked.size(), static_cast<unsigned long long>(S->reads.stats().ranges),
                 static_cast<unsigned long long>(S->lag_waits), S->lag_ms,
                 static_cast<unsigned long long>(S->ring.records()), static_cast<double>(S->ring.bytes()) / (1 << 20),
                 static_cast<unsigned long long>(S->ring.full_waits()), static_cast<unsigned long long>(S->big));

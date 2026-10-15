@@ -324,6 +324,8 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
       M.mvpFrames = frames;
       M.mvpVsync = vsync;
       M._mvp_set_threaded(1);
+      const tune = options.rtTune;
+      if (tune) M._mvp_render_tune(tune[0] ?? -1, tune[1] ?? -1, tune[2] ?? 0, tune[3] ?? -1);
     }
     const tg = performance.now();
     gfxReady = new Promise<boolean>((resolve) => {
@@ -416,7 +418,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   }
   booted = true;
   if (options.tracePresent) M._mvp_trace(1);
-  if (options.digest) M._mvp_digest(1);
+  if (options.digest) M._mvp_digest(1, options.digestDetail?.[0] ?? 1, options.digestDetail?.[1] ?? 0);
   enableAudio();
   phase('boot', t);
 
