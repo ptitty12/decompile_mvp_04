@@ -461,3 +461,14 @@
 
     Each writes `docs/engine/<id>_LOG.md`, so a fresh session can resume from those logs.
   | Owner: optional, a verify.py fix for name reuse across statics (unblocks OSInit/DVDInit). Later: VPS deploy access.
+- 2026-10-14/15 (night) | lead + agents | engine and deploy | On main:
+  - **E3a:** natively the engine reaches an exhibition game, through the first pitch and first ball in play. Fixes: the FP-unavailable exception (the movie specks), the write-gather/WPAR fixes, /O2 game code (4-6× faster), FP shortcuts proven equal.
+  - **E2c:** browser audio, gamepad, disc from the server, translation cache.
+  - **E5/E5b:** lockstep netplay plus the server (password gate, first-run password page, disc route, lobby, WebRTC signaling, TURN).
+  - **Deploy:** Dokploy compose (`deploy/docker-compose.yml`, guide `docs/engine/DEPLOY_DOKPLOY.md`). The owner deployed it to mvp.ptaylor.dev, and it boots.
+  - **Lead state for resuming:**
+    - E2d (wasm emitter: FP/psq/lmw inlining plus E3a's FP-unavailable and WPAR semantics; worktree decompile_mvp_04-e2d, branch engine/e2d) is running. Until it lands, `test_wasm_lockstep` is DISABLED and the browser build doesn't match native in-game.
+    - Next wave: E3c (full 9-inning game natively, the E3 exit; worktree -e1, engine/e3c) and E6 (roster packs in the engine; worktree -e2, engine/e6).
+    - Integration: `git merge --no-ff engine/<x>` onto origin/main in decompile_mvp_04-docs, record decisions, then `python tools/coord.py run-locked claude-side-goals ... -- python tools/team/integrate.py --push --head-only`.
+    - Engine merges that conflict are delegated to a merge agent, which builds and tests both toolchains.
+  | Owner: deployments only at milestones (owner, 2026-10-15). Optional: the verify.py fix for OSInit/DVDInit names.
