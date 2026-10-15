@@ -7,14 +7,17 @@
 # script is written here, the logs stay in the build tree.
 #
 #   cmake -DTOOL=<mvp-netplay> -DWORK=<dir> [-DFRAMES=N] [-DDELAY=D] [-DIMPAIR="--loss 0.2 --latency 30 --jitter 20"]
-#         [-DPORT=47311] [-DEXPECT_STOPS=1] -P lockstep.cmake
+#         [-DPORT=47311] [-DSTALL="--stall-from F --stall-to G --stall-ms MS"] [-DEXPECT_STOPS=1] -P lockstep.cmake
 #
 # The script starts an exhibition game between the two players (E5c): the menus,
 # Select Team with player 2 on the away side, then the match's loading, where the
 # game polls frames without rendering, closer together than any VI, audio or DVD
 # event (frames 2,914-3,000). There a poll could come before the run had a
 # chance to wait for the peer ("gate missed", E6); now the run stops at such a
-# poll. -DEXPECT_STOPS=1 requires that it did (a slow link makes it certain).
+# poll. -DSTALL makes player 2's host sleep after each poll in a range (the
+# guest cannot tell), so player 1 waits for it at every one of those frames; with
+# the range over the loading's fast polls, player 1's run must stop at a poll
+# (-DEXPECT_STOPS=1 checks that it did).
 #
 # With -DDESYNC=1 player 2 corrupts one window hash instead: both peers must stop
 # with a desync at that window.
@@ -54,6 +57,7 @@ file(WRITE "${script}" "mvp-input 1
 2910 2 tap 3 A
 ")
 separate_arguments(impair UNIX_COMMAND "${IMPAIR}")
+separate_arguments(stall UNIX_COMMAND "${STALL}")
 set(common --input "${script}" --frames ${FRAMES} --delay ${DELAY} --hash-every 60)
 
 if(NOT DESYNC)
@@ -74,7 +78,7 @@ endif()
 execute_process(
   COMMAND "${TOOL}" peer --player 1 --port ${PORT} --peer-port ${PORT2} ${common} ${impair}
           --log "${WORK}/p1.frames" --report "${WORK}/p1.report" --diag "${WORK}/p1.diag"
-  COMMAND "${TOOL}" peer --player 2 --port ${PORT2} --peer-port ${PORT} ${common} ${impair} ${corrupt}
+  COMMAND "${TOOL}" peer --player 2 --port ${PORT2} --peer-port ${PORT} ${common} ${impair} ${corrupt} ${stall}
           --log "${WORK}/p2.frames" --report "${WORK}/p2.report" --diag "${WORK}/p2.diag"
   WORKING_DIRECTORY "${WORK}"
   RESULTS_VARIABLE rcs
