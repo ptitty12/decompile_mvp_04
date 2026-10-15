@@ -56,10 +56,25 @@ if(MVP_DISC_PATH AND EXISTS "${MVP_DISC_PATH}")
   target_include_directories(mvp_game_native PRIVATE ${MVP_GEN_DIR})
   target_link_libraries(mvp_game_native PUBLIC engine_runtime)
   set_target_properties(mvp_game_native PROPERTIES MSVC_DEBUG_INFORMATION_FORMAT "")
+  # Optimization of the translated code (E3a): /O2 on MSVC, -O1 elsewhere, unless
+  # MVP_GAME_OPT names another level (e.g. -Od for a quick build; from Git Bash
+  # write -O2, not /O2, which its path conversion mangles). Guest floating point
+  # is integer code (ppc/fp.h) and host FP keeps /fp:precise (no contraction), so
+  # the level changes speed only: local_boot_twice and local_play_determinism
+  # give the same guest state at /Od and /O2.
+  set(MVP_GAME_OPT "" CACHE STRING "Optimization flag for the translated game code (empty: /O2 on MSVC, -O1 elsewhere)")
   if(MSVC)
-    target_compile_options(mvp_game_native PRIVATE /Od /bigobj /w /EHsc)
+    set(game_opt /O2)
   else()
-    target_compile_options(mvp_game_native PRIVATE -O1 -w)
+    set(game_opt -O1)
+  endif()
+  if(MVP_GAME_OPT)
+    set(game_opt ${MVP_GAME_OPT})
+  endif()
+  if(MSVC)
+    target_compile_options(mvp_game_native PRIVATE ${game_opt} /fp:precise /bigobj /w /EHsc)
+  else()
+    target_compile_options(mvp_game_native PRIVATE ${game_opt} -ffp-contract=off -fno-fast-math -w)
   endif()
 
   add_executable(mvp-boot tools/mvp_boot.cpp)
