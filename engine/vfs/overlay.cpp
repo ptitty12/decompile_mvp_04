@@ -8,10 +8,10 @@
 
 namespace mvp::vfs {
 
-OverlaySource::OverlaySource(std::unique_ptr<Source> base, std::vector<Patch> patches)
+OverlaySource::OverlaySource(std::unique_ptr<Source> base, std::vector<Patch> patches, std::uint64_t min_size)
     : base_(std::move(base)), patches_(std::move(patches)) {
   std::sort(patches_.begin(), patches_.end(), [](const Patch& a, const Patch& b) { return a.offset < b.offset; });
-  size_ = base_->size();
+  size_ = std::max<std::uint64_t>(base_->size(), min_size);
   for (const auto& p : patches_) size_ = std::max<std::uint64_t>(size_, p.offset + p.bytes.size());
 }
 
@@ -87,7 +87,8 @@ bool mount_overlay(Disc& disc, std::vector<OverlayFile> files, std::string* erro
     patches.push_back({at, std::move(f.bytes)});
   }
   patches.push_back({disc.gcm.fst_offset(), std::move(fst)});
-  auto image = std::make_unique<OverlaySource>(std::move(disc.image), std::move(patches));
+  const std::uint64_t end = (pos + kOverlayAlign - 1) & ~std::uint64_t(kOverlayAlign - 1);
+  auto image = std::make_unique<OverlaySource>(std::move(disc.image), std::move(patches), end);
   std::string err;
   auto gcm = Gcm::open(*image, &err);
   if (!gcm) {

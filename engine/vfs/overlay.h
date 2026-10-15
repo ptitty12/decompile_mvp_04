@@ -5,7 +5,9 @@
 //
 // How: each replaced file's bytes are placed past the end of the image, each on
 // a 32 KiB boundary, in the order given, and its FST entry is patched to point
-// there (offset and size; the FST keeps its size and its names). The game finds
+// there (offset and size; the FST keeps its size and its names). The image then
+// ends on the next 32 KiB boundary (zeros): the game reads files in 32-byte
+// units, so a read of the last file runs past its end, as on a real disc. The game finds
 // files only through the FST (the boot environment copies it into MEM1), so it
 // reads the new bytes wherever it would have read the old ones. The same image
 // and the same replacements always give the same virtual disc, byte for byte.
@@ -27,7 +29,7 @@ namespace mvp::vfs {
 
 // A source with byte ranges replaced: reads inside a patch come from memory,
 // reads elsewhere from the base; past the base's end and between patches the
-// source reads zeros up to its size (the end of the last patch).
+// source reads zeros up to its size (the end of the last patch, or `min_size`).
 class OverlaySource final : public Source {
  public:
   struct Patch {
@@ -35,7 +37,7 @@ class OverlaySource final : public Source {
     std::vector<std::uint8_t> bytes;
   };
   // Patches must not overlap each other.
-  OverlaySource(std::unique_ptr<Source> base, std::vector<Patch> patches);
+  OverlaySource(std::unique_ptr<Source> base, std::vector<Patch> patches, std::uint64_t min_size = 0);
   std::uint64_t size() const override { return size_; }
   bool read(std::uint64_t off, void* dst, std::size_t n) override;
   Source& base() { return *base_; }

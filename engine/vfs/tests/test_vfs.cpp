@@ -282,6 +282,9 @@ TEST_CASE("mod overlay: replaced files come from memory, everything else from th
                    span.begin() + 0x2440 + std::ptrdiff_t(fst_before.size())));  // the rest of the image as it was
   CHECK(std::equal(bigger.begin(), bigger.end(), span.begin() + big->offset));
   CHECK(span[static_cast<std::size_t>(big->offset + bigger.size())] == 0);
+  // The image ends on a 32 KiB boundary: 32-byte reads that run past the last file work.
+  CHECK(disc->image->size() % kOverlayAlign == 0);
+  CHECK(disc->image->read((a->offset + 3) & ~31u, span.data(), 32));
   CHECK_FALSE(disc->image->read(disc->image->size() - 1, span.data(), 2));
   // The boot DOL is untouched; the same mount twice gives the same image.
   auto again = open_disc(std::make_unique<MemorySource>(raw), false, &err);
