@@ -1,5 +1,8 @@
 #include "ppc/fp.h"
 
+#include <bit>
+#include <cstring>
+
 namespace mvp::ppc::fp {
 
 namespace {
@@ -300,6 +303,8 @@ u64 add_impl(u64 ab, u64 bb, bool negate_b, Prec p, u32 fpscr) {
 
 }  // namespace
 
+namespace ref {
+
 u64 add(u64 a, u64 b, Prec p, u32 fpscr) { return add_impl(a, b, false, p, fpscr); }
 u64 sub(u64 a, u64 b, Prec p, u32 fpscr) { return add_impl(a, b, true, p, fpscr); }
 
@@ -419,6 +424,8 @@ u64 round_to_single(u64 x, u32 fpscr) {
   return round_pack(n.sign, n.m, n.e, Prec::Single, fpscr);
 }
 
+}  // namespace ref
+
 u64 to_int32(u64 x, bool toward_zero, u32 fpscr) {
   u32 value;
   Num n = unpack(x);
@@ -519,6 +526,8 @@ namespace {
 int scale_exp(u32 scale) { return (scale & 0x20) ? static_cast<int>(scale) - 64 : static_cast<int>(scale); }
 }  // namespace
 
+namespace ref {
+
 u64 dequantize(u32 raw, u32 type, u32 scale) {
   long v;
   switch (type) {
@@ -571,6 +580,159 @@ u32 quantize(u64 value, u32 type, u32 scale) {
     }
   }
   return static_cast<u32>(r) & (type == 4 || type == 6 ? 0xFFu : 0xFFFFu);
+}
+
+}  // namespace ref
+
+// ---- shortcuts through host double arithmetic (E3a) ----
+//
+// The exact integer code above costs tens of nanoseconds per operation; paired-
+// single code (the movie decoder, the game's matrix math) runs millions of them.
+// Each function below first tries the host's IEEE double arithmetic and keeps its
+// result only where it is provably the result of the exact code, else it calls
+// ref::. The conditions:
+// - round to nearest (FPSCR[RN] = 0) and finite operands, so no NaN (whose host
+//   payload is not deterministic) can arise;
+// - double results: the host result is correctly rounded; it is kept when it is
+//   normal or zero (a subnormal result is where NI flushes);
+// - single results: the host double result r = RN53(x) of the exact value x is
+//   rounded again to single. That equals RN24(x) unless r lies exactly on a
+//   midpoint between two singles (a midpoint is a double, so rounding x to double
+//   can reach it but never cross it); midpoints go to ref::, and so do results
+//   near or outside the normal single range (NI flushing, overflow);
+// - fused multiply-add: only when the product is exact in double (the operands'
+//   significant bits add up to at most 53), so one rounding of p + b is the fused
+//   result;
+// - zero results carry IEEE's signs, as the exact code's do.
+// The host must round to nearest (the default; nothing in the engine changes it)
+// and must not flush subnormals; WebAssembly does both. test_fp compares every
+// shortcut with ref:: on millions of operands, midpoints included.
+
+namespace {
+
+inline double as_double(u64 x) {
+  double d;
+  std::memcpy(&d, &x, 8);
+  return d;
+}
+inline u64 as_bits(double d) {
+  u64 x;
+  std::memcpy(&x, &d, 8);
+  return x;
+}
+inline bool finite(u64 x) { return (x & kExpMask) != kExpMask; }
+inline u32 biased_exp(u64 x) { return static_cast<u32>((x >> 52) & 0x7FF); }
+// 2^k as a double, for |k| <= 64.
+inline double pow2(int k) { return as_double(static_cast<u64>(1023 + k) << 52); }
+
+// The result of precision p for the host double result r, or false.
+inline bool finish(double r, Prec p, u64* out) {
+  const u64 b = as_bits(r);
+  if ((b & ~kSign) == 0) {  // zero
+    *out = b;
+    return true;
+  }
+  const u32 e = biased_exp(b);
+  if (p == Prec::Double) {
+    if (e == 0 || e == 0x7FF) return false;  // subnormal (NI), infinity, NaN
+    *out = b;
+    return true;
+  }
+  if (e <= 1023 - 126 || e >= 1023 + 127) return false;  // |r| < 2^-125 or >= 2^127
+  if ((b & 0x1FFFFFFFull) == 0x10000000ull) return false;  // on a midpoint between two singles
+  *out = as_bits(static_cast<double>(static_cast<float>(r)));
+  return true;
+}
+
+// Whether a * c is exact in double: both normal or zero, significant bits <= 53.
+inline bool product_exact(u64 a, u64 c) {
+  if ((a & ~kSign) == 0 || (c & ~kSign) == 0) return true;
+  if (biased_exp(a) == 0 || biased_exp(c) == 0) return false;
+  const int sa = 53 - std::countr_zero((a & kFracMask) | (1ull << 52));
+  const int sc = 53 - std::countr_zero((c & kFracMask) | (1ull << 52));
+  return sa + sc <= 53;
+}
+
+}  // namespace
+
+u64 add(u64 a, u64 b, Prec p, u32 fpscr) {
+  u64 r;
+  if (!(fpscr & 3) && finite(a) && finite(b) && finish(as_double(a) + as_double(b), p, &r)) return r;
+  return ref::add(a, b, p, fpscr);
+}
+
+u64 sub(u64 a, u64 b, Prec p, u32 fpscr) {
+  u64 r;
+  if (!(fpscr & 3) && finite(a) && finite(b) && finish(as_double(a) - as_double(b), p, &r)) return r;
+  return ref::sub(a, b, p, fpscr);
+}
+
+u64 mul(u64 a, u64 c, Prec p, u32 fpscr) {
+  u64 r;
+  if (!(fpscr & 3) && finite(a) && finite(c) && finish(as_double(a) * as_double(c), p, &r)) return r;
+  return ref::mul(a, c, p, fpscr);
+}
+
+u64 div(u64 a, u64 b, Prec p, u32 fpscr) {
+  u64 r;
+  if (!(fpscr & 3) && finite(a) && finite(b) && finish(as_double(a) / as_double(b), p, &r)) return r;
+  return ref::div(a, b, p, fpscr);
+}
+
+u64 madd(u64 a, u64 c, u64 b, bool negate_b, bool negate_result, Prec p, u32 fpscr) {
+  if (!(fpscr & 3) && finite(a) && finite(c) && finite(b) && product_exact(a, c)) {
+    const double prod = as_double(a) * as_double(c);
+    const u64 pb = as_bits(prod);
+    // Exact: normal, or zero because an operand is zero (not an underflow).
+    const bool zero_operand = (a & ~kSign) == 0 || (c & ~kSign) == 0;
+    if (zero_operand || biased_exp(pb) != 0) {
+      const double addend = negate_b ? -as_double(b) : as_double(b);
+      u64 r;
+      if (finish(prod + addend, p, &r)) return negate_result ? r ^ kSign : r;
+    }
+  }
+  return ref::madd(a, c, b, negate_b, negate_result, p, fpscr);
+}
+
+u64 round_to_single(u64 x, u32 fpscr) {
+  u64 r;
+  if (!(fpscr & 3) && finite(x) && finish(as_double(x), Prec::Single, &r)) return r;
+  return ref::round_to_single(x, fpscr);
+}
+
+u64 dequantize(u32 raw, u32 type, u32 scale) {
+  int v;
+  switch (type) {
+    case 4: v = static_cast<int>(raw & 0xFF); break;
+    case 5: v = static_cast<int>(raw & 0xFFFF); break;
+    case 6: v = static_cast<int>(static_cast<signed char>(raw & 0xFF)); break;
+    case 7: v = static_cast<int>(static_cast<short>(raw & 0xFFFF)); break;
+    default: return single_to_double(raw);
+  }
+  // v * 2^-scale is exact in double and in single (|v| < 2^16, |scale| <= 32).
+  return as_bits(static_cast<double>(v) * pow2(-scale_exp(scale)));
+}
+
+u32 quantize(u64 value, u32 type, u32 scale) {
+  if (type < 4) return double_to_single_ftz(value);
+  // A value that is already a normal single (or zero) is its own rounding to
+  // single; scaling by a power of two is exact; then truncate and saturate.
+  const u32 e = biased_exp(value);
+  const bool zero = (value & ~kSign) == 0;
+  if (zero || (e >= 1023 - 126 && e <= 1023 + 127 && (value & 0x1FFFFFFFull) == 0)) {
+    double lo, hi;
+    switch (type) {
+      case 4: lo = 0; hi = 255; break;
+      case 5: lo = 0; hi = 65535; break;
+      case 6: lo = -128; hi = 127; break;
+      default: lo = -32768; hi = 32767; break;
+    }
+    double t = as_double(value) * pow2(scale_exp(scale));
+    t = t < lo ? lo : t > hi ? hi : t;
+    const long r = static_cast<long>(t);  // toward zero
+    return static_cast<u32>(r) & (type == 4 || type == 6 ? 0xFFu : 0xFFFFu);
+  }
+  return ref::quantize(value, type, scale);
 }
 
 }  // namespace mvp::ppc::fp

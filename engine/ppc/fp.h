@@ -1,9 +1,13 @@
 // Gekko floating-point semantics, computed exactly in integer arithmetic.
 //
 // Every result is the infinitely precise result rounded once to the target
-// precision (24 or 53 bits) with the FPSCR rounding mode. Nothing here uses the
-// host FPU, so native and WebAssembly builds agree bit for bit, NaN payloads
-// included (WebAssembly arithmetic NaNs are nondeterministic; E0_SURVEY §3).
+// precision (24 or 53 bits) with the FPSCR rounding mode. The model is integer
+// code (namespace ref), so native and WebAssembly builds agree bit for bit, NaN
+// payloads included (WebAssembly arithmetic NaNs are nondeterministic;
+// E0_SURVEY §3). For speed, the arithmetic first tries host double arithmetic and
+// keeps it only where it provably equals the model: round to nearest, finite
+// operands, no NaN, normal or exactly-zero results, never a single-precision
+// midpoint (fp.cpp, "shortcuts"; test_fp compares the two).
 //
 // The model (each point is checked by tests/test_fp.cpp):
 // - Values are raw IEEE double bits (u64). A single-precision result is the double
@@ -84,5 +88,19 @@ inline u64 select(u64 a, u64 c, u64 b) {
 inline u32 quant_size(u32 type) { return type == 4 || type == 6 ? 1 : type == 5 || type == 7 ? 2 : 4; }
 u64 dequantize(u32 raw, u32 type, u32 scale);
 u32 quantize(u64 value, u32 type, u32 scale);
+
+// The exact integer implementations (the model above). The functions above take
+// a shortcut through host double arithmetic where its result is provably the
+// same (fp.cpp, "shortcuts"), and call these otherwise. Tests compare the two.
+namespace ref {
+u64 add(u64 a, u64 b, Prec p, u32 fpscr);
+u64 sub(u64 a, u64 b, Prec p, u32 fpscr);
+u64 mul(u64 a, u64 c, Prec p, u32 fpscr);
+u64 div(u64 a, u64 b, Prec p, u32 fpscr);
+u64 madd(u64 a, u64 c, u64 b, bool negate_b, bool negate_result, Prec p, u32 fpscr);
+u64 round_to_single(u64 x, u32 fpscr);
+u64 dequantize(u32 raw, u32 type, u32 scale);
+u32 quantize(u64 value, u32 type, u32 scale);
+}  // namespace ref
 
 }  // namespace mvp::ppc::fp

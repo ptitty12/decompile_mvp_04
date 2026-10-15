@@ -317,3 +317,89 @@ TEST_CASE("NI flushing") {
   CHECK(add(bits(0x1p-1060), bits(1.0), Prec::Double, ni) == bits(1.0));
   CHECK(add(bits(0x1p-1060), bits(0x1p-1060), Prec::Double, 0) == bits(0x1p-1059));
 }
+
+// ---- the shortcuts through host double arithmetic (fp.cpp) against the exact code ----
+
+namespace {
+
+// Operands from several families: single values (as the paired-single unit holds
+// them), doubles over the whole exponent range, subnormals, small integers and
+// dyadic fractions (pixel arithmetic), values near the single range limits, and
+// specials.
+u64 operand(Rng& r) {
+  const u64 k = r.next() % 16;
+  switch (k) {
+    case 0: case 1: case 2: case 3:
+      return bits(static_cast<double>(r.single(-30, 30)));
+    case 4: return bits(static_cast<double>(r.single(-140, 127)));  // single subnormal range included
+    case 5: case 6: return bits(r.finite(-60, 60));
+    case 7: return bits(r.finite(-1074 + 52, 1023));
+    case 8: return r.next() & kFracMask;  // double subnormal (or zero)
+    case 9: case 10: {  // small integers and eighths / 128ths
+      const double v = static_cast<double>(static_cast<std::int64_t>(r.next() % 1024) - 512);
+      return bits(v / static_cast<double>(1u << (r.next() % 8)));
+    }
+    case 11: return bits(r.finite(-127, -124));  // around the smallest normal single
+    case 12: return bits(r.finite(125, 129));    // around the largest single
+    case 13: {
+      const u64 specials[] = {0, kSign, kExpMask, kExpMask | kSign, kDefaultNaN, 0x7FF4000000000001ull,
+                              0x3FF0000000000000ull, 0x0010000000000000ull, 0x7FEFFFFFFFFFFFFFull,
+                              bits(0x1p-126), bits(0x1p128), bits(0x1.fffffep127)};
+      return specials[r.next() % (sizeof specials / sizeof specials[0])];
+    }
+    default: return bits(r.finite(-10, 10));
+  }
+}
+
+// A pair whose double sum (or difference) lands on, or next to, a midpoint between
+// two singles: the case where rounding twice could differ from rounding once.
+void midpoint_pair(Rng& r, u64* a, u64* b) {
+  const float s = r.single(-20, 20);
+  const int e = std::ilogb(s);  // the single's ulp is 2^(e - 23)
+  const double half = std::ldexp(1.0, e - 24);
+  const double tweak[] = {0.0, std::ldexp(1.0, e - 60), -std::ldexp(1.0, e - 60), std::ldexp(1.0, e - 100),
+                          -std::ldexp(1.0, e - 79)};
+  *a = bits(static_cast<double>(s));
+  *b = bits(half + tweak[r.next() % 5]);
+}
+
+}  // namespace
+
+TEST_CASE("host-arithmetic shortcuts give exactly the results of the exact code") {
+  Rng r(0xE3A0E3A0);
+  const u32 fpscrs[] = {0, 4, 1, 2, 3, 4 | 3};
+  const Prec kPrecs[] = {Prec::Single, Prec::Double};
+  long long checked = 0;
+  for (int n = 0; n < 600000; ++n) {
+    u64 a = operand(r), b = operand(r), c = operand(r);
+    if (n % 8 == 0) midpoint_pair(r, &a, &b);
+    const u32 fs = fpscrs[n % 6 < 4 ? (n % 2 ? 0 : 1) : static_cast<std::size_t>(n % 6)];
+    for (Prec p : kPrecs) {
+      if (add(a, b, p, fs) != ref::add(a, b, p, fs)) FAIL_CHECK("add ", a, " ", b, " fpscr ", fs);
+      if (sub(a, b, p, fs) != ref::sub(a, b, p, fs)) FAIL_CHECK("sub ", a, " ", b, " fpscr ", fs);
+      const u64 c25 = p == Prec::Single ? force25(c) : c;
+      if (mul(a, c25, p, fs) != ref::mul(a, c25, p, fs)) FAIL_CHECK("mul ", a, " ", c25, " fpscr ", fs);
+      if (div(a, b, p, fs) != ref::div(a, b, p, fs)) FAIL_CHECK("div ", a, " ", b, " fpscr ", fs);
+      for (int k = 0; k < 4; ++k)
+        if (madd(a, c25, b, k & 1, k & 2, p, fs) != ref::madd(a, c25, b, k & 1, k & 2, p, fs))
+          FAIL_CHECK("madd ", a, " ", c25, " ", b, " forms ", k, " fpscr ", fs);
+      checked += 8;
+    }
+    if (round_to_single(a, fs) != ref::round_to_single(a, fs)) FAIL_CHECK("frsp ", a, " fpscr ", fs);
+    for (u32 type = 4; type < 8; ++type) {
+      const u32 scale = static_cast<u32>(r.next() % 64);
+      if (quantize(a, type, scale) != ref::quantize(a, type, scale)) FAIL_CHECK("quantize ", a, " ", type, " ", scale);
+    }
+    checked += 5;
+  }
+  // Every quantized load: all raw values of the integer types at every scale.
+  for (u32 type = 4; type < 8; ++type)
+    for (u32 scale = 0; scale < 64; ++scale)
+      for (u32 raw = 0; raw < (type == 4 || type == 6 ? 0x100u : 0x10000u); ++raw) {
+        if (dequantize(raw, type, scale) != ref::dequantize(raw, type, scale)) {
+          FAIL_CHECK("dequantize ", raw, " ", type, " ", scale);
+        }
+        ++checked;
+      }
+  MESSAGE("shortcut comparisons: ", checked);
+}
