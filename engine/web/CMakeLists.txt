@@ -27,8 +27,8 @@ add_executable(mvp-web-cache-sim wasm/tools/cache_sim.cpp)
 target_link_libraries(mvp-web-cache-sim PRIVATE engine_web_core)
 target_compile_options(mvp-web-cache-sim PRIVATE ${ENGINE_WARN})
 
-add_executable(mvp-web wasm/mvp_web.cpp wasm/web_disc.cpp wasm/net_web.cpp)
-target_link_libraries(mvp-web PRIVATE engine_wasm_host engine_audio engine_web_core engine_net)
+add_executable(mvp-web wasm/mvp_web.cpp wasm/web_disc.cpp wasm/net_web.cpp wasm/packs_web.cpp)
+target_link_libraries(mvp-web PRIVATE engine_wasm_host engine_audio engine_web_core engine_net engine_mods)
 target_compile_options(mvp-web PRIVATE ${ENGINE_WARN})
 if(TARGET engine_gfx_wgpu)
   target_link_libraries(mvp-web PRIVATE engine_gfx_wgpu)
@@ -51,6 +51,26 @@ target_link_options(mvp-web PRIVATE
   "-sEXPORTED_RUNTIME_METHODS=['UTF8ToString','HEAPU8','specialHTMLTargets']"
   "-sEXPORTED_FUNCTIONS=['_malloc','_free']")
 
+# The page's roster-pack checker (E6): engine/mods alone (no disc, no game), so the
+# Roster packs panel shows each pack's problems and hashes before a game starts,
+# with the same code the engine applies them with. Also loaded by the unit tests.
+add_executable(mvp-packs wasm/packs_web.cpp)
+target_link_libraries(mvp-packs PRIVATE engine_mods)
+target_compile_options(mvp-packs PRIVATE ${ENGINE_WARN})
+set_target_properties(mvp-packs PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${MVP_WEB_SITE})
+target_link_options(mvp-packs PRIVATE
+  -sENVIRONMENT=web,worker,node
+  -sNODERAWFS=0
+  -sEXIT_RUNTIME=0
+  -sMODULARIZE=1
+  -sEXPORT_ES6=1
+  -sEXPORT_NAME=createMvpPacks
+  -sSTACK_SIZE=1MB
+  -sINITIAL_MEMORY=16MB
+  "-sEXPORTED_RUNTIME_METHODS=['UTF8ToString','HEAPU8']"
+  "-sEXPORTED_FUNCTIONS=['_malloc','_free']")
+add_dependencies(mvp-web mvp-packs)
+
 # ---- The shell ----
 # tsc from engine/web/node_modules (pinned in package.json / package-lock.json;
 # installed with `npm ci` in engine/web, docs/engine/TOOLCHAIN.md).
@@ -71,7 +91,7 @@ if(EXISTS ${MVP_WEB_TSC} AND MVP_NODE)
   # resampler, the disc's server contract; node --test on the compiled modules.
   file(GLOB MVP_WEB_TESTS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.test.mjs)
   add_test(NAME test_web_shell COMMAND ${MVP_NODE} --test ${MVP_WEB_TESTS})
-  set_tests_properties(test_web_shell PROPERTIES ENVIRONMENT "MVP_WEB_SITE=${MVP_WEB_SITE}")
+  set_tests_properties(test_web_shell PROPERTIES ENVIRONMENT "MVP_WEB_SITE=${MVP_WEB_SITE};MVP_REPO_ROOT=${MVP_REPO_ROOT}")
 else()
   message(STATUS "web: TypeScript not installed in engine/web/node_modules (npm ci); the shell is not compiled")
   set(_mvp_web_js)

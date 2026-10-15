@@ -34,6 +34,9 @@
 //                     time produced it (keep it under build/; never commit it)
 //   --no-audio        no playback (default: SDL3 playback when a window is open)
 //   --audio-latency MS buffering between the mixer and the device (default 100)
+//   --pack PATH       (E6) a roster pack (directory or .zip), repeatable, in set order:
+//                     applied to the disc's tables and mounted on the virtual disc
+//                     before boot (docs/MODDING.md, mods/mount.h)
 //
 // Determinism: the renderer and the mixer only read guest state, audio and
 // window events never reach the guest (playback throttles the host, not the
@@ -66,6 +69,7 @@
 #include "gfx/wgpu/gpu.h"
 #include "gfx/wgpu/renderer.h"
 #include "gfx/wgpu/window.h"
+#include "mods/mount.h"
 #include "runtime/boot.h"
 #include "runtime/hle.h"
 #include "runtime/host_yield.h"
@@ -348,6 +352,7 @@ int main(int argc, char** argv) {
   int profile_top = 0;
   std::uint64_t profile_from = 0;
   std::string trace_entry, trace_file;
+  std::vector<std::string> packs;
   Play play;
   for (int k = 1; k < argc; ++k) {
     std::string a = argv[k];
@@ -381,13 +386,14 @@ int main(int argc, char** argv) {
     else if (a == "--audio-wav") audio_wav = next();
     else if (a == "--no-audio") no_audio = true;
     else if (a == "--audio-latency") audio_latency = static_cast<std::uint32_t>(std::strtoul(next().c_str(), nullptr, 10));
+    else if (a == "--pack") packs.push_back(next());
     else {
       std::fprintf(stderr,
                    "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
                    "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
                    "[--perf-every N] [--profile N [--profile-from F]] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
-                   "[--trace-to N] [--trace-peek HEX,...]] [--audio-wav FILE] [--no-audio] [--audio-latency MS]\n");
+                   "[--trace-to N] [--trace-peek HEX,...]] [--audio-wav FILE] [--no-audio] [--audio-latency MS] [--pack PATH]...\n");
       return 2;
     }
   }
@@ -403,6 +409,15 @@ int main(int argc, char** argv) {
   if (!in) {
     std::fprintf(stderr, "mvp-play: %s\n", err.c_str());
     return 77;
+  }
+  if (!packs.empty()) {  // E6: roster packs on the virtual disc, before boot
+    std::string log;
+    const auto mounted = mods::mount_pack_paths(in->disc, packs, &log);
+    std::printf("%s", log.c_str());
+    if (!mounted.ok) {
+      std::fprintf(stderr, "mvp-play: the roster packs cannot be used\n");
+      return 1;
+    }
   }
   std::string script_text = "mvp-input 1\n";
   if (!input_path.empty()) {

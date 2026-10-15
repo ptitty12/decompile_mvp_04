@@ -270,8 +270,14 @@ std::string incompatibility(const Hello& a, const Hello& b) {
   if (a.id.build != b.id.build) return "different engine builds (" + a.id.build + " vs " + b.id.build + ")";
   if (a.id.disc != b.id.disc)
     return "different disc identities (" + hex(a.id.disc.data(), 20) + " vs " + hex(b.id.disc.data(), 20) + ")";
-  if (a.id.packset != b.id.packset)
-    return "different pack sets (" + hex(a.id.packset.data(), 32) + " vs " + hex(b.id.packset.data(), 32) + ")";
+  if (a.id.packset != b.id.packset) {
+    // Named by player, not "here"/"there": the other side shows this text too (BYE).
+    const Hello& p1 = a.player == 1 ? a : b;
+    const Hello& p2 = a.player == 1 ? b : a;
+    return "the players chose different roster packs (player 1: pack set " + hex(p1.id.packset.data(), 32).substr(0, 16) +
+           ", player 2: " + hex(p2.id.packset.data(), 32).substr(0, 16) +
+           "); both must pick the same packs in the same order";
+  }
   if (a.id.cpi != b.id.cpi || a.id.di_latency_tb != b.id.di_latency_tb || a.id.di_tb_per_kib != b.id.di_tb_per_kib)
     return "different engine timing constants (CLK1/DVD1)";
   if (a.id.settings != b.id.settings) return "different settings (" + a.id.settings + " vs " + b.id.settings + ")";

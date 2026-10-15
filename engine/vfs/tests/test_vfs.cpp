@@ -9,6 +9,7 @@
 #include "common/bytes.h"
 #include "common/sha1.h"
 #include "vfs/disc_check.h"
+#include "vfs/overlay.h"
 
 using namespace mvp;
 using namespace mvp::vfs;
@@ -248,4 +249,54 @@ TEST_CASE("ELF section header parse") {
   CHECK((*secs)[1].addr == 0x80003100);
   CHECK((*secs)[2].name == ".shstrtab");
   CHECK_FALSE((*secs)[2].alloc());
+}
+
+TEST_CASE("mod overlay: replaced files come from memory, everything else from the image") {
+  auto raw = make_gcm(make_dol(), root_files(), sub_files());
+  std::string err;
+  auto disc = open_disc(std::make_unique<MemorySource>(raw), false, &err);
+  REQUIRE(disc);
+  const std::uint64_t base_size = disc->image->size();
+  const auto fst_before = disc->gcm.fst_bytes();
+  std::vector<u8> bigger(70000);
+  for (std::size_t i = 0; i < bigger.size(); ++i) bigger[i] = u8(i * 7 + 3);
+  std::vector<OverlayFile> files = {{"/SUB/big.DAT", bigger}, {"/a.bin", {9, 8, 7}}};
+  REQUIRE(mount_overlay(*disc, files, &err));
+  // The FST keeps its size and names; the two entries point past the image.
+  CHECK(disc->gcm.fst_bytes().size() == fst_before.size());
+  const FstEntry* big = disc->gcm.find("/sub/Big.dat");
+  const FstEntry* a = disc->gcm.find("/a.bin");
+  REQUIRE(big);
+  REQUIRE(a);
+  CHECK(big->offset >= base_size);
+  CHECK(big->offset % kOverlayAlign == 0);
+  CHECK(a->offset % kOverlayAlign == 0);
+  CHECK(a->offset >= big->offset + bigger.size());
+  CHECK(*disc->gcm.read_file(*disc->image, "/sub/Big.dat") == bigger);
+  CHECK(*disc->gcm.read_file(*disc->image, "/a.bin") == std::vector<u8>{9, 8, 7});
+  CHECK(disc->gcm.read_file(*disc->image, "/mvp.elf")->empty());
+  // Reads across the end of the image and between replaced files: zeros where nothing is.
+  std::vector<u8> span(static_cast<std::size_t>(disc->image->size()));
+  REQUIRE(disc->image->read(0, span.data(), span.size()));
+  CHECK(std::equal(raw.begin() + 0x2440 + std::ptrdiff_t(fst_before.size()), raw.end(),
+                   span.begin() + 0x2440 + std::ptrdiff_t(fst_before.size())));  // the rest of the image as it was
+  CHECK(std::equal(bigger.begin(), bigger.end(), span.begin() + big->offset));
+  CHECK(span[static_cast<std::size_t>(big->offset + bigger.size())] == 0);
+  // The image ends on a 32 KiB boundary: 32-byte reads that run past the last file work.
+  CHECK(disc->image->size() % kOverlayAlign == 0);
+  CHECK(disc->image->read((a->offset + 3) & ~31u, span.data(), 32));
+  CHECK_FALSE(disc->image->read(disc->image->size() - 1, span.data(), 2));
+  // The boot DOL is untouched; the same mount twice gives the same image.
+  auto again = open_disc(std::make_unique<MemorySource>(raw), false, &err);
+  REQUIRE(mount_overlay(*again, files, &err));
+  CHECK(again->gcm.fst_bytes() == disc->gcm.fst_bytes());
+  CHECK(again->image->size() == disc->image->size());
+  // Unknown or repeated paths are refused and leave the disc as it was.
+  auto third = open_disc(std::make_unique<MemorySource>(raw), false, &err);
+  CHECK_FALSE(mount_overlay(*third, {{"/nope.bin", {1}}}, &err));
+  CHECK(err.find("no file /nope.bin") != std::string::npos);
+  CHECK_FALSE(mount_overlay(*third, {{"/a.bin", {1}}, {"/A.BIN", {2}}}, &err));
+  CHECK(third->gcm.fst_bytes() == fst_before);
+  CHECK(third->image->size() == base_size);
+  CHECK_FALSE(mount_overlay(*third, {{"/sub", {1}}}, &err));  // a directory
 }

@@ -5,6 +5,7 @@
 
 #include "common/bytes.h"
 #include "common/sha1.h"
+#include "common/sha256.h"
 
 using namespace mvp;
 
@@ -55,4 +56,25 @@ TEST_CASE("sha1 split updates equal one update") {
     auto d = s.finish();
     CHECK(Sha1::hex(d) == whole);
   }
+}
+
+TEST_CASE("sha256 FIPS 180 vectors") {
+  CHECK(Sha256::of("", 0) == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+  CHECK(Sha256::of("abc", 3) == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+  std::string two = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+  CHECK(Sha256::of(two) == "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1");
+  Sha256 s;
+  std::vector<char> a(1000, 'a');
+  std::size_t left = 1000000, step = 1;
+  while (left) {
+    std::size_t n = step % a.size() + 1;
+    if (n > left) n = left;
+    s.update(a.data(), n);
+    left -= n;
+    step = step * 7 + 3;
+  }
+  CHECK(Sha256::hex(s.finish()) == "cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0");
+  // The empty pack set (docs/MODDING.md §10).
+  CHECK(Sha256::of(std::string("mvp2005-packset-hash/1\n{\"packs\":[]}")) ==
+        "f5e1298911db13adf522a1b34d4d4f9291b42fa7a77f63a5f6f07bc322dcc66e");
 }

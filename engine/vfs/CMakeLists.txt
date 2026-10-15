@@ -1,4 +1,4 @@
-add_library(engine_vfs STATIC source.cpp gcm.cpp dol.cpp disc_check.cpp)
+add_library(engine_vfs STATIC source.cpp gcm.cpp dol.cpp disc_check.cpp refpack.cpp big.cpp overlay.cpp)
 target_link_libraries(engine_vfs PUBLIC engine_common)
 target_compile_options(engine_vfs PRIVATE ${ENGINE_WARN})
 

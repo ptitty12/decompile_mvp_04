@@ -12,6 +12,7 @@
 //        [--disc PATH] [--script FILE] [--frames N] [--delay D] [--fast] [--headed]
 //        [--expect "guest: ..."] [--out DIR] [--tag NAME] [--timeout SECONDS] [--no-render]
 //        [--steady-from FRAME] [--netsim LATENCY,JITTER,LOSS]
+//        [--packs P1,P2,...] [--packs2 P1,...|none] [--expect-reject]
 //
 //   --expect   a guest line both pages must also match (e.g. the native
 //              `mvp-netplay solo` run of the same script, frames and delay)
@@ -19,6 +20,11 @@
 //              this frame on (default N/2: past the boot and the intro movie)
 //   --netsim   a slow network: each page delays its outgoing datagrams by LATENCY
 //              ms plus up to JITTER ms and drops a fraction LOSS (both directions)
+//   --packs    roster packs (E6) for both players: pack folders or .zip files, in set
+//              order, through each page's Roster packs panel before the disc
+//   --packs2   player 2's packs instead (`none`: no packs)
+//   --expect-reject  the two pack sets differ on purpose: pass when both pages are
+//              refused at the handshake with the roster-packs reason, and neither boots
 //
 // Writes netplay-BROWSER[-TAG].json to --out (default build/engine/web-check).
 // Exit status: 0 when both pages stopped at frame N with identical guest lines
@@ -26,7 +32,7 @@
 
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, firefox } from 'playwright';
@@ -53,6 +59,10 @@ const render = !flag('--no-render');
 const expect = opt('--expect', '');
 const netsim = opt('--netsim', '');  // "latency,jitter,loss" on each page's outgoing datagrams
 const tag = opt('--tag', '');
+const packsList = (v) => (v === 'none' ? [] : v.split(',').filter(Boolean).map((p) => resolve(p)));
+const packs1 = packsList(opt('--packs', ''));
+const packs2 = argv.includes('--packs2') ? packsList(opt('--packs2', '')) : packs1;
+const expectReject = flag('--expect-reject');
 const timeoutS = Number(opt('--timeout', '900'));
 const site = resolve(opt('--site', join(repo, 'build', 'engine', 'emscripten', 'web', 'site')));
 const serverMain = join(repo, 'engine', 'server', 'dist', 'src', 'main.js');
@@ -95,7 +105,8 @@ const launchers = {
   }),
 };
 
-const summary = { browser: browserName, browser2: browserName2, netsim: netsim || null, tag: tag || null, frames, delay, fast, render, script: scriptFile || null };
+const summary = { browser: browserName, browser2: browserName2, netsim: netsim || null, tag: tag || null, frames, delay, fast, render, script: scriptFile || null,
+                  packs: [packs1, packs2], expectReject };
 let rc = 1;
 const browsers = [];
 try {
@@ -134,12 +145,24 @@ try {
   summary.invite = invite.replace(/room=[a-z0-9]+/, 'room=<id>');
   await b.page.goto(`${invite}&${q}`);
   await b.page.waitForFunction(() => window.mvp?.net?.player === 2, null, { timeout: 15000 });
+  // Roster packs (E6), through each page's panel, before the disc starts the engine.
+  for (const [k, list] of [packs1, packs2].entries()) {
+    for (const [i, p] of list.entries()) {
+      await pages[k].page.setInputFiles(statSync(p).isDirectory() ? '#packs-folder' : '#packs-zip', p);
+      await pages[k].page.waitForFunction((n) => window.mvp.packs?.count === n && window.mvp.packs.report, i + 1,
+                                          { timeout: 30000 });
+    }
+  }
+  summary.packSets = await Promise.all(pages.map((p) => p.page.evaluate(() => window.mvp.packs?.setHash ?? null)));
+  console.log(`pack sets: ${summary.packSets.join(' / ')}`);
   const t0 = Date.now();
   await Promise.all(pages.map((p) => p.page.setInputFiles('#disc', disc)));
 
   const read = (p) => p.page.evaluate(() => {
     const s = window.mvp;
     return { phases: s.phases, firstFrameMs: s.firstFrameMs, stats: s.stats, stopped: s.stopped, error: s.error,
+             packs: s.packs?.mounted ? { ok: s.packs.mounted.ok, set: s.packs.mounted.set_hash,
+                                         result: s.packs.mounted.result_hash, files: s.packs.mounted.files } : null,
              net: s.net && { ...s.net, windows: undefined, diagnostic: s.net.diagnostic } , windows: s.net?.windows };
   });
   const deadline = t0 + timeoutS * 1000;
@@ -168,18 +191,25 @@ try {
     const done = states.every((st) => st.stopped && st.windows !== undefined);
     const failed = states.some((st) => st.error || (st.net?.status && ['desynced', 'rejected', 'disconnected'].includes(st.net.status.state)
                                                     && !st.stopped));
-    if (done || failed) break;
+    const bothRefused = states.every((st) => st.net?.status?.state === 'rejected' && st.error);
+    if (done || (failed && (!expectReject || bothRefused))) break;
     await new Promise((r) => setTimeout(r, 500));
   }
   // Let the final reports arrive.
   await new Promise((r) => setTimeout(r, 1500));
   states = await Promise.all(pages.map(read));
+  // Each page's last frame (game-derived: under build/ only).
+  if (render) {
+    for (const p of pages)
+      await p.page.locator('#screen').screenshot({ path: join(out, `${label}-${p.who}-final.png`) }).catch(() => undefined);
+  }
   summary.wallSeconds = (Date.now() - t0) / 1000;
   summary.timeline = timeline;
   summary.pages = states.map((st, k) => ({
     who: pages[k].who,
     phases: st.phases,
     error: st.error ?? null,
+    packs: st.packs,
     guestLine: st.stopped?.guestLine ?? null,
     why: st.stopped?.status.why ?? null,
     net: st.net ? { ...st.net, diagnostic: st.net.diagnostic ? st.net.diagnostic.slice(0, 4000) : undefined } : null,
@@ -221,6 +251,15 @@ try {
   summary.checks = { sameGuest, sameWindows, noDesync, stoppedAtN, matchesExpect, windows: summary.pages[0].windowsCount };
   if (expect) summary.expect = expect;
   rc = sameGuest && sameWindows && noDesync && stoppedAtN && matchesExpect ? 0 : 1;
+  if (expectReject) {
+    // Both refused at the handshake, for the roster packs, and neither booted.
+    const refused = [sa, sb].map((st) => st.net?.status?.state === 'rejected' &&
+                                         /different roster packs/.test(st.net.status.reason) && !st.stopped &&
+                                         st.phases?.boot === undefined);
+    summary.checks = { refused, reasons: [sa, sb].map((st) => st.net?.status?.reason ?? null),
+                       errors: [sa, sb].map((st) => st.error?.message ?? null) };
+    rc = refused.every(Boolean) ? 0 : 1;
+  }
 } catch (e) {
   summary.exception = String(e?.stack ?? e);
 } finally {
@@ -232,5 +271,6 @@ console.log(JSON.stringify({ checks: summary.checks, exception: summary.exceptio
                              pages: summary.pages?.map((p) => ({ who: p.who, guestLine: p.guestLine, why: p.why, error: p.error,
                                                                  net: p.net?.status, route: p.net?.route, transport: p.net?.transport })) },
                            null, 2));
-console.log(rc === 0 ? 'PASS: both browsers stayed in lockstep' : 'FAIL');
+console.log(rc === 0 ? (expectReject ? 'PASS: both browsers refused the game: different roster packs'
+                                     : 'PASS: both browsers stayed in lockstep') : 'FAIL');
 process.exit(rc);
