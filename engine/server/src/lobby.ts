@@ -88,11 +88,15 @@ export interface Client {
   ws: WebSocket;
   room: Room | null;
   player: 1 | 2 | 0;
+  /** The site's origin as this page reached it ("https://mvp.example.com"): invite links. */
+  origin: string;
+  /** Its host name: the ICE servers' "{host}". */
+  host: string;
 }
 
 export interface LobbyOptions {
-  invite: (room: string) => string;  // the invite link of a room
-  ice: () => IceServer[];
+  invite: (room: string, origin: string) => string;  // the invite link of a room
+  ice: (host: string) => IceServer[];
   idleMinutes: number;
   now?: () => number;
 }
@@ -115,10 +119,16 @@ export class Lobby {
     return c.room.players[c.player === 1 ? 1 : 0];
   }
 
-  /** A new connection: gets the ICE servers. */
-  connect(ws: WebSocket): Client {
-    const c: Client = { ws, room: null, player: 0 };
-    this.send(c, { t: 'welcome', v: 1, iceServers: this.opt.ice() });
+  /** A new connection from a page at `origin`: gets the ICE servers. */
+  connect(ws: WebSocket, origin: string): Client {
+    let host = '';
+    try {
+      host = new URL(origin).hostname;
+    } catch {
+      // no usable origin: "{host}" stays empty
+    }
+    const c: Client = { ws, room: null, player: 0, origin, host };
+    this.send(c, { t: 'welcome', v: 1, iceServers: this.opt.ice(host) });
     return c;
   }
 
@@ -163,7 +173,7 @@ export class Lobby {
         this.rooms.set(id, room);
         c.room = room;
         c.player = 1;
-        this.send(c, { t: 'room', room: id, player: 1, invite: this.opt.invite(id), delay: room.delay, peer: false });
+        this.send(c, { t: 'room', room: id, player: 1, invite: this.opt.invite(id, c.origin), delay: room.delay, peer: false });
         return;
       }
       case 'join': {
@@ -183,7 +193,7 @@ export class Lobby {
         c.room = room;
         c.player = slot === 0 ? 1 : 2;
         const other = this.other(c);
-        this.send(c, { t: 'room', room: room.id, player: c.player, invite: this.opt.invite(room.id), delay: room.delay, peer: !!other });
+        this.send(c, { t: 'room', room: room.id, player: c.player, invite: this.opt.invite(room.id, c.origin), delay: room.delay, peer: !!other });
         if (other) this.send(other, { t: 'peer', present: true });
         return;
       }

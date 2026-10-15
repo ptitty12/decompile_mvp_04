@@ -8,7 +8,8 @@
 //     "password": {                          // absent until setup is done
 //       "kdf": "scrypt", "N": 131072, "r": 8, "p": 1, "keylen": 64,
 //       "salt": "<base64>", "hash": "<base64>", "setAt": 1760400123456
-//     }
+//     },
+//     "resetToken": "<sha256 hex>"           // optional: the last reset request carried out (src/setup.ts)
 //   }
 //
 // Written atomically (a temporary file in the same directory, fsync, rename),
@@ -36,6 +37,8 @@ export interface StateFile {
   /** When the server first started without a password (ms since the epoch). */
   setupOpenedAt: number;
   password?: StoredPassword & { setAt: number };
+  /** SHA-256 (hex) of the last MVP_RESET_PASSWORD value carried out, so each value resets only once. */
+  resetToken?: string;
 }
 
 export class StateFileError extends Error {}
@@ -58,6 +61,10 @@ export function readState(path: string): StateFile | null {
       const rec = o.password as Record<string, unknown>;
       if (typeof rec.setAt !== 'number' || !Number.isFinite(rec.setAt)) throw new Error('password.setAt is not a time');
       out.password = { ...parseStoredPassword(rec), setAt: rec.setAt };
+    }
+    if (o.resetToken !== undefined) {
+      if (typeof o.resetToken !== 'string' || !/^[0-9a-f]{64}$/.test(o.resetToken)) throw new Error('resetToken is not a SHA-256');
+      out.resetToken = o.resetToken;
     }
     return out;
   } catch (e) {
