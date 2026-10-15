@@ -286,6 +286,16 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   Safari itself is unmeasured (needs a Mac). | Exit of ROADMAP E2. | merge a6239996 (E2b plus E3b, 34/34 native and 31/31 Node tests)
 
+- 2026-10-14 | **E2c: browser client** (lead, under the owner's delegation; docs/engine/E2C_LOG.md).
+  - Browser audio goes through an AudioWorklet fed over a MessagePort, not a SharedArrayBuffer, so no cross-origin isolation headers are needed. The buffer target is 60 ms (sound trails the picture by 80-115 ms).
+  - The gamepad maps to the GameCube pad and is sampled only at the frame poll.
+  - The page loads the disc from `/config.json` and `/api/disc/image` on the private deployment.
+  - The translation is cached per DOL and engine build, cutting start-up from 0.7-1.1 s to 0.3-0.4 s.
+  - The deployment must use HTTPS: WebGPU, AudioWorklet and OPFS need a secure context.
+  - **Lead decision:** the disc blocks the browser fetched from the private server may be cached in that player's own browser storage, so later boots are fast. This stays on the player's machine (the owner and invited players own the game). The server keeps sending `no-store` so no intermediary caches it.
+
+  | | merge of engine/e2c
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
