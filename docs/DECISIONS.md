@@ -371,6 +371,17 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/clk2
 
+- 2026-10-15 | **P2: smooth play in the browser** (lead, under the owner's delegation; docs/engine/P2_LOG.md).
+  - **P2-T1:** a threaded engine (`mvp-web-mt`, pthreads and shared memory). A render thread owns WebGPU and runs the GX processor and the renderer, fed by a 16 MiB command ring. When the page is not cross-origin isolated (or `threads=0`), the single-threaded engine is used.
+  - **P2-T2, exactness:** `gfx::GpReads` marks the guest memory the renderer will read, per 64 bytes, and guest writes wait only where it hasn't finished reading. Fences alone were not exact.
+  - **P2-T3, presentation:** at most one present per display refresh, sent to the page as an ImageBitmap.
+  - **P2-H1:** the server sends COOP, COEP `require-corp` and CORP `same-origin`. The first deploy compiles the engine twice (20-40 minutes).
+  - **Measured in Chrome, in a match (CLK2 engine):** 1.00× speed; 11.4 ms per field on the emulation thread (was 14.7); composited p95 about 20 ms (was 38-50); 0.5-0.8% of frames over 25 ms (was 9-13%); 57-59 new frames shown per second.
+  - Exactness: renderer digests are identical threaded vs single-threaded (0 of 20,600 fields differ), guest lines equal native, and netplay lockstep holds.
+  - Also fixed: the tall EFB copy at 0x01797180.
+
+  | | merge of engine/p2-thread
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
