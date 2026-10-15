@@ -392,6 +392,14 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/q3-pad
 
+- 2026-10-15 | **Q1: menu flashing fixed; picture quality** (lead, under the owner's delegation; docs/engine/Q1_LOG.md).
+  - **Q1-G1:** the renderer reads guest memory as the CPU cache has written it back. Lines flushed with the SDK's DC* calls are read from a snapshot until the next field; DMA and the write buffer end the snapshot.
+    - The cause: EA's sprite code writes the next sprite's vertices before waiting for the current draw. On console those writes are still in the cache.
+    - Menu flicker went to 0 (title 130 → 0, main menu 238 → 0), and the wrong logos and grey boxes in play are fixed. Guest state is unchanged.
+  - **Q1-G2:** 4:3 display; internal resolution 1-3× (Auto, chosen by canvas size); area or sharp-bilinear final scaling; the game's texture LOD bias applied.
+
+  | | merge of engine/q1-visual
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
