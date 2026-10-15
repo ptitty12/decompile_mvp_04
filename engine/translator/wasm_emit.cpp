@@ -2553,17 +2553,17 @@ void swap32_from_local(Fn& h, u32 local) {  // stack: x (also in `local`) -> bsw
 }
 
 // P2: before a store to guest memory, whether the render thread has still to
-// read any of it (env.gp_pages, ppc::g_gp_pages: per 4 KiB of physical memory,
-// nonzero while an issued GX command reads it); if so rt.gp_wait(cpu, first,
-// last) waits for it. `first` and `last` push the first and the last byte's
-// address.
+// read any of it (env.gp_pages, ppc::g_gp_pages: per 2^WasmGpLayout::kShift
+// bytes of physical memory, nonzero while an issued GX command reads them); if
+// so rt.gp_wait(cpu, first, last) waits for it. `first` and `last` push the
+// first and the last byte's address.
 void gp_check(Fn& h, const std::function<void()>& first, const std::function<void()>& last) {
   auto entry = [&](const std::function<void()>& addr) {
     h.global(gGpPages);
     addr();
-    h.i32c(12);
+    h.i32c(WasmGpLayout::kShift);
     h.op(op::i32_shr_u);
-    h.i32c(0x1FFF);
+    h.i32c(WasmGpLayout::kMask);
     h.op(op::i32_and);
     h.i32c(2);
     h.op(op::i32_shl);

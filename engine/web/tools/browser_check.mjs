@@ -440,7 +440,8 @@ async function runOnce(context, run) {
       windows.push({ field: st.fields, ...state.stats.window,
                      audio: w ? { fill: w.fill, underruns: w.underruns, skipped: w.skipped } : undefined,
                      // P2, threaded: the render thread's working time and the emulation's fence waits so far (ms)
-                     renderBusyMs: st.render?.busy_ms, fenceMs: st.thread?.fence_ms, fences: st.thread?.fences });
+                     renderBusyMs: st.render?.busy_ms, fenceMs: st.thread?.fence_ms, fences: st.thread?.fences,
+                     writeWaitMs: st.thread?.write_wait_ms, writeWaits: st.thread?.write_waits });
     }
     const field = state.stats?.status.fields ?? 0;
     lastField = field;

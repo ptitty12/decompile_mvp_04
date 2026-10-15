@@ -32,6 +32,8 @@ static_assert(offsetof(WgpState, buf) == L::kBuf && offsetof(WgpState, n) == L::
                   offsetof(WgpState, fast) == L::kFast && offsetof(WgpState, last_read) == L::kLastRead &&
                   offsetof(WgpState, fast_stores) == L::kFastStores,
               "the translator's view of WgpState");
+static_assert(ppc::kGpShift == xlat::WasmGpLayout::kShift && ppc::kGpEntries - 1 == xlat::WasmGpLayout::kMask,
+              "the translator's view of ppc::g_gp_pages");
 
 // Development (E2d): MVP_WASM_EXEC_STATS=1 counts rt.exec calls by opcode (the
 // instructions, or slow paths, the module left to the interpreter's semantics)

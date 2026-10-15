@@ -9,20 +9,23 @@ namespace mvp::ppc {
 [[noreturn]] void fault_unmapped(Cpu& c, u32 ea, bool write, int size);
 
 // P2 (the browser's threaded engine): guest memory a GX command already issued
-// will still read on the render thread, per 4 KiB of physical memory (entry
-// (ea >> 12) & 0x1FFF; nonzero: pending). A write there first waits for the
+// will still read on the render thread, per 2^kGpShift bytes of the 32 MiB
+// physical space (entry gp_entry(ea); nonzero: pending). A write there first waits for the
 // render thread (gp_write_wait, through the hook the runtime sets), so the
 // render thread reads what the command saw. The translated module checks its
 // own stores (env.gp_pages); these are the semantics library's and the
 // hardware model's. Natively nothing is ever pending.
-extern std::uint32_t g_gp_pages[8192];
+constexpr u32 kGpShift = 6;  // the translated module's checks use the same (xlat::WasmGpLayout)
+constexpr u32 kGpEntries = 1u << (25 - kGpShift);
+inline u32 gp_entry(u32 ea) { return (ea >> kGpShift) & (kGpEntries - 1); }
+extern std::uint32_t g_gp_pages[kGpEntries];
 extern void (*g_gp_wait_hook)(u32 first, u32 last);
 inline void gp_check(u32 ea, u32 n) {
 #ifdef __EMSCRIPTEN__
   if (!n) return;
   const u32 last = ea + n - 1;
-  if (n <= 4096) {
-    if (!(g_gp_pages[(ea >> 12) & 0x1FFF] | g_gp_pages[(last >> 12) & 0x1FFF])) return;
+  if (n <= (1u << kGpShift)) {
+    if (!(g_gp_pages[gp_entry(ea)] | g_gp_pages[gp_entry(last)])) return;
   }
   if (g_gp_wait_hook) g_gp_wait_hook(ea, last);
 #else

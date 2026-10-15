@@ -106,6 +106,13 @@ struct WasmWgpLayout {
   static constexpr std::uint32_t kBuf = 0, kN = 32, kFast = 36, kLastRead = 40, kFastStores = 48;
 };
 
+// P2: env.gp_pages (ppc::g_gp_pages): one 32-bit entry per 2^kShift bytes of
+// the 32 MiB physical space, nonzero while the render thread has still to read
+// them (the runtime checks that it agrees: ppc/mem_access.h).
+struct WasmGpLayout {
+  static constexpr std::uint32_t kShift = 6, kMask = (1u << (25 - kShift)) - 1;
+};
+
 // Trap codes passed to rt.trap.
 enum class WasmTrap : std::uint32_t {
   InvalidInstruction = 0,

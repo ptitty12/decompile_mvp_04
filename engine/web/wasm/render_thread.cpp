@@ -173,10 +173,11 @@ Shared* S = nullptr;
 
 // Emulation thread: the command being appended reads [addr, addr + size).
 void mark(u32 addr, u32 size) {
-  const u32 first = addr >> 12, last = (addr + size - 1) >> 12;
+  const u32 first = addr >> ppc::kGpShift, last = (addr + size - 1) >> ppc::kGpShift;
   for (u32 p = first; p <= last; ++p) {
-    std::uint32_t& e = ppc::g_gp_pages[p & 0x1FFF];
-    if (!e) S->marked.push_back(p & 0x1FFF);
+    const u32 i = p & (ppc::kGpEntries - 1);
+    std::uint32_t& e = ppc::g_gp_pages[i];
+    if (!e) S->marked.push_back(i);
     e = S->mark_pos + 1;
   }
 }
@@ -186,8 +187,8 @@ void mark(u32 addr, u32 size) {
 // finished every command that reads those pages.
 void gp_wait(u32 first, u32 last) {
   ++S->write_checks;
-  for (u32 p = first >> 12; p <= (last >> 12); ++p) {
-    std::uint32_t& e = ppc::g_gp_pages[p & 0x1FFF];
+  for (u32 p = first >> ppc::kGpShift; p <= (last >> ppc::kGpShift); ++p) {
+    std::uint32_t& e = ppc::g_gp_pages[p & (ppc::kGpEntries - 1)];
     if (!e) continue;
     const u32 pos = e - 1;
     if (!S->ring.finished(pos)) {
