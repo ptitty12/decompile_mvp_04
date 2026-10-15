@@ -382,6 +382,16 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/p2-thread
 
+- 2026-10-15 | **Q3: controller support in the browser** (lead, under the owner's delegation; docs/engine/Q3_LOG.md, decisions Q3-C1..C5).
+  - Pads: standard-mapping pads (Xbox, DualShock 4, DualSense); Switch Pro with Nintendo button labels; an Xbox raw profile; GameCube adapters through a guided setup (no layout guessed without hardware).
+  - Sticks get a radial dead zone and the octagonal gate; triggers are analog with a click threshold.
+  - The Controls panel offers per-port assignment, press-to-bind for pads and keyboard, a live test, and per-model mappings stored in the browser. A pad claims a port on its first press.
+  - Online, the local pad drives the player's own port, and the lobby shows each player's controller readiness.
+  - Input still reaches the guest only at the frame poll. `?inputLog=1` replays prove it (live run equals its replay).
+  - Not yet: a real-controller test, in-game rumble (a `PADControlMotor` hook in hle.cpp), WebHID for the official GameCube adapter.
+
+  | | merge of engine/q3-pad
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:

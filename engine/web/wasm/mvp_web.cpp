@@ -168,6 +168,48 @@ struct LiveInput : InputSource {
   }
 };
 
+// The inputs the guest consumed, as an mvp-input script (runtime/input.h), for
+// tests (Q3): one line per change, at the frame poll that first saw it, against
+// a start of "port 1 connected, neutral". A live run (a gamepad, the keyboard, a
+// netplay peer's ports too) can then be replayed from its own log and must end in
+// the same guest state: host input reaches the guest only through the frame
+// poll. Host-side only; never read by the guest.
+struct InputLog {
+  bool on = false;
+  FrameInput prev = neutral_input(1);
+  std::string text = "mvp-input 1\n";
+  void record(std::uint64_t frame, const FrameInput& in) {
+    if (!on || text.size() > (1u << 20)) return;
+    static const struct { const char* name; u16 bit; } kBits[] = {
+        {"LEFT", pad::kLeft}, {"RIGHT", pad::kRight}, {"DOWN", pad::kDown}, {"UP", pad::kUp}, {"Z", pad::kZ},
+        {"R", pad::kR},       {"L", pad::kL},         {"A", pad::kA},       {"B", pad::kB},   {"X", pad::kX},
+        {"Y", pad::kY},       {"START", pad::kStart}};
+    for (std::size_t k = 0; k < kPorts; ++k) {
+      const PadState& a = prev.pad[k];
+      const PadState& b = in.pad[k];
+      if (a == b) continue;
+      const std::string head = std::to_string(frame) + " " + std::to_string(k + 1) + " ";
+      if (a.connected != b.connected) text += head + (b.connected ? "connect\n" : "disconnect\n");
+      if (!b.connected) continue;  // an unplugged pad reads as zeros: nothing more to say
+      std::string press, release;
+      for (const auto& e : kBits) {
+        if ((b.buttons & e.bit) && !(a.buttons & e.bit)) press += std::string(" ") + e.name;
+        if (!(b.buttons & e.bit) && (a.buttons & e.bit)) release += std::string(" ") + e.name;
+      }
+      if (!press.empty()) text += head + "press" + press + "\n";
+      if (!release.empty()) text += head + "release" + release + "\n";
+      auto pair = [&](const char* cmd, int x, int y, int ox, int oy) {
+        if (x != ox || y != oy) text += head + cmd + " " + std::to_string(x) + " " + std::to_string(y) + "\n";
+      };
+      pair("stick", b.stick_x, b.stick_y, a.stick_x, a.stick_y);
+      pair("cstick", b.substick_x, b.substick_y, a.substick_x, a.substick_y);
+      pair("trigger", b.trigger_l, b.trigger_r, a.trigger_l, a.trigger_r);
+      pair("analog", b.analog_a, b.analog_b, a.analog_a, a.analog_b);
+    }
+    prev = in;
+  }
+};
+
 struct Engine;
 
 // The guest's DVD reads as the host serves them (P1): every read the drive
@@ -235,6 +277,7 @@ struct Engine {
   std::unique_ptr<InputQueue> input;
   std::unique_ptr<InputScript> script;
   LiveInput live;
+  InputLog input_log;  // development: mvp_input_log
   Observer obs;
   std::uint64_t stop_fields = ~0ull, stop_frames = ~0ull;
   std::uint64_t frames = 0;
@@ -303,6 +346,7 @@ void Observer::vi_field(std::uint64_t field, std::uint32_t xfb) {
 
 void frame_hook(ppc::Cpu&, std::uint64_t frame) {
   g.frames = frame;
+  if (g.input_log.on) g.input_log.record(frame, g.input->current());
   if (frame >= g.stop_frames) throw StopRun{"ran " + std::to_string(frame) + " frames"};
   if (web::net_active()) web::net_after_poll(frame);  // netplay (E5): state hash, early yield
 }
@@ -869,6 +913,14 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_digest_take() {
   }
 #endif
   g_text = g.rs.digest_take();
+  return g_text.c_str();
+}
+
+// Development (Q3): record the inputs the guest consumes (InputLog); mvp_input_log()
+// returns them as an mvp-input script. Enable before mvp_boot or any time after.
+EMSCRIPTEN_KEEPALIVE void mvp_input_log_enable() { g.input_log.on = true; }
+EMSCRIPTEN_KEEPALIVE const char* mvp_input_log() {
+  g_text = g.input_log.text;
   return g_text.c_str();
 }
 

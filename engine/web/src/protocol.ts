@@ -105,6 +105,7 @@ export interface RunOptions {
   fastUntil?: number;  // development (P1): run unpaced up to this VI field, then paced
   pacing?: 'chase' | 'raf';  // P1: 'raf' = batches of up to 4 fields per animation frame (the earlier loop)
   ioLog?: boolean;     // development: log every guest DVD read with its host timing (P1)
+  inputLog?: boolean;  // development (Q3): the inputs the guest consumed, as an mvp-input script, in `stopped`
   threads?: boolean;   // P2: false = the inline renderer even where the threaded engine could run
   digest?: boolean;    // development (P2): the renderer digest per VI field, in each stats window's `digest`
   digestDetail?: number[];  // development (P2): VI fields [from, to] whose draws get a digest line each
@@ -195,7 +196,7 @@ export type FromWorker =
       window: { fields: number; ms: number; wallMs: number; trace?: unknown[]; digest?: string;
                 saturatedMs?: number;  // Q2: wall ms so far with the machine saturated (one-field batches)
                 fieldCost?: number } }  // ... the smoothed host time per field, as a share of a field
-  | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string; ioLog?: string }
+  | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string; ioLog?: string; inputLog?: string }
   | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
   | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string };
 

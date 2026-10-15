@@ -20,6 +20,7 @@
 //   discBlock=KIB, discBlocks=N, discRun=N, discAhead=N   the server image's block cache
 //   traceDisc=1     record the picked image's reads (offsets and sizes) for tuning that cache
 //   ioLog=1         log every guest DVD read with its host timing (P1 measurements)
+//   inputLog=1      at the stop, report the inputs the guest consumed as an mvp-input script (Q3 tests)
 //   store=0         read the server's image over the network instead of keeping it in this browser
 //   storeSpare=MB   free space the download must leave (tests of the storage-quota error)
 //   threads=0       the single-threaded engine even where the page is cross-origin isolated (P2)
@@ -34,7 +35,7 @@
 import { AudioOut, type AudioState } from './audio.js';
 import { findServerDisc } from './disc.js';
 import { DownloadError, canStore, downloadDisc, progressText, storedDisc, type DiscOffer } from './disc-store.js';
-import { GamepadPanel } from './gamepad-ui.js';
+import { ControlsPanel } from './controls.js';
 import { HostInput } from './input.js';
 import { Online, type OnlineState } from './netplay.js';
 import { PackPanel, type PacksState } from './packs.js';
@@ -66,6 +67,7 @@ interface PageState {
   stats?: { status: Status; window: { fields: number; ms: number; wallMs: number } };
   stopped?: { status: Status; guestLine: string };
   discTrace?: string;
+  inputLog?: string;           // the inputs the guest consumed, as an mvp-input script (inputLog=1, Q3)
   ioLog?: string;              // every guest DVD read: "field at_ms offset size ms" lines (ioLog=1)
   digest?: string;             // P2: the renderer digest, "field digest draws" lines (digest=1)
   error?: { stage: string; message: string };
@@ -74,7 +76,9 @@ interface PageState {
   audio?: AudioState;
   audioAttachedAtField?: number;
   paused: boolean;
-  pad?: Pad;
+  pad?: Pad;                   // port 0 (player 1, or the online player)
+  pads?: Pad[];                // every port the page drives, as last sent (Q3)
+  controls?: () => Record<string, unknown>;  // the Controls panel's state (Q3)
   log: string[];
   audioProbe: () => { rms: number; peak: number } | null;
   net?: OnlineState;  // online play (E5, netplay.ts)
@@ -114,6 +118,7 @@ const options: RunOptions = {
   fastUntil: Number(params.get('fastUntil') ?? 0) || 0,
   pacing: params.get('pacing') === 'raf' ? 'raf' : 'chase',
   ioLog: params.get('ioLog') === '1',
+  inputLog: params.get('inputLog') === '1',
   threads: params.get('threads') !== '0',
   digest: params.get('digest') === '1',
   digestDetail: params.has('digestDetail') ? (params.get('digestDetail') ?? '').split('-').map(Number) : undefined,
@@ -228,11 +233,28 @@ function updateHint(): void {
 
 let worker: Worker | null = null;
 let pendingAudioPort: MessagePort | null = null;
-const input = new HostInput(window, (pad: Pad) => {
-  state.pad = pad;
-  send({ type: 'pad', port: 0, pad });
+// Controllers and keyboard (Q3): ports 0 and 1 are players 1 and 2 (online: only this page's player, port 0).
+const input = new HostInput(window, (pad: Pad, port: number) => {
+  if (port === 0) state.pad = pad;
+  (state.pads ??= [])[port] = pad;
+  send({ type: 'pad', port, pad });
 });
-new GamepadPanel($<HTMLElement>('gamepad'), input);
+const controls = new ControlsPanel($<HTMLElement>('controls'), input, {
+  chip: document.getElementById('pad-chip'), details: document.getElementById('controls-details') as HTMLDetailsElement | null,
+  summary: document.getElementById('controls-summary'),
+});
+state.controls = () => controls.snapshot();
+if (online) {
+  online.onChange = () => controls.setOnline(online.state.player ?? null);
+  controls.onChange = () => online.setController(controls.localController());
+}
+document.getElementById('pad-chip')?.addEventListener('click', () => {
+  const d = document.getElementById('controls-details') as HTMLDetailsElement | null;
+  if (d) {
+    d.open = true;
+    d.scrollIntoView({ block: 'nearest' });
+  }
+});
 
 function send(msg: ToWorker, transfer: Transferable[] = []): void {
   worker?.postMessage(msg, transfer);
@@ -323,6 +345,7 @@ function onWorker(msg: FromWorker): void {
       state.stopped = { status: msg.status, guestLine: msg.guestLine };
       state.discTrace = msg.discTrace;
       state.ioLog = msg.ioLog;
+      state.inputLog = msg.inputLog;
       setStatus(`Stopped: ${msg.status.why ?? ''}`);
       log(msg.guestLine);
       break;
@@ -468,6 +491,7 @@ const vsync = (self as unknown as { crossOriginIsolated?: boolean }).crossOrigin
 
 function tick(now: number): void {
   input.poll();
+  if (!startBox.hidden && !input.capture && input.manager.confirmPressed()) playBtn.click();  // "press A to play" with a controller
   if (vsync) {
     Atomics.add(vsync, 0, 1);
     Atomics.notify(vsync, 0);

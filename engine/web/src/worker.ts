@@ -450,6 +450,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   t = performance.now();
   post({ type: 'progress', text: 'Booting', step: 5, steps: 5 });
   if (options.ioLog) M._mvp_io_log_enable();
+  if (options.inputLog) M._mvp_input_log_enable();
   const script = new TextEncoder().encode(options.script);
   const ok = withBytes(script, (p, n) => M!._mvp_boot(p, options.script ? n : 0, options.stopFields,
                                                       options.stopFrames));
@@ -516,7 +517,8 @@ function afterRun(ran: number, ms: number): boolean {
     }
     const discTrace = opts?.traceDisc ? cstr(M!._mvp_disc_trace()) : undefined;
     const ioLog = opts?.ioLog ? cstr(M!._mvp_io_log()) : undefined;
-    post({ type: 'stopped', status: status(), guestLine: cstr(M!._mvp_guest_line()), discTrace, ioLog });
+    const inputLog = opts?.inputLog ? cstr(M!._mvp_input_log()) : undefined;
+    post({ type: 'stopped', status: status(), guestLine: cstr(M!._mvp_guest_line()), discTrace, ioLog, inputLog });
     if (net) reportNet(true);
     return false;
   }
