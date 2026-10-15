@@ -9,6 +9,7 @@
 //                        (exact state at an MMIO stop: lockstep)
 //   MVP_WASM_HELPERS=1   every non-branch instruction through the runtime
 //   MVP_WASM_OUT=FILE    also write the module (only ever under build/)
+//   MVP_WASM_NAMES=1     add a name section (function names for profilers)
 #include <emscripten.h>
 
 #include <chrono>
@@ -52,6 +53,7 @@ void mvp_register_game() {
     opt.hle.push_back({table[k].name, table[k].address, static_cast<int>(k), table[k].kind == rt::HleKind::Before});
   opt.precise_io = env_on("MVP_WASM_PRECISE");
   opt.inline_ops = !env_on("MVP_WASM_HELPERS");
+  opt.names = env_on("MVP_WASM_NAMES");
   auto t2 = std::chrono::steady_clock::now();
   xlat::WasmModule mod;
   if (!xlat::emit_wasm(cfg, opt, &mod, &err)) {

@@ -17,9 +17,15 @@
 //   which locals are spilled before a call, a helper or a return ("dirty") and
 //   which are reloaded after one ("live"), using ppc::effects();
 // - instructions the emitter knows (integer ALU, compares, rotates, CR logic,
-//   loads and stores, branches) are inline; every other one calls the runtime's
-//   semantics (rt.exec: the interpreter's execute_plain), with only its own
-//   registers spilled and reloaded;
+//   loads and stores, branches, SPR moves) are inline; every other one calls the
+//   runtime's semantics (rt.exec: the interpreter's execute_plain), with only its
+//   own registers spilled and reloaded;
+// - floating point (E2d): FPRs stay in the Cpu struct as raw bits; arithmetic,
+//   compares, conversions and paired singles have an inline fast path on IEEE
+//   f64 arithmetic, used only where it provably equals the exact model
+//   (ppc/fp.h), else the whole instruction goes to rt.exec (rules: wasm_emit.cpp,
+//   "floating point"); quantized loads and stores, lmw and stmw are in-module
+//   helpers with a one-page fast path;
 // - control flow: one block per label, nested so forward branches are direct
 //   `br`s; backward branches, jump tables, resume labels and secondary entries
 //   go through a loop with a br_table dispatcher;
@@ -48,6 +54,13 @@ struct WasmEmitOptions {
   // Run every non-branch instruction through the runtime (rt.exec): for tests
   // of the helper path and for measuring what inlining buys.
   bool inline_ops = true;
+  // Add a "name" custom section (function names: the guest symbol, the helpers
+  // and imports), for profilers. Off by default: it only costs bytes.
+  bool names = false;
+  // Check MSR[FP] before FPU instructions (floating-point unavailable, E3a): the
+  // first of each block, as the C++ emitter does. Off only for tests that compare
+  // single instructions with execute_plain(), which has no such check.
+  bool fpu_checks = true;
 };
 
 // A guest address and the table slot (relative to the module's table base) of

@@ -3,6 +3,8 @@
 #include <emscripten.h>
 
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <unordered_map>
 #include <vector>
 
@@ -19,6 +21,25 @@ using ppc::Cpu;
 namespace {
 
 std::unordered_map<u32, u32> g_resume_index;  // resume label -> its function's dispatcher index
+
+// Development (E2d): MVP_WASM_EXEC_STATS=1 counts rt.exec calls by opcode (the
+// instructions, or slow paths, the module left to the interpreter's semantics)
+// and prints them at exit.
+std::uint64_t* g_exec_counts = nullptr;
+void print_exec_counts() {
+  std::uint64_t total = 0;
+  for (std::size_t k = 0; k < static_cast<std::size_t>(ppc::Op::count); ++k) total += g_exec_counts[k];
+  std::printf("rt.exec: %llu calls", static_cast<unsigned long long>(total));
+  for (int n = 0; n < 24; ++n) {
+    std::size_t best = 0;
+    for (std::size_t k = 1; k < static_cast<std::size_t>(ppc::Op::count); ++k)
+      if (g_exec_counts[k] > g_exec_counts[best]) best = k;
+    if (!g_exec_counts[best]) break;
+    std::printf(" %s %llu", ppc::op_name(static_cast<ppc::Op>(best)), static_cast<unsigned long long>(g_exec_counts[best]));
+    g_exec_counts[best] = 0;
+  }
+  std::printf("\n");
+}
 
 GuestFn as_fn(u32 table_index) { return reinterpret_cast<GuestFn>(static_cast<std::uintptr_t>(table_index)); }
 
@@ -64,7 +85,9 @@ EMSCRIPTEN_KEEPALIVE void mvp_rt_write32(Cpu* c, u32 ea, u32 v, u32 pc, std::uin
 EMSCRIPTEN_KEEPALIVE void mvp_rt_exec(Cpu* c, u32 w, u32 pc, std::uint64_t t) {
   c->pc = pc;
   c->ticks = t;
-  ppc::execute_plain(*c, ppc::decode(w), ppc::Insn{w});
+  ppc::Op op = ppc::decode(w);
+  if (g_exec_counts) ++g_exec_counts[static_cast<std::size_t>(op)];
+  ppc::execute_plain(*c, op, ppc::Insn{w});
 }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_call_indirect(Cpu* c, u32 target) { call_indirect(*c, target); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_absolute_call(Cpu* c, u32 target) { absolute_call(*c, target); }
@@ -82,6 +105,7 @@ EMSCRIPTEN_KEEPALIVE void mvp_rt_hle_before(Cpu* c, u32 index) { hle_before(*c, 
 EMSCRIPTEN_KEEPALIVE void mvp_rt_trap(Cpu* c, u32 a, u32 code) { trap(*c, a, xlat::wasm_trap_text(code)); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_rfi(Cpu* c) { ppc::sem::rfi(*c); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_system_call(Cpu* c) { c->hooks->system_call(*c); }
+EMSCRIPTEN_KEEPALIVE void mvp_rt_fp_unavailable(Cpu* c, u32 at) { fp_unavailable(*c, at); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_tw(Cpu* c, u32 w, u32 pc) {
   ppc::Insn i{w};
   bool is_tw = ppc::decode(w) == ppc::Op::tw;
@@ -98,7 +122,7 @@ EM_JS(int, mvp_js_instantiate,
       {
         var names = ["on_entry", "safepoint", "read8", "read16", "read32", "write8", "write16", "write32", "exec",
                      "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap", "rfi",
-                     "system_call", "tw"];
+                     "system_call", "tw", "fp_unavailable"];
         try {
           var table = (typeof wasmTable != 'undefined') ? wasmTable : __indirect_function_table;
           var t0 = performance.now();
@@ -162,6 +186,10 @@ bool load_wasm_module(const xlat::WasmModule& m, WasmLoadStats* stats, std::stri
   set_hle_sites(sites.data(), sites.size());
   g_resume_index.clear();
   for (const auto& [a, k] : m.resume_index) g_resume_index[a] = k;
+  if (const char* v = std::getenv("MVP_WASM_EXEC_STATS"); v && *v == '1' && !g_exec_counts) {
+    g_exec_counts = new std::uint64_t[static_cast<std::size_t>(ppc::Op::count)]();
+    std::atexit(print_exec_counts);
+  }
   if (stats) {
     stats->compile_ms = times[0];
     stats->instantiate_ms = times[1];
