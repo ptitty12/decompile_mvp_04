@@ -42,6 +42,12 @@ struct FixedHooks : ppc::Hooks {
   void msr_changed(ppc::Cpu&, u32) override {}
   void icbi(ppc::Cpu&, u32) override {}
   void system_call(ppc::Cpu& c) override;
+  // Floating-point unavailable: taken architecturally (the reference interpreter
+  // continues in the handler) or, with `run_handlers` (the native machine), run to
+  // its rfi as the runtime's SystemHooks do.
+  void exception(ppc::Cpu& c, u32 vector) override;
+  bool run_handlers = false;
+  std::uint64_t exceptions = 0;
 };
 
 struct LockstepResult {

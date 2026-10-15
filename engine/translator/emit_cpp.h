@@ -5,7 +5,9 @@
 // with the return-address check of runtime/native.h, jump tables are switches.
 // Every call's return address and every loop back edge is a resume label: an
 // unwind may continue there in a live frame, and the dispatcher may re-enter the
-// function's body there (runtime/native.h, E0c).
+// function's body there (runtime/native.h, E0c). Every FPU instruction first
+// checks MSR[FP] and takes the floating-point unavailable exception when it is
+// clear (rt::fp_unavailable, E3a).
 //
 // The output is derived from the player's disc: it is written under build/ only.
 #pragma once
@@ -36,6 +38,7 @@ struct EmitOptions {
 
 struct EmitStats {
   std::size_t functions = 0, entries = 0, instructions = 0, bytes = 0, hle_stubs = 0, resume_labels = 0;
+  std::size_t fpu_checks = 0;   // FPU instructions checked for MSR[FP] (floating-point unavailable)
   std::vector<int> hle_matched;  // HleSpec::index of every spec that found its function
 };
 

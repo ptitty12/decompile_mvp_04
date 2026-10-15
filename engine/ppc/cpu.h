@@ -83,6 +83,13 @@ class Hooks {
   // instruction at c.pc runs) once c.ticks >= c.next_event: run due events,
   // deliver interrupts, and set the next c.next_event.
   virtual void safepoint(Cpu& c);
+  // A synchronous exception raised by the instruction at c.pc, which has not run
+  // (vector 0x800: floating-point unavailable). The default takes it the way the
+  // hardware does (sem::enter_exception: SRR0/SRR1, the new MSR, c.pc at the
+  // vector) and returns, so an interpreter continues in the handler. The runtime
+  // runs the handler to its rfi instead (runtime/sys_hooks.h), so translated code
+  // continues where it was.
+  virtual void exception(Cpu& c, u32 vector);
 };
 
 struct Cpu {

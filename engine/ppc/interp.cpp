@@ -17,6 +17,7 @@ namespace {
 }  // namespace
 
 void Hooks::safepoint(Cpu& c) { c.next_event = ~0ull; }
+void Hooks::exception(Cpu& c, u32 vector) { sem::enter_exception(c, vector); }
 
 u32 slow_read(Cpu& c, u32 ea, int size) {
   // Entirely inside one unmapped page: an I/O access.
@@ -100,9 +101,16 @@ bool execute_plain(Cpu& c, Op op, Insn i) {
 }
 
 Op execute(Cpu& c, u32 w) {
-  ++c.ticks;  // counts instructions started, as translated code does
   Insn i{w};
   Op op = decode(w);
+  // An FPU instruction with MSR[FP] clear does not start: floating-point
+  // unavailable (isa.h, uses_fpu). The hooks take the exception; the instruction
+  // runs when the handler returns to it.
+  if (uses_fpu(op) && !(c.msr & msr::FP)) {
+    c.hooks->exception(c, 0x800);
+    return op;
+  }
+  ++c.ticks;  // counts instructions started, as translated code does
   if (execute_plain(c, op, i)) {
     c.pc += 4;
     return op;

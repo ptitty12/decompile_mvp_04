@@ -260,6 +260,14 @@ enum class Op : std::uint16_t {
       count
 };
 
+// Instructions that need the FPU: floating-point loads and stores, arithmetic,
+// moves, compares, FPSCR moves and every paired-single instruction (lfd through
+// ps_sum1 in the table above). With MSR[FP] clear they do not run: they raise the
+// floating-point unavailable exception (vector 0x800), which the OS uses to switch
+// FPU contexts lazily (OSSetCurrentContext clears MSR[FP] for a thread that does
+// not own the FPU).
+inline bool uses_fpu(Op op) { return op >= Op::lfd && op <= Op::ps_sum1; }
+
 struct OpInfo {
   const char* name;  // base mnemonic as the ISA spells it ("andi.", "stwcx.")
   u32 pattern;

@@ -47,6 +47,7 @@ struct Machine {
     c.mem = mem.get();
     c.hooks = &hooks;
     c.pc = kPc;
+    c.msr = msr::FP;  // the FPU on, as the boot environment leaves it
   }
   // Executes `word` at kPc (or at `at`); returns the op.
   Op run(u32 word, u32 at = kPc) {

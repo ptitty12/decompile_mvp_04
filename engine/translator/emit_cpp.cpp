@@ -120,13 +120,18 @@ class Writer {
     idle_.clear();
     idle_.insert(f.idle_spins.begin(), f.idle_spins.end());
     bool prev_falls = false;
+    fpu_on_ = false;
     for (std::size_t k = 0; k < f.insns.size(); ++k) {
       if (!f.reachable[k]) {
         prev_falls = false;
+        fpu_on_ = false;
         continue;
       }
       const InsnInfo& x = f.insns[k];
-      if (labels.count(x.addr)) out_ << label(x.addr) << ":\n";
+      if (labels.count(x.addr)) {
+        out_ << label(x.addr) << ":\n";
+        fpu_on_ = false;  // reached from elsewhere: MSR[FP] unknown
+      }
       ++stats_.instructions;
       emit_insn(f, x, fx);
       prev_falls = falls_through(x);
@@ -213,6 +218,18 @@ class Writer {
     else if (back_edges_.count(a))
       out_ << "  sp = c.gpr[1];\n  rt::safepoint_check(c);\n  if (c.pc != " << h8(a) << " || rt::g_unwinding) "
            << miss_ << "\n";
+    // Floating-point unavailable (E3a): an FPU instruction with MSR[FP] clear does
+    // not start; the OS handler switches the FPU context and returns to it. Once
+    // checked, MSR[FP] stays set until a label, a branch or call, a safe point,
+    // mtmsr or sc, so the following FPU instructions of the block skip the check.
+    if (back_edges_.count(a) || idle_.count(a)) fpu_on_ = false;
+    if (x.flow == Flow::Plain && ppc::uses_fpu(x.op) && !fpu_on_) {
+      out_ << "  if (!(c.msr & 0x2000u)) {\n    sp = c.gpr[1];\n    rt::fp_unavailable(c, " << h8(a) << ");\n    if (c.pc != "
+           << h8(a) << " || rt::g_unwinding) " << miss_ << "\n  }\n";
+      ++stats_.fpu_checks;
+      fpu_on_ = true;
+    }
+    if (x.flow != Flow::Plain || x.op == Op::mtmsr || x.op == Op::sc) fpu_on_ = false;
     out_ << "  ++c.ticks;\n";
     const std::string cond = "sem::branch_cond(c, " + insn(w) + ")";
     switch (x.flow) {
@@ -311,6 +328,7 @@ class Writer {
   std::set<u32> idle_;        // its pure spin back edges
   std::set<u32> resume_;      // its resume labels
   std::string miss_;          // what an unwinding return does in it
+  bool fpu_on_ = false;       // MSR[FP] already checked in this block
   std::vector<std::pair<u32, u32>> resume_table_;
 };
 

@@ -115,6 +115,7 @@ void dispatch(Cpu& c, bool nested, u32 stop) {
     }
     ppc::step(c);
     ++g_interpreted;
+    if (unwound()) return;  // a floating-point unavailable handler switched threads
   }
 }
 
@@ -128,6 +129,11 @@ void call_indirect(Cpu& c, u32 target) {
     return;
   }
   dispatch(c, true, ret & ~3u);
+}
+
+void fp_unavailable(Cpu& c, u32 at) {
+  c.pc = at;
+  c.hooks->exception(c, 0x800);
 }
 
 void absolute_call(Cpu& c, u32 target) {
@@ -155,7 +161,11 @@ void run_handler(Cpu& c, u32 resume_pc, u32 sp) {
     }
     ppc::Op op = ppc::step(c);
     ++g_interpreted;
-    if (op == ppc::Op::rfi && (c.msr & ppc::msr::EE)) {
+    if (g_unwinding) {  // a nested exception (floating-point unavailable) switched threads
+      if (at_resume()) g_unwinding = false;
+      return;
+    }
+    if (op == ppc::Op::rfi && ((c.msr & ppc::msr::EE) || at_resume())) {
       if (!at_resume()) g_unwinding = true;  // another thread resumes
       return;
     }

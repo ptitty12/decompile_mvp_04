@@ -91,6 +91,12 @@ inline void leave() { g_unwinding = true; }
 
 [[noreturn]] void trap(Cpu& c, u32 address, const char* why);
 
+// Floating-point unavailable (E3a): the FPU instruction at `at` found MSR[FP]
+// clear. Takes the exception through c.hooks (the runtime runs the OS handler,
+// which switches the FPU context and returns to `at` with MSR[FP] set). The
+// caller then checks c.pc and g_unwinding as after a call.
+void fp_unavailable(Cpu& c, u32 at);
+
 // Calls the guest function at `target` (LR already set): native if translated,
 // otherwise in the interpreter until it returns to LR (or an unwind passes).
 void call_indirect(Cpu& c, u32 target);
@@ -126,8 +132,9 @@ u32 resume_target(Cpu& c, u32 sp, GuestFn self);
 void run(Cpu& c);
 
 // Runs an exception handler entered at c.pc (SRR0/SRR1 set) until the exception
-// ends: an rfi that sets MSR[EE] in the interpreter, or an rfi in translated code
-// (OSLoadContext), whose unwind ends here. Back at the interrupted point (an rfi
+// ends: an rfi in the interpreter that sets MSR[EE] or lands at `resume_pc` with
+// the stack pointer `sp` (a synchronous exception in code that runs with EE
+// clear), or an rfi in translated code (OSLoadContext), whose unwind ends here. Back at the interrupted point (an rfi
 // to `resume_pc` with the stack pointer `sp`) it returns normally; anywhere else
 // (the scheduler switched threads) it returns with g_unwinding set and c.pc at
 // the new thread, and the interrupted frames unwind from their safe point.

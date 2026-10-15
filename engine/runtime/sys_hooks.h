@@ -8,6 +8,8 @@
 // time never enters. Interrupts (decrementer, and PI causes from the hardware
 // model) are delivered only at safe points (function entries and loop back
 // edges) while MSR[EE] is set (R4), by running the OS's own exception vector code.
+// The floating-point unavailable exception is synchronous: it is taken at the
+// FPU instruction that raises it (MSR[FP] clear, ppc/isa.h uses_fpu).
 #pragma once
 
 #include <cstdint>
@@ -48,6 +50,10 @@ class SystemHooks : public ppc::Hooks {
   // Runs due events, delivers a pending interrupt, applies the idle skip, and
   // stops the run (StopRun) once `tick_limit` instructions have run.
   void safepoint(ppc::Cpu& c) override;
+  // A synchronous exception (floating-point unavailable, 0x800) raised by the
+  // instruction at c.pc: delivered like an interrupt, and its handler runs until
+  // it returns to that instruction (or switches threads, as an interrupt may).
+  void exception(ppc::Cpu& c, u32 vector) override;
 
   // Recomputes c.next_event from the scheduled events.
   void reschedule(ppc::Cpu& c);
@@ -55,6 +61,7 @@ class SystemHooks : public ppc::Hooks {
   std::uint64_t tick_limit = ~0ull;
   std::uint64_t syscalls = 0, icbi_blocks = 0, real_mode_switches = 0;
   std::uint64_t external_interrupts = 0, decrementer_interrupts = 0, idle_skips = 0, idle_ticks_skipped = 0;
+  std::uint64_t fp_unavailable = 0;  // floating-point unavailable exceptions (lazy FPU context switches)
 
  private:
   void deliver(ppc::Cpu& c, u32 vector);

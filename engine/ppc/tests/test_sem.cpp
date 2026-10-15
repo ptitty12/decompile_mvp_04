@@ -4,6 +4,7 @@
 #include <doctest/doctest.h>
 
 #include <cstring>
+#include <string>
 
 #include "encode.h"
 #include "machine.h"
@@ -1181,6 +1182,46 @@ TEST_CASE("system: sc, rfi, traps, invalid") {
   CHECK_THROWS_AS(m.run(X(31, 3, 4, 5, 438)), GuestFault);  // ecowx
   c.gpr[4] = 0x90000000;  // unmapped, no Io
   CHECK_THROWS_AS(m.run(D(32, 3, 4, 0)), GuestFault);
+}
+
+TEST_CASE("floating-point unavailable: FPU instructions with MSR[FP] clear raise 0x800") {
+  // The class is exactly the FPU instructions, by mnemonic.
+  for (int k = 1; k < static_cast<int>(Op::count); ++k) {
+    Op op = static_cast<Op>(k);
+    std::string n = op_name(op);
+    bool fpu = n.rfind("lf", 0) == 0 || n.rfind("stf", 0) == 0 || n.rfind("ps", 0) == 0 || n[0] == 'f' ||
+               n == "mcrfs" || n == "mffs" || n.rfind("mtfs", 0) == 0;
+    CHECK_MESSAGE(uses_fpu(op) == fpu, n);
+  }
+  Machine m;
+  auto& c = m.c;
+  c.msr = 0x00009032;  // EE ME IR DR RI, FP clear
+  c.gpr[4] = 0x80002000;
+  m.w32(0x80002000, 0x3F800000);  // 1.0f
+  c.fpr[1].ps0 = 0;
+  const auto ticks = c.ticks;
+  m.run(D(48, 1, 4, 0));  // lfs f1, 0(r4): does not run
+  CHECK(c.fpr[1].ps0 == 0);
+  CHECK(c.pc == 0x00000800);  // the vector, in real mode
+  CHECK(c.spr[spr::SRR0] == Machine::kPc);
+  CHECK(c.spr[spr::SRR1] == 0x00009032);
+  CHECK(c.msr == 0x00001000);  // only ME stays
+  CHECK(m.hooks.last_old_msr == 0x00009032);
+  CHECK(c.ticks == ticks);  // the instruction did not start
+  // The handler returns with FP set in SRR1 (rfi placed at the vector's cached
+  // address, since this machine maps no real mode): the load runs this time.
+  c.spr[spr::SRR1] |= msr::FP;
+  m.run(X(19, 0, 0, 0, 50), 0x80000800);  // rfi
+  CHECK(c.pc == Machine::kPc);
+  m.run(D(48, 1, 4, 0));
+  CHECK(c.fpr[1].ps0 == 0x3FF0000000000000ull);
+  CHECK(c.ticks == ticks + 2);
+  // Integer instructions and dcbz_l never need the FPU.
+  c.msr = 0;
+  c.gpr[3] = 1;
+  m.run(D(14, 3, 3, 1));  // addi r3, r3, 1
+  CHECK(c.gpr[3] == 2);
+  CHECK_FALSE(uses_fpu(Op::dcbz_l));
 }
 
 // Must stay last in this file: every opcode has a vector above.

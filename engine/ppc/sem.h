@@ -756,6 +756,22 @@ inline void rfi(Cpu& c) {
   c.pc = c.spr[spr::SRR0] & ~3u;
   c.hooks->msr_changed(c, old);
 }
+
+// Exception entry, as the hardware takes an interrupt: SRR0 = c.pc (the
+// interrupted or faulting instruction), SRR1 = the MSR's low half, the new MSR
+// keeps only ME, IP and ILE (LE from ILE: external and decrementer interrupts,
+// floating-point unavailable), and c.pc = the vector (at 0xFFF00000 with MSR[IP]).
+// Translation goes off with IR/DR (the caller's hooks see the MSR change).
+inline void enter_exception(Cpu& c, u32 vector) {
+  constexpr u32 kME = 1u << 12, kIP = 1u << 6, kILE = 1u << 16, kLE = 1u;
+  const u32 old = c.msr;
+  c.spr[spr::SRR0] = c.pc;
+  c.spr[spr::SRR1] = old & 0x0000FFFFu;
+  c.msr = (old & (kME | kIP | kILE)) | ((old & kILE) ? kLE : 0);
+  c.hooks->msr_changed(c, old);
+  c.pc = ((old & kIP) ? 0xFFF00000u : 0u) | vector;
+}
+
 inline bool trap_cond(u32 to, s32 a, s32 b) {
   return ((to & 16) && a < b) || ((to & 8) && a > b) || ((to & 4) && a == b) ||
          ((to & 2) && static_cast<u32>(a) < static_cast<u32>(b)) ||

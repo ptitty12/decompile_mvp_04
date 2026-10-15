@@ -12,7 +12,7 @@
 namespace mvp::rt {
 
 namespace {
-constexpr u32 kEE = ppc::msr::EE, kIP = 1u << 6, kME = 1u << 12, kILE = 1u << 16, kLE = 1u;
+constexpr u32 kEE = ppc::msr::EE;
 
 // Whether the spin loop's back-edge branch at c.pc is about to be taken. Only
 // then does the guest wait; on the pass that leaves the loop no time may be
@@ -84,12 +84,7 @@ void SystemHooks::reschedule(ppc::Cpu& c) {
 
 void SystemHooks::deliver(ppc::Cpu& c, u32 vector) {
   u32 resume = c.pc, sp = c.gpr[1];
-  u32 old = c.msr;
-  c.spr[ppc::spr::SRR0] = resume;
-  c.spr[ppc::spr::SRR1] = old & 0x0000FFFFu;
-  c.msr = (old & (kME | kIP | kILE)) | ((old & kILE) ? kLE : 0);
-  msr_changed(c, old);
-  c.pc = ((old & kIP) ? 0xFFF00000u : 0u) | vector;
+  ppc::sem::enter_exception(c, vector);
   reschedule(c);
   int depth = g_exception_depth++;
   u32 lr = g_exception_lr;
@@ -103,6 +98,11 @@ void SystemHooks::deliver(ppc::Cpu& c, u32 vector) {
   }
   g_exception_depth = depth;
   g_exception_lr = lr;
+}
+
+void SystemHooks::exception(ppc::Cpu& c, u32 vector) {
+  if (vector == 0x800) ++fp_unavailable;
+  deliver(c, vector);
 }
 
 void SystemHooks::safepoint(ppc::Cpu& c) {

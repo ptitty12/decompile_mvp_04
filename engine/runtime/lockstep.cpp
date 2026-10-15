@@ -5,12 +5,24 @@
 #include <cstring>
 
 #include "ppc/interp.h"
+#include "ppc/sem.h"
 #include "runtime/hle.h"
 
 namespace mvp::rt {
 
 void FixedHooks::system_call(ppc::Cpu& c) {
   throw ppc::GuestFault(c.pc, "sc (system call) before the runtime handles it");
+}
+
+void FixedHooks::exception(ppc::Cpu& c, u32 vector) {
+  ++exceptions;
+  if (!run_handlers) {
+    ppc::Hooks::exception(c, vector);
+    return;
+  }
+  const u32 resume = c.pc, sp = c.gpr[1];
+  ppc::sem::enter_exception(c, vector);
+  run_handler(c, resume, sp);
 }
 
 std::string cpu_diff(const ppc::Cpu& a, const ppc::Cpu& b) {

@@ -77,6 +77,7 @@ int main(int argc, char** argv) {
     std::printf("emitted %zu functions (%zu entry points, %zu resume labels), %zu instructions, %zu bytes of C++ in "
                 "%d shards\n",
                 st.functions, st.entries, st.resume_labels, st.instructions, st.bytes, opt.shards);
+    std::printf("FPU checks (floating-point unavailable) %zu\n", st.fpu_checks);
     // Every replacement and hook must find its function: a rename in symbols.txt
     // (or a wrong address) would otherwise drop it silently.
     int missing = 0;

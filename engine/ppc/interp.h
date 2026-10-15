@@ -11,7 +11,9 @@ namespace mvp::ppc {
 
 // Executes the instruction at c.pc and advances c.pc (to the branch target when a
 // branch is taken). Returns the opcode it executed. Throws GuestFault on an
-// invalid instruction, a guest trap or an unmapped access.
+// invalid instruction, a guest trap or an unmapped access. An FPU instruction
+// with MSR[FP] clear does not run: c.hooks->exception(c, 0x800) takes the
+// floating-point unavailable exception, and its opcode is returned.
 Op step(Cpu& c);
 
 // Executes one already-fetched instruction word at c.pc (same contract as step).

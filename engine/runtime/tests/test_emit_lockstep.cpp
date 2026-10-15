@@ -4,6 +4,7 @@
 // the results it stores must be the expected ones.
 #include <doctest/doctest.h>
 
+#include "../../ppc/tests/encode.h"
 #include "../../translator/tests/synth.h"
 #include "common/bytes.h"
 #include "runtime/hle.h"
@@ -41,6 +42,26 @@ TEST_CASE("translated synthetic program matches the interpreter in lockstep") {
   nat.cpu().hooks = &hn;
   ref.load_dol(*dol);
   nat.load_dol(*dol);
+  // The program starts with MSR[FP] clear (MSR 0), so its first FPU instruction
+  // (in fpwork) raises floating-point unavailable. The handler at 0x800 sets FP in
+  // SRR1 and returns: the reference interpreter runs it in line, the native side
+  // runs it to its rfi from the translated frame (rt::fp_unavailable) and goes on.
+  {
+    using namespace mvp::ppc::enc;
+    const u32 handler[] = {
+        SPR(467, 3, 272),       // mtsprg0 r3
+        SPR(339, 3, 27),        // mfsrr1 r3
+        D(24, 3, 3, 0x2000),    // ori r3, r3, MSR[FP]
+        SPR(467, 3, 27),        // mtsrr1 r3
+        SPR(339, 3, 272),       // mfsprg0 r3
+        X(19, 0, 0, 0, 50),     // rfi
+    };
+    for (Machine* m : {&ref, &nat}) {
+      for (std::size_t k = 0; k < std::size(handler); ++k) put_be32(m->mem1() + 0x800 + 4 * k, handler[k]);
+      m->set_real_mode(true);  // the vector runs at its physical address
+    }
+  }
+  hn.run_handlers = true;
   mvp_register_game();
   REQUIRE_FALSE(g_native.empty());
 
@@ -62,9 +83,11 @@ TEST_CASE("translated synthetic program matches the interpreter in lockstep") {
   // The dispatcher re-enters a_fn after b_fn's unwind, then main where a_fn
   // returns, and main again where leaf returns after jumper's.
   CHECK(g_resume_entries == entries + 3);
-  // Only main's two instructions after jumper's return (a store, the bl) ran in
-  // the interpreter.
-  CHECK(g_interpreted == interpreted + 2);
+  // Only main's two instructions after jumper's return (a store, the bl) and the
+  // six of the floating-point unavailable handler ran in the interpreter.
+  CHECK(g_interpreted == interpreted + 2 + 6);
+  CHECK(hr.exceptions == 1);
+  CHECK(hn.exceptions == 1);
   CHECK_FALSE(g_unwinding);
 
   // OSReport ran through the HLE (runtime/hle.h), formatted from guest varargs.

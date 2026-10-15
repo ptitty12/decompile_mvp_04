@@ -216,6 +216,7 @@ TEST_CASE("random integer/branch/CR/XER programs: reference interpreter vs purei
     Cpu c;
     c.mem = mem.get();
     c.hooks = &hooks;
+    c.msr = msr::FP;  // as pureikyubu's (MSR_FP): stray FP stores run, not trap
     PkState s{};
     for (int k = 0; k < 32; ++k) s.gpr[k] = c.gpr[k] = kData + 0x8000 + r.below(0x10000);
     s.cr = c.cr = static_cast<u32>(r.next());
