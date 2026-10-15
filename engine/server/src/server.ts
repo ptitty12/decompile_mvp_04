@@ -114,7 +114,7 @@ export async function startServer(cfg: ServerConfig): Promise<App> {
       return;
     }
     if (path === '/login') {
-      const loginCsp = `default-src 'none'; style-src ${LOGIN_CSS_HASH}; form-action 'self'; frame-ancestors 'none'; base-uri 'none'`;
+      const loginCsp = `default-src 'none'; style-src ${LOGIN_CSS_HASH}; img-src data:; form-action 'self'; frame-ancestors 'none'; base-uri 'none'`;
       const page = (status: number, next: string, error: string) =>
         res
           .writeHead(status, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Content-Security-Policy': loginCsp })

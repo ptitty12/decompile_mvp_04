@@ -122,7 +122,7 @@ function escapeHtml(s: string): string {
 
 export function loginPage(next: string, error: string): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MVP Baseball 2005</title><style>${LOGIN_CSS}</style></head><body>
+<title>MVP Baseball 2005</title><link rel="icon" href="data:,"><style>${LOGIN_CSS}</style></head><body>
 <form method="post" action="/login"><h1>MVP Baseball 2005</h1>
 ${error ? `<p class="err">${escapeHtml(error)}</p>` : ''}
 <label>Password <input type="password" name="password" autocomplete="current-password" autofocus required></label>
