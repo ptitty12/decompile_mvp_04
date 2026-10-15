@@ -5,7 +5,9 @@ operation does, how packs are checked, combined and hashed, and how the format m
 The engine (`engine/mods/`, milestones E6 and E7 in [`ROADMAP.md`](ROADMAP.md)) implements
 it. The reference implementation is [`tools/rosters/pack.py`](../tools/rosters/pack.py), with
 tests in `tools/rosters/tests/test_pack.py` and an example pack in
-[`examples/packs/fictional-league/`](examples/packs/fictional-league/). The data formats it
+[`examples/packs/fictional-league/`](examples/packs/fictional-league/).
+`engine/mods/tests/crosscheck.py` runs both on pack.py's synthetic disc and test packs and
+requires the same issues, hashes and output bytes (E6: 65 scenarios). The data formats it
 patches are described in [`ROSTERS.md`](ROSTERS.md).
 
 **Version: format 1.0** (engine mod API 1.0), 2026-10-14. Where this file and `pack.py`
@@ -569,7 +571,9 @@ repo):
     (nickname), 2050 (full name) and 7210 (abbreviation) in both files, and 17618 (city) in
     `FEENG.LOC`;
   - the `org` row of Anaheim points to the renamed manager.
-- A second run gave byte-identical files.
+- A second run gave byte-identical files. The result hash is
+  `181b6977c6fa8893c3a06968e8d719d260e769e417eb7403cfbaf6ba9cea973f`; the engine
+  (`engine/mods`, natively and in the browser) gives the same hash and the same bytes.
 - `database.big` grew from 1,010,678 to 1,056,803 bytes, because 17 tables were recompressed.
 
 ## 13. Team slots: what a team pack can replace
@@ -626,8 +630,10 @@ These need the engine, a real boot or more decomp. None of them blocks the forma
 can only relax a v1 rule or add to section 13.
 
 1. **Larger `database.big`.** The game loads the file whole into a buffer sized from the file
-   (`ROSTERS.md` §2.2), but nobody has booted a recompressed or larger one. The example grows it
-   by 46 KB. Test in E2/E6. The fallback (raw payloads) is larger still.
+   (`ROSTERS.md` §2.2). The example grows it by 46 KB. *Answered for the example (E6,
+   2026-10-15):* the engine booted the recompressed 1,056,803-byte file and played into a
+   game with the pack's roster (`docs/engine/E6_LOG.md`). How much larger the game accepts
+   is still untested; the fallback (raw payloads) is larger still.
 2. **Roster sizes.** The loader accepts 1-25 players per team. Whether menus, the AI and
    dynasty mode cope with fewer than 25 or 22, or with 25 in a minor-league team, is untested.
 3. **Players without a team.** Every shipped player has a roster place. Whether a player on no

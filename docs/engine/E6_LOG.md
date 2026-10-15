@@ -13,8 +13,8 @@ first in "Status"; a later session resumes from "Next step".
 | 1 | `engine/mods`: format v1 (MODDING.md), cross-checked against `pack.py` | Done: 65 scenarios identical; the real disc byte for byte |
 | 2 | `engine/vfs`: RefPack, BIG, the virtual disc's mod overlay | Done; the game boots with the patched files |
 | 3 | Native evidence: the example pack on screen | Done (captures local, `build/engine/e6/`) |
-| 4 | Page: the Roster packs panel; packs in the Worker | In progress |
-| 5 | Netplay: the set hash in the handshake; a mismatch refused | In progress |
+| 4 | Page: the Roster packs panel; packs in the Worker | Done: Chrome shows the change; browser == native with the pack |
+| 5 | Netplay: the set hash in the handshake; a mismatch refused | Done: same set in lockstep; different sets refused, no boot |
 
 ## How to build and run (agents)
 
@@ -28,7 +28,14 @@ wrapper in the scratchpad (vswhere then prints a harmless error).
 - `mvp-play --pack PATH` (repeatable, set order): packs mounted before boot.
 - Tests: `test_common` (SHA-256), `test_vfs` (overlay), `test_mods` (data-free; JSON
   vectors from pack.py, the example pack's documented hashes, a zip), `mods_crosscheck`
-  (`python -I engine/mods/tests/crosscheck.py --mvp-pack <exe> --repo .`).
+  (`python -I engine/mods/tests/crosscheck.py --mvp-pack <exe> --repo .`),
+  `test_net_protocol` (the refusal text), `test_web_shell` (`tests/packs.test.mjs`: the
+  browser module on the example pack as a folder and a zip, a broken pack, the empty set).
+- Browser (Emscripten preset, `engine/tools/emsdk.cmd`): targets `mvp-web` (now also
+  builds `mvp-packs`). `engine/server` needs `npm ci && npm run build` once for
+  `netplay_check.mjs`. Checks: `browser_check.mjs --packs DIR_OR_ZIP,...` and
+  `netplay_check.mjs --packs ... [--packs2 ...|none] [--expect-reject]`; outputs and
+  screenshots under `build/engine/e6/web/`.
 
 ## 1. `engine/mods` (done)
 
@@ -100,6 +107,76 @@ script (`nav6` up to Play Now, then UP x4 at Select Team, A, A, A):
 - Without packs nothing changes: MEM1 at frame 1,900 of the menu path is `768b36a8...`,
   E3a's value.
 
+## 4. The page and the Worker (done)
+
+- **Panel** (`src/packs.ts`, `#packs` above the disc picker): add pack folders (a
+  directory input) and `.zip` files, order them (Up, Down, Remove). Every change is
+  checked by `mvp-packs.js` (engine/mods alone, 0.58 MB of wasm, loaded on the first
+  pick): each pack's name, id, version, hash prefix; the set hash; every issue with its
+  code and place. After the start: locked, with the engine's result (patched files,
+  result hash). `window.mvp.packs` for the checks.
+- **Worker**: after the disc check, `feedPacks` + `mvp_packs_mount`: the packs are applied
+  to this disc and mounted on the virtual disc before the translation and the handshake.
+  Errors stop the start: "The roster packs cannot be used with this disc, so the game did
+  not start: <first problems>".
+- **Handshake** (`wasm/net_web.cpp`): the disc identity is computed when the disc is
+  checked (the overlay rewrites the FST), the pack-set field is the mounted set's hash.
+- **Chrome** (local, `browser_check.mjs --packs docs/examples/packs/fictional-league`): the
+  panel showed set `b9a04e65...` and no issues before the disc; the Worker applied the pack
+  in 278 ms with result hash `181b6977...` (= native = pack.py); with UP x4 at Select Team,
+  frame 2,280 shows **Harbor City Lanterns**, rank 28th. The guest line equals mvp-play's
+  for the same script and pack (16,991,561,020 instructions, MEM1 `9531f1af...`): the
+  overlay gives the same game in the browser as natively.
+
+## 5. Netplay (done)
+
+Two Chrome pages through the netplay server (`netplay_check.mjs`, D = 3, `--fast`):
+- **Same set** (the example pack on both): 2,280 frames (P1 picks the Lanterns), identical
+  guest lines (MEM1 `2f4ca83c...`) and all 38 state-hash windows, no desync; both screens
+  on Select Team with "Harbor City Lanterns".
+- **Different sets**: player 2 with no packs, and player 2 with the same pack at version
+  1.0.1. Both pages are refused at the handshake and neither boots: "the players chose
+  different roster packs (player 1: pack set b9a04e6578e789b4, player 2:
+  f5e1298911db13ad); both must pick the same packs in the same order" (player 2 shows the
+  same text, received in player 1's BYE; the text names players, not "here").
+- **Into the match (not reached, not a pack problem).** With the pack on both pages, P1
+  picks the Lanterns and presses A three times (frames 2,300 / 3,100 / 3,300) to start the
+  game. Both pages stayed in lockstep to frame ~3,310 (55 windows, no desync), then one
+  page stopped with E5's guard "netplay: frame 3310 was polled before its input arrived
+  (gate missed)" as the match's loading began. **The same run without packs stops the
+  same way** (frame 3,308, the other page), so this is a netplay limitation E5 never met
+  (its runs ended at frame 1,200, in the menus). Likely cause, not yet confirmed: during
+  the loading the frame poll runs where no yieldable safe point follows it before the
+  next poll (`YieldingHooks` never yields with `g_exception_depth > 0`, e.g. a poll from
+  an interrupt-level callback while the main thread idles). Owner of the fix: netplay /
+  runtime (E5 follow-up or E3c), not E6. Until then an online game can play the menus
+  with packs but not start the match in the browser.
+
+## Notes for the lead (docs outside docs/engine/)
+
+- ROADMAP/DECISIONS: E6's exit is met (sections 3-5). Decision candidates: **E6-M1** the
+  engine's pack code is a port of pack.py and must stay byte-compatible
+  (`mods_crosscheck` in ctest); **E6-V1** the virtual disc places replaced files past the
+  end of the image on 32 KiB boundaries and pads the end; **E6-N1** the handshake's disc
+  identity is the unpatched disc's, packs are compared by the set hash.
+- pack.py bugs to fix in `tools/rosters/pack.py` (section 1): the `$` and `\d` regex
+  quirks, `manager.edit` with an empty `set`.
+- PROGRESS.md was not touched (this session's scope is `engine/` and `docs/engine/`).
+
 ## Next step
 
-Page panel, Worker integration, handshake wiring, browser checks (sections 4 and 5).
+0. **Netplay into the match** (E5 follow-up, see section 5): reproduce the gate miss at
+   the loading after the difficulty screen, find the polls without a yieldable safe
+   point between them, and make the gate hold there (or yield outside the handler
+   first). Then rerun `netplay_check.mjs --packs docs/examples/packs/fictional-league
+   --script <nav into the match> --frames 4420`: both screens should show the Lanterns'
+   defensive line-up, as natively (section 3).
+1. **Persist the picked packs** in the browser (IndexedDB) so a player picks them once;
+   optionally packs the server lists (the deployment serves authored packs only).
+2. **Show the pack set in the lobby** (the room carries the creator's set hash and pack
+   names, so a joiner sees a mismatch before the handshake).
+3. **Art and audio packs**: an example pack with authored `.gsh` logos and uniforms (the
+   format supports them; v1 cannot check `.gsh` layouts, MODDING.md §14 question 9).
+4. **Saves**: store the set hash in a memory-card save and warn on load (MODDING.md §14
+   question 6).
+5. The `--pack` option for `mvp-netplay` (native netplay) if native peers need packs.

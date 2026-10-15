@@ -33,7 +33,8 @@ Everything below is run by agents; the owner never runs commands.
    | File | What |
    |---|---|
    | `index.html`, `style.css` | the page (`engine/web/static/`) |
-   | `main.js`, `worker.js`, `protocol.js`, `input.js`, `gamepad.js`, `gamepad-ui.js`, `audio.js`, `audio-worklet.js`, `resampler.js`, `disc.js`, `module-cache.js` | the shell, compiled from `engine/web/src/*.ts` by `tsc` |
+   | `main.js`, `worker.js`, `protocol.js`, `input.js`, `gamepad.js`, `gamepad-ui.js`, `audio.js`, `audio-worklet.js`, `resampler.js`, `disc.js`, `module-cache.js`, `packs.js`, `packs-core.js` | the shell, compiled from `engine/web/src/*.ts` by `tsc` |
+   | `mvp-packs.js`, `mvp-packs.wasm` (0.6 MB) | the roster-pack checker for the page's panel (E6): `engine/mods` alone, loaded only when packs are picked |
    | `mvp-web.js`, `mvp-web.wasm` (0.6 MB) | the engine: translator, runtime, interpreter, renderer, mixer (`engine/web/wasm/`) |
    | `build-id.json` | the SHA-256 of `mvp-web.wasm` and of `symbols.txt` (the key of the browser's translation cache) |
    | `symbols.txt` | `config/GV4E69/symbols.txt`: repository metadata (function boundaries and names), not game data (ARCHITECTURE.md §4) |
@@ -62,7 +63,8 @@ Everything below is run by agents; the owner never runs commands.
    behind `navigator.getGamepads()`), `--runs N` with `--clear-cache` (cold and
    warm starts in one profile) or `--no-cache`, `--hide F:MS` (the tab hidden for
    MS ms), `--trace-disc` (the picked image's read offsets and sizes),
-   `--disc-cache PARAMS`, and `--real-server MAIN_JS` (E5's server, built,
+   `--disc-cache PARAMS`, `--packs P1,P2` (E6: roster pack folders or zips through the
+   page's panel, before the disc), and `--real-server MAIN_JS` (E5's server, built,
    instead of the mock: a throwaway password, the check logs in through its
    form, the disc configured; with the lobby there the check presses Play). It starts the server, opens the page with Playwright,
    and writes `summary-BROWSER[-TAG].json` and the screenshots to `--out`
@@ -121,6 +123,9 @@ Everything below is run by agents; the owner never runs commands.
      2005 for GameCube, USA (GV4E69), revision 0 only." and the reason (for
      example `main.dol SHA-1 056ef58c... is not GV4E69 rev 0`, or `GCM: bad disc
      magic at 0x1C`);
+  2b. (E6) the roster packs the page handed over, if any: checked, applied to the
+     tables of this disc (`engine/mods`, `wasm/packs_web.cpp`) and mounted on the
+     virtual disc (`vfs/overlay.h`); an error stops here with the reason (below);
   3. the translation: from this browser's cache if it has one for this DOL and
      engine build (`mvp_translate_cached`, below), else `mvp_translate`:
      `symbols.txt` (fetched from the site) -> CFG -> one WebAssembly module
@@ -205,6 +210,20 @@ Everything below is run by agents; the owner never runs commands.
   fetches asynchronously between batches. Failed reads retry twice; a read that
   still fails stops the run with the reason. Nothing is kept after the page
   closes.
+- **Roster packs** (E6; `src/packs.ts`, `src/packs-core.ts`, engine `wasm/packs_web.*`;
+  format: `docs/MODDING.md`). The Roster packs panel, above the disc picker, takes pack
+  folders (a directory picker) and `.zip` files, in the order the player puts them (Up,
+  Down, Remove). Each change is checked at once by `mvp-packs.js`, the engine's pack
+  code without the rest of the engine: every pack's name, id, version and hash, the set
+  hash, and every problem with its MODDING.md code and place. The packs must be picked
+  before the disc (picking the disc starts the game). At the start the panel locks and
+  hands the files to the Worker, which applies them to the player's disc before the
+  translation (`packs` phase: the example pack takes about 280 ms in Chrome) and reports
+  the result (result hash, patched files) back to the panel; errors that need the disc
+  (an unknown player, a broken roster) stop the start with "The roster packs cannot be
+  used with this disc ..." and the first problems. The set hash goes into the netplay
+  handshake (`NETPLAY.md` §3). The packs never leave the browser; the patched tables
+  live only in the engine's memory.
 - **The translation cache** (`src/module-cache.ts`, engine `wasm/module_cache.*`).
   After the first frame the Worker serializes the translator's output (the wasm
   binary and the tables the runtime fills from it, about 52 MB) and writes it to

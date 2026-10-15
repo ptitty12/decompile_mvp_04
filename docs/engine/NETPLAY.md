@@ -156,9 +156,17 @@ build ids must match anyway, peers always run the same version today.
   is everything the boot environment copies into memory plus the code, and the same
   for ISO and CISO dumps of the disc. Other file contents are not hashed (that would
   read the whole 1.4 GB image); a damaged file would show up as a desync.
-- **Pack set**: the ordered pack-set hash of `docs/MODDING.md` §10. The engine has no
-  pack loader yet, so both sides send the empty set's hash
-  (`f5e1298911db13adf522a1b34d4d4f9291b42fa7a77f63a5f6f07bc322dcc66e`).
+- **Pack set** (E6): the ordered pack-set hash of `docs/MODDING.md` §10 of the roster
+  packs the player picked on the page (the Roster packs panel, `docs/engine/WEB.md`),
+  computed by the engine's pack code (`engine/mods`) after it mounted them on the virtual
+  disc; without packs, the empty set's hash
+  (`f5e1298911db13adf522a1b34d4d4f9291b42fa7a77f63a5f6f07bc322dcc66e`). The disc identity
+  above is taken when the disc is checked, before the packs are mounted (mounting rewrites
+  the FST), so a pack mismatch is reported as one: "the players chose different roster
+  packs (player 1: pack set b9a04e6578e789b4, player 2: f5e1298911db13ad); both must pick
+  the same packs in the same order". The same disc and the same packs give the same
+  virtual disc on both sides, byte for byte, so the guests stay in lockstep
+  (`docs/engine/E6_LOG.md`).
 - **Settings**: sorted `key=value` pairs joined by `;`: `aram_size`, `ax_voices`,
   `bus_clock`, `console_type`, `cpu_clock`, `pad` (PadState version), `ports`,
   `rtc_seconds`, `sram_flags`, `sram_language`, `tv_mode` (`net/identity.cpp`).
@@ -420,4 +428,9 @@ guest state on every machine and browser. It relies on:
   run; Edge is Chromium; Safari is untested (no Mac).
 - **Not yet over the internet:** the server, TURN and the two-network exit need the
   VPS (E5_LOG, "Next step").
+- **Not yet into a match in the browser** (found in E6, 2026-10-15): two pages in
+  lockstep through the menus stop at the loading after the difficulty screen (frame
+  ~3,310 of the E3a path) with "frame N was polled before its input arrived (gate
+  missed)", with or without roster packs. The gate's early yield did not happen between
+  two polls there (`docs/engine/E6_LOG.md` §5).
 - **Memory card:** absent on both sides; saves in netplay come with K5 or later.
