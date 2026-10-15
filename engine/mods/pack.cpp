@@ -2,9 +2,6 @@
 
 #include <algorithm>
 #include <cstdio>
-#include <filesystem>
-#include <fstream>
-#include <sstream>
 
 #include "common/sha256.h"
 #include "mods/zip.h"
@@ -16,14 +13,6 @@ std::string sha256_hex(const std::string& data) { return Sha256::of(data.data(),
 std::string sha256_hex(const std::vector<std::uint8_t>& data) { return Sha256::of(data.data(), data.size()); }
 
 namespace {
-
-std::filesystem::path host_path(const std::string& utf8) {
-  return std::filesystem::path(std::u8string(reinterpret_cast<const char8_t*>(utf8.data()), utf8.size()));
-}
-std::string utf8_of(const std::filesystem::path& p) {
-  const std::u8string u = p.u8string();
-  return std::string(reinterpret_cast<const char*>(u.data()), u.size());
-}
 
 bool lower_alnum(char c) { return (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'); }
 bool alpha(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
@@ -298,9 +287,8 @@ const Schema& schema() {
   static const Schema s = [] {
     Schema sc;
     for (const auto& [table, text] : schema_text()) {
-      std::istringstream in(text);
-      std::string tok;
-      while (in >> tok) sc.tables[table].push_back(parse_column(tok));
+      for (const auto& tok : split(text, ' '))
+        if (!tok.empty()) sc.tables[table].push_back(parse_column(tok));
     }
     return sc;
   }();
@@ -398,54 +386,6 @@ class ZipSource final : public PackSource {
   std::map<std::string, const ZipEntry*> files_;
 };
 
-namespace fs = std::filesystem;
-
-class DirSource final : public PackSource {
- public:
-  explicit DirSource(const std::string& root) {
-    std::error_code ec;
-    root_ = fs::absolute(host_path(root), ec);
-  }
-  bool exists(const std::string& rel) override { return path(rel).has_value(); }
-  std::uint64_t size(const std::string& rel) override {
-    std::error_code ec;
-    return fs::file_size(*path(rel), ec);
-  }
-  std::optional<std::vector<std::uint8_t>> read(const std::string& rel, std::string* error) override {
-    auto p = path(rel);
-    std::ifstream f(*p, std::ios::binary);
-    if (!f) {
-      if (error) *error = "cannot read " + rel;
-      return std::nullopt;
-    }
-    return std::vector<std::uint8_t>((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
-  }
-
- private:
-  fs::path root_;
-  // Exact-case match of every segment, and the result must stay inside the root.
-  std::optional<fs::path> path(const std::string& rel) {
-    fs::path cur = root_;
-    std::error_code ec;
-    for (const auto& seg : split(rel, '/')) {
-      bool found = false;
-      for (fs::directory_iterator it(cur, ec), end; !ec && it != end; it.increment(ec))
-        if (utf8_of(it->path().filename()) == seg) {
-          found = true;
-          break;
-        }
-      if (!found) return std::nullopt;
-      cur /= host_path(seg);
-    }
-    const fs::path real = fs::weakly_canonical(cur, ec), base = fs::weakly_canonical(root_, ec);
-    auto r = real.begin(), b = base.begin();
-    for (; b != base.end(); ++b, ++r)
-      if (r == real.end() || *r != *b) return std::nullopt;
-    if (!fs::is_regular_file(cur, ec)) return std::nullopt;
-    return cur;
-  }
-};
-
 }  // namespace
 
 std::unique_ptr<PackSource> memory_source(std::map<std::string, std::vector<std::uint8_t>> files,
@@ -467,8 +407,6 @@ std::unique_ptr<PackSource> zip_source(std::vector<std::uint8_t> bytes, std::str
   if (!z) return nullptr;
   return std::make_unique<ZipSource>(std::move(*z));
 }
-
-std::unique_ptr<PackSource> dir_source(const std::string& root) { return std::make_unique<DirSource>(root); }
 
 // ---------------------------------------------------------------- versions
 int compare(const Semver& a, const Semver& b) {
@@ -768,32 +706,6 @@ Pack load_pack(const std::string& label, PackSource* src, Report& report) {
   top.set("files", std::move(files_obj));
   pack.hash = sha256_hex("mvp2005-pack-hash/1\n" + canonical_json(top));
   return pack;
-}
-
-Pack load_pack_path(const std::string& spec, Report& report) {
-  namespace fs = std::filesystem;
-  std::error_code ec;
-  const fs::path p = host_path(spec);
-  if (fs::is_directory(p, ec)) {
-    auto src = dir_source(spec);
-    return load_pack(spec, src.get(), report);
-  }
-  if (fs::is_regular_file(p, ec)) {
-    std::ifstream f(p, std::ios::binary);
-    std::vector<std::uint8_t> bytes((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
-    if (ZipArchive::is_zip(bytes)) {
-      std::string err;
-      auto src = zip_source(std::move(bytes), &err);
-      if (!src) {
-        Pack pack;
-        pack.label = spec;
-        report.error("E-PACK", spec, err);
-        return pack;
-      }
-      return load_pack(spec, src.get(), report);
-    }
-  }
-  return load_pack(spec, nullptr, report);
 }
 
 // ---------------------------------------------------------------- static op checks

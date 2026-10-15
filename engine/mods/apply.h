@@ -46,7 +46,8 @@ class DiscFiles {
 
 // The files of a checked disc image (vfs).
 std::unique_ptr<DiscFiles> image_files(vfs::Disc& disc);
-// An extracted disc in a host directory (data/..., sys/main.dol), as pack.py's Disc.
+// An extracted disc in a host directory (data/..., sys/main.dol), as pack.py's Disc
+// (engine_mods_host).
 std::unique_ptr<DiscFiles> dir_files(const std::string& root);
 
 struct ApplyOutput {

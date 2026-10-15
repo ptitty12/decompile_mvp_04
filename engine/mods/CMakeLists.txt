@@ -3,13 +3,18 @@
 add_library(engine_mods STATIC json.cpp tables.cpp zip.cpp pack.cpp apply.cpp mount.cpp)
 target_link_libraries(engine_mods PUBLIC engine_vfs engine_common)
 target_compile_options(engine_mods PRIVATE ${ENGINE_WARN})
+# Packs and extracted discs in host directories (native tools, tests): kept out of
+# engine_mods so the browser modules carry no std::filesystem or iostreams.
+add_library(engine_mods_host STATIC host.cpp)
+target_link_libraries(engine_mods_host PUBLIC engine_mods)
+target_compile_options(engine_mods_host PRIVATE ${ENGINE_WARN})
 
 # mvp-pack: pack.py's commands on the engine's implementation (and mount-check).
 add_executable(mvp-pack tools/mvp_pack.cpp)
-target_link_libraries(mvp-pack PRIVATE engine_mods)
+target_link_libraries(mvp-pack PRIVATE engine_mods_host)
 target_compile_options(mvp-pack PRIVATE ${ENGINE_WARN})
 
-engine_test(test_mods SOURCES tests/test_mods.cpp LIBS engine_mods
+engine_test(test_mods SOURCES tests/test_mods.cpp LIBS engine_mods_host
             ENV "MVP_REPO_ROOT=${MVP_REPO_ROOT}")
 
 # The cross-check against the reference tool: pack.py's own synthetic disc and

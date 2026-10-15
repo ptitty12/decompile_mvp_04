@@ -94,7 +94,8 @@ std::unique_ptr<PackSource> memory_source(std::map<std::string, std::vector<std:
                                           bool strip_single_top = true);
 // A zip's bytes; nullopt with the reason if they are not a readable zip.
 std::unique_ptr<PackSource> zip_source(std::vector<std::uint8_t> bytes, std::string* error);
-// A directory on the host (exact-case paths that stay inside it).
+// A directory on the host (exact-case paths that stay inside it). Host tools only
+// (engine_mods_host).
 std::unique_ptr<PackSource> dir_source(const std::string& root);
 
 // ---------------------------------------------------------------- packs
@@ -147,7 +148,7 @@ struct Pack {
 
 // Reads and statically validates one pack (MODDING.md §7.1). Check report.ok().
 Pack load_pack(const std::string& label, PackSource* source, Report& report);
-// A directory or a zip file on the host, as pack.py's load_pack(spec).
+// A directory or a zip file on the host, as pack.py's load_pack(spec) (engine_mods_host).
 Pack load_pack_path(const std::string& spec, Report& report);
 
 // Unique ids; every dependency earlier in the set with a matching version.

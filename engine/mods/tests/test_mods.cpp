@@ -204,22 +204,26 @@ TEST_CASE("zip packs: deflate, one top folder, the same hash as pack.py") {
 TEST_CASE("the example pack: static validation and the documented hashes") {
   const std::string root = repo_root();
   if (root.empty()) return;  // run by ctest with MVP_REPO_ROOT
+  // The files as a browser hands over a picked folder (one top folder, extra files).
+  std::map<std::string, std::vector<std::uint8_t>> files;
+  for (const char* rel : {"pack.json", "patches/players.json", "patches/harbor-city.json", "patches/tweaks.json"})
+    files[std::string("fictional-league/") + rel] = *read_file(root + "/docs/examples/packs/fictional-league/" + rel);
+  files["fictional-league/notes.txt"] = {'x'};
+  auto src = memory_source(files);
   Report r;
-  Pack p = load_pack_path(root + "/docs/examples/packs/fictional-league", r);
+  Pack p = load_pack("fictional-league", src.get(), r);
   CHECK(r.render() == "0 error(s), 0 warning(s)");
   CHECK(p.id == "fictional-league");
   CHECK(p.patches.size() == 3);
   // docs/MODDING.md §12.
   CHECK(p.hash == "e83c0341774a0363d2ce834624a8ca62bbc944a9e005806fd025f42bb2aab4f5");
   CHECK(set_hash({p}) == "b9a04e6578e789b4abe0f8a95d4c269ebda1881ace871e083c399f1d6023cafb");
-  // The same files handed over by a browser (a picked folder: one top folder).
-  std::map<std::string, std::vector<std::uint8_t>> files;
-  for (const char* rel : {"pack.json", "patches/players.json", "patches/harbor-city.json", "patches/tweaks.json"})
-    files[std::string("fictional-league/") + rel] = *read_file(root + "/docs/examples/packs/fictional-league/" + rel);
-  files["fictional-league/notes.txt"] = {'x'};
-  auto src = memory_source(files);
+#ifndef __EMSCRIPTEN__
+  // The directory itself (Node's file system cannot list a Windows path under Emscripten).
   Report r2;
-  CHECK(load_pack("fictional-league", src.get(), r2).hash == p.hash);
+  CHECK(load_pack_path(root + "/docs/examples/packs/fictional-league", r2).hash == p.hash);
+  CHECK(r2.ok());
+#endif
 }
 
 TEST_CASE("the empty set and set order") {

@@ -4,8 +4,6 @@
 #include <array>
 #include <cctype>
 #include <cstdio>
-#include <filesystem>
-#include <fstream>
 #include <set>
 #include <unordered_map>
 
@@ -1164,58 +1162,9 @@ class ImageFiles final : public DiscFiles {
   vfs::Disc& d_;
 };
 
-namespace fs = std::filesystem;
-
-class DirFiles final : public DiscFiles {
- public:
-  explicit DirFiles(std::string root) : root_(std::move(root)) {}
-  std::optional<std::vector<std::uint8_t>> read(const std::string& path) override {
-    auto p = find(path);
-    if (!p) return std::nullopt;
-    std::ifstream f(*p, std::ios::binary);
-    return std::vector<std::uint8_t>((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
-  }
-  std::optional<std::string> name_of(const std::string& lower_path) override {
-    return find(lower_path) ? std::optional<std::string>(lower_path) : std::nullopt;
-  }
-  std::optional<std::vector<std::uint8_t>> dol() override {
-    for (const char* rel : {"/sys/main.dol", "/main.dol"})
-      if (auto d = read(rel)) return d;
-    return std::nullopt;
-  }
-  std::string label() const override { return root_; }
-
- private:
-  std::string root_;
-  std::optional<fs::path> find(const std::string& path) {
-    fs::path cur = fs::path(std::u8string(reinterpret_cast<const char8_t*>(root_.data()), root_.size()));
-    std::string p = path;
-    while (!p.empty() && p.front() == '/') p.erase(0, 1);
-    while (!p.empty() && p.back() == '/') p.pop_back();
-    std::size_t at = 0;
-    std::error_code ec;
-    for (;;) {
-      const std::size_t k = p.find('/', at);
-      const std::string seg = lower(p.substr(at, k == std::string::npos ? std::string::npos : k - at));
-      std::optional<fs::path> hit;
-      for (fs::directory_iterator it(cur, ec), end; !ec && it != end; it.increment(ec)) {
-        const std::u8string u = it->path().filename().u8string();
-        if (lower(std::string(reinterpret_cast<const char*>(u.data()), u.size())) == seg) hit = it->path();
-      }
-      if (!hit) return std::nullopt;
-      cur = *hit;
-      if (k == std::string::npos) break;
-      at = k + 1;
-    }
-    if (!fs::is_regular_file(cur, ec)) return std::nullopt;
-    return cur;
-  }
-};
-
 }  // namespace
 
 std::unique_ptr<DiscFiles> image_files(vfs::Disc& disc) { return std::make_unique<ImageFiles>(disc); }
-std::unique_ptr<DiscFiles> dir_files(const std::string& root) { return std::make_unique<DirFiles>(root); }
 
 std::string result_hash(const std::map<std::string, std::vector<std::uint8_t>>& texts) {
   Json o = Json::object();

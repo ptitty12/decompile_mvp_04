@@ -55,7 +55,8 @@ struct MountResult {
 MountResult mount_packs(vfs::Disc& disc, PackSet& set, const SlotConfig& slots = {});
 
 // Loads packs from host paths (directories or .zip files), checks the set and
-// mounts it: the native tools' --pack option. Prints the issues to `log`.
+// mounts it: the native tools' --pack option. Prints the issues to `log`
+// (engine_mods_host).
 MountResult mount_pack_paths(vfs::Disc& disc, const std::vector<std::string>& paths, std::string* log,
                              std::string* set_hash = nullptr);
 

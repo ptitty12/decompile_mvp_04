@@ -48,30 +48,6 @@ MountResult mount_packs(vfs::Disc& disc, PackSet& set, const SlotConfig& slots) 
   return r;
 }
 
-MountResult mount_pack_paths(vfs::Disc& disc, const std::vector<std::string>& paths, std::string* log,
-                             std::string* hash) {
-  PackSet set;
-  for (const auto& p : paths) set.add(load_pack_path(p, set.report));
-  set.check();
-  if (hash) *hash = set.set_hash();
-  MountResult r = mount_packs(disc, set);
-  if (log) {
-    *log = set.report.render() + "\n";
-    if (!r.fatal.empty()) *log += "error: " + r.fatal + "\n";
-    for (const auto& p : set.packs) *log += "pack " + p.where() + " " + p.version_text() + " " + p.hash + "\n";
-    *log += "set hash " + set.set_hash() + "\n";
-    if (r.ok && !set.packs.empty()) {
-      *log += "result hash " + r.result_hash + "\n";
-      *log += "changed tables:";
-      for (const auto& t : r.changed_tables) *log += " " + t;
-      *log += "\nmounted:";
-      for (const auto& f : r.files) *log += " " + f;
-      *log += " (" + std::to_string(r.bytes) + " bytes)\n";
-    }
-  }
-  return r;
-}
-
 Json set_json(const PackSet& set, const MountResult* mounted) {
   Json o = Json::object();
   const bool ok = set.report.ok() && (!mounted || mounted->ok);
