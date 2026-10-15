@@ -191,6 +191,54 @@ match exactly. Whether the hardware matches us there is open: that IDCT is not t
 integer reference, so FFmpeg is no oracle for those blocks, and no hardware capture
 exists.
 
+## Merged with origin/main (2026-10-14, `claude-side-e3amerge`)
+
+`engine/e3a` merged origin/main at `45de368e` (E2 wasm emitter and Emscripten
+preset, E2b/E2c browser client, E3b audio, E5/E5b netplay and server). Two files
+conflicted; both were resolved as the union:
+- `runtime/CMakeLists.txt`, **`MVP_GAME_OPT`**: one option, one meaning. It sets
+  the optimization level of the translated game code only; empty means `/O2` on
+  MSVC (E3a-B1) and `-O1` elsewhere (clang, Emscripten, as E2 had it). The `msvc`
+  preset is therefore `/O2` by default; E2's `/Od` comparison build is the same
+  preset with `-DMVP_GAME_OPT=-Od` (E2_LOG updated). E3a's `/fp:precise` and
+  `-ffp-contract=off -fno-fast-math` on the game code are kept.
+- `gfx/tools/mvp_play.cpp`: E3a's options (`--perf-every`, `--profile`,
+  `--profile-from`, `--trace-*`, `--dump-to`) and E3b/E2's (`--audio-wav`,
+  `--no-audio`, `--audio-latency`, `--yield`) all kept; the VI-field observer
+  prints perf lines and requests the host yield; the report has both the
+  `runtime:` line and the audio lines.
+Everything else merged cleanly. E2's per-field yield, E3b's audio observer and
+E5's netplay input source work unchanged with the floating-point unavailable
+exception: a 0x800 handler runs inside `deliver` (exception depth > 0), where
+`YieldingHooks` never yields.
+
+**Native** (`msvc` preset, `/O2` default, `MVP_DISC` and `MVP_DTK_ASM` set): 40 of
+40 tests pass, none skipped. The guest state is identical in a second tree at
+`-DMVP_GAME_OPT=-Od` (all 10 local tests pass there with the same hashes):
+`local_boot_twice` SDK log `6841fdf4...`, `local_input_start` `8c1e5a94...` and
+`e68558c6...`, `local_play_determinism` (rendered, alone and yielding) MEM1
+`73e856d4...` (2,845,943,121 instructions at 700 fields), `local_audio_determinism`
+SDK log `5d46aca3...`, `local_netplay_lockstep` (solo and both peers) MEM1
+`e46c01ed...`, 10,857,210,189 instructions, window list `9c27f789...`. These are
+E3a's values; E3b's audio log (`09cfc165...`) and E5's netplay state
+(`520439ba...`, 10,836,931,415 instructions) changed with the floating-point
+unavailable exception. No test hard-codes them, so no expectation changed;
+`test_ppc_digest`'s constants hold natively and under Node, so the host-double
+shortcuts leave every digest operand set unchanged.
+
+**Emscripten** (Node, no disc at configure time): 30 of 30 run tests pass
+(27 data-free; `local_disc`, `local_cfg` and `local_disasm` pass with the disc at
+test time). **Known gap, tracked by E2d:** the wasm emitter does not take the
+floating-point unavailable exception yet, so `test_wasm_lockstep` (all three
+cases: the reference interpreter enters 0x800 at the first FPU instruction, the
+wasm code runs it) is `DISABLED` in `runtime/CMakeLists.txt` with a comment until
+E2d lands. For the same reason the browser's guest lines (WEB.md §4) no longer
+equal native ones at in-game checkpoints; native and browser netplay peers never
+pair (different build ids), so this cannot cause a mixed desync. The WPAR pipe
+reset already reaches wasm-emitted code on main: its `mtspr` to any SPR other
+than LR/CTR runs `sem::write_spr` through `rt.exec`. E2d's inline SPR moves must
+keep that (call `Hooks::write_pipe_reset` for WPAR).
+
 ## For the lead (decisions to record; docs outside docs/engine/)
 
 - **E3a-FP1** (semantics): the floating-point unavailable exception (0x800) is part

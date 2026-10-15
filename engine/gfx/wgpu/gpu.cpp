@@ -15,6 +15,31 @@ std::string to_string(wgpu::StringView s) {
 
 }  // namespace
 
+void Gpu::describe_adapter() {
+  wgpu::AdapterInfo info{};
+  adapter_.GetInfo(&info);
+  adapter_name_ = to_string(info.device) + " (" + to_string(info.description) + ")";
+  if (adapter_name_ == " ()") adapter_name_ = to_string(info.vendor) + " " + to_string(info.architecture);
+}
+
+void Gpu::set_device_callbacks(wgpu::DeviceDescriptor* ddesc) {
+  ddesc->label = "mvp";
+  ddesc->SetUncapturedErrorCallback(
+      [](const wgpu::Device&, wgpu::ErrorType type, wgpu::StringView message, std::uint64_t* errors) {
+        ++*errors;
+        std::fprintf(stderr, "gfx: WebGPU error %d: %s\n", static_cast<int>(type), to_string(message).c_str());
+      },
+      errors_.get());
+  ddesc->SetDeviceLostCallback(wgpu::CallbackMode::AllowSpontaneous,
+                               [](const wgpu::Device&, wgpu::DeviceLostReason reason, wgpu::StringView message) {
+                                 if (reason == wgpu::DeviceLostReason::Destroyed) return;
+                                 std::fprintf(stderr, "gfx: WebGPU device lost (%d): %s\n", static_cast<int>(reason),
+                                              to_string(message).c_str());
+                               });
+}
+
+#ifndef __EMSCRIPTEN__
+
 std::unique_ptr<Gpu> Gpu::create(std::string* err) {
   auto g = std::unique_ptr<Gpu>(new Gpu());
   static const wgpu::InstanceFeatureName kFeatures[] = {wgpu::InstanceFeatureName::TimedWaitAny};
@@ -41,24 +66,10 @@ std::unique_ptr<Gpu> Gpu::create(std::string* err) {
     if (err) *err = "no WebGPU adapter: " + adapter_error;
     return nullptr;
   }
-  wgpu::AdapterInfo info{};
-  g->adapter_.GetInfo(&info);
-  g->adapter_name_ = to_string(info.device) + " (" + to_string(info.description) + ")";
+  g->describe_adapter();
 
   wgpu::DeviceDescriptor ddesc{};
-  ddesc.label = "mvp";
-  ddesc.SetUncapturedErrorCallback(
-      [](const wgpu::Device&, wgpu::ErrorType type, wgpu::StringView message, std::uint64_t* errors) {
-        ++*errors;
-        std::fprintf(stderr, "gfx: WebGPU error %d: %s\n", static_cast<int>(type), to_string(message).c_str());
-      },
-      g->errors_.get());
-  ddesc.SetDeviceLostCallback(wgpu::CallbackMode::AllowSpontaneous,
-                              [](const wgpu::Device&, wgpu::DeviceLostReason reason, wgpu::StringView message) {
-                                if (reason == wgpu::DeviceLostReason::Destroyed) return;
-                                std::fprintf(stderr, "gfx: WebGPU device lost (%d): %s\n", static_cast<int>(reason),
-                                             to_string(message).c_str());
-                              });
+  g->set_device_callbacks(&ddesc);
   std::string device_error;
   f = g->adapter_.RequestDevice(&ddesc, wgpu::CallbackMode::WaitAnyOnly,
                                 [&](wgpu::RequestDeviceStatus status, wgpu::Device device, wgpu::StringView message) {
@@ -113,6 +124,56 @@ std::vector<std::uint8_t> Gpu::read_texture(const wgpu::Texture& texture, std::u
   buf.Unmap();
   return out;
 }
+
+#else  // __EMSCRIPTEN__
+
+void Gpu::create_async(Ready done) {
+  // The Gpu under construction and the continuation live until the last callback.
+  struct State {
+    std::unique_ptr<Gpu> gpu;
+    Ready done;
+  };
+  auto st = std::make_shared<State>();
+  st->gpu = std::unique_ptr<Gpu>(new Gpu());
+  st->done = std::move(done);
+  st->gpu->instance_ = wgpu::CreateInstance(nullptr);
+  if (!st->gpu->instance_) {
+    st->done(nullptr, "wgpuCreateInstance failed (no WebGPU in this browser?)");
+    return;
+  }
+  wgpu::RequestAdapterOptions opts{};
+  opts.powerPreference = wgpu::PowerPreference::HighPerformance;
+  st->gpu->instance_.RequestAdapter(
+      &opts, wgpu::CallbackMode::AllowSpontaneous,
+      [st](wgpu::RequestAdapterStatus status, wgpu::Adapter adapter, wgpu::StringView message) {
+        if (status != wgpu::RequestAdapterStatus::Success || !adapter) {
+          st->done(nullptr, "no WebGPU adapter: " + to_string(message));
+          return;
+        }
+        Gpu& g = *st->gpu;
+        g.adapter_ = std::move(adapter);
+        g.describe_adapter();
+        wgpu::DeviceDescriptor ddesc{};
+        g.set_device_callbacks(&ddesc);
+        g.adapter_.RequestDevice(
+            &ddesc, wgpu::CallbackMode::AllowSpontaneous,
+            [st](wgpu::RequestDeviceStatus status, wgpu::Device device, wgpu::StringView message) {
+              if (status != wgpu::RequestDeviceStatus::Success || !device) {
+                st->done(nullptr, "no WebGPU device: " + to_string(message));
+                return;
+              }
+              st->gpu->device_ = std::move(device);
+              st->gpu->queue_ = st->gpu->device_.GetQueue();
+              st->done(std::move(st->gpu), std::string());
+            });
+      });
+}
+
+void Gpu::wait_idle() {}
+
+std::vector<std::uint8_t> Gpu::read_texture(const wgpu::Texture&, std::uint32_t, std::uint32_t) { return {}; }
+
+#endif  // __EMSCRIPTEN__
 
 wgpu::ShaderModule Gpu::shader(const std::string& wgsl, const char* label) {
   wgpu::ShaderSourceWGSL src{};

@@ -222,3 +222,55 @@ TEST_CASE("PB updates apply at the start of their millisecond") {
   CHECK(be16(&mem[0x2000 + pb::kState]) == kStateStop);
   CHECK(be32(&mem[0x2000 + pb::kCurHi]) == 2 * kSamplesPerMs);
 }
+
+TEST_CASE("AX2: milliseconds run while the voice runs, the envelope is written back, an observer sees each one") {
+  std::vector<u8> mem(0x10000, 0), aram(0x1000, 0);
+  for (u32 k = 0; k < 0x400; ++k) put_be16(&aram[2 * k], static_cast<u16>(k));
+  SampleMemory m{aram.data(), static_cast<u32>(aram.size())};
+  const u16 cl[] = {0x0002, 0x0000, 0x2000, 0x0003};
+  for (u32 k = 0; k < 4; ++k) put_be16(&mem[0x1000 + 2 * k], cl[k]);
+  // 0x80 samples at a ratio of 1 + 1/256: the end comes in millisecond 3.
+  Pb a = voice(kFormatPcm16, 0, 0x7F);
+  a.h(pb::kSrcSelect, 0);
+  a.w(pb::kRatioHi, 0x10100);
+  a.h(pb::kVeVolume, 0x4000);
+  a.h(pb::kVeDelta, 2);
+  std::copy(a.b, a.b + kPbSize, &mem[0x2000]);
+
+  struct Obs : FrameObserver {
+    int begins = 0, ends = 0;
+    std::vector<VoiceMs> ms;
+    std::vector<u16> ve;
+    std::vector<s16> in;
+    void frame_begin(const u8*, u32, u32 cmdlist) override { begins += cmdlist == 0x1000; }
+    void voice_ms(const VoiceMs& v) override {
+      ms.push_back(v);
+      ve.push_back(be16(v.pb + pb::kVeVolume));
+      in.insert(in.end(), v.in, v.in + v.n_in);
+    }
+    void frame_end() override { ++ends; }
+  } obs;
+  FrameStats st = process_frame(mem.data(), static_cast<u32>(mem.size()), m, 0x1000, &obs);
+  REQUIRE(st.error.empty());
+  CHECK(obs.begins == 1);
+  CHECK(obs.ends == 1);
+  REQUIRE(obs.ms.size() == 4);  // milliseconds 0..3; the voice stopped in 3
+  for (u32 k = 0; k < 4; ++k) {
+    CHECK(obs.ms[k].ms == k);
+    CHECK(obs.ms[k].pb_addr == 0x2000);
+    CHECK(obs.ve[k] == 0x4000 + 64 * k);  // the PB as it was at the start of that millisecond
+    CHECK(obs.ms[k].ended == (k == 3));
+  }
+  CHECK(obs.ms[0].n_in == 32);  // floor(32 x (1 + 1/256)) = 32, fraction 0x2000
+  CHECK(obs.in.size() == 0x80);
+  for (u32 k = 0; k < obs.in.size(); ++k) CHECK(obs.in[k] == static_cast<s16>(k));
+  CHECK(be16(&mem[0x2000 + pb::kState]) == kStateStop);
+  CHECK(be16(&mem[0x2000 + pb::kVeVolume]) == 0x4000 + 4 * 32 * 2);  // four milliseconds of +2
+  CHECK(be16(&mem[0x2000 + pb::kFrac]) == ((4 * 32 * 0x100) & 0xFFFF));  // no fraction after the end
+  // The same frame without an observer writes the same guest state.
+  std::vector<u8> mem2(0x10000, 0);
+  for (u32 k = 0; k < 4; ++k) put_be16(&mem2[0x1000 + 2 * k], cl[k]);
+  std::copy(a.b, a.b + kPbSize, &mem2[0x2000]);
+  process_frame(mem2.data(), static_cast<u32>(mem2.size()), m, 0x1000);
+  CHECK(mem2 == mem);
+}

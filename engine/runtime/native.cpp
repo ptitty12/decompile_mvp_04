@@ -10,6 +10,7 @@ namespace mvp::rt {
 EntryHook g_entry_hook = nullptr;
 bool g_unwinding = false;
 bool g_resume = false;
+bool g_yield = false;
 std::uint64_t g_unwinds = 0;
 std::uint64_t g_inframe_resumes = 0;
 std::uint64_t g_resume_entries = 0;
@@ -65,7 +66,7 @@ u32 resume_target(Cpu& c, u32 sp, GuestFn self) {
     g_resume = false;
     return c.pc;
   }
-  if (c.gpr[1] == sp && g_resume_labels.find(c.pc) == self) {
+  if (!g_yield && c.gpr[1] == sp && g_resume_labels.find(c.pc) == self) {
     // The guest continues in this activation (same function, same stack frame):
     // the unwind ends here, and this frame goes on natively.
     g_unwinding = false;
@@ -82,13 +83,18 @@ namespace {
 // at an instruction boundary (nested: an interpreted call made by translated
 // code), or forever (the top level). A nested loop returns as soon as an unwind
 // passes through it, so the translated frames below it unwind too; the top level
-// ends the unwind and goes on at c.pc, re-entering native code at resume labels.
+// ends the unwind and goes on at c.pc, re-entering native code at resume labels,
+// or returns if the unwind was a host yield (g_yield).
 void dispatch(Cpu& c, bool nested, u32 stop) {
   auto unwound = [&]() {
     if (!g_unwinding) return false;
     if (nested) return true;
     g_unwinding = false;
     ++g_unwinds;  // native frames are gone; continue at c.pc
+    if (g_yield) {  // ... in the next run()
+      g_yield = false;
+      return true;
+    }
     return false;
   };
   for (;;) {
@@ -103,7 +109,7 @@ void dispatch(Cpu& c, bool nested, u32 stop) {
         ++g_resume_entries;
         g_resume = true;
         fn(c);
-        unwound();
+        if (unwound()) return;
         continue;
       }
     }

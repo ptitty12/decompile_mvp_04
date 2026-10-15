@@ -12,8 +12,8 @@
 //   start), and the DSP side of the mailbox protocol, without running DSP code:
 //   the IPL init microcode's answer, the boot ROM's task loader, and the AX
 //   microcode's frame handshake (each command list is answered with a yield
-//   after a fixed time; the voices advance through runtime/ax.h, the mix itself
-//   is not computed, R8);
+//   after a fixed time; the voices advance through runtime/ax.h, R8; the mix
+//   is computed by an optional read-only observer, engine/audio, E3b);
 // - DI: the DVD drive reads the disc image (vfs::Source); a command completes
 //   after a fixed latency plus its transfer time (R7), then raises TCINT;
 // - AI: the streaming sample counter counts at 32 or 48 kHz of virtual time
@@ -36,6 +36,7 @@
 #include <vector>
 
 #include "ppc/cpu.h"
+#include "runtime/ax.h"
 #include "runtime/gx_fifo.h"
 
 namespace mvp::vfs {
@@ -119,6 +120,10 @@ class Hardware : public ppc::Io {
   std::uint64_t di_commands() const { return di_commands_; }
   std::uint64_t dsp_frames() const { return dsp_frames_; }
   const AxStats& ax_stats() const { return ax_; }
+  // The mixer (E3b, engine/audio): sees every AX frame the DSP processes, read-only.
+  void set_ax_observer(ax::FrameObserver* o) { ax_obs_ = o; }
+  // The rate the AI plays the DSP's output at (AICR bit 6: 32 kHz, else 48 kHz).
+  u32 ai_dsp_rate() const { return (ai_cr_ & 0x40) ? 32000u : 48000u; }
   int dsp_state() const { return static_cast<int>(dsp_state_); }
   std::size_t dsp_mails_waiting() const { return dsp_out_.size(); }
   u32 dsp_control() const { return dsp_cr_; }
@@ -189,6 +194,7 @@ class Hardware : public ppc::Io {
   std::vector<DspMail> dsp_out_;
   std::uint64_t dsp_frames_ = 0;
   AxStats ax_;
+  ax::FrameObserver* ax_obs_ = nullptr;
 
   // AI DMA (DSP registers 0x30-0x3A): the block being played and its end.
   void aid_start_block(std::uint64_t tb);

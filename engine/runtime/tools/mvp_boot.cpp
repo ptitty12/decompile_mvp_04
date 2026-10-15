@@ -6,7 +6,8 @@
 //   mvp-boot run [--until main|none|NAME|0xADDR] [--mmio N] [--log FILE] [--fifo FILE]
 //                [--max-entries N] [--max-ticks N] [--unnamed stop|log]
 //                [--input SCRIPT] [--frames N] [--ports MASK] [--frame-log FILE]
-//                [--ax-voices on|off]
+//                [--ax-voices on|off] [--trace on|off] [--audio-wav FILE]
+//                [--count NAME,...] [--peek ADDR:LEN,...]
 //                       E0b items 7 and 8: boot with the IPL environment
 //                       (runtime/boot.h) and the hardware model (runtime/hw.h).
 //                       Prints the calls __start makes; logs every call from game
@@ -22,16 +23,30 @@
 //                       one line per frame poll goes to the frame log (default
 //                       frames.log). --ax-voices off freezes the AX voices
 //                       (E0b behaviour; runtime/ax.h).
+//                       E2: --trace off runs without the per-entry trace hook
+//                       (no SDK call log, --until and --max-entries unused): the
+//                       speed of the translated code alone, for measurements.
+//                       E3b: --audio-wav mixes
+//                       the AX frames (audio/mixer.h) into a WAV file (keep it
+//                       under build/); the mixer only reads guest state, so
+//                       everything else in the report is the same without it.
+//                       --count prints how often the listed functions (names
+//                       or 0x addresses) were entered, --peek prints guest
+//                       memory (hex, at most 256 bytes each) at the end of the
+//                       run (for investigations).
 //
 // Needs the disc (MVP_DISC) and a build with the translated code. Prints register
 // values, names and addresses only; the log stays under build/ (only its hash may
 // be committed).
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <map>
 #include <string>
 #include <vector>
 
+#include "audio/mixer.h"
+#include "audio/wav.h"
 #include "common/bytes.h"
 #include "common/file.h"
 #include "common/sha1.h"
@@ -108,6 +123,7 @@ struct RunTrace {
   std::map<u32, u32> unnamed_first_caller;
   std::map<std::string, std::uint64_t> per_function;
   std::vector<std::string> first_order;
+  std::map<u32, std::uint64_t> counted;  // --count: entries per function address
 
   std::string name(u32 a) const {
     const xlat::Symbol* s = cfg->index.containing(a);
@@ -154,6 +170,10 @@ void frame_hook(ppc::Cpu& c, std::uint64_t frame) {
 void trace_hook(ppc::Cpu& c, u32 addr) {
   RunTrace& t = *g_trace;
   ++t.events;
+  if (!t.counted.empty()) {
+    auto it = t.counted.find(addr);
+    if (it != t.counted.end()) ++it->second;
+  }
   // Thread switches: the OS's current-thread pointer (0x800000E4) changed.
   if (const u8* p = c.mem->host(0x800000E4u)) {
     u32 cur = be32(p);
@@ -216,9 +236,10 @@ void trace_hook(ppc::Cpu& c, u32 addr) {
 
 int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::string until = "main", log_path = "sdk_calls.log", fifo_path, unnamed_mode = "stop";
-  std::string input_path, frame_log_path = "frames.log";
+  std::string input_path, frame_log_path = "frames.log", audio_wav, count_list, peek_list;
   std::size_t mmio_lines = 40;
   std::uint64_t max_entries = 20000000, max_ticks = 2000000000ull, max_frames = ~0ull;
+  bool trace = true;
   u32 ports = 1;
   HardwareConfig hw_cfg;
   for (int k = 2; k + 1 < argc; ++k) {
@@ -235,6 +256,10 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
     if (a == "--ports") ports = static_cast<u32>(std::strtoul(argv[k + 1], nullptr, 0)) & 0xF;
     if (a == "--frame-log") frame_log_path = argv[k + 1];
     if (a == "--ax-voices") hw_cfg.ax_voices = std::string(argv[k + 1]) != "off";
+    if (a == "--trace") trace = std::string(argv[k + 1]) != "off";
+    if (a == "--audio-wav") audio_wav = argv[k + 1];
+    if (a == "--count") count_list = argv[k + 1];
+    if (a == "--peek") peek_list = argv[k + 1];
   }
   // Controller input (R14): a script, or port(s) connected with nothing pressed.
   std::string script_text = "mvp-input 1\n";
@@ -275,12 +300,41 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   hooks.tick_limit = max_ticks;
   hooks.reschedule(m.cpu());
   mvp_register_game();
+  // The mixer (E3b): an observer of the DSP's frames; it writes only the WAV.
+  audio::AxMixer mixer;
+  audio::WavWriter wav;
+  audio::LevelMeter levels;
+  audio::TeeSink tee;
+  if (!audio_wav.empty()) {
+    if (!wav.open(audio_wav)) {
+      std::fprintf(stderr, "mvp-boot: cannot write %s\n", audio_wav.c_str());
+      return 2;
+    }
+    tee.add(&wav);
+    tee.add(&levels);
+    mixer.set_sink(&tee);
+    mixer.set_rate([&hw] { return hw.ai_dsp_rate(); });
+    hw.set_ax_observer(&mixer);
+  }
   RunTrace t;
   t.cfg = &cfg;
   t.units = &units;
   t.start_fn = in.disc.dol.entry();
   t.max_events = max_entries;
   t.stop_on_unnamed = unnamed_mode != "log";
+  for (std::size_t at = 0; at < count_list.size();) {
+    std::size_t comma = count_list.find(',', at);
+    if (comma == std::string::npos) comma = count_list.size();
+    const std::string name = count_list.substr(at, comma - at);
+    at = comma + 1;
+    const xlat::Symbol* s = name.rfind("0x", 0) == 0 ? nullptr : in.symbols.find(name);
+    const u32 a = s ? s->address : static_cast<u32>(std::strtoul(name.c_str(), nullptr, 16));
+    if (!a) {
+      std::fprintf(stderr, "mvp-boot: --count: no symbol %s\n", name.c_str());
+      return 2;
+    }
+    t.counted[a] = 0;
+  }
   const xlat::Symbol* mainsym = in.symbols.find("main");
   t.stop_at = until == "main" ? (mainsym ? mainsym->address : 0x8014D63Cu) : 0;
   if (until.rfind("0x", 0) == 0) {  // a function entry by address
@@ -296,7 +350,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   t.log = std::fopen(log_path.c_str(), "wb");
   if (!t.log) std::fprintf(stderr, "mvp-boot: cannot write %s\n", log_path.c_str());
   g_trace = &t;
-  rt::g_entry_hook = &trace_hook;
+  rt::g_entry_hook = trace ? &trace_hook : nullptr;
   FrameTrace ft;
   ft.hooks = &hooks;
   ft.stop_at = max_frames;
@@ -307,6 +361,9 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   rt::g_frame_hook = &frame_hook;
   std::string why;
   int rc = 1;
+  // Host time spent running guest code (E2 speed measurements): printed only,
+  // never visible to the guest.
+  auto run_start = std::chrono::steady_clock::now();
   try {
     rt::run(m.cpu());
   } catch (const StopRun& s) {
@@ -315,9 +372,11 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   } catch (const ppc::GuestFault& f) {
     why = std::string("guest fault: ") + f.what() + " in " + t.name(f.pc());
   }
+  double run_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - run_start).count();
   rt::g_entry_hook = nullptr;
   rt::g_frame_hook = nullptr;
   rt::g_input = nullptr;
+  hw.set_ax_observer(nullptr);
   if (ft.log) std::fclose(ft.log);
   std::printf("stopped: %s (pc 0x%08X in %s) after %llu function entries, %llu unwinds\n", why.c_str(),
               m.cpu().pc, t.name(m.cpu().pc).c_str(), static_cast<unsigned long long>(t.events),
@@ -334,10 +393,36 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   if (t.log) std::fclose(t.log);
   std::printf("SDK call log: %s, %llu bytes, sha1 %s\n", log_path.c_str(), static_cast<unsigned long long>(t.log_bytes),
               Sha1::hex(t.log_sha.finish()).c_str());
+  for (const auto& [a, n] : t.counted)
+    std::printf("count: %s (0x%08X) entered %llu times\n", t.name(a).c_str(), a, static_cast<unsigned long long>(n));
+  for (std::size_t at = 0; at < peek_list.size();) {
+    std::size_t comma = peek_list.find(',', at);
+    if (comma == std::string::npos) comma = peek_list.size();
+    const std::string item = peek_list.substr(at, comma - at);
+    at = comma + 1;
+    char* end = nullptr;
+    const u32 addr = static_cast<u32>(std::strtoul(item.c_str(), &end, 16));
+    const u32 len = std::min<u32>(*end == ':' ? static_cast<u32>(std::strtoul(end + 1, nullptr, 0)) : 4u, 256u);
+    std::printf("peek: %08X:", addr);
+    for (u32 k = 0; k < len; ++k) {
+      const u8* b = m.memory().host(addr + k);
+      if (k && k % 32 == 0) std::printf("\npeek: %08X:", addr + k);
+      std::printf(k % 4 ? "%02x" : " %02x", b ? *b : 0);
+    }
+    std::printf("\n");
+  }
   auto ull = [](std::uint64_t v) { return static_cast<unsigned long long>(v); };
+  // stderr: host time differs between runs; the reports on stdout must not (local_boot_twice).
+  std::fprintf(stderr, "host: %.3f s in rt::run, %.0f million guest instructions executed per second\n", run_seconds,
+               run_seconds > 0 ? static_cast<double>(m.cpu().ticks - hooks.idle_ticks_skipped) / run_seconds / 1e6 : 0.0);
   std::printf("clock: %llu instructions, time base %llu (%.3f s of guest time), %llu VI fields\n", ull(m.cpu().ticks),
               ull(hooks.time_base(m.cpu())), static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0,
               ull(hw.vi_fields()));
+  {
+    Sha1 mem;
+    mem.update(m.mem1(), Machine::kMem1Size);
+    std::printf("memory: MEM1 sha1 %s\n", Sha1::hex(mem.finish()).c_str());
+  }
   std::printf("threads: %llu switches (%.2f per VI field), %llu unwinds (%.3f per switch), %llu in-frame resumes, "
               "%llu resume entries\n",
               ull(t.thread_switches),
@@ -371,6 +456,24 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
               "%llu loop wraps, %llu PB updates\n",
               hw_cfg.ax_voices ? "advanced" : "frozen", ull(ax.voice_frames), ull(ax.max_running), ull(ax.samples),
               ull(ax.ended), ull(ax.looped), ull(ax.updates));
+  if (!audio_wav.empty()) {
+    const bool ok = wav.close();
+    const audio::MixerStats& ms = mixer.stats();
+    std::printf("audio: %s%s, %u Hz (%llu rate changes); %s\n", audio_wav.c_str(), ok ? "" : " (WRITE FAILED)",
+                wav.rate(), ull(wav.rate_changes()), levels.summary().c_str());
+    std::printf("audio: mixer %llu frames, %llu voice-ms (src %llu/%llu/%llu/%llu), at most %u voices, %llu mix "
+                "reloads, %llu ramp ms, %llu lpf ms, %llu itd ms, %llu envelope ms, max envelope 0x%04X, %llu depops; "
+                "aux A %llu frames (%llu with sends, %llu with returns), aux B %llu (%llu, %llu); stereo %llu, "
+                "surround %llu, DPL2 %llu, compressor %llu frames; %llu unknown commands; %llu clipped, %llu "
+                "non-silent frames\n",
+                ull(ms.frames), ull(ms.voice_ms), ull(ms.src_ms[0]), ull(ms.src_ms[1]), ull(ms.src_ms[2]),
+                ull(ms.src_ms[3]), ms.max_voices, ull(ms.mix_reloads), ull(ms.ramp_ms), ull(ms.lpf_ms), ull(ms.itd_ms),
+                ull(ms.env_ms), ms.max_ve, ull(ms.depops), ull(ms.aux_frames[0]), ull(ms.aux_send_frames[0]),
+                ull(ms.aux_return_frames[0]), ull(ms.aux_frames[1]), ull(ms.aux_send_frames[1]),
+                ull(ms.aux_return_frames[1]), ull(ms.stereo_mode_frames), ull(ms.surround_mode_frames),
+                ull(ms.dpl2_frames), ull(ms.compressor_frames), ull(ms.unknown_commands), ull(ms.clipped),
+                ull(ms.nonsilent_frames));
+  }
   std::printf("DSP: state %d, %zu mails waiting, mailbox 0x%08X, control 0x%04X; PI cause 0x%05X mask 0x%05X\n",
               hw.dsp_state(), hw.dsp_mails_waiting(), hw.dsp_mail_to_cpu(), hw.dsp_control(), hw.pi_cause(),
               hw.pi_mask());
@@ -409,6 +512,6 @@ int main(int argc, char** argv) {
   if (cmd == "run") return run_boot(*in, argc, argv);
   std::fprintf(stderr, "usage: mvp-boot lockstep | run [--until main|none|NAME|0xADDR] [--mmio N] [--log FILE] [--fifo FILE] "
                        "[--max-entries N] [--max-ticks N] [--unnamed stop|log] [--input SCRIPT] [--frames N] "
-                       "[--ports MASK] [--frame-log FILE] [--ax-voices on|off]\n");
+                       "[--ports MASK] [--frame-log FILE] [--ax-voices on|off] [--trace on|off]\n");
   return 2;
 }

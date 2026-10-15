@@ -154,7 +154,7 @@ pinned to the exact upstream commit it was fetched from.
 | Path | Upstream | License | Pinned commit | Used for |
 |---|---|---|---|---|
 | `engine/third_party/doctest/doctest.h`, `LICENSE.txt` | [doctest/doctest](https://github.com/doctest/doctest) v2.5.3 | MIT | `2d0a9359a60c51affe2a9bebb1be1dca47868151` | Unit-test framework for every data-free engine test |
-| `engine/third_party/pureikyubu/` (`gekko.cpp`, `gekko.h`, `gekkoc.cpp`, `gekkoc.h`, `gekkodec.cpp`, `gekkodec.h`, `gekkodisasm.cpp`, `gekkodisasm.h`, `gqr.h` from `src/`; `pch.h`, `stubs.cpp` from `testing/gekko_bench/`; `LICENSE`) | [emu-russia/pureikyubu](https://github.com/emu-russia/pureikyubu) | CC0-1.0 | `0c29dca5cfa13d9126a137b9ebf95f13821413cb` (the last commit where the benchmark's `pch.h` and the core sources agree) | Test oracle only: `test_ppc_fuzz_pk` runs random integer/branch/CR/XER programs on its interpreter and ours. Not linked into the engine. Changes: `pch.h` includes our `pk_jit_stub.h` when the recompiler is not built; `pk_jit_stub.h` and `CMakeLists.txt` are ours |
+| `engine/third_party/pureikyubu/` (`gekko.cpp`, `gekko.h`, `gekkoc.cpp`, `gekkoc.h`, `gekkodec.cpp`, `gekkodec.h`, `gekkodisasm.cpp`, `gekkodisasm.h`, `gqr.h` from `src/`; `pch.h`, `stubs.cpp` from `testing/gekko_bench/`; `LICENSE`) | [emu-russia/pureikyubu](https://github.com/emu-russia/pureikyubu) | CC0-1.0 | `0c29dca5cfa13d9126a137b9ebf95f13821413cb` (the last commit where the benchmark's `pch.h` and the core sources agree) | Test oracle only: `test_ppc_fuzz_pk` runs random integer/branch/CR/XER programs on its interpreter and ours. Not linked into the engine. Changes: `pch.h` includes our `pk_jit_stub.h` when the recompiler is not built; `pk_jit_stub.h`, `pk_wasm_shim.h` (no x86 cycle counter in the WebAssembly build, E2) and `CMakeLists.txt` are ours |
 
 ### Read, not copied: the renderer (`engine/gfx/`, E1)
 
@@ -166,3 +166,44 @@ These were read for hardware facts and design, and no code was copied:
 | [encounter/aurora](https://github.com/encounter/aurora) at `51797212b9283e91cc03c273854d63b2421d8490` | MIT | Design of the TEV-to-WGSL generator, pipeline cache and register decoding (`lib/gx/shader.cpp`, `regs.cpp`, `gx.cpp`: BP cull encoding and front face); its texture converter was judged too tied to its own buffers to vendor |
 | Dolphin (VideoCommon) | GPL-2.0+ (read only) | Hardware behaviour: CMPR's 5/8-3/8 interpolation, indirect texturing (formats, bias, matrix scale, wraps), the TEV fixed-point lerp and compare modes, fog and lighting formulas, EFB copy register fields |
 | YAGCD and the Dolphin SDK's GX macros | public documentation | Register layouts and command lengths |
+
+### Compiled in, not vendored: the browser build (`engine/web/`, E2)
+
+Nothing new is copied into the tree. The browser engine (`mvp-web.js`/`.wasm`)
+compiles in third-party code from SDKs outside the repository
+(`docs/engine/TOOLCHAIN.md`); the build copies their notices into the served
+site's `licenses/` directory:
+
+| Code | License | In the served engine as |
+|---|---|---|
+| emdawnwebgpu, Dawn release `v20261013.193955` (`webgpu.cpp`, `webgpu_cpp.h`, `library_webgpu*.js`) | BSD-3-Clause (Dawn & Tint authors); its JS bindings under Emscripten's MIT/NCSA | `webgpu.h` for the renderer (`licenses/dawn-emdawnwebgpu.txt`) |
+| Emscripten 6.0.12 runtime and system libraries (JS glue, libc, libc++, libc++abi) | MIT/NCSA; libc++ Apache-2.0 with LLVM exception; musl MIT | everything (`licenses/emscripten.txt`) |
+
+Dev tools only, never served: TypeScript 6.0.3 (Apache-2.0) compiles the shell;
+Playwright 1.64.0 (Apache-2.0) drives the local browser check.
+
+### Read, not copied: audio (`engine/audio/`, E3b)
+
+Nothing is vendored for audio; SDL3 is the external SDK `engine/gfx/` already uses
+(`docs/engine/TOOLCHAIN.md`). These were read for behaviour, and no code or data was copied:
+
+| Source | License | Read for |
+|---|---|---|
+| Dolphin (DSPHLE `UCodes/AX.h`, `AX.cpp`, `AXStructs.h`, `AXVoice.h`, master as of 2026-10-14) | GPL-2.0+ (read only) | AX microcode behaviour: command numbers and arguments, the 2004 microcode's mixerCtrl bits, per-millisecond voice processing (SRC, envelope, LPF, mix with ramps), aux send/return and the Dolby Pro Logic II commands 0x13/0x10, output clamping. The DSP ROM's polyphase coefficients were not used: `audio/mixer.cpp` designs its own |
+| The game's own SDK and EA SND code (`config/GV4E69` symbols, dtk assembly of `dolphin/ax` and `snd/`) | the retail binary (read, as for the decomp) | The command list the CPU builds (fn_804181DC), the PB fields it reads back (fn_80419568), the studio/depop ramp (fn_804190A4), the aux buffer rotation (fn_80417F50), EA's mixerCtrl and ramp use (SNDDRV_DSPMixerUpdate) and its aux A callback (SNDDRV_audiocallback) |
+
+### Netplay and the VPS server (`engine/net/`, `engine/server/`, E5)
+
+Nothing is vendored into the repository. The server has one runtime dependency,
+installed by npm from the pinned `engine/server/package-lock.json` and copied into
+the deploy package (`engine/server/tools/package.mjs`) with its own license file:
+
+| Code | License | Used as |
+|---|---|---|
+| [ws](https://github.com/websockets/ws) 8.22.0 | MIT | The WebSocket server for the lobby and signaling (`engine/server/src/server.ts`) |
+| TypeScript 6.0.3, `@types/node` 24.19.2, `@types/ws` 8.18.2 | Apache-2.0 / MIT | Development only (compiling and type-checking the server) |
+
+| Source | License | Read for |
+|---|---|---|
+| xxHash's XXH64 description ([Cyan4973/xxHash](https://github.com/Cyan4973/xxHash), `doc/xxhash_spec.md`) | BSD-2-Clause | `engine/net/state_hash.cpp` implements XXH64 from the published algorithm (no code copied); its reference vectors are in `test_net_protocol` |
+| coturn's documentation ("TURN REST API", `use-auth-secret`) | BSD-3-Clause | The credential format `engine/server/src/turn.ts` derives and the `deploy/turnserver.conf.template` settings |

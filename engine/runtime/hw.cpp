@@ -544,7 +544,7 @@ void Hardware::dsp_receive(u32 mail) {
         ++dsp_frames_;
         if (cfg_.ax_voices) {  // the voices advance (R8, runtime/ax.h)
           ax::FrameStats st =
-              ax::process_frame(mem1_, mem1_size_, {aram_.data(), static_cast<u32>(aram_.size())}, mail);
+              ax::process_frame(mem1_, mem1_size_, {aram_.data(), static_cast<u32>(aram_.size())}, mail, ax_obs_);
           if (!st.error.empty()) {
             char at[32];
             std::snprintf(at, sizeof at, " (pc 0x%08X)", cpu_ ? cpu_->pc : 0u);

@@ -11,6 +11,9 @@
 //   --max-ticks N     instruction budget (default: none)
 //   --headless        no window: render off-screen only (captures still work)
 //   --no-render       no renderer at all (the guest runs alone; for the determinism check)
+//   --yield           return from rt::run() at every VI field and call it again, as
+//                     the browser does (runtime/host_yield.h); the guest must run
+//                     the same (compare the "guest:" line with a run without it)
 //   --present-every N show every Nth VI field (default 1)
 //   --capture DIR     write the scanned-out frame as DIR/field_N_frame_F.png (VI field N,
 //                     game frame poll F, the number input scripts use) every
@@ -27,9 +30,14 @@
 //   --trace-entry A,B registers and memory at r3/r4 at each entry of those functions (hex
 //                     addresses), from VI field --trace-from to --trace-to, to --trace-file;
 //                     --trace-peek O1,O2: also the words at r3 + those (hex) offsets
+//   --audio-wav FILE  (E3b) the AX mix as a 16-bit stereo WAV, exactly as virtual
+//                     time produced it (keep it under build/; never commit it)
+//   --no-audio        no playback (default: SDL3 playback when a window is open)
+//   --audio-latency MS buffering between the mixer and the device (default 100)
 //
-// Determinism: the renderer only reads guest state, and window events never
-// reach the guest; with the same input script, the guest runs exactly as under
+// Determinism: the renderer and the mixer only read guest state, audio and
+// window events never reach the guest (playback throttles the host, not the
+// guest); with the same input script, the guest runs exactly as under
 // mvp-boot. The report's "guest:" line (instructions, time base, SHA-1 of MEM1)
 // is the same with and without --no-render (local test local_play_determinism).
 // Captures are game-derived: they belong under build/ and are never committed.
@@ -47,6 +55,9 @@
 #include <thread>
 #include <vector>
 
+#include "audio/mixer.h"
+#include "audio/sdl_out.h"
+#include "audio/wav.h"
 #include "common/file.h"
 #include "common/sha1.h"
 #include "gfx/gx_processor.h"
@@ -57,6 +68,7 @@
 #include "gfx/wgpu/window.h"
 #include "runtime/boot.h"
 #include "runtime/hle.h"
+#include "runtime/host_yield.h"
 #include "runtime/hw.h"
 #include "runtime/input.h"
 #include "runtime/native.h"
@@ -160,9 +172,11 @@ struct DrawLog : gfx::Backend {
 };
 
 struct Play : GfxObserver {
+  YieldingHooks* yield_hooks = nullptr;  // --yield
   gfx::GxProcessor* proc = nullptr;
   gfx::Renderer* renderer = nullptr;
   gfx::Window* window = nullptr;
+  audio::SdlAudioOut* audio_out = nullptr;
   std::uint64_t present_every = 1, max_fields = ~0ull;
   std::string capture_dir;
   std::uint64_t capture_every = 60;
@@ -191,6 +205,7 @@ struct Play : GfxObserver {
   void vi_field(std::uint64_t field, std::uint32_t xfb) override {
     fields = field;
     perf(field);
+    if (yield_hooks) yield_hooks->request_yield();
     if (!renderer) {
       if (field >= max_fields) throw StopRun{"ran " + std::to_string(max_fields) + " VI fields (--fields)"};
       return;
@@ -199,6 +214,7 @@ struct Play : GfxObserver {
     const gfx::Renderer::Frame* f = renderer->xfb(xfb);
     if (!f) f = renderer->latest_xfb();
     if (window && field % present_every == 0) {
+      if (audio_out) audio_out->throttle();  // keep the host near real time (host pacing only)
       if (!window->pump()) throw StopRun{"window closed"};
       if (f) {
         window->present(f->view, f->width, f->height);
@@ -323,10 +339,12 @@ int main(int argc, char** argv) {
   std::setvbuf(stdout, nullptr, _IOLBF, 1 << 16);
   std::string input_path, capture_at, draw_log_path;
   std::uint64_t draw_log_from = 0, draw_log_to = ~0ull, dump_field = ~0ull, dump_to = 0;
-  std::string dump_dir;
+  std::string dump_dir, audio_wav;
+  bool no_audio = false;
+  std::uint32_t audio_latency = 100;
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
-  bool headless = false, no_render = false;
+  bool headless = false, no_render = false, yield = false;
   int profile_top = 0;
   std::uint64_t profile_from = 0;
   std::string trace_entry, trace_file;
@@ -341,6 +359,7 @@ int main(int argc, char** argv) {
     else if (a == "--max-ticks") max_ticks = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--headless") headless = true;
     else if (a == "--no-render") no_render = headless = true;
+    else if (a == "--yield") yield = true;
     else if (a == "--present-every") play.present_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
     else if (a == "--capture") play.capture_dir = next();
     else if (a == "--capture-every") play.capture_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
@@ -359,13 +378,16 @@ int main(int argc, char** argv) {
     else if (a == "--trace-from") g_trace.from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--trace-to") g_trace.to = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--trace-peek") g_trace.peeks = parse_hex_list(next());
+    else if (a == "--audio-wav") audio_wav = next();
+    else if (a == "--no-audio") no_audio = true;
+    else if (a == "--audio-latency") audio_latency = static_cast<std::uint32_t>(std::strtoul(next().c_str(), nullptr, 10));
     else {
       std::fprintf(stderr,
                    "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
-                   "[--headless] [--no-render] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
+                   "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
                    "[--perf-every N] [--profile N [--profile-from F]] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
-                   "[--trace-to N] [--trace-peek HEX,...]]\n");
+                   "[--trace-to N] [--trace-peek HEX,...]] [--audio-wav FILE] [--no-audio] [--audio-latency MS]\n");
       return 2;
     }
   }
@@ -428,7 +450,7 @@ int main(int argc, char** argv) {
   setup_boot_environment(m, in->disc);
   Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size);
   hw.set_disc(in->disc.image.get());
-  SystemHooks hooks(&m, &hw);
+  YieldingHooks hooks(&m, &hw);
   m.memory().io = &hw;
   m.cpu().hooks = &hooks;
   hooks.tick_limit = max_ticks;
@@ -456,9 +478,42 @@ int main(int argc, char** argv) {
   play.proc = &proc;
   play.renderer = renderer;
   play.window = window.get();
+  if (yield) play.yield_hooks = &hooks;
   if (!renderer) play.proc = nullptr;
   hw.set_gfx_observer(&play);
   g_play = &play;
+
+  // Audio (E3b): the mixer observes the DSP's frames; it feeds a WAV, a level
+  // meter and, with a window, SDL3 playback.
+  audio::AxMixer mixer;
+  audio::TeeSink tee;
+  audio::WavWriter wav;
+  audio::LevelMeter levels;
+  std::unique_ptr<audio::SdlAudioOut> audio_out;
+  if (!audio_wav.empty()) {
+    if (!wav.open(audio_wav)) {
+      std::fprintf(stderr, "mvp-play: cannot write %s\n", audio_wav.c_str());
+      return 2;
+    }
+    tee.add(&wav);
+  }
+  if (window && !no_audio) {
+    audio_out = audio::SdlAudioOut::open(audio::kDspRate, audio_latency, &err);
+    if (audio_out) {
+      std::printf("audio: SDL %s, device \"%s\" at %u Hz, %u ms buffer\n", audio_out->driver().c_str(),
+                  audio_out->device().c_str(), audio_out->device_rate(), audio_latency);
+      tee.add(audio_out.get());
+      play.audio_out = audio_out.get();
+    } else {
+      std::fprintf(stderr, "mvp-play: no audio: %s\n", err.c_str());
+    }
+  }
+  if (!audio_wav.empty() || audio_out) {
+    tee.add(&levels);
+    mixer.set_sink(&tee);
+    mixer.set_rate([&hw] { return hw.ai_dsp_rate(); });
+    hw.set_ax_observer(&mixer);
+  }
   rt::g_input = &input;
   rt::g_frame_hook = &frame_hook;
   if (!trace_entry.empty()) {
@@ -478,7 +533,7 @@ int main(int argc, char** argv) {
   GuestProfiler profiler;
   if (profile_top > 0) profiler.start(&m.cpu(), &play.fields, profile_from);
   try {
-    rt::run(m.cpu());
+    for (;;) rt::run(m.cpu());  // returns at each VI field with --yield
   } catch (const StopRun& s) {
     why = s.why;
   } catch (const ppc::GuestFault& f) {
@@ -488,6 +543,7 @@ int main(int argc, char** argv) {
   const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
   if (profile_top > 0) profiler.finish(in->symbols, profile_top);
   hw.set_gfx_observer(nullptr);
+  hw.set_ax_observer(nullptr);
   rt::g_input = nullptr;
   rt::g_frame_hook = nullptr;
   rt::g_entry_hook = nullptr;
@@ -507,6 +563,9 @@ int main(int argc, char** argv) {
     std::printf("guest: %llu instructions, time base %llu, %llu frame polls, MEM1 sha1 %s\n", ull(m.cpu().ticks),
                 ull(hooks.time_base(m.cpu())), ull(rt::g_frame_polls), Sha1::hex(mem.finish()).c_str());
   }
+  if (yield)
+    std::printf("yield: %llu host yields, %llu repeated safe points skipped\n", ull(hooks.yields),
+                ull(hooks.repeats_skipped));
   std::printf("time: %.3f s of guest time in %.1f s (%.2fx real time); %llu VI fields, %llu frame polls\n", guest, secs,
               secs > 0 ? guest / secs : 0.0, ull(hw.vi_fields()), ull(play.frames));
   std::printf("runtime: %llu unwinds, %llu in-frame resumes, %llu resume entries; %llu external and %llu decrementer "
@@ -515,6 +574,22 @@ int main(int argc, char** argv) {
               ull(rt::g_unwinds), ull(rt::g_inframe_resumes), ull(rt::g_resume_entries), ull(hooks.external_interrupts),
               ull(hooks.decrementer_interrupts), ull(hooks.fp_unavailable), ull(hooks.idle_skips),
               ull(hooks.idle_ticks_skipped), ull(rt::g_interpreted));
+  if (!audio_wav.empty() || audio_out) {
+    const audio::MixerStats& ms = mixer.stats();
+    std::printf("audio: %llu frames mixed (%u Hz), %llu voice-ms, at most %u voices, aux A returns in %llu frames; %s\n",
+                ull(ms.frames), hw.ai_dsp_rate(), ull(ms.voice_ms), ms.max_voices, ull(ms.aux_return_frames[0]),
+                levels.summary().c_str());
+    if (!audio_wav.empty()) std::printf("audio: WAV %s%s\n", audio_wav.c_str(), wav.close() ? "" : " (WRITE FAILED)");
+    if (audio_out) {
+      audio_out->close();
+      const audio::SdlAudioOut::Stats as = audio_out->stats();
+      std::printf("audio: played %llu frames (%llu non-silent, peak %d), %llu silent, %llu underruns, %llu skipped, "
+                  "%llu dropped (ring full), ratio %.4f..%.4f, throttled %llu ms\n",
+                  ull(as.drift.out_frames), ull(as.played_nonsilent), as.played_peak, ull(as.drift.silent_frames),
+                  ull(as.drift.underruns), ull(as.drift.skipped_frames), ull(as.ring_full), as.drift.min_ratio,
+                  as.drift.max_ratio, ull(as.throttle_waits));
+    }
+  }
   if (!renderer) return rc;
   const auto& ps = proc.stats();
   std::printf("gx: %llu commands, %llu draws, %llu vertices, %llu triangles, %llu EFB copies (%llu to the XFB), "

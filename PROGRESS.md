@@ -445,3 +445,19 @@
     - `staged/k1c-scommon`: the common-symbol fix and the .sbss splits (VERIFY PASS);
     - `staged/k1c-names`: the generated name commit. It does not link until ldscript.ld defines the four symbols. Its objdiff report has 21,141 matched and no drops, and OSInit goes from 96.5% to 97.4%.
   | Owner: the K1c entry in DECISIONS.md "Open questions for owner".
+- 2026-10-14 (evening) | Claude Opus 5.5 ("claude-side-goals", acting lead) + engine agents | engine track | **The game boots, renders and plays sound natively, and boots in the browser.** Everything is on main with gates passing.
+  - **E0b:** the retail code is translated by our own translator and boots deterministically to the frame loop.
+  - **E0c:** resume labels (0.01% interpreted), the per-frame input queue (the netplay hook), AX voice state.
+  - **E1:** GX → Dawn/WebGPU. Loading screen, EA logo, intro, title screen, menus.
+  - **E3b:** audio. D5: DSP command lists; mixer plus SDL3; the mixer is read-only.
+  - **E2:** a WebAssembly emitter (whole DOL translated in the browser in about 0.5 s, 87% of native speed). The page runs in Chrome, Edge and Firefox, with guest hashes equal to native.
+  - **K1c:** ldscript.ld linker symbols, owner-approved; one line of protected.sha256 refreshed. The OSInit/DVDInit names (`staged/k1c-names-v2`, c0e42e51) wait on a verify.py false positive; the fix is an open owner question.
+  - **Owner decisions:** the toolchain downloads; the private, password-protected deployment may serve the owner's disc image.
+  - **Running at the end of the session:**
+    - E3a (native speed `/O2`, into an exhibition game; worktree decompile_mvp_04-e1, branch engine/e3a);
+    - E5 (netplay lockstep plus server: login gate, disc route, lobby, signaling; decompile_mvp_04-e5, engine/e5);
+    - E2c (browser audio, gamepad, disc from `/config.json` → `/api/disc/image`, caching; decompile_mvp_04-e2, engine/e2c);
+    - E2d (wasm emitter FP/psq/lmw inlining and speed; decompile_mvp_04-e2d, engine/e2d).
+
+    Each writes `docs/engine/<id>_LOG.md`, so a fresh session can resume from those logs.
+  | Owner: optional, a verify.py fix for name reuse across statics (unblocks OSInit/DVDInit). Later: VPS deploy access.

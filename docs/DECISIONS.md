@@ -241,6 +241,61 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | The determinism invariant is kept: two-run SDK logs are byte-identical in every configuration. | commits 0a4ff1c4, 3968dfbb, d29148e8
 
+- 2026-10-14 | **E2 groundwork closed: in-browser translation is viable** (lead, under the owner's delegation; numbers in docs/engine/E2_SPIKE.md).
+  - **Measurements:**
+    - The translator itself, built as wasm, translates the whole DOL in 0.33 s.
+    - The module is 49.5 MB. V8's lazy compile takes 25-45 ms and eager Liftoff 0.22 s.
+    - The game code runs at 87% of native `/O2` speed.
+    - Booting through the wasm emitter gives the same SDK-log hash as native.
+    - FP digests are identical between native and wasm. FP is integer-only by design, so no FMA or NaN workaround was needed.
+  - **E2-W1, emitter design:**
+    - the WebAssembly emitter builds the module straight from the CFG, with no C compiler;
+    - guest registers live in locals, with spills decided by per-instruction register effects (`ppc/effects`);
+    - direct forward branches; a dispatcher for back edges, jump tables and resume labels;
+    - `return_call` only at guest tail calls;
+    - E0c's call protocol, so wasm-emitted and C++-emitted functions interchange.
+  - **E2-W2:** wasm exceptions are used only to end a run.
+  - **D2 refinement:** one module translated at startup is enough, so per-unit modules and lazy translation aren't needed now. Caching the translated module is optional (re-translating costs about 0.35 s).
+
+  | Retires E2 risk #2 (`E0_SURVEY.md` §7). Risk #3 (engine differences across Chrome, Firefox and Safari) remains for the browser page. | commits 7212973d..86ef36c9
+
+- 2026-10-14 | **E3b closed: game audio plays; D5 decided** (lead, under the owner's delegation; details in docs/engine/E3B_LOG.md).
+  - **D5: audio is replaced at the DSP command-list level, not the AX API.**
+    - AX, EA SND and EA's CPU mixer stay retail code, so voice acquire/free, the DSP-cycle budget and the sync flags are untouched.
+    - The intro audio exists only at this level (EA mixes on the CPU and feeds AX aux A).
+    - The interface is one command-list format plus the voice parameter blocks: a pure function of guest memory at points fixed by guest instructions.
+  - **AX2:** voices are processed per millisecond with the envelope written back. A read-only frame observer feeds the mixer.
+  - **MIX1:** the mixer (`engine/audio/`) is a read-only observer of guest memory. It handles 4-tap polyphase or linear rate conversion, the envelope, low-pass, mix ramps, depop, aux returns and Dolby Pro Logic II (the game's default mode; folded to stereo). Output is 32 kHz (the rate the game sets) into a lock-free ring, with an adaptive resampler (±0.5%) to SDL3. Host audio timing never reaches the guest.
+
+  `local_audio_determinism` (mixer on vs off) gives an identical SDK log, MEM1 and frame log. | Keeps retail code retail and keeps audio fully outside the netplay contract. | commits c9bb883d..7055f22c
+
+- 2026-10-14 | **Private deployment may serve the owner's disc image.** Owner, in chat: "since i already have my own copy and this is just for me and my brother ... who also has his own disk image we don't need to worry about the user proving a disk since it's a private url anyway".
+  - The owner's deployment may serve the owner's own disc image to the owner and invited players who own the game. The page loads it from the server instead of the file picker, and translation still runs in each browser.
+  - The lead adds a password gate in front of the whole site; a secret URL alone leaks through history, logs and link previews.
+  - Unchanged: the public repo never contains game data or anything derived from it; nothing game-derived is served anywhere other than that private deployment; the disc-identity check stays.
+
+  | Convenience for two players who both own the game; keeps the public repository clean. | owner reply in chat
+
+- 2026-10-14 | **E2 closed: the game boots in the browser** (lead, under the owner's delegation; docs/engine/WEB.md, E2_LOG.md; decisions E2-W3..W5 are in E2_LOG).
+  - In Chrome 155, Edge 155 and Firefox 157, the page loads the disc image and checks its identity (GV4E69 rev 0 SHA-1). A Worker translates the DOL in about 0.5 s and WebGPU renders on an OffscreenCanvas.
+  - Shown so far: the loading screen, EA logo, licence screen, title screen, memory-card dialog and main menu. Keyboard input works.
+  - Pick to first frame takes 0.67-1.09 s. Everything except the intro movie holds 59.94 fields/s.
+  - Guest-state hashes equal native at every checkpoint (Chrome, Edge, Firefox; WebKit without WebGPU).
+  - `rt::run()` returns to the host at each VI field without the guest being able to tell.
+  - The page only requested the engine's own files.
+
+  Safari itself is unmeasured (needs a Mac). | Exit of ROADMAP E2. | merge a6239996 (E2b plus E3b, 34/34 native and 31/31 Node tests)
+
+- 2026-10-14 | **E2c: browser client** (lead, under the owner's delegation; docs/engine/E2C_LOG.md).
+  - Browser audio goes through an AudioWorklet fed over a MessagePort, not a SharedArrayBuffer, so no cross-origin isolation headers are needed. The buffer target is 60 ms (sound trails the picture by 80-115 ms).
+  - The gamepad maps to the GameCube pad and is sampled only at the frame poll.
+  - The page loads the disc from `/config.json` and `/api/disc/image` on the private deployment.
+  - The translation is cached per DOL and engine build, cutting start-up from 0.7-1.1 s to 0.3-0.4 s.
+  - The deployment must use HTTPS: WebGPU, AudioWorklet and OPFS need a secure context.
+  - **Lead decision:** the disc blocks the browser fetched from the private server may be cached in that player's own browser storage, so later boots are fast. This stays on the player's machine (the owner and invited players own the game). The server keeps sending `no-store` so no intermediary caches it.
+
+  | | merge of engine/e2c
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
