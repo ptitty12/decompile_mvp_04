@@ -132,7 +132,11 @@ EM_JS(int, mvp_js_instantiate,
         try {
           var table = (typeof wasmTable != 'undefined') ? wasmTable : __indirect_function_table;
           var t0 = performance.now();
-          var mod = new WebAssembly.Module(new Uint8Array(wasmMemory.buffer, bytes, len));
+          var view = new Uint8Array(wasmMemory.buffer, bytes, len);
+          // A shared memory (the threaded engine, P2): WebAssembly.Module takes no shared view.
+          if (typeof SharedArrayBuffer != 'undefined' && wasmMemory.buffer instanceof SharedArrayBuffer)
+            view = view.slice();
+          var mod = new WebAssembly.Module(view);
           var t1 = performance.now();
           var rt = {};
           for (var n of names) {

@@ -271,6 +271,7 @@ void Hardware::gp_run() {
     moved = true;
   }
   if (moved || gp_at_breakpoint()) kick();
+  if (gfx_ && gp_at_breakpoint()) gfx_->gp_sync();  // P2: the guest can see where the GP stopped
 }
 
 void Hardware::gp_consume(const u8* bytes, std::size_t n) {
@@ -284,6 +285,8 @@ void Hardware::gp_consume(const u8* bytes, std::size_t n) {
     ++draw_dones_;
   }
   if (fx.token_int || fx.draw_done) kick();
+  // P2: from here the guest can know that the GP consumed every command so far.
+  if (gfx_ && (fx.draw_done || fx.token_set)) gfx_->gp_sync();
 }
 
 // ---- AI ----
@@ -729,11 +732,17 @@ u32 Hardware::read(u32 addr, int size) {
       word = ai_count(now());
     } else if ((addr & ~3u) == 0xCC003000u) {
       word = pi_cause();
+      if (gfx_ && (word & 0x800)) gfx_->gp_sync();  // P2: a CP interrupt tells where the GP is
     } else if ((addr & ~3u) == 0xCC000000u) {
       word = cp_status() << 16 | cp16(0x02);
+      if (gfx_ && (size == 4 || (addr & 3) < 2)) gfx_->gp_sync();  // P2: the CP status (GP idle)
     } else if ((addr & ~3u) == 0xCC000030u) {
       u32 d = gp_distance();
       word = (d & 0xFFFFu) << 16 | d >> 16;
+      if (gfx_) gfx_->gp_sync();  // P2: the read-write distance
+    } else if ((addr & ~3u) == 0xCC000038u) {
+      word = reg(addr);
+      if (gfx_) gfx_->gp_sync();  // P2: the GP's read pointer
     } else if ((addr & ~3u) == 0xCC001008u) {
       word = (reg(0xCC001008u) & 0xFFFF0000u) | pe_ctrl_;
     } else if ((addr & ~3u) == 0xCC00100Cu) {
