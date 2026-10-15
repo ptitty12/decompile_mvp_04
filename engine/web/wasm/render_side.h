@@ -70,6 +70,9 @@ class RenderSide {
     if (renderer_) renderer_->flush();
   }
   void resize(int width, int height);
+  // Q1: the internal resolution, 1-3 times the console's (gfx/wgpu/renderer.h);
+  // it takes effect with the next frame the game starts.
+  void set_scale(int s);
 
   void set_trace(bool on) { tap_.on = on; }
   std::string trace_take();      // the records since the last call, as a JSON array
@@ -102,6 +105,7 @@ class RenderSide {
   std::uint64_t detail_from_ = 1, detail_to_ = 0;
   std::uint32_t xfb_ = 0;
   std::uint64_t presents_ = 0, last_presented_ = 0, copies_at_present_ = 0, resizes_ = 0;
+  int scale_ = 1;
 };
 
 }  // namespace mvp::web

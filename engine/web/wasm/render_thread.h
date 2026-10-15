@@ -66,6 +66,7 @@ void render_batch_begin();   // a run batch starts (the render thread waits in p
 bool render_present(std::uint64_t frame_polls);  // ends the batch; true once a frame has reached the canvas
 void render_flush();
 void render_resize(int width, int height);
+void render_scale(int scale);  // Q1: the internal resolution (render_side.h)
 void render_trace(bool on);
 void render_digest(bool on, std::uint64_t detail_from, std::uint64_t detail_to);
 // Q1: what the GP sees of memory (gfx/gp_memory.h). The game wrote the data

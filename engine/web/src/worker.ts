@@ -418,6 +418,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
     return;
   }
   booted = true;
+  M._mvp_render_scale(options.scale ?? 1);  // Q1: the Picture setting
   if (options.tracePresent) M._mvp_trace(1);
   if (options.digest) M._mvp_digest(1, options.digestDetail?.[0] ?? 1, options.digestDetail?.[1] ?? 0);
   enableAudio();
@@ -571,6 +572,10 @@ scope.onmessage = (ev: MessageEvent<ToWorker>) => {
       break;
     case 'resize':
       M?._mvp_canvas_resize(msg.width, msg.height);
+      break;
+    case 'scale':
+      if (booted) M?._mvp_render_scale(msg.scale);
+      if (opts) opts.scale = msg.scale;
       break;
     case 'net-open':
       channelOpen();

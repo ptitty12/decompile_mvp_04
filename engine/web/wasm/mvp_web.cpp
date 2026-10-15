@@ -827,6 +827,18 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_trace_take() {
   return g_text.c_str();
 }
 
+// Q1: the renderer's internal resolution, 1-3 times the console's (the page's
+// Picture setting); it applies from the next frame the game starts.
+EMSCRIPTEN_KEEPALIVE void mvp_render_scale(int scale) {
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    if (web::render_thread_running()) web::render_scale(scale);
+    return;
+  }
+#endif
+  g.rs.set_scale(scale);
+}
+
 // Development (Q1), before mvp_boot: 0 = the renderer reads guest memory as it
 // is, without the model of the CPU's data cache (gfx/gp_memory.h), for comparisons.
 EMSCRIPTEN_KEEPALIVE void mvp_gp_view(int on) { g_gp_view = on != 0; }

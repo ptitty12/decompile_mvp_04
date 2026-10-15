@@ -44,9 +44,11 @@ u32 alpha_env(u32 a, u32 b, u32 c, u32 d) { return d << 4 | c << 7 | b << 10 | a
 
 struct Scene {
   std::vector<std::uint8_t> mem = std::vector<std::uint8_t>(0x100000, 0);
-  Renderer r{gpu(), mem.data(), static_cast<u32>(mem.size())};
+  Renderer r;
   GxProcessor p{&r};
-  Scene() { p.set_memory(mem.data(), static_cast<u32>(mem.size())); }
+  explicit Scene(u32 scale = 1) : r(gpu(), mem.data(), static_cast<u32>(mem.size()), scale) {
+    p.set_memory(mem.data(), static_cast<u32>(mem.size()));
+  }
 };
 
 // Common state: 2D projection, one color channel from the vertex, one TEV
@@ -392,6 +394,82 @@ TEST_CASE("a texture taller than the EFB copy at its address: the copy's rows, t
   CHECK(near(px(img, 640, 360, 325), 255, 0, 0));
   CHECK(sc.r.stats().copy_tall == 1);
   CHECK(sc.r.stats().copy_size_misses == 0);
+  CHECK(gpu().errors() == 0);
+}
+
+TEST_CASE("internal resolution: 2x and 3x frames and copies show the 1x picture in more pixels (Q1)") {
+  for (u32 scale : {2u, 3u}) {
+    CAPTURE(scale);
+    Scene sc(scale);
+    for (u32 tile = 0; tile < 16 * 16; ++tile)
+      for (u32 k = 0; k < 16; ++k) {
+        sc.mem[0x60000 + tile * 64 + 2 * k] = 0xFF;
+        sc.mem[0x60000 + tile * 64 + 2 * k + 1] = 0xFF;
+      }
+    // The tall-copy scene above: an XFB copy, a half-scale copy to a texture
+    // sampled taller than the copy (its rows, then memory), the quads' scissor.
+    Stream s = base();
+    copy_xfb(s, 0x000000FF);
+    quad(s, 0, 0, 128, 96, 0xFFFF00FF);
+    s.bp(bp::kEfbTL, 0);
+    s.bp(bp::kEfbWH, 127u | 95u << 10);
+    s.bp(bp::kXfbAddr, 0x60000 >> 5);
+    s.bp(bp::kTriggerCopy, ((6u & 7) << 1 | 6u >> 3) << 3 | 1u << 9);
+    copy_xfb(s, 0x000000FF);
+    s.xf(xf::kNumTexGens, {1});
+    s.xf(xf::kTexGen, {5u << 7});
+    s.xff(60 * 4, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0});
+    s.cp(cp::kMatIndexA, 60u << 6);
+    s.bp(bp::kGenMode, 1u | 1u << 4);
+    s.bp(bp::kTref, 1u << 6);
+    s.bp(bp::kTevColorEnv, color_env(kZeroC, kZeroC, kZeroC, kTexC));
+    s.bp(bp::tex_reg(bp::kTexImage0, 0), 63u | 63u << 10 | 6u << 20);
+    s.bp(bp::tex_reg(bp::kTexImage3, 0), 0x60000 >> 5);
+    for (int k = 0; k < 2; ++k) {
+      s.bp(static_cast<u8>(bp::kSuSSize + 2 * k), 63);
+      s.bp(static_cast<u8>(bp::kSuTSize + 2 * k), 63);
+    }
+    quad(s, 300, 200, 428, 328, 0xFFFFFFFF);
+    copy_xfb(s, 0x000000FF, false);
+    s.run(sc.p);
+    const Renderer::Frame* f = sc.r.xfb(0x80000);
+    REQUIRE(f != nullptr);
+    CHECK(f->width == 640 * scale);
+    CHECK(f->height == 480 * scale);
+    auto img = sc.r.read_frame(*f);
+    const u32 w = 640 * scale;
+    CHECK(near(px(img, w, 360 * scale, 210 * scale), 255, 255, 0));
+    CHECK(near(px(img, w, 360 * scale, 290 * scale), 255, 255, 0));
+    CHECK(near(px(img, w, 360 * scale, 300 * scale), 255, 0, 0));
+    CHECK(near(px(img, w, 360 * scale, 325 * scale), 255, 0, 0));
+    CHECK(near(px(img, w, 299 * scale, 250 * scale), 0, 0, 0));        // just left of the quad
+    CHECK(near(px(img, w, 300 * scale, 250 * scale), 255, 255, 0));    // its first column
+    CHECK(near(px(img, w, 300 * scale + scale - 1, 250 * scale), 255, 255, 0));
+    CHECK(sc.r.stats().copy_tall == 1);
+    CHECK(sc.r.stats().copy_size_misses == 0);
+  }
+  // A change of scale applies at the next XFB copy that clears the EFB.
+  Scene sc;
+  Stream a = base();
+  copy_xfb(a, 0x0000FFFF);
+  quad(a, 100, 50, 300, 250, 0xFF0000FF);
+  a.run(sc.p);
+  sc.r.set_scale(2);
+  CHECK(sc.r.scale() == 1);
+  Stream b;
+  copy_xfb(b, 0x0000FFFF);  // copies the red quad at 1x, then clears: 2x from here
+  b.run(sc.p);
+  CHECK(sc.r.scale() == 2);
+  CHECK(sc.r.xfb(0x80000)->width == 640);
+  Stream c = base();
+  quad(c, 100, 50, 300, 250, 0xFF0000FF);
+  copy_xfb(c, 0x000000FF, false);
+  c.run(sc.p);
+  const Renderer::Frame* f = sc.r.xfb(0x80000);
+  CHECK(f->width == 1280);
+  auto img = sc.r.read_frame(*f);
+  CHECK(near(px(img, 1280, 400, 300), 255, 0, 0));
+  CHECK(near(px(img, 1280, 196, 300), 0, 0, 255));
   CHECK(gpu().errors() == 0);
 }
 

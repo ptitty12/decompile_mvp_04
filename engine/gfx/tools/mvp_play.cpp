@@ -19,6 +19,7 @@
 //                     the browser does (runtime/host_yield.h); the guest must run
 //                     the same (compare the "guest:" line with a run without it)
 //   --present-every N show every Nth VI field (default 1)
+//   --scale N         (Q1) internal resolution, N = 1-3 times the console's (captures too)
 //   --gp-live         (Q1, comparisons) the renderer reads guest memory as it is, not as
 //                     the GP sees it after the data cache's write-backs (gfx/gp_memory.h)
 //   --capture DIR     write the scanned-out frame as DIR/field_N_frame_F.png (VI field N,
@@ -665,6 +666,7 @@ int main(int argc, char** argv) {
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
   bool headless = false, no_render = false, yield = false, gp_live = false;
+  std::uint32_t scale = 1;
   int profile_top = 0, host_profile_top = 0;
   std::uint64_t profile_from = 0;
   std::string trace_entry, trace_file;
@@ -682,6 +684,7 @@ int main(int argc, char** argv) {
     else if (a == "--no-render") no_render = headless = true;
     else if (a == "--yield") yield = true;
     else if (a == "--gp-live") gp_live = true;
+    else if (a == "--scale") scale = static_cast<std::uint32_t>(std::strtoul(next().c_str(), nullptr, 10));
     else if (a == "--present-every") play.present_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
     else if (a == "--capture") play.capture_dir = next();
     else if (a == "--capture-every") play.capture_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
@@ -840,7 +843,7 @@ int main(int argc, char** argv) {
   mvp_register_game();
 
   std::unique_ptr<gfx::Renderer> renderer_owner;
-  if (gpu) renderer_owner = std::make_unique<gfx::Renderer>(*gpu, m.mem1(), Machine::kMem1Size);
+  if (gpu) renderer_owner = std::make_unique<gfx::Renderer>(*gpu, m.mem1(), Machine::kMem1Size, scale);
   gfx::Renderer* renderer = renderer_owner.get();
   // Q1: the renderer reads memory as the GP sees it (gfx/gp_memory.h): the game's
   // cache write-backs (rt::g_dc_flush_hook), DMA and the write-gather pipe.

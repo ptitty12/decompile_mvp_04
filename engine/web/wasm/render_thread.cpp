@@ -101,6 +101,7 @@ enum : u32 {
   kGpActivate,  // Q1: {addr, len}: the game wrote these lines back from the cache (gfx/gp_memory.h)
   kGpLines,     // Q1: {first line, lines} + their contents as written back (lines that changed)
   kGpDrop,      // Q1: {addr, len}: memory written without the cache
+  kScale,       // Q1: {internal resolution}
 };
 
 constexpr u32 kRingBytes = 16u << 20;
@@ -457,6 +458,12 @@ void handle(const gfx::RenderRing::Record& r) {
       S->side.gp_set_lines(v.a, v.b, r.data + sizeof v);
       return;
     }
+    case kScale: {
+      u32 v;
+      std::memcpy(&v, r.data, sizeof v);
+      S->side.set_scale(static_cast<int>(v));
+      return;
+    }
     case kGpDrop: {
       Pair v;
       std::memcpy(&v, r.data, sizeof v);
@@ -723,6 +730,11 @@ void render_flush() {
 void render_resize(int width, int height) {
   ++S->resizes;
   put(kResize, Pair{static_cast<u32>(width), static_cast<u32>(height)});
+  publish_and_kick();
+}
+
+void render_scale(int scale) {
+  put(kScale, static_cast<u32>(scale));
   publish_and_kick();
 }
 
