@@ -1,5 +1,8 @@
-// A desktop window (SDL3) with a WebGPU surface, and a blit that shows a
-// texture in it (E1). The browser build replaces this with a canvas (E2).
+// Where frames are shown, with a WebGPU surface and a blit that shows a
+// texture in it (E1, E2). Natively a desktop window (SDL3); in the browser a
+// canvas (an OffscreenCanvas when the engine runs in a Worker), found by its
+// CSS selector through emdawnwebgpu (the page registers it). The blit and the
+// presentation logic are the same code on both.
 //
 // Window events (close, resize) are host input. They may stop the run or
 // change how frames are shown; they never reach guest state (determinism).
@@ -19,8 +22,17 @@ class Gpu;
 
 class Window {
  public:
+#ifndef __EMSCRIPTEN__
   // Opens a window of `width` x `height` (client area) and creates its surface.
   static std::unique_ptr<Window> open(const char* title, int width, int height, std::string* err);
+#else
+  // Browser: the canvas `selector` names (emdawnwebgpu looks it up in the
+  // module's specialHTMLTargets first, then in the document), drawn at
+  // `width` x `height` pixels.
+  static std::unique_ptr<Window> open_canvas(const char* selector, int width, int height, std::string* err);
+  // The canvas's drawing buffer size changed (the page's layout or zoom).
+  void resize(int width, int height);
+#endif
   ~Window();
 
   // Creates and configures the surface for `gpu` and builds the blit
@@ -28,17 +40,23 @@ class Window {
   bool attach(Gpu& gpu, std::string* err);
 
   // Handles pending window events; false once the user closed the window.
+  // (The browser's page handles its own events: always true there.)
   bool pump();
 
   // Shows `src` (a 2D texture with TextureBinding usage) scaled to the window,
-  // keeping its aspect ratio, then presents.
+  // keeping its aspect ratio, then presents. In the browser the frame goes to
+  // the canvas when the current task returns to the event loop.
   void present(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height);
 
  private:
   Window() = default;
   void configure();
 
+#ifndef __EMSCRIPTEN__
   SDL_Window* window_ = nullptr;
+#else
+  std::string selector_;
+#endif
   Gpu* gpu_ = nullptr;
   wgpu::Surface surface_;
   wgpu::TextureFormat format_ = wgpu::TextureFormat::BGRA8Unorm;

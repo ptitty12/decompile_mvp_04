@@ -3,10 +3,11 @@
 # engine_gfx is the data-free core (GX state machine, vertex decoding and
 # transform, texture decoders, TEV -> WGSL); it needs nothing outside the repo
 # and its tests run everywhere. engine_gfx_wgpu is the WebGPU backend: Dawn
-# natively (SDL3 for the window), browser WebGPU under Emscripten later (E2).
-# Dawn and SDL3 are prebuilt SDKs outside the repository, pinned in
-# docs/engine/TOOLCHAIN.md; without them the backend is skipped and the rest of
-# the engine builds as before.
+# natively (SDL3 for the window), browser WebGPU through Emscripten's
+# emdawnwebgpu port from the same Dawn release (E2; a canvas instead of the
+# window). Dawn, SDL3 and emdawnwebgpu are SDKs outside the repository, pinned
+# in docs/engine/TOOLCHAIN.md; without them the backend is skipped and the rest
+# of the engine builds as before.
 
 add_library(engine_gfx STATIC png.cpp gx_processor.cpp texture_decode.cpp tev_wgsl.cpp)
 target_link_libraries(engine_gfx PUBLIC engine_common)
@@ -39,10 +40,30 @@ if(NOT "$ENV{MVP_SDL3_DIR}" STREQUAL "")
 endif()
 set(MVP_DAWN_DIR "${_mvp_dawn_default}" CACHE PATH "Dawn release package (the directory holding lib/cmake/Dawn)")
 set(MVP_SDL3_DIR "${_mvp_sdl3_default}" CACHE PATH "SDL3 development package (the directory holding cmake/SDL3Config.cmake)")
-option(MVP_GFX_WEBGPU "Build the WebGPU renderer when Dawn and SDL3 are found" ON)
+option(MVP_GFX_WEBGPU "Build the WebGPU renderer when Dawn and SDL3 (native) or emdawnwebgpu (Emscripten) are found" ON)
 
 set(MVP_HAVE_WEBGPU OFF)
-if(MVP_GFX_WEBGPU)
+if(MVP_GFX_WEBGPU AND EMSCRIPTEN)
+  # Browser (E2): emdawnwebgpu, the webgpu.h of the same Dawn release, as an
+  # Emscripten "local port" (text only: C++ and JS sources, built by emcc).
+  set(_mvp_emdawn_default "${_mvp_home}/tools-ext/emdawnwebgpu/${MVP_DAWN_RELEASE}/emdawnwebgpu_pkg")
+  if(NOT "$ENV{MVP_EMDAWNWEBGPU_DIR}" STREQUAL "")
+    set(_mvp_emdawn_default "$ENV{MVP_EMDAWNWEBGPU_DIR}")
+  endif()
+  set(MVP_EMDAWNWEBGPU_DIR "${_mvp_emdawn_default}" CACHE PATH "emdawnwebgpu_pkg of the pinned Dawn release (the directory holding emdawnwebgpu.port.py)")
+  if(EXISTS "${MVP_EMDAWNWEBGPU_DIR}/emdawnwebgpu.port.py")
+    message(STATUS "gfx: WebGPU renderer with emdawnwebgpu ${MVP_DAWN_RELEASE} (browser)")
+    add_library(engine_gfx_wgpu STATIC wgpu/gpu.cpp wgpu/window.cpp wgpu/renderer.cpp)
+    set(_mvp_emdawn_port "--use-port=${MVP_EMDAWNWEBGPU_DIR}/emdawnwebgpu.port.py")
+    target_compile_options(engine_gfx_wgpu PUBLIC ${_mvp_emdawn_port})
+    target_link_options(engine_gfx_wgpu INTERFACE ${_mvp_emdawn_port})
+    target_link_libraries(engine_gfx_wgpu PUBLIC engine_gfx)
+    target_compile_options(engine_gfx_wgpu PRIVATE ${ENGINE_WARN})
+  else()
+    message(STATUS "gfx: emdawnwebgpu not found (MVP_EMDAWNWEBGPU_DIR=${MVP_EMDAWNWEBGPU_DIR}); "
+                   "the browser renderer is not built")
+  endif()
+elseif(MVP_GFX_WEBGPU)
   if(EXISTS "${MVP_DAWN_DIR}/lib/cmake/Dawn/DawnConfig.cmake" AND EXISTS "${MVP_SDL3_DIR}/cmake/SDL3Config.cmake")
     set(MVP_HAVE_WEBGPU ON)
   else()

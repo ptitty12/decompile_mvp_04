@@ -333,6 +333,7 @@ void Renderer::begin_pass() {
   da.view = efb_depth_view_;
   da.depthLoadOp = wgpu::LoadOp::Load;
   da.depthStoreOp = wgpu::StoreOp::Store;
+  da.depthClearValue = 1.0f;  // unused with Load, but browsers reject webgpu.h's NaN default (E2)
   wgpu::RenderPassDescriptor rp{};
   rp.colorAttachmentCount = 1;
   rp.colorAttachments = &ca;

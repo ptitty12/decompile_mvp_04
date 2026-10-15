@@ -31,11 +31,11 @@
     },
     {
       "name": "emscripten",
-      "displayName": "Emscripten + Ninja: wasm32, tests under Node (run inside engine/tools/emsdk.cmd)",
+      "displayName": "Emscripten + Ninja: wasm32, tests under Node, the browser build (run inside engine/tools/emsdk.cmd)",
       "inherits": "base",
       "generator": "Ninja",
       "toolchainFile": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "MVP_GFX_WEBGPU": "OFF" }
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release", "MVP_GFX_WEBGPU": "ON" }
     }
   ],
   "buildPresets": [

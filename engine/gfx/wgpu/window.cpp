@@ -1,6 +1,8 @@
 #include "gfx/wgpu/window.h"
 
+#ifndef __EMSCRIPTEN__
 #include <SDL3/SDL.h>
+#endif
 
 #ifdef _WIN32
 #include <windows.h>
@@ -43,6 +45,8 @@ struct VsOut { @builtin(position) pos: vec4f, @location(0) uv: vec2f };
 
 }  // namespace
 
+#ifndef __EMSCRIPTEN__
+
 std::unique_ptr<Window> Window::open(const char* title, int width, int height, std::string* err) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     if (err) *err = std::string("SDL_Init: ") + SDL_GetError();
@@ -66,10 +70,42 @@ Window::~Window() {
   SDL_QuitSubSystem(SDL_INIT_VIDEO);
 }
 
+#else  // __EMSCRIPTEN__
+
+std::unique_ptr<Window> Window::open_canvas(const char* selector, int width, int height, std::string* err) {
+  if (!selector || !*selector || width <= 0 || height <= 0) {
+    if (err) *err = "no canvas";
+    return nullptr;
+  }
+  auto w = std::unique_ptr<Window>(new Window());
+  w->selector_ = selector;
+  w->width_ = width;
+  w->height_ = height;
+  return w;
+}
+
+Window::~Window() {
+  if (configured_) surface_.Unconfigure();
+  surface_ = nullptr;
+}
+
+void Window::resize(int width, int height) {
+  if (width <= 0 || height <= 0 || (width == width_ && height == height_)) return;
+  width_ = width;
+  height_ = height;
+  if (gpu_) configure();
+}
+
+#endif  // __EMSCRIPTEN__
+
 bool Window::attach(Gpu& gpu, std::string* err) {
   gpu_ = &gpu;
   wgpu::SurfaceDescriptor sd{};
-#ifdef _WIN32
+#if defined(__EMSCRIPTEN__)
+  wgpu::EmscriptenSurfaceSourceCanvasHTMLSelector src{};
+  src.selector = wgpu::StringView(selector_.data(), selector_.size());
+  sd.nextInChain = &src;
+#elif defined(_WIN32)
   SDL_PropertiesID props = SDL_GetWindowProperties(window_);
   wgpu::SurfaceSourceWindowsHWND src{};
   src.hwnd = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
@@ -80,7 +116,7 @@ bool Window::attach(Gpu& gpu, std::string* err) {
   src.hinstance = GetModuleHandleW(nullptr);
   sd.nextInChain = &src;
 #else
-  if (err) *err = "window surfaces are only implemented for Windows so far";
+  if (err) *err = "window surfaces are only implemented for Windows and the browser so far";
   return false;
 #endif
   surface_ = gpu.instance().CreateSurface(&sd);
@@ -127,11 +163,15 @@ bool Window::attach(Gpu& gpu, std::string* err) {
 }
 
 void Window::configure() {
+#ifndef __EMSCRIPTEN__
   int w = 0, h = 0;
   SDL_GetWindowSizeInPixels(window_, &w, &h);
   if (w <= 0 || h <= 0) return;
   width_ = w;
   height_ = h;
+#else
+  const int w = width_, h = height_;
+#endif
   wgpu::SurfaceConfiguration cfg{};
   cfg.device = gpu_->device();
   cfg.format = format_;
@@ -145,6 +185,7 @@ void Window::configure() {
 }
 
 bool Window::pump() {
+#ifndef __EMSCRIPTEN__
   SDL_Event e;
   bool open = true;
   while (SDL_PollEvent(&e)) {
@@ -152,6 +193,9 @@ bool Window::pump() {
     if (e.type == SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED && gpu_) configure();
   }
   return open;
+#else
+  return true;
+#endif
 }
 
 void Window::present(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height) {
@@ -202,7 +246,9 @@ void Window::present(const wgpu::TextureView& src, std::uint32_t src_width, std:
   pass.End();
   wgpu::CommandBuffer cb = enc.Finish();
   gpu_->queue().Submit(1, &cb);
-  surface_.Present();
+#ifndef __EMSCRIPTEN__
+  surface_.Present();  // the browser presents the canvas when the task ends
+#endif
 }
 
 }  // namespace mvp::gfx
