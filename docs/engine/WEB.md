@@ -287,6 +287,7 @@ averaged over half-second windows; achieved fields per second in brackets; E2):
   browser with WebGPU. The movie is decoded by game code on the CPU, mostly FP and
   paired-single work that still goes through the interpreter (`rt.exec`, E2_SPIKE
   §6 item 3); it runs at 20-30% of real time, as natively (`/Od`: 18%).
+  *Since E2d the movie runs at full speed too: next table.*
 - The main menu costs 12.9 ms per field in Chrome, 11.6 ms of it in game code
   (the same run with `render=0`): the renderer adds about 1.3 ms there. Chrome
   with V8's tier-up off (`--js-flags --no-wasm-tier-up`, Liftoff only) gives the
@@ -298,6 +299,35 @@ averaged over half-second windows; achieved fields per second in brackets; E2):
   and the 49.5 MB module, freed after instantiation and reused by the heap) plus
   the machine (24 MB MEM1, 16 MB ARAM). The compiled code lives outside it, in
   the browser's own memory.
+
+**Frame time, E2d** (2026-10-14; `docs/engine/E2D_LOG.md`): the wasm emitter now
+computes floating point, paired singles, quantized loads and stores and
+`lmw`/`stmw` inline. The same `menus` run with E2c's client and sound on
+(`browser_check.mjs --audio --no-cache`), against `origin/main` before E2d
+(`45de368e`) on the same machine the same evening. Host ms per field (achieved
+fields/s); unpaced (`--fast`): times real time.
+
+| Scene (VI fields) | Chrome before | Chrome E2d | Firefox before | Firefox E2d |
+|---|---:|---:|---:|---:|
+| boot loading screen (0-580) | 3.9 (59.8/s) | 3.3 (59.8/s) | 2.3 (60/s) | 2.8 (59.8/s) |
+| intro movie (600-1270) | 60.4 (15.8/s) | **7.0 (60/s)** | 53.7 (17.8/s) | **7.2 (60/s)** |
+| licence screen (1300-1660) | 0.31 (60/s) | 0.25 (60/s) | 0.31 (60/s) | 0.28 (60/s) |
+| title, "PRESS START" (1940-2150) | 0.96 (60/s) | 0.93 (60/s) | 1.09 (60/s) | 1.02 (60/s) |
+| memory card dialog (2180-2500) | 2.5 (60/s) | 1.8 (60/s) | 2.6 (60/s) | 2.1 (60/s) |
+| main menu + profile dialog (2730-3600) | 9.1 (60/s) | **5.0 (60/s)** | 8.1 (60/s) | **5.6 (60/s)** |
+| audio underruns during the movie | 107 | 0 | 106 | 0 |
+| unpaced: intro movie | 0.25x | **2.26x** | (0.07x, a disturbed run) | **2.14x** |
+| unpaced: main menu | 1.79x | **3.31x** | (0.62x, a disturbed run) | **2.96x** |
+| unpaced: boot loading screen | 4.51x | 5.42x | 2.75x | 3.51x |
+
+- The intro movie now runs at 1.0x real time paced and about 2.2x unpaced in both
+  browsers, with no sound underruns; the main menu takes 5.0-5.6 ms of the 16.7 ms
+  field.
+- Translation: the module is 62.1 MB (was 49.5); emit 340-360 ms in Chrome (was
+  275-295), V8's lazy compile 19-20 ms, Firefox's compile 180-240 ms (was 122);
+  cold start in Chrome 760-810 ms (was 685-730), Firefox 1.08-1.4 s.
+- Firefox numbers are from a headed window on a machine other sessions shared;
+  their spread is wider than Chrome's.
 
 **Sound** (E2c; details in E2C_LOG.md): sound trails the picture by about
 80-115 ms (the worklet's 60 ms target, its fill averaging 60-74 ms at full speed;
@@ -331,13 +361,17 @@ or not, with or without rendering, with or without sound, read from a file or a
 server, paused or not, with yields at every field: the same guest state as the
 native build that does not yield.
 
-**Known gap since the E3a merge (2026-10-14), tracked by E2d:** the native engine
-now takes the floating-point unavailable exception (E3A_LOG.md), which changes the
-guest state (native at 700 fields: 2,845,943,121 instructions, time base
-474,323,853, MEM1 `73e856d4...`). The wasm emitter does not take that exception
-yet, so the browser lines above are pre-E3a values and do not equal native ones
-until E2d gives the emitter the same semantics; `test_wasm_lockstep` is disabled
-for the same reason.
+**Since E3a and E2d (2026-10-14):** the native engine takes the floating-point
+unavailable exception (E3A_LOG.md), which changed the guest state once, and the
+wasm emitter takes it the same way (E2D_LOG.md §3). The lines above are pre-E3a
+values; the current ones, native `mvp-play --no-render` (translated code at `/Od`)
+and the browsers with E2d's emitter, with sound on, unpaced:
+
+| Run | Guest line | Matches |
+|---|---|---|
+| 700 fields, no input | 2,845,943,121 instructions, time base 474,323,853, 94 polls, MEM1 `73e856d4...` | native, Chrome 155, Firefox 157 |
+| 2,400 fields, START at 280/430/580/730 | 9,737,828,100, 1,622,971,350, 966 polls, MEM1 `c70ca6c5...` | native, Chrome, Firefox |
+| 3,600 fields, the `menus` script | 14,602,688,100, 2,433,781,350, 2,117 polls, MEM1 `5e150b6c...` | native, Chrome (paced and unpaced), Firefox (paced and unpaced); `mvp-boot-wasm` under Node |
 
 ## 5. Limits and next steps
 
@@ -345,10 +379,10 @@ for the same reason.
   engine itself runs there (same guest line), and the page now says the browser
   has no WebGPU. A Mac is needed for Safari with WebGPU.
 - **Firefox headless** gets no WebGPU adapter; headed works.
-- **Speed:** the intro movie runs at 20-30% of real time (its sound plays in
-  pieces) and the main menu uses half to three quarters of the frame budget.
-  Inlining the FP and paired-single arithmetic (E2_SPIKE §6 item 3) is the lever;
-  E3a owns runtime speed.
+- **Speed:** since E2d the intro movie runs at full speed (about 2.2x real time
+  unpaced) and the main menu uses about a third of the frame budget in Chrome and
+  Firefox (§3, "Frame time, E2d"). What is left and what was tried:
+  `docs/engine/E2D_LOG.md` §5.
 - **Remote play:** each missed block of the server image costs a round trip; the
   boot waits about 2 s at 30 ms. Next: keep the boot's read plan (offsets only)
   in the browser after the first visit and prefetch it in parallel during the

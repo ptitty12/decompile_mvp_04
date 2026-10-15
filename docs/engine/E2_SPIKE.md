@@ -133,6 +133,12 @@ Observations:
   of our functions (a deep nest of blocks per function, up to ~50 live locals
   across every merge), but it was not investigated. V8's default dynamic
   tiering loses nothing here, since it starts every function in Liftoff.
+  **Corrected by E2d (`docs/engine/E2D_LOG.md` §5):** TurboFan's code is not
+  slower. With `--no-liftoff` V8 still compiles lazily, so every function's
+  first call runs a synchronous TurboFan compile inside the timed run (5.3 s on
+  this budget); compiled eagerly (`--no-wasm-lazy-compilation --no-liftoff`,
+  compile outside the timing) TurboFan's code is 10-15% faster than Liftoff's
+  (boot budget 0.999 s against 1.150 s, after E2d).
 - The idle skip makes this budget mostly real game code: 8.23 s of guest time
   in 1.36 s of host time is about 6x real time, before rendering and audio.
 
@@ -157,11 +163,14 @@ Observations:
 3. **Inline the rest:** FP arithmetic through in-module calls into the integer
    softfloat (or an exact fast path), lmw/stmw unrolled, psq_l/psq_st for the
    common GQR types. 4.8% of instructions still call the interpreter.
+   *Done in E2d* (`E2D_LOG.md`): exact inline fast paths, 130 instructions left
+   to the runtime.
 4. **Smaller modules:** about 11 MB are spills and reloads (share them per call
    site group, or keep fewer registers live across calls), and each memory
    access carries a 6-byte PC constant and a ticks expression only its slow
    path uses.
 5. **TurboFan:** find out why its code is slower here before relying on tier-up
-   in other engines.
+   in other engines. *Answered in E2d:* it was lazy compilation in the timed
+   run, not the code (above).
 6. **Memory:** the process holds 365 MiB after loading; the module bytes (49.5 MB)
    and the CFG can be released after instantiation.
