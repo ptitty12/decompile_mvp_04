@@ -92,3 +92,20 @@ export async function probeDiscUrl(url: string, fetchFn: Fetch = fetch): Promise
   if (!(size > 0)) return { ok: false, message: 'The server did not say how large the disc image is.' };
   return { ok: true, size };
 }
+
+// The deployment's "Server disc" page (upload the image to the server: the
+// Docker deployment, docs/engine/DEPLOY_DOKPLOY.md), when /config.json names
+// one on this same site; null anywhere else.
+export async function findDiscPage(base: string, fetchFn: Fetch = fetch): Promise<string | null> {
+  try {
+    const res = await fetchFn(new URL('/config.json', base).href, { credentials: 'same-origin', cache: 'no-store' });
+    if (!res.ok) return null;
+    const cfg: unknown = await res.json();
+    const page = cfg && typeof cfg === 'object' ? (cfg as Record<string, unknown>).discPage : undefined;
+    if (typeof page !== 'string' || !page) return null;
+    const url = new URL(page, base);
+    return url.origin === new URL(base).origin ? url.href : null;
+  } catch {
+    return null;
+  }
+}

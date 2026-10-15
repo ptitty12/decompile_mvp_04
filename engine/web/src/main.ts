@@ -20,7 +20,7 @@
 // The page publishes its state as `window.mvp` for the browser check.
 
 import { AudioOut, type AudioState } from './audio.js';
-import { findServerDisc } from './disc.js';
+import { findDiscPage, findServerDisc } from './disc.js';
 import { GamepadPanel } from './gamepad-ui.js';
 import { HostInput } from './input.js';
 import { Online, type OnlineState } from './netplay.js';
@@ -376,6 +376,12 @@ requestAnimationFrame(tick);
 // ---- where the disc comes from ----
 
 async function init(): Promise<void> {
+  // The Docker deployment's Server disc page (upload the image to the server), when there is one.
+  void findDiscPage(location.href).then((url) => {
+    if (!url) return;
+    $<HTMLAnchorElement>('server-disc-link').href = url;
+    $<HTMLElement>('server-disc').hidden = false;
+  });
   if (options.render && !hasWebGPU) {
     pickerBox.hidden = true;
     showError('webgpu', NO_WEBGPU);
