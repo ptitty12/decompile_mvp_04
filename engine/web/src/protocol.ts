@@ -192,7 +192,9 @@ export type FromWorker =
   | { type: 'cache'; report: CacheReport }
   | { type: 'audio'; attachedAtField: number }
   | { type: 'stats'; status: Status;
-      window: { fields: number; ms: number; wallMs: number; trace?: unknown[]; digest?: string } }
+      window: { fields: number; ms: number; wallMs: number; trace?: unknown[]; digest?: string;
+                saturatedMs?: number;  // Q2: wall ms so far with the machine saturated (one-field batches)
+                fieldCost?: number } }  // ... the smoothed host time per field, as a share of a field
   | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string; ioLog?: string }
   | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
   | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string };

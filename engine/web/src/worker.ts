@@ -500,8 +500,10 @@ function afterRun(ran: number, ms: number): boolean {
   if (now - winWall >= 500) {
     const trace = opts?.tracePresent ? JSON.parse(cstr(M!._mvp_trace_take())) as unknown[] : undefined;
     const digest = opts?.digest ? cstr(M!._mvp_digest_take()) : undefined;
+    const sat = saturatedMs + (saturated ? now - saturatedSince : 0);
     post({ type: 'stats', status: status(),
-           window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace, digest } });
+           window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace, digest, saturatedMs: sat,
+                     fieldCost } });
     winFields = 0;
     winMs = 0;
     winWall = now;
@@ -532,7 +534,24 @@ function afterRun(ran: number, ms: number): boolean {
 // waiting for an animation frame; each batch's frame is presented when its task
 // ends. Ahead of the clock the loop waits for animation frames as before.
 // pacing=raf (URL) keeps the earlier batches of up to four fields per animation frame.
+//
+// Q2 (saturated): on a machine that cannot run the game at full speed (the
+// fields take longer than the display's refresh on average), chasing the clock
+// only made it worse: two-field batches showed every other frame of the game
+// (its picture moved in 33 ms jumps), and debts of up to eight fields came and
+// went in bursts. While the host time per field (smoothed over about a second)
+// is a whole field or more, every batch is one field, each followed by
+// its present, back to back, and the clock never waits for more than two
+// fields of debt: the game runs evenly in slow motion, every frame shown, and
+// the sound stretches to match (resampler.ts). Under 90 % it chases again.
+// Guest state is the same either way (wall time decides only how many fields
+// run per batch).
 const CHASE_FIELDS = 2;
+const SATURATED_ON = 1.0, SATURATED_OFF = 0.9, SATURATED_S = 1.0;
+let fieldCost = 0;          // smoothed host ms per field, as a share of a field
+let saturated = false;
+let saturatedMs = 0;        // statistics: wall time spent saturated
+let saturatedSince = 0;
 const chase = new MessageChannel();
 let chasePending = false;
 chase.port1.onmessage = () => {
@@ -543,19 +562,30 @@ chase.port1.onmessage = () => {
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
   let due = Math.floor((now - pacedStart) / FIELD_MS) - pacedFields;
-  if (due > MAX_FIELDS_PER_FRAME * 2) {
-    // Too far behind (a slow stretch, a background tab): drop the debt.
+  if (due > (saturated ? 2 : MAX_FIELDS_PER_FRAME * 2)) {
+    // Too far behind (a slow stretch, a background tab, a slow machine): drop the debt.
     pacedStart = now - pacedFields * FIELD_MS;
     due = 1;
   }
   const rafOnly = opts?.pacing === 'raf';
-  due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : due >= 3 ? CHASE_FIELDS : 1);
+  due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : saturated ? 1 : due >= 3 ? CHASE_FIELDS : 1);
   if (due <= 0) return;
   const t0 = performance.now();
   const ran = M._mvp_run_fields(due);
+  const ms = performance.now() - t0;
   pacedFields += Math.max(0, ran);
+  if (ran > 0) {
+    fieldCost += (1 - Math.exp(-(ran * FIELD_MS) / (1000 * SATURATED_S))) * (ms / ran / FIELD_MS - fieldCost);
+    if (!saturated && fieldCost >= SATURATED_ON) {
+      saturated = true;
+      saturatedSince = t0;
+    } else if (saturated && fieldCost < SATURATED_OFF) {
+      saturated = false;
+      saturatedMs += t0 - saturatedSince;
+    }
+  }
   gated = !!net && ran >= 0 && ran < due;
-  if (!afterRun(ran, performance.now() - t0) || rafOnly || gated) return;
+  if (!afterRun(ran, ms) || rafOnly || gated) return;
   // Still behind: the next batch now, in its own task (this one's frame is presented when it ends).
   if (!chasePending && Math.floor((performance.now() - pacedStart) / FIELD_MS) - pacedFields >= 1) {
     chasePending = true;
