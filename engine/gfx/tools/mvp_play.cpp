@@ -20,6 +20,12 @@
 //                     --draw-log-from N (default 0) to --draw-log-to N
 //   --dump-textures DIR at VI field --dump-field N: every texture each draw
 //                     samples, decoded from guest memory, as DIR/tex_F_D_M.png
+//                     (--dump-to M: every field from N to M)
+//   --perf-every N    print guest and host seconds every N VI fields (speed per stretch)
+//   --profile N       sample the guest PC (a host thread); print the N busiest functions
+//   --trace-entry A,B registers and memory at r3/r4 at each entry of those functions (hex
+//                     addresses), from VI field --trace-from to --trace-to, to --trace-file;
+//                     --trace-peek O1,O2: also the words at r3 + those (hex) offsets
 //
 // Determinism: the renderer only reads guest state, and window events never
 // reach the guest; with the same input script, the guest runs exactly as under
@@ -29,11 +35,16 @@
 //
 // Exit status: 0 when the run ended by its budget with frames shown and no
 // WebGPU errors (or with --no-render), 1 otherwise, 77 without the disc.
+#include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <map>
 #include <set>
 #include <string>
+#include <thread>
+#include <vector>
 
 #include "common/file.h"
 #include "common/sha1.h"
@@ -70,7 +81,7 @@ struct DrawLog : gfx::Backend {
   const std::uint8_t* mem = nullptr;
   std::uint32_t mem_size = 0;
   std::string dump_dir;
-  std::uint64_t dump_field = ~0ull, dump_draw = 0;
+  std::uint64_t dump_field = ~0ull, dump_to = 0, dump_draw = 0;
   void dump(const gfx::DrawCall& d) {
     for (int m = 0; m < 8; ++m) {
       const gfx::TextureDesc& t = d.tex[static_cast<std::size_t>(m)];
@@ -133,7 +144,7 @@ struct DrawLog : gfx::Backend {
                      v.color[0][3], v.tex[0][0], v.tex[0][1], v.tex[0][2], v.tex[1][0], v.tex[1][1], v.tex[1][2]);
       }
     }
-    if (!dump_dir.empty() && *field == dump_field) dump(d);
+    if (!dump_dir.empty() && *field >= dump_field && *field <= std::max(dump_field, dump_to)) dump(d);
     next->draw(d);
   }
   void efb_copy(const gfx::EfbCopy& c) override {
@@ -157,6 +168,19 @@ struct Play : GfxObserver {
   std::set<std::uint64_t> capture_at;
   std::uint64_t last_capture_serial = 0, captures = 0, fields = 0, presents = 0;
   std::uint64_t frames = 0, max_frames = ~0ull;
+  // --perf-every N: host and guest seconds every N fields (speed per stretch).
+  std::uint64_t perf_every = 0;
+  std::chrono::steady_clock::time_point t0;
+  rt::SystemHooks* hooks = nullptr;
+  ppc::Cpu* cpu = nullptr;
+
+  void perf(std::uint64_t field) {
+    if (!perf_every || field % perf_every) return;
+    const double host = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+    const double guest = static_cast<double>(hooks->time_base(*cpu)) / 40500000.0;
+    std::printf("perf: field %llu frame %llu guest %.3f s host %.3f s\n", static_cast<unsigned long long>(field),
+                static_cast<unsigned long long>(frames), guest, host);
+  }
 
   // Without a renderer (--no-render) the observer only counts fields.
   void gx_command(const std::uint8_t* cmd, std::size_t len) override {
@@ -165,6 +189,7 @@ struct Play : GfxObserver {
 
   void vi_field(std::uint64_t field, std::uint32_t xfb) override {
     fields = field;
+    perf(field);
     if (!renderer) {
       if (field >= max_fields) throw StopRun{"ran " + std::to_string(max_fields) + " VI fields (--fields)"};
       return;
@@ -198,16 +223,108 @@ void frame_hook(ppc::Cpu&, std::uint64_t frame) {
   if (frame >= g_play->max_frames) throw StopRun{"ran " + std::to_string(frame) + " frames (--frames)"};
 }
 
+// --trace-entry ADDR[,ADDR...] (debugging): at each translated entry of those
+// functions, one line with the VI field, LR, MSR and r3-r8, then 128 bytes at r3
+// and at r4, the words at r3 + each --trace-peek offset, r13 and the GQRs, to
+// --trace-file (default stdout). Read-only.
+struct EntryTrace {
+  std::set<std::uint32_t> addrs;
+  std::vector<std::uint32_t> peeks;
+  std::FILE* f = stdout;
+  const std::uint64_t* field = nullptr;
+  std::uint64_t from = 0, to = ~0ull;
+  std::uint64_t max_lines = 100000, lines = 0;
+};
+EntryTrace g_trace;
+
+std::vector<std::uint32_t> parse_hex_list(const std::string& s) {
+  std::vector<std::uint32_t> v;
+  for (std::size_t at = 0; at < s.size();) {
+    std::size_t comma = s.find(',', at);
+    if (comma == std::string::npos) comma = s.size();
+    v.push_back(static_cast<std::uint32_t>(std::strtoul(s.substr(at, comma - at).c_str(), nullptr, 16)));
+    at = comma + 1;
+  }
+  return v;
+}
+
+void trace_hook(ppc::Cpu& c, std::uint32_t address) {
+  if (!g_trace.addrs.count(address) || *g_trace.field < g_trace.from || *g_trace.field > g_trace.to) return;
+  if (g_trace.lines++ >= g_trace.max_lines) return;
+  std::fprintf(g_trace.f, "field %llu entry %08X lr %08X msr %08X r3 %08X r4 %08X r5 %08X r6 %08X r7 %08X r8 %08X\n",
+               static_cast<unsigned long long>(*g_trace.field), address, c.lr, c.msr, c.gpr[3], c.gpr[4], c.gpr[5],
+               c.gpr[6], c.gpr[7], c.gpr[8]);
+  auto byte = [&](std::uint32_t a) -> unsigned {
+    const std::uint8_t* p = c.mem->host(a);
+    return p ? *p : 0u;
+  };
+  for (int r = 3; r <= 4; ++r) {
+    std::fprintf(g_trace.f, "  [r%d]", r);
+    for (std::uint32_t k = 0; k < 128; ++k) std::fprintf(g_trace.f, k % 32 == 0 ? "\n   %02X" : " %02X", byte(c.gpr[r] + k));
+    std::fprintf(g_trace.f, "\n");
+  }
+  for (std::uint32_t off : g_trace.peeks) {
+    const std::uint32_t a = c.gpr[3] + off;
+    std::fprintf(g_trace.f, "  [r3+%X] %02X%02X%02X%02X\n", off, byte(a), byte(a + 1), byte(a + 2), byte(a + 3));
+  }
+  std::fprintf(g_trace.f, "  r13 %08X gqr", c.gpr[13]);
+  for (int q = 0; q < 8; ++q) std::fprintf(g_trace.f, " %08X", c.spr[ppc::spr::GQR0 + q]);
+  std::fprintf(g_trace.f, "\n");
+}
+
+// --profile N: a host thread samples the guest PC (c.pc, stored before every
+// translated instruction) at the host timer's pace (a sleep of 1 ms: about 15 ms
+// on Windows) and prints the N functions with the most samples. Read-only: a
+// racy read of one u32 the guest never sees.
+struct GuestProfiler {
+  std::atomic<bool> stop{false};
+  std::thread thread;
+  std::map<std::uint32_t, std::uint64_t> pcs;
+  std::uint64_t samples = 0;
+  void start(const ppc::Cpu* cpu) {
+    thread = std::thread([this, cpu] {
+      while (!stop.load(std::memory_order_relaxed)) {
+        const std::uint32_t pc = reinterpret_cast<const volatile std::uint32_t&>(cpu->pc);
+        ++pcs[pc];
+        ++samples;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      }
+    });
+  }
+  void finish(const xlat::SymbolTable& syms, int top) {
+    stop = true;
+    if (thread.joinable()) thread.join();
+    std::map<std::string, std::uint64_t> by_fn;
+    for (const auto& [pc, n] : pcs) {
+      const xlat::Symbol* f = syms.function_containing(pc);
+      char b[32];
+      std::snprintf(b, sizeof b, "?%08X", pc & ~0xFFFu);
+      by_fn[f ? f->name : std::string(b)] += n;
+    }
+    std::vector<std::pair<std::uint64_t, std::string>> v;
+    for (const auto& [name, n] : by_fn) v.push_back({n, name});
+    std::sort(v.rbegin(), v.rend());
+    std::printf("profile: %llu samples\n", static_cast<unsigned long long>(samples));
+    for (int k = 0; k < top && k < static_cast<int>(v.size()); ++k) {
+      const auto& [n, name] = v[static_cast<std::size_t>(k)];
+      std::printf("  %6.2f%%  %s\n", samples ? 100.0 * static_cast<double>(n) / static_cast<double>(samples) : 0.0,
+                  name.c_str());
+    }
+  }
+};
+
 }  // namespace
 
 int main(int argc, char** argv) {
   std::setvbuf(stdout, nullptr, _IOLBF, 1 << 16);
   std::string input_path, capture_at, draw_log_path;
-  std::uint64_t draw_log_from = 0, draw_log_to = ~0ull, dump_field = ~0ull;
+  std::uint64_t draw_log_from = 0, draw_log_to = ~0ull, dump_field = ~0ull, dump_to = 0;
   std::string dump_dir;
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
   bool headless = false, no_render = false;
+  int profile_top = 0;
+  std::string trace_entry, trace_file;
   Play play;
   for (int k = 1; k < argc; ++k) {
     std::string a = argv[k];
@@ -228,11 +345,21 @@ int main(int argc, char** argv) {
     else if (a == "--draw-log-to") draw_log_to = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--dump-textures") dump_dir = next();
     else if (a == "--dump-field") dump_field = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--dump-to") dump_to = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--perf-every") play.perf_every = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--profile") profile_top = std::atoi(next().c_str());
+    else if (a == "--trace-entry") trace_entry = next();
+    else if (a == "--trace-file") trace_file = next();
+    else if (a == "--trace-from") g_trace.from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--trace-to") g_trace.to = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--trace-peek") g_trace.peeks = parse_hex_list(next());
     else {
       std::fprintf(stderr,
                    "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
                    "[--headless] [--no-render] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
-                   "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N]\n");
+                   "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
+                   "[--perf-every N] [--profile N] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
+                   "[--trace-to N] [--trace-peek HEX,...]]\n");
       return 2;
     }
   }
@@ -314,6 +441,7 @@ int main(int argc, char** argv) {
   draw_log.mem_size = Machine::kMem1Size;
   draw_log.dump_dir = dump_dir;
   draw_log.dump_field = dump_field;
+  draw_log.dump_to = dump_to;
   if (!draw_log_path.empty()) draw_log.f = std::fopen(draw_log_path.c_str(), "w");
   const bool wrap = draw_log.f || !dump_dir.empty();
   gfx::GxProcessor proc(wrap ? static_cast<gfx::Backend*>(&draw_log) : renderer);
@@ -327,10 +455,22 @@ int main(int argc, char** argv) {
   g_play = &play;
   rt::g_input = &input;
   rt::g_frame_hook = &frame_hook;
+  if (!trace_entry.empty()) {
+    for (std::uint32_t a : parse_hex_list(trace_entry)) g_trace.addrs.insert(a);
+    if (!trace_file.empty()) g_trace.f = std::fopen(trace_file.c_str(), "w");
+    if (!g_trace.f) g_trace.f = stdout;
+    g_trace.field = &play.fields;
+    rt::g_entry_hook = &trace_hook;
+  }
 
   const auto t0 = std::chrono::steady_clock::now();
+  play.t0 = t0;
+  play.hooks = &hooks;
+  play.cpu = &m.cpu();
   std::string why;
   int rc = 0;
+  GuestProfiler profiler;
+  if (profile_top > 0) profiler.start(&m.cpu());
   try {
     rt::run(m.cpu());
   } catch (const StopRun& s) {
@@ -340,9 +480,12 @@ int main(int argc, char** argv) {
     rc = 1;
   }
   const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+  if (profile_top > 0) profiler.finish(in->symbols, profile_top);
   hw.set_gfx_observer(nullptr);
   rt::g_input = nullptr;
   rt::g_frame_hook = nullptr;
+  rt::g_entry_hook = nullptr;
+  if (g_trace.f && g_trace.f != stdout) std::fclose(g_trace.f);
   if (renderer) {
     renderer->flush();
     gpu->wait_idle();
@@ -360,6 +503,12 @@ int main(int argc, char** argv) {
   }
   std::printf("time: %.3f s of guest time in %.1f s (%.2fx real time); %llu VI fields, %llu frame polls\n", guest, secs,
               secs > 0 ? guest / secs : 0.0, ull(hw.vi_fields()), ull(play.frames));
+  std::printf("runtime: %llu unwinds, %llu in-frame resumes, %llu resume entries; %llu external and %llu decrementer "
+              "interrupts, %llu floating-point unavailable; idle skips %llu (%llu instructions skipped); interpreted %llu "
+              "instructions\n",
+              ull(rt::g_unwinds), ull(rt::g_inframe_resumes), ull(rt::g_resume_entries), ull(hooks.external_interrupts),
+              ull(hooks.decrementer_interrupts), ull(hooks.fp_unavailable), ull(hooks.idle_skips),
+              ull(hooks.idle_ticks_skipped), ull(rt::g_interpreted));
   if (!renderer) return rc;
   const auto& ps = proc.stats();
   std::printf("gx: %llu commands, %llu draws, %llu vertices, %llu triangles, %llu EFB copies (%llu to the XFB), "
