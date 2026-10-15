@@ -198,7 +198,7 @@ describe('login limits and sessions', () => {
   });
 
   it('reads secrets from the environment only, and refuses a short password', () => {
-    assert.throws(() => loadConfig({ MVP_SITE: site }), /MVP_PASSWORD/);
+    assert.throws(() => loadConfig({ MVP_SITE: site }), /MVP_STATE_FILE/);  // no password source (E5b)
     assert.throws(() => loadConfig({ MVP_SITE: site, MVP_PASSWORD: 'short' }), /at least 8/);
     const pw = join(dir, 'pw.txt');
     writeFileSync(pw, 'from a file 123\n');

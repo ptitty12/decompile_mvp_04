@@ -1,5 +1,6 @@
 // Entry point: `node dist/src/main.js` with the configuration in the
-// environment (src/config.ts; docs/engine/NETPLAY.md, "Deploying on a VPS").
+// environment (src/config.ts; docs/engine/NETPLAY.md, "Deploying on a VPS" and
+// "First-run password setup").
 import { loadConfig } from './config.js';
 import { startServer } from './server.js';
 
@@ -8,7 +9,7 @@ try {
   const app = await startServer(cfg);
   console.log(
     `mvp-server: listening on ${app.url}; site ${cfg.site}; disc ${cfg.disc ? 'configured' : 'not configured'}; ` +
-      `turn ${cfg.turn ? 'configured' : 'not configured'}`,
+      `turn ${cfg.turn ? 'configured' : 'not configured'}; password ${app.passwordMode()}`,
   );
   const stop = () => {
     app.close().then(() => process.exit(0));

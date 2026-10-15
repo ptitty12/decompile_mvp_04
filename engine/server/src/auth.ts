@@ -1,4 +1,5 @@
-// The password gate (E5): one shared password, a login form, and an HTTP-only
+// The password gate (E5): one shared password (from the environment, or the hash
+// chosen at first-run setup: src/setup.ts), a login form, and an HTTP-only
 // session cookie. Sessions live in memory (a restart logs everyone out). Failed
 // logins are limited per client address.
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
@@ -110,13 +111,13 @@ export function isNavigation(req: IncomingMessage): boolean {
   return req.method === 'GET' && (req.headers.accept ?? '').includes('text/html');
 }
 
-const LOGIN_CSS = `body{font:16px system-ui,sans-serif;background:#10141a;color:#e8ecf1;display:grid;place-items:center;min-height:100vh;margin:0}
+export const LOGIN_CSS = `body{font:16px system-ui,sans-serif;background:#10141a;color:#e8ecf1;display:grid;place-items:center;min-height:100vh;margin:0}
 form{background:#1b222c;padding:24px 28px;border-radius:10px;display:grid;gap:12px;min-width:260px}
 h1{font-size:18px;margin:0 0 4px}input,button{font:inherit;padding:8px 10px;border-radius:6px;border:1px solid #3a4553;background:#0f1319;color:inherit}
 button{background:#2f6fde;border-color:#2f6fde;cursor:pointer}.err{color:#ff8a80;margin:0}`;
 export const LOGIN_CSS_HASH = `'sha256-${createHash('sha256').update(LOGIN_CSS).digest('base64')}'`;
 
-function escapeHtml(s: string): string {
+export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
