@@ -217,8 +217,10 @@ TypeScript on Node 24 (D3), one dependency (`ws`), pinned in `package-lock.json`
 
 Without a session, a page load is sent to the login form and anything else gets
 401. Every response has `X-Content-Type-Options`, `Referrer-Policy: no-referrer`
-(invite links never leak through referrers) and `X-Frame-Options: DENY`; engine
-pages have a Content-Security-Policy (same origin only, plus `wasm-unsafe-eval` to
+(invite links never leak through referrers), `X-Frame-Options: DENY` and (P2)
+`Cross-Origin-Opener-Policy: same-origin`, `Cross-Origin-Embedder-Policy: require-corp`
+and `Cross-Origin-Resource-Policy: same-origin`, so the page is cross-origin isolated
+and loads the threaded engine (WEB.md section 2); engine pages have a Content-Security-Policy (same origin only, plus `wasm-unsafe-eval` to
 compile the translated game). Secrets come only from the environment or from files
 outside the repository: `MVP_TURN_SECRET`/`MVP_TURN_SECRET_FILE`, and the site password
 (created in the browser on the first run, below, or `MVP_PASSWORD`/`MVP_PASSWORD_FILE`).

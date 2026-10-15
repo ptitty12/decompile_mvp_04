@@ -16,7 +16,8 @@ and `docs/engine/NETPLAY.md`.
   provider's web panel, give it an **A record** pointing to the VPS's public IP
   address. If you use Cloudflare, set that record to **DNS only** (grey cloud).
 - **The VPS** needs at least 2 GB of memory and about 6 GB of free disk. The first
-  deploy compiles the engine, which takes roughly 10 to 20 minutes on a small VPS.
+  deploy compiles the engine twice (the regular one and the faster threaded one),
+  which takes roughly 20 to 40 minutes on a small VPS.
 
 ## 1. Create the app
 
