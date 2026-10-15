@@ -25,7 +25,7 @@ void put(Machine& m, u32 addr, const std::vector<u32>& words) {
 
 TEST_CASE("time base and decrementer follow the instruction count") {
   Machine m;
-  SystemHooks h(&m, nullptr, ClockConfig{2});
+  SystemHooks h(&m, nullptr, ClockConfig{2000});
   ppc::Cpu& c = m.cpu();
   c.hooks = &h;
   c.ticks = 600;
@@ -40,6 +40,27 @@ TEST_CASE("time base and decrementer follow the instruction count") {
   CHECK(h.decrementer(c) == 0);
   // The decrementer fires when it turns negative: one tick later.
   CHECK(c.next_event == h.ticks_for(5010 + 101));
+}
+
+TEST_CASE("fractional charges per instruction (CLK2) and a change of charge mid-run") {
+  Machine m;
+  SystemHooks h(&m, nullptr, ClockConfig{1250});  // 1.25 cycles: 48 instructions per 5 time-base ticks
+  ppc::Cpu& c = m.cpu();
+  c.hooks = &h;
+  c.ticks = 48;
+  CHECK(h.time_base(c) == 5);
+  c.ticks = 47;
+  CHECK(h.time_base(c) == 4);  // rounds down
+  CHECK(h.ticks_for(5) == 48);  // the first count that reaches it
+  CHECK(h.ticks_for(4) == 39);  // 39 * 1.25 / 12 = 4.06; 38 gives 3.96
+  // The charge changes at 4,800 instructions (500 ticks); the time base goes on from there.
+  c.ticks = 4800;
+  h.set_clock(c, ClockConfig{1000});
+  CHECK(h.clock().cpi_milli == 1000);
+  CHECK(h.time_base(c) == 500);
+  c.ticks += 120;  // 120 more at one cycle each
+  CHECK(h.time_base(c) == 510);
+  CHECK(h.ticks_for(510) == c.ticks);
 }
 
 namespace {
