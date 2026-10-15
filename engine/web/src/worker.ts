@@ -537,20 +537,18 @@ function afterRun(ran: number, ms: number): boolean {
 // ends. Ahead of the clock the loop waits for animation frames as before.
 // pacing=raf (URL) keeps the earlier batches of up to four fields per animation frame.
 //
-// Q2 (saturated): on a machine that cannot run the game at full speed (the
-// fields take longer than the display's refresh on average), chasing the clock
-// only made it worse: two-field batches showed every other frame of the game
-// (its picture moved in 33 ms jumps), and debts of up to eight fields came and
-// went in bursts. While the host time per field (smoothed over about a second)
-// is a whole field or more, every batch is one field, each followed by
-// its present, back to back, and the clock never waits for more than two
-// fields of debt: the game runs evenly in slow motion, every frame shown, and
-// the sound stretches to match (resampler.ts). Under 90 % it chases again.
-// Threaded engine only: there the render thread presents, so a present per
-// field costs the emulation nothing; the single-threaded engine presents
-// inline (measured: a present per field cost it 10 % of its speed on this
-// PC), so it keeps chasing with two-field batches. Guest state is the same
-// either way (wall time decides only how many fields run per batch).
+// Q2 (slowMotion=1, opt-in): on a machine that cannot run the game at full
+// speed, while the host time per field (smoothed over about a second) is a
+// whole field or more, every batch is one field, each followed by its
+// present, back to back, and the clock runs at most two fields ahead: the game
+// runs evenly in slow motion with every frame shown, instead of the chase's
+// two-field batches (every other frame shown). Measured at a simulated 2x
+// slower machine (Q2_LOG.md section 4): 37.7 instead of 25.9 new frames a
+// second, but the game at 0.63x instead of 0.69x, so it is off by default.
+// Threaded engine only (the single-threaded one presents inline: a present
+// per field cost it about 10 % of its speed). Under 90 % it chases again.
+// Guest state is the same either way (wall time decides only how many fields
+// run per batch).
 const CHASE_FIELDS = 2;
 const SATURATED_ON = 1.0, SATURATED_OFF = 0.9, SATURATED_S = 1.0;
 let fieldCost = 0;          // smoothed host ms per field, as a share of a field
@@ -567,7 +565,7 @@ chase.port1.onmessage = () => {
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
   let due = Math.floor((now - pacedStart) / FIELD_MS) - pacedFields;
-  const slowMotion = saturated && mt && opts?.slowMotion !== false;  // threaded: presenting costs the emulation nothing
+  const slowMotion = saturated && mt && opts?.slowMotion === true;  // opt-in (slowMotion=1), threaded only
   if (due > (slowMotion ? 2 : MAX_FIELDS_PER_FRAME * 2)) {
     // Too far behind (a slow stretch, a background tab, a slow machine): drop the debt.
     pacedStart = now - pacedFields * FIELD_MS;
