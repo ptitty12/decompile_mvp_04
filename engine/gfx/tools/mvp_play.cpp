@@ -11,6 +11,9 @@
 //   --max-ticks N     instruction budget (default: none)
 //   --headless        no window: render off-screen only (captures still work)
 //   --no-render       no renderer at all (the guest runs alone; for the determinism check)
+//   --yield           return from rt::run() at every VI field and call it again, as
+//                     the browser does (runtime/host_yield.h); the guest must run
+//                     the same (compare the "guest:" line with a run without it)
 //   --present-every N show every Nth VI field (default 1)
 //   --capture DIR     write the scanned-out frame as DIR/field_N_frame_F.png (VI field N,
 //                     game frame poll F, the number input scripts use) every
@@ -45,6 +48,7 @@
 #include "gfx/wgpu/window.h"
 #include "runtime/boot.h"
 #include "runtime/hle.h"
+#include "runtime/host_yield.h"
 #include "runtime/hw.h"
 #include "runtime/input.h"
 #include "runtime/native.h"
@@ -148,6 +152,7 @@ struct DrawLog : gfx::Backend {
 };
 
 struct Play : GfxObserver {
+  YieldingHooks* yield_hooks = nullptr;  // --yield
   gfx::GxProcessor* proc = nullptr;
   gfx::Renderer* renderer = nullptr;
   gfx::Window* window = nullptr;
@@ -165,6 +170,7 @@ struct Play : GfxObserver {
 
   void vi_field(std::uint64_t field, std::uint32_t xfb) override {
     fields = field;
+    if (yield_hooks) yield_hooks->request_yield();
     if (!renderer) {
       if (field >= max_fields) throw StopRun{"ran " + std::to_string(max_fields) + " VI fields (--fields)"};
       return;
@@ -207,7 +213,7 @@ int main(int argc, char** argv) {
   std::string dump_dir;
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
-  bool headless = false, no_render = false;
+  bool headless = false, no_render = false, yield = false;
   Play play;
   for (int k = 1; k < argc; ++k) {
     std::string a = argv[k];
@@ -219,6 +225,7 @@ int main(int argc, char** argv) {
     else if (a == "--max-ticks") max_ticks = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--headless") headless = true;
     else if (a == "--no-render") no_render = headless = true;
+    else if (a == "--yield") yield = true;
     else if (a == "--present-every") play.present_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
     else if (a == "--capture") play.capture_dir = next();
     else if (a == "--capture-every") play.capture_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
@@ -231,7 +238,7 @@ int main(int argc, char** argv) {
     else {
       std::fprintf(stderr,
                    "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
-                   "[--headless] [--no-render] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
+                   "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N]\n");
       return 2;
     }
@@ -295,7 +302,7 @@ int main(int argc, char** argv) {
   setup_boot_environment(m, in->disc);
   Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size);
   hw.set_disc(in->disc.image.get());
-  SystemHooks hooks(&m, &hw);
+  YieldingHooks hooks(&m, &hw);
   m.memory().io = &hw;
   m.cpu().hooks = &hooks;
   hooks.tick_limit = max_ticks;
@@ -322,6 +329,7 @@ int main(int argc, char** argv) {
   play.proc = &proc;
   play.renderer = renderer;
   play.window = window.get();
+  if (yield) play.yield_hooks = &hooks;
   if (!renderer) play.proc = nullptr;
   hw.set_gfx_observer(&play);
   g_play = &play;
@@ -332,7 +340,7 @@ int main(int argc, char** argv) {
   std::string why;
   int rc = 0;
   try {
-    rt::run(m.cpu());
+    for (;;) rt::run(m.cpu());  // returns at each VI field with --yield
   } catch (const StopRun& s) {
     why = s.why;
   } catch (const ppc::GuestFault& f) {
@@ -358,6 +366,9 @@ int main(int argc, char** argv) {
     std::printf("guest: %llu instructions, time base %llu, %llu frame polls, MEM1 sha1 %s\n", ull(m.cpu().ticks),
                 ull(hooks.time_base(m.cpu())), ull(rt::g_frame_polls), Sha1::hex(mem.finish()).c_str());
   }
+  if (yield)
+    std::printf("yield: %llu host yields, %llu repeated safe points skipped\n", ull(hooks.yields),
+                ull(hooks.repeats_skipped));
   std::printf("time: %.3f s of guest time in %.1f s (%.2fx real time); %llu VI fields, %llu frame polls\n", guest, secs,
               secs > 0 ? guest / secs : 0.0, ull(hw.vi_fields()), ull(play.frames));
   if (!renderer) return rc;

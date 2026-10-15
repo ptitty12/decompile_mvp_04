@@ -121,9 +121,20 @@ u32 resume_target(Cpu& c, u32 sp, GuestFn self);
 
 // Runs guest code from c.pc. Whenever c.pc is a translated entry point, the
 // native function runs; a resume label re-enters its function's body; anything
-// else runs in the reference interpreter. Returns only by exception (GuestFault,
-// or whatever an Io handler or hook throws to stop the run).
+// else runs in the reference interpreter. Returns by exception (GuestFault, or
+// whatever an Io handler or hook throws to stop the run), or after yield_run().
 void run(Cpu& c);
+
+// Host yield (E2): makes run() return so the host can go back to its own event
+// loop (a browser between VI fields), by an unwind like a thread switch's: every
+// native frame returns (resume_target never resumes in frame while it is set)
+// and the top-level dispatcher returns. The next run() continues at c.pc. Call
+// it from a safe point outside interrupt handlers (runtime/host_yield.h does).
+extern bool g_yield;
+inline void yield_run() {
+  g_yield = true;
+  g_unwinding = true;
+}
 
 // Runs an exception handler entered at c.pc (SRR0/SRR1 set) until the exception
 // ends: an rfi that sets MSR[EE] in the interpreter, or an rfi in translated code
