@@ -307,6 +307,14 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | Determinism kept: 40/40 native tests, identical hashes at /Od and /O2. | merge 4f61815f
 
+- 2026-10-15 | **E2d: browser game code inline and exact** (lead, under the owner's delegation; docs/engine/E2D_LOG.md).
+  - **E2-W6:** each FP and paired-single instruction gets a fast path on IEEE doubles only where it provably equals `sem.h`; otherwise it falls back to the runtime's exact semantics. Only 130 of 1,473,997 instructions still go to the runtime.
+  - **E2-W7:** MSR[FP] checks (the FP-unavailable exception, mirroring E3a-FP1) are placed by dataflow.
+  - **Evidence:** a digest through translated code equals native; 170M+ fuzz cases with 0 differences; `test_wasm_lockstep` re-enabled and passing; Chrome and Firefox guest lines equal native at every WEB.md checkpoint.
+  - **Speed in Chrome:** the intro movie went from 0.25× to 2.26× real time unpaced, and the main menu takes 5.0 ms per field. The module grew from 49.5 to 62.1 MB.
+
+  | | merge of engine/e2d
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
