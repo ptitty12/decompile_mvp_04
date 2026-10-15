@@ -201,6 +201,9 @@ export type FromWorker =
 export type WorkletIn =
   | { type: 'source'; port: MessagePort }               // the Worker's channel
   | { type: 'pcm'; rate: number; data: Int16Array }     // interleaved stereo frames
+  // Q2: from now on the frames come through a ring in shared memory (web_audio.h AudioRing: a 64-byte
+  // header of int32s at byte `header` of `sab`, the frames where the header says), not as 'pcm'
+  | { type: 'ring'; sab: SharedArrayBuffer; header: number }
   | { type: 'reset' }
   | { type: 'target'; ms: number };
 
@@ -224,4 +227,18 @@ export interface WorkletStats {
   available: number;
   chunks: number;
   maxGapMs: number;
+  // Q2
+  transport: 'port' | 'ring';
+  ringDropped: number;  // frames the producer found no room for in the ring
+  gaps: number;
+  gaps20: number;
+  gapMs: number;
+  longestGapMs: number;
+  speed: number;
+  stretch: number;
+  minStretch: number;
+  stretched: number;
+  splices: number;
+  targetMs: number;
+  maxTargetMs: number;
 }

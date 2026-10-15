@@ -54,6 +54,7 @@ export interface MvpEngine {
   _mvp_audio_take(): number;
   _mvp_audio_ptr(): number;
   _mvp_audio_rate(): number;
+  _mvp_audio_ring(capacity: number): number;  // Q2: the threaded build's ring in shared memory (0: none)
 
   // P1: every guest DVD read with its host timing (development).
   _mvp_io_log_enable(): void;

@@ -258,15 +258,55 @@ function enableAudio(): void {
   if (!M || !booted || !opts?.audio || !audioPort || audioAttached) return;
   M._mvp_audio_enable(1);
   audioAttached = true;
+  audioRing();
   post({ type: 'audio', attachedAtField: status().fields });
 }
 
-// The batch's mixed frames, to the worklet (the buffer is transferred).
+// Q2: where memory can be shared (a cross-origin isolated page), the frames go
+// to the worklet through a ring in shared memory (web_audio.h's AudioRing
+// layout): the threaded engine's mixer writes into one in the engine's own
+// memory as it mixes; the single-threaded engine's batches are copied into one
+// here. Elsewhere (or audioRing=0) each batch is a message.
+const RING_FRAMES = 16384;  // about half a second at 32 kHz
+let ringOut: { h: Int32Array; frames: Int16Array; cap: number } | null = null;
+function audioRing(): void {
+  const canShare = (self as unknown as { crossOriginIsolated?: boolean }).crossOriginIsolated === true &&
+                   typeof SharedArrayBuffer !== 'undefined';
+  if (!M || !audioPort || opts?.audioRing === false || !canShare) return;
+  let msg: WorkletIn | null = null;
+  if (mt && M.wasmMemory) {
+    const header = M._mvp_audio_ring(RING_FRAMES);
+    if (header) msg = { type: 'ring', sab: M.wasmMemory.buffer as unknown as SharedArrayBuffer, header };
+  }
+  if (!msg) {
+    const sab = new SharedArrayBuffer(64 + 4 * RING_FRAMES);
+    const h = new Int32Array(sab, 0, 16);
+    h.set([0x4d565041, RING_FRAMES, 32000, 0, 0, 0, 64]);
+    ringOut = { h, frames: new Int16Array(sab, 64, 2 * RING_FRAMES), cap: RING_FRAMES };
+    msg = { type: 'ring', sab, header: 0 };
+  }
+  audioPort.postMessage(msg);
+}
+
+// The batch's mixed frames, to the worklet: into the Worker's ring, or as a
+// message (the buffer transferred). Nothing to do with the engine's own ring.
 function pumpAudio(): void {
   if (!audioAttached || !audioPort || !M) return;
   const n = M._mvp_audio_take();
   if (!n) return;
   const ptr = M._mvp_audio_ptr();
+  if (ringOut) {
+    const { h, frames, cap } = ringOut;
+    const w = Atomics.load(h, 3) >>> 0, used = (w - (Atomics.load(h, 4) >>> 0)) >>> 0;
+    const k = Math.min(n, cap - used), at = w & (cap - 1), first = Math.min(k, cap - at);
+    const src = new Int16Array(heap().buffer, ptr, 2 * n);
+    frames.set(src.subarray(0, 2 * first), 2 * at);
+    if (k > first) frames.set(src.subarray(2 * first, 2 * k), 0);
+    Atomics.store(h, 2, M._mvp_audio_rate());
+    Atomics.store(h, 3, (w + k) | 0);
+    if (k < n) Atomics.add(h, 5, n - k);
+    return;
+  }
   // A copy in its own (never shared) buffer, to transfer.
   const data = new Int16Array(heap().slice(ptr, ptr + 4 * n).buffer);
   const msg: WorkletIn = { type: 'pcm', rate: M._mvp_audio_rate(), data };

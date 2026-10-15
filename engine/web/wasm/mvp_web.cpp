@@ -646,6 +646,19 @@ EMSCRIPTEN_KEEPALIVE void mvp_audio_enable(int on) {
 // The frames mixed since the last call (interleaved 16-bit stereo at
 // mvp_audio_rate() Hz); mvp_audio_ptr() is valid until the next call.
 EMSCRIPTEN_KEEPALIVE int mvp_audio_take() { return static_cast<int>(g.audio.take()); }
+// Q2, the threaded engine (shared memory): the mixer writes into a ring of
+// `capacity` frames (a power of two) in this module's memory as it mixes, which
+// the AudioWorklet reads directly (web_audio.h); returns the ring's header
+// address, 0 where the memory is not shared. mvp_audio_take() then returns 0.
+EMSCRIPTEN_KEEPALIVE std::uintptr_t mvp_audio_ring(int capacity) {
+#ifdef MVP_WEB_THREADS
+  if (capacity < 1024 || (capacity & (capacity - 1))) return 0;
+  return reinterpret_cast<std::uintptr_t>(g.audio.make_ring(static_cast<std::uint32_t>(capacity)));
+#else
+  (void)capacity;
+  return 0;
+#endif
+}
 EMSCRIPTEN_KEEPALIVE const std::int16_t* mvp_audio_ptr() { return g.audio.taken(); }
 EMSCRIPTEN_KEEPALIVE int mvp_audio_rate() { return static_cast<int>(g.audio.rate()); }
 
