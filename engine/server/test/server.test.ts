@@ -2,7 +2,7 @@
 // route, the lobby and signaling. No game data: the "disc" is random bytes in
 // a temporary directory.
 import assert from 'node:assert/strict';
-import { createHmac, randomBytes } from 'node:crypto';
+import { createHash, createHmac, randomBytes } from 'node:crypto';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { get as httpGet } from 'node:http';
 import { tmpdir } from 'node:os';
@@ -243,9 +243,13 @@ describe('static site', () => {
 
 describe('disc route', () => {
   it('advertises the disc in /config.json only when configured', async () => {
-    for (const [d, body] of [[discPath, { disc: '/api/disc/image' }], ['', {}]] as const) {
-      const app = await startServer(config({ disc: d }));
+    // One piece: the image hash is SHA-256 over that piece's SHA-256 (src/disc_hash.ts).
+    const hash = createHash('sha256').update(createHash('sha256').update(disc).digest()).digest('hex');
+    const withDisc = { disc: '/api/disc/image', discHash: hash, discSize: disc.length, discManifest: '/api/disc/manifest' };
+    for (const [d, body] of [[discPath, withDisc], ['', {}]] as const) {
+      const app = await startServer(config({ disc: d }), { log: () => {} });
       try {
+        await app.discReady();
         const cookie = await login(app);
         const r = await fetch(`${app.url}/config.json`, { headers: { Cookie: cookie } });
         assert.equal(r.status, 200);

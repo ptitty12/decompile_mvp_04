@@ -28,6 +28,8 @@
 // read-ahead for the server's image (mvp_disc_want / mvp_disc_insert).
 // E6 adds roster packs (packs_web.h: mvp_pack_*, mvp_packs_mount), mounted on the
 // virtual disc between mvp_open_disc and mvp_boot.
+// P1 times the drive model's reads on the host ("io" in mvp_status;
+// mvp_io_log_enable / mvp_io_log for a per-read log).
 //
 // Determinism: guest state depends only on the disc and the per-frame inputs.
 // Wall time never reaches it: the shell decides *how many* fields to run per
@@ -173,6 +175,36 @@ struct XfbTap : gfx::Backend {
   void invalidate_textures() override { next->invalidate_textures(); }
 };
 
+// The guest's DVD reads as the host serves them (P1): every read the drive
+// model makes goes through here and is timed on the host clock, so a hitch from
+// a slow read shows up in mvp_status ("io") and, when enabled, in a per-read log
+// (mvp_io_log). Host-side only: the guest gets the same bytes at the same
+// virtual time however long the host took.
+class TimedSource final : public vfs::Source {
+ public:
+  explicit TimedSource(vfs::Source* inner) : inner_(inner) {}
+  std::uint64_t size() const override { return inner_->size(); }
+  bool read(std::uint64_t off, void* dst, std::size_t n) override;
+
+  struct Stats {
+    std::uint64_t reads = 0, bytes = 0;
+    double ms = 0, max_ms = 0;                         // host time spent in reads
+    std::uint64_t over16 = 0, over50 = 0, over100 = 0;  // reads longer than a field, 50 ms, 100 ms
+  };
+  Stats st;
+  struct Record {
+    std::uint64_t field;
+    double at_ms;  // the Worker's clock (performance.now()) when the read started
+    std::uint64_t off;
+    std::uint32_t n;
+    double ms;
+  };
+  std::vector<Record>* log = nullptr;
+
+ private:
+  vfs::Source* inner_;
+};
+
 // The renderer's view of the run, and the field boundary.
 struct Observer : GfxObserver {
   Engine* e = nullptr;
@@ -187,6 +219,7 @@ struct Engine {
   std::uint64_t want_first = 0;           // mvp_disc_want's run
   std::optional<vfs::Disc> disc;
   std::string image_kind;
+  std::unique_ptr<TimedSource> timed;     // the drive model's view of the image (mvp_boot)
 
   // Translation.
   bool translated = false;
@@ -234,6 +267,23 @@ struct Engine {
   std::uint64_t run_fields = 0;
 };
 Engine g;
+std::vector<TimedSource::Record> g_io_log;
+bool g_io_logging = false;
+
+bool TimedSource::read(std::uint64_t off, void* dst, std::size_t n) {
+  const double t0 = now_ms();
+  const bool ok = inner_->read(off, dst, n);
+  const double dt = now_ms() - t0;
+  ++st.reads;
+  st.bytes += n;
+  st.ms += dt;
+  if (dt > st.max_ms) st.max_ms = dt;
+  if (dt > 1000.0 / 59.94) ++st.over16;
+  if (dt > 50) ++st.over50;
+  if (dt > 100) ++st.over100;
+  if (log) log->push_back({g.hw ? g.hw->vi_fields() : 0, t0, off, static_cast<std::uint32_t>(n), dt});
+  return ok;
+}
 
 void Observer::gx_command(const std::uint8_t* cmd, std::size_t len) {
   if (e->proc) e->proc->command(cmd, len);
@@ -372,6 +422,21 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_disc_trace() {
   g_text.clear();
   for (const auto& [off, n] : g_trace)
     g_text += (off == ~0ull ? "F " + std::to_string(n) : std::to_string(off) + " " + std::to_string(n)) + '\n';
+  return g_text.c_str();
+}
+
+// Development (P1): log every guest DVD read with its host timing (call before
+// mvp_boot); mvp_io_log() returns "field at_ms offset size ms" lines (at_ms on
+// the Worker's performance.now() clock; offsets and sizes only, no data).
+EMSCRIPTEN_KEEPALIVE void mvp_io_log_enable() { g_io_logging = true; }
+EMSCRIPTEN_KEEPALIVE const char* mvp_io_log() {
+  g_text.clear();
+  char b[96];
+  for (const auto& r : g_io_log) {
+    std::snprintf(b, sizeof b, "%llu %.1f %llu %u %.2f\n", static_cast<unsigned long long>(r.field), r.at_ms,
+                  static_cast<unsigned long long>(r.off), r.n, r.ms);
+    g_text += b;
+  }
   return g_text.c_str();
 }
 
@@ -560,7 +625,9 @@ EMSCRIPTEN_KEEPALIVE int mvp_boot(const char* script, int len, double stop_field
   g.m->load_dol(g.disc->dol);
   setup_boot_environment(*g.m, *g.disc);
   g.hw = std::make_unique<Hardware>(&g.m->cpu(), g.m->mem1(), Machine::kMem1Size);
-  g.hw->set_disc(g.disc->image.get());
+  g.timed = std::make_unique<TimedSource>(g.disc->image.get());
+  if (g_io_logging) g.timed->log = &g_io_log;
+  g.hw->set_disc(g.timed.get());
   g.hooks = std::make_unique<YieldingHooks>(g.m.get(), g.hw.get());
   g.m->memory().io = g.hw.get();
   g.m->cpu().hooks = g.hooks.get();
@@ -734,6 +801,16 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_status() {
   std::string s(b, static_cast<std::size_t>(n));
   s += ",\"heap_mb\":" + std::to_string(emscripten_get_heap_size() >> 20);
   if (g.stopped) s += ",\"why\":\"" + json_escape(g.why) + "\"";
+  if (g.timed) {
+    const auto& io = g.timed->st;
+    std::snprintf(b, sizeof b,
+                  ",\"io\":{\"reads\":%llu,\"bytes\":%llu,\"ms\":%.1f,\"max_ms\":%.1f,\"over16\":%llu,\"over50\":%llu,"
+                  "\"over100\":%llu}",
+                  static_cast<unsigned long long>(io.reads), static_cast<unsigned long long>(io.bytes), io.ms,
+                  io.max_ms, static_cast<unsigned long long>(io.over16), static_cast<unsigned long long>(io.over50),
+                  static_cast<unsigned long long>(io.over100));
+    s += b;
+  }
   if (g.file)
     s += ",\"disc_reads\":" + std::to_string(g.file->reads) + ",\"disc_bytes\":" + std::to_string(g.file->bytes);
   if (g.http) {

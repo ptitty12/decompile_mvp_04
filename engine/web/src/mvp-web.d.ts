@@ -45,6 +45,10 @@ export interface MvpEngine {
   _mvp_audio_ptr(): number;
   _mvp_audio_rate(): number;
 
+  // P1: every guest DVD read with its host timing (development).
+  _mvp_io_log_enable(): void;
+  _mvp_io_log(): number;
+
   // Netplay (E5, wasm/net_web.cpp).
   _mvp_net_begin(player: number, delay: number, hashEvery: number, build: number, buildLen: number, nonce: number): number;
   _mvp_net_recv(data: number, len: number): void;

@@ -20,8 +20,12 @@ need it. Design: `docs/ARCHITECTURE.md` §8. Working log and evidence:
 
 Only controller inputs, acknowledgements and state hashes cross the network.
 Nothing game-derived does: each browser reads its own disc (or, on the owner's
-private deployment only, the owner's image from the password-protected disc
-route), translates the game itself, and keeps any diagnostic dump local.
+private deployment only, the owner's image, downloaded once from the
+password-protected disc route into that player's own browser storage: P1,
+`docs/engine/WEB.md`), translates the game itself, and keeps any diagnostic dump
+local. On the deployment a page opens the lobby only once its copy of the disc is
+complete, so a player still downloading never makes the other one wait past the
+session's 10 s timeout.
 
 ## 1. Lockstep
 
@@ -204,8 +208,9 @@ TypeScript on Node 24 (D3), one dependency (`ws`), pinned in `package-lock.json`
 | `GET /login`, `POST /login`, `POST /logout` | the password gate: one shared password, an HttpOnly `SameSite=Lax` session cookie (`Secure` behind TLS), in-memory sessions (30 days), failed logins limited per address (10 per 15 min), no open redirects |
 | `GET /setup`, `POST /setup` | first-run password setup (below): the form while the server has no password and its window is open (every page request is sent here); 403 once the window has closed; **404 forever once a password exists** |
 | `GET /healthz` | `ok`, without a login (monitoring) |
-| `GET /config.json` | `{"disc":"/api/disc/image"}` when a disc image is configured, else `{}` |
+| `GET /config.json` | `{"disc":"/api/disc/image"}` when a disc image is configured, else `{}`; with a disc also `discHash` (the image hash), `discSize` and `discManifest`, or `discPreparing` while the server hashes the image (P1); `discPage` with uploads |
 | `GET`/`HEAD /api/disc/image` | the owner's image: `Accept-Ranges: bytes`, single ranges (206, or 416), `Cache-Control: private, no-store` |
+| `GET /api/disc/manifest` | the image's 8 MiB pieces' SHA-256 and the image hash (SHA-256 over those digests), for the pages' one-time download (`src/disc_hash.ts`); 503 while hashing, `private, no-store` |
 | `GET /api/rooms` | open rooms |
 | `/ws` | lobby and signaling (above) |
 | anything else | the engine site (static, `Cache-Control: private, no-cache` + ETag) |
@@ -307,7 +312,7 @@ hands each page credentials derived from the shared secret (username
 `<expiry>:mvp`, password base64 HMAC-SHA1), valid for 24 hours. No accounts are
 stored, and leaked credentials expire.
 
-Tests: `npm test` in `engine/server` (61 tests, `test/disc.test.ts` for the disc upload and the Docker settings: the gate, sessions and limits, the
+Tests: `npm test` in `engine/server` (64 tests, `test/disc.test.ts` for the disc upload, the image hash and the Docker settings: the gate, sessions and limits, the
 static site, the disc route, the lobby, signaling, TURN credentials, and first-run
 setup: setup mode redirects, form validation and CSRF, the stored hash and its file,
 the window, restarts, the environment override, limits), also run by ctest as

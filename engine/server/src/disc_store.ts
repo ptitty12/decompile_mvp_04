@@ -3,6 +3,8 @@
 // disc" page (src/disc_page.ts) instead of copying it to the server by hand.
 //
 //   <dir>/GV4E69.img              the image the disc route serves (ISO or CISO, by its first bytes)
+//   <dir>/GV4E69.manifest.json    its piece hashes for the players' one-time download (src/disc_hash.ts),
+//                                 kept so a restart does not hash the image again
 //   <dir>/upload/upload.json      the upload in progress: id, size, name, file fingerprint, bytes received
 //   <dir>/upload/<id>.part        its bytes so far
 //
@@ -106,12 +108,15 @@ export class DiscStore {
   private readonly log: (message: string) => void;
   private readonly uploadDir: string;
   readonly imagePath: string;
+  /** Where the image's manifest is kept (src/disc_hash.ts). */
+  readonly manifestPath: string;
 
   private constructor(private readonly o: DiscStoreOptions) {
     this.now = o.now ?? Date.now;
     this.log = o.log ?? (() => {});
     this.uploadDir = join(o.dir, 'upload');
     this.imagePath = join(o.dir, `${o.expect.gameId}.img`);
+    this.manifestPath = join(o.dir, `${o.expect.gameId}.manifest.json`);
   }
 
   /** Opens the directory (creating it, 0700), checks the stored image and picks up an unfinished upload. */
