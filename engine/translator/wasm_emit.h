@@ -62,7 +62,9 @@ struct WasmEmitOptions {
   // single instructions with execute_plain(), which has no such check.
   bool fpu_checks = true;
   // Import the memory as shared, with a maximum of 4 GiB (P2: the threaded
-  // browser engine, whose memory is a SharedArrayBuffer). The code is the same.
+  // browser engine, whose memory is a SharedArrayBuffer), and check each store
+  // to guest memory against env.gp_pages first (WasmGpLayout): only there can a
+  // render thread still have to read what the store overwrites.
   bool shared_memory = false;
 };
 

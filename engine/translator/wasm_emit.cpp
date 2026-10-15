@@ -2557,7 +2557,12 @@ void swap32_from_local(Fn& h, u32 local) {  // stack: x (also in `local`) -> bsw
 // bytes of physical memory, nonzero while an issued GX command reads them); if
 // so rt.gp_wait(cpu, first, last) waits for it. `first` and `last` push the
 // first and the last byte's address.
+// Emitted only into a module of the threaded engine (WasmEmitOptions::shared_memory):
+// elsewhere nothing is ever pending.
+thread_local bool t_gp_checks = false;
+
 void gp_check(Fn& h, const std::function<void()>& first, const std::function<void()>& last) {
+  if (!t_gp_checks) return;
   auto entry = [&](const std::function<void()>& addr) {
     h.global(gGpPages);
     addr();
@@ -3534,6 +3539,7 @@ const char* wasm_trap_text(std::uint32_t code) {
 }
 
 bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out, std::string* error) {
+  t_gp_checks = opt.shared_memory;
   *out = WasmModule{};
   if (p.errors) {
     if (error) *error = "the CFG has errors";
