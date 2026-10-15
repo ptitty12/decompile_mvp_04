@@ -12,6 +12,8 @@
 //   room=ID         join this game (the invite link)
 //   online=create   create a game at once
 //   delay=N         the input delay to propose (frames, default 3)
+//   netsim=L,J,P    tests only: delay this page's outgoing datagrams by L ms plus
+//                   up to J ms of jitter, and drop a fraction P of them
 
 import type { ClientMsg, IceServer, ServerMsg, SignalData } from '../../server/src/lobby_protocol.js';
 import type { NetOptions, NetStatus } from './protocol.js';
@@ -48,6 +50,8 @@ export class Online {
   private readonly createBtn: HTMLButtonElement;
   private readonly delayEl: HTMLSelectElement;
   private openWaiters: (() => void)[] = [];
+  // A simulated slow network for tests (?netsim=latency,jitter,loss).
+  private readonly sim: { latency: number; jitter: number; loss: number } | null;
 
   /** Datagrams from the other player (to the Worker). */
   onDatagram: (data: ArrayBuffer) => void = () => {};
@@ -55,6 +59,9 @@ export class Online {
   onChange: () => void = () => {};
 
   constructor(container: HTMLElement, private readonly params: URLSearchParams) {
+    const sim = params.get('netsim');
+    const [latency = 0, jitter = 0, loss = 0] = (sim ?? '').split(',').map(Number);
+    this.sim = sim ? { latency, jitter, loss } : null;
     this.el = container;
     this.el.replaceChildren();
     const h = document.createElement('h2');
@@ -65,8 +72,8 @@ export class Online {
     this.createBtn.type = 'button';
     this.createBtn.textContent = 'Create a game';
     this.delayEl = document.createElement('select');
-    this.delayEl.title = 'Input delay (frames): higher is smoother on slow connections';
-    for (const d of [2, 3, 4]) {
+    this.delayEl.title = 'Input delay in frames: 3 suits a round trip up to about 90 ms; take 4 or more for longer distances';
+    for (const d of [2, 3, 4, 5, 6]) {
       const o = document.createElement('option');
       o.value = String(d);
       o.textContent = `delay ${d}`;
@@ -121,8 +128,17 @@ export class Online {
 
   /** A datagram from the Worker to the other player. */
   send(data: ArrayBuffer): void {
-    if (this.dc?.readyState === 'open') this.dc.send(data);
+    const sim = this.sim;
+    if (!sim) {
+      if (this.dc?.readyState === 'open') this.dc.send(data);
+      return;
+    }
+    if (Math.random() < sim.loss) return;
+    setTimeout(() => {
+      if (this.dc?.readyState === 'open') this.dc.send(data);
+    }, sim.latency + Math.random() * sim.jitter);
   }
+
 
   /** The engine's session status (from the Worker). */
   engineStatus(status: NetStatus, windows?: string, diagnostic?: string): void {
@@ -140,7 +156,20 @@ export class Online {
       this.say(s.state === 'desynced'
         ? `The two games went out of sync, so the game stopped. ${s.reason}`
         : `Online game over: ${s.reason}`, true);
+      if (s.state === 'desynced' && diagnostic) this.offerDiagnostic(diagnostic);
     }
+  }
+
+  // The desync diagnostic as a text file to save (numbers only, no game data;
+  // it stays on this computer unless the player chooses to share it).
+  private offerDiagnostic(text: string): void {
+    if (this.el.querySelector('a.diag')) return;
+    const a = document.createElement('a');
+    a.className = 'diag';
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    a.download = `mvp-netplay-diagnostic-player${this.state.player ?? 0}.txt`;
+    a.textContent = "Save the diagnostic (compare it with the other player's to see what differed)";
+    this.el.append(a);
   }
 
   private say(text: string, error = false): void {
@@ -247,7 +276,10 @@ export class Online {
       this.onChange();
     });
     dc.addEventListener('message', (ev: MessageEvent<ArrayBuffer>) => this.onDatagram(ev.data));
-    pc.addEventListener('icecandidate', (ev) => this.signal({ kind: 'candidate', candidate: ev.candidate ? ev.candidate.toJSON() as never : null }));
+    pc.addEventListener('icecandidate', (ev) => {
+      const c = ev.candidate;
+      this.signal({ kind: 'candidate', candidate: c ? { candidate: c.candidate, sdpMid: c.sdpMid, sdpMLineIndex: c.sdpMLineIndex } : null });
+    });
     pc.addEventListener('connectionstatechange', () => {
       if (pc.connectionState === 'failed') this.say('Could not connect to the other player (no route, even through the relay).', true);
     });

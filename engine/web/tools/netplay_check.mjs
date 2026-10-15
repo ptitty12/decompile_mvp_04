@@ -11,12 +11,14 @@
 //   node engine/web/tools/netplay_check.mjs [--browser chrome|msedge|chromium|firefox] [--browser2 NAME]
 //        [--disc PATH] [--script FILE] [--frames N] [--delay D] [--fast] [--headed]
 //        [--expect "guest: ..."] [--out DIR] [--tag NAME] [--timeout SECONDS] [--no-render]
-//        [--steady-from FRAME]
+//        [--steady-from FRAME] [--netsim LATENCY,JITTER,LOSS]
 //
 //   --expect   a guest line both pages must also match (e.g. the native
 //              `mvp-netplay solo` run of the same script, frames and delay)
 //   --steady-from  measure input latency, frame rate, stalls and bandwidth from
 //              this frame on (default N/2: past the boot and the intro movie)
+//   --netsim   a slow network: each page delays its outgoing datagrams by LATENCY
+//              ms plus up to JITTER ms and drops a fraction LOSS (both directions)
 //
 // Writes netplay-BROWSER[-TAG].json to --out (default build/engine/web-check).
 // Exit status: 0 when both pages stopped at frame N with identical guest lines
@@ -49,6 +51,7 @@ const fast = flag('--fast');
 const headed = flag('--headed');
 const render = !flag('--no-render');
 const expect = opt('--expect', '');
+const netsim = opt('--netsim', '');  // "latency,jitter,loss" on each page's outgoing datagrams
 const tag = opt('--tag', '');
 const timeoutS = Number(opt('--timeout', '900'));
 const site = resolve(opt('--site', join(repo, 'build', 'engine', 'emscripten', 'web', 'site')));
@@ -92,7 +95,7 @@ const launchers = {
   }),
 };
 
-const summary = { browser: browserName, browser2: browserName2, tag: tag || null, frames, delay, fast, render, script: scriptFile || null };
+const summary = { browser: browserName, browser2: browserName2, netsim: netsim || null, tag: tag || null, frames, delay, fast, render, script: scriptFile || null };
 let rc = 1;
 const browsers = [];
 try {
@@ -122,6 +125,7 @@ try {
   q.set('frames', String(frames));
   if (fast) q.set('fast', '1');
   if (!render) q.set('render', '0');
+  if (netsim) q.set('netsim', netsim);
 
   const [a, b] = pages;
   await a.page.goto(`${base}/?online=create&delay=${delay}&${q}`);
