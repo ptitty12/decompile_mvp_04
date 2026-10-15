@@ -26,7 +26,9 @@ Everything below is run by agents; the owner never runs commands.
 2. **Configure and build** (from `engine/`):
    `tools\emsdk.cmd cmake --preset emscripten`, then
    `tools\emsdk.cmd cmake --build --preset emscripten -j 8 --target mvp-web`
-   (about 20 s; the whole preset builds the tests and, with `MVP_DISC`, the
+   (about 20 s, plus the threaded engine below: its own tree,
+   `build/engine/emscripten/mt`, a few minutes the first time; `-DMVP_WEB_MT=OFF`
+   skips it; the whole preset builds the tests and, with `MVP_DISC`, the
    C++-emitted dev path too). The preset finds emdawnwebgpu under
    `%USERPROFILE%\tools-ext\emdawnwebgpu\<Dawn release>\emdawnwebgpu_pkg`
    (`MVP_EMDAWNWEBGPU_DIR` overrides it).
@@ -38,14 +40,17 @@ Everything below is run by agents; the owner never runs commands.
    | `main.js`, `worker.js`, `protocol.js`, `input.js`, `gamepad.js`, `gamepad-ui.js`, `audio.js`, `audio-worklet.js`, `resampler.js`, `disc.js`, `disc-store.js`, `disc-download.js`, `module-cache.js`, `packs.js`, `packs-core.js` | the shell, compiled from `engine/web/src/*.ts` by `tsc` |
    | `mvp-packs.js`, `mvp-packs.wasm` (0.6 MB) | the roster-pack checker for the page's panel (E6): `engine/mods` alone, loaded only when packs are picked |
    | `mvp-web.js`, `mvp-web.wasm` (0.6 MB) | the engine: translator, runtime, interpreter, renderer, mixer (`engine/web/wasm/`) |
-   | `build-id.json` | the SHA-256 of `mvp-web.wasm` and of `symbols.txt` (the key of the browser's translation cache) |
+   | `mvp-web-mt.js`, `mvp-web-mt.wasm` | the threaded engine (P2): the same sources for wasm threads, the renderer on its own thread (section 2); loaded where the page is cross-origin isolated |
+   | `build-id.json` | the SHA-256 of `mvp-web.wasm` (`engine`), of `mvp-web-mt.wasm` (`engine_mt`) and of `symbols.txt` (the key of the browser's translation cache) |
    | `symbols.txt` | `config/GV4E69/symbols.txt`: repository metadata (function boundaries and names), not game data (ARCHITECTURE.md §4) |
    | `licenses/` | notices for the third-party code compiled into the engine (Emscripten, emdawnwebgpu) |
 
 4. **Serve:** `node engine/web/tools/serve.mjs` (`--port N`, default 8000;
    `--root DIR`). It serves that directory only, on 127.0.0.1, GET and HEAD
-   only, no listings, `Cache-Control: no-store`. No COOP/COEP headers: the
-   engine needs no SharedArrayBuffer (§2, Sound). **`--disc PATH`** (local
+   only, no listings, `Cache-Control: no-store`, and (P2) COOP `same-origin`,
+   COEP `require-corp` and CORP `same-origin`, so the page is cross-origin
+   isolated and runs the threaded engine; `--no-isolation` leaves them out (the
+   single-threaded fallback). **`--disc PATH`** (local
    tests only) mocks the owner's deployment (E5 builds the real one in
    `engine/server/`): `GET /config.json` answers `{"disc": "/api/disc/image"}`,
    and `/api/disc/image` serves PATH to HEAD and to ranged GETs (206,
@@ -74,7 +79,13 @@ Everything below is run by agents; the owner never runs commands.
    CDP, which also slow the page's Workers), `--io-log` (every guest DVD read with
    its host wait, summarized), `--clear-disc`, `--store-off` (read the server's
    image over the network as before P1), `--interrupt-download PCT`, `--fallback`,
-   `--params Q`, `--profile DIR` (a profile on disk) and `--site DIR`; `netplay_check.mjs
+   `--params Q`, `--profile DIR` (a profile on disk) and `--site DIR`; P1-gfx adds
+   `--fast-until F` (unpaced to field F, then paced), `--trace-present` and
+   `--screencast F:N`; P2 adds `--threads 0` (the single-threaded engine on an
+   isolated page), `--no-isolation`, `--digest` (the renderer digest of every field,
+   written to `digest-BROWSER-rN.txt`) and `--cast-size WxH` (small JPEG screencast
+   frames that keep up at 60 fps); the summary says whether the page was
+   cross-origin isolated and whether the render thread drew; `netplay_check.mjs
    --server-disc` runs E5's two-page check the deployment's way. It starts the server, opens the page with Playwright,
    and writes `summary-BROWSER[-TAG].json` and the screenshots to `--out`
    (default `build/engine/web-check`; screenshots are game-derived and stay under
@@ -207,9 +218,27 @@ Everything below is run by agents; the owner never runs commands.
   the target, it skips down to it; full, it drops. An AnalyserNode taps its
   output (`window.mvp.audioProbe()`); M or the Sound button mutes. **Why a
   MessagePort and no SharedArrayBuffer:** a SAB ring needs cross-origin isolation
-  (COOP/COEP headers) on every server that serves the page, and would not lower
-  the latency, which the Worker's batches (one animation frame) and the device
-  set. Nothing goes back from the worklet to the Worker.
+  (COOP/COEP headers) on every server that serves the page (since P2 they are
+  sent, for the render thread, but the fallback engine runs without them), and
+  would not lower the latency, which the Worker's batches (one animation frame)
+  and the device set. Nothing goes back from the worklet to the Worker.
+- **The render thread** (P2: `wasm/render_thread.h`, `wasm/render_side.h`,
+  `gfx/render_ring.h`, `gfx/gp_reads.h`; P2_LOG.md). Where the page is
+  cross-origin isolated (the server's and `serve.mjs`'s headers) and `threads=0`
+  is not given, the Worker loads `mvp-web-mt.js` instead: the same engine with a
+  shared memory and one pthread that owns the WebGPU device and runs the GX
+  processor and the renderer. The emulation copies every GX command, VI field and
+  present into a 16 MiB ring in shared memory and goes on; a guest write to
+  memory the render thread has still to read for a command already issued (the
+  vertex arrays, palettes, textures and other sources `gfx::GpReads` finds in the
+  commands, tracked per 64 bytes) waits until the render thread has read it, so
+  guest state and everything drawn are the same as inline. The render thread
+  shows at most one frame per display refresh (the page counts its animation
+  frames in shared memory) and posts each frame to the page as an ImageBitmap,
+  which the page's `bitmaprenderer` canvas shows. Without isolation, or with
+  `threads=0`, `mvp-web.js` renders inline in the Worker as before. URL
+  parameters: `threads=0`, `bitmaps=0` (draw into the page's transferred canvas
+  instead), `digest=1` / `digestDetail=F1-F2` (the renderer digest), `rtTune=...`.
 - **The disc from the server, kept in the browser** (P1: `src/disc-store.ts`,
   `src/disc-download.ts`; the server's `src/disc_hash.ts`). The server advertises
   its image in `/config.json` with `discHash` (the image hash: SHA-256 over the
@@ -432,6 +461,14 @@ rate; 114 s with the machine loaded), 57 s at 40 ms / 200 Mbit/s, 223 s at 80 ms
 50 Mbit/s, 4.8 s on localhost. The disc check before the boot fell from 1,240 ms to
 24 ms. The guest line at frame 5,200 is the same either way (`MEM1 8d79a7b5...`).
 
+**The threaded engine (P2, 2026-10-15; P2_LOG.md section 4).** Chrome 155 headed,
+after CLK2, paced, 60 s of CPU-vs-CPU play and 40 s of human pitching, against
+origin/main `6ed1c7a9`: speed 0.97-0.98x -> 1.000x; the Worker's (now the
+emulation thread's) time per field 14.7-14.8 -> 11.4 ms (CPU vs CPU) and 13.7 ->
+10.9 ms (human); composited frame intervals p95 38-50 ms with 9-13% over 25 ms
+-> 20-21 ms with 0.5-0.8%; new frames shown 51-55 -> 58-59 a second. The render
+thread works 4.7-6.0 ms per field.
+
 ## 4. Determinism
 
 The browser's guest line (`mvp_guest_line`: instructions, time base, frame
@@ -470,6 +507,13 @@ list walks are no longer idle-skipped (CLK2_LOG.md), so every line changes again
 | 700 fields, no input | 4,547,010,125 instructions, time base 473,646,888, 360 polls, MEM1 `53221c4a...` | native, Chrome 155 (unpaced) |
 | 2,400 fields, START at 280/430/580/730 | 15,574,026,125, 1,622,294,388, 1,882 polls, MEM1 `4285f135...` | native |
 | 3,600 fields, the `menus` script | 23,357,802,126, 2,433,104,388, 2,747 polls, MEM1 `40a7692d...` | native at `/O2`, at `/Od` and with `--yield`; Chrome 155 (unpaced) |
+
+**The threaded engine (P2):** the same lines in Chrome 155 threaded (700 fields
+with sound, 2,400 and 3,600 fields, paced and unpaced), single-threaded on an
+isolated page and without isolation, and in Firefox 157 threaded (700 and 3,600);
+two threaded pages in a netplay game agree with native `mvp-netplay solo`; the
+renderer digests of the threaded and the inline engine agree in every field of
+both match sessions (P2_LOG.md section 3).
 
 ## 5. Limits and next steps
 

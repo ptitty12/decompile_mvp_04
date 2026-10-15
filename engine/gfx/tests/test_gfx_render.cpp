@@ -349,6 +349,52 @@ TEST_CASE("an EFB copy to a texture is sampled by a later draw") {
   CHECK(gpu().errors() == 0);
 }
 
+TEST_CASE("a texture taller than the EFB copy at its address: the copy's rows, then memory (P2)") {
+  Scene sc;
+  // Memory at 0x60000: a 64 x 64 RGBA8 texture, every texel opaque red (4 x 4 tiles:
+  // 16 AR pairs, then 16 GB pairs).
+  for (u32 tile = 0; tile < 16 * 16; ++tile)
+    for (u32 k = 0; k < 16; ++k) {
+      sc.mem[0x60000 + tile * 64 + 2 * k] = 0xFF;      // A
+      sc.mem[0x60000 + tile * 64 + 2 * k + 1] = 0xFF;  // R
+    }
+  Stream s = base();
+  copy_xfb(s, 0x000000FF);
+  // A 128 x 96 yellow rectangle, copied at half scale (64 x 48, RGBA8) to 0x60000,
+  // as the game copies 512 x 448 to 256 x 224 and samples it as 256 x 256.
+  quad(s, 0, 0, 128, 96, 0xFFFF00FF);
+  s.bp(bp::kEfbTL, 0);
+  s.bp(bp::kEfbWH, 127u | 95u << 10);
+  s.bp(bp::kXfbAddr, 0x60000 >> 5);
+  s.bp(bp::kTriggerCopy, ((6u & 7) << 1 | 6u >> 3) << 3 | 1u << 9);  // RGBA8, half scale
+  // Clear, then sample it as a 64 x 64 texture over (300, 200)-(428, 328), two pixels per texel.
+  copy_xfb(s, 0x000000FF);
+  s.xf(xf::kNumTexGens, {1});
+  s.xf(xf::kTexGen, {5u << 7});
+  s.xff(60 * 4, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0});
+  s.cp(cp::kMatIndexA, 60u << 6);
+  s.bp(bp::kGenMode, 1u | 1u << 4);
+  s.bp(bp::kTref, 1u << 6);
+  s.bp(bp::kTevColorEnv, color_env(kZeroC, kZeroC, kZeroC, kTexC));
+  s.bp(bp::tex_reg(bp::kTexImage0, 0), 63u | 63u << 10 | 6u << 20);
+  s.bp(bp::tex_reg(bp::kTexImage3, 0), 0x60000 >> 5);
+  for (int k = 0; k < 2; ++k) {
+    s.bp(static_cast<u8>(bp::kSuSSize + 2 * k), 63);
+    s.bp(static_cast<u8>(bp::kSuTSize + 2 * k), 63);
+  }
+  quad(s, 300, 200, 428, 328, 0xFFFFFFFF);
+  copy_xfb(s, 0x000000FF, false);
+  s.run(sc.p);
+  auto img = sc.r.read_frame(*sc.r.xfb(0x80000));
+  CHECK(near(px(img, 640, 360, 210), 255, 255, 0));  // rows 0-47: the copy
+  CHECK(near(px(img, 640, 360, 290), 255, 255, 0));
+  CHECK(near(px(img, 640, 360, 300), 255, 0, 0));    // rows 48-63: memory
+  CHECK(near(px(img, 640, 360, 325), 255, 0, 0));
+  CHECK(sc.r.stats().copy_tall == 1);
+  CHECK(sc.r.stats().copy_size_misses == 0);
+  CHECK(gpu().errors() == 0);
+}
+
 TEST_CASE("generated TEV shaders compile for many configurations") {
   std::mt19937 rng(1234);
   int made = 0;

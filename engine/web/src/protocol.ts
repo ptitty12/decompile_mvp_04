@@ -105,6 +105,10 @@ export interface RunOptions {
   fastUntil?: number;  // development (P1): run unpaced up to this VI field, then paced
   pacing?: 'chase' | 'raf';  // P1: 'raf' = batches of up to 4 fields per animation frame (the earlier loop)
   ioLog?: boolean;     // development: log every guest DVD read with its host timing (P1)
+  threads?: boolean;   // P2: false = the inline renderer even where the threaded engine could run
+  digest?: boolean;    // development (P2): the renderer digest per VI field, in each stats window's `digest`
+  digestDetail?: number[];  // development (P2): VI fields [from, to] whose draws get a digest line each
+  rtTune?: number[];   // development (P2): the render thread's waiting (mvp_render_tune: us, ms, KiB, sync fences)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }
 
@@ -114,7 +118,9 @@ export interface RunOptions {
 export type DiscSource = { kind: 'file'; file: File; stored?: boolean } | { kind: 'url'; url: string };
 
 export type ToWorker =
-  | { type: 'start'; disc: DiscSource; canvas: OffscreenCanvas | null; width: number; height: number; options: RunOptions }
+  | { type: 'start'; disc: DiscSource; canvas: OffscreenCanvas | null; width: number; height: number; options: RunOptions;
+      vsync?: SharedArrayBuffer;  // P2: a counter the page bumps at every display refresh (cross-origin isolated)
+      frames?: MessagePort }      // P2: instead of `canvas`, the engine sends each frame here as an ImageBitmap
   | { type: 'pad'; port: number; pad: Pad }
   | { type: 'tick'; now: number }  // the page's animation frame, when the Worker has no requestAnimationFrame
   | { type: 'resize'; width: number; height: number }
@@ -146,6 +152,11 @@ export interface Status {
   disc_reads?: number;
   disc_bytes?: number;
   heap_mb?: number;  // the engine's WebAssembly memory
+  threaded?: boolean;  // P2: the render thread draws (the threaded engine)
+  // P2, threaded: fences (the emulation waited for the render thread at a GPU sync point) and their time,
+  // waits because the render thread was two batches behind, the ring's records and megabytes.
+  thread?: { fences: number; fence_waits: number; fence_ms: number; lag_waits: number; lag_ms: number;
+             records: number; ring_mb: number; full_waits: number; big: number };
   // The guest's DVD reads as the host served them (P1): host ms in reads, the longest, and how many took
   // longer than a field (16.7 ms), 50 ms and 100 ms.
   io?: { reads: number; bytes: number; ms: number; max_ms: number; over16: number; over50: number; over100: number };
@@ -177,7 +188,8 @@ export type FromWorker =
   | { type: 'first-frame'; fields: number }
   | { type: 'cache'; report: CacheReport }
   | { type: 'audio'; attachedAtField: number }
-  | { type: 'stats'; status: Status; window: { fields: number; ms: number; wallMs: number; trace?: unknown[] } }
+  | { type: 'stats'; status: Status;
+      window: { fields: number; ms: number; wallMs: number; trace?: unknown[]; digest?: string } }
   | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string; ioLog?: string }
   | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
   | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string };

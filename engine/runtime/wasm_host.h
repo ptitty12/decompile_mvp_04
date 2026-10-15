@@ -24,4 +24,9 @@ struct WasmLoadStats {
 
 bool load_wasm_module(const xlat::WasmModule& m, WasmLoadStats* stats, std::string* error);
 
+// P2: the write-gather pipe's buffer translated modules append to directly
+// (xlat::WasmWgpLayout). Give it to the machine's Hardware (set_wgp_state).
+struct WgpState;
+WgpState* wasm_wgp_state();
+
 }  // namespace mvp::rt

@@ -9,6 +9,7 @@ import type { PackInput, PackSetReport } from './protocol.js';
 // The exports both modules have (wasm/packs_web.cpp).
 export interface PacksModule {
   HEAPU8: Uint8Array;
+  wasmMemory?: WebAssembly.Memory;  // the threaded engine (P2): a shared memory another thread may grow
   UTF8ToString(ptr: number, maxBytes?: number): string;
   _malloc(size: number): number;
   _free(ptr: number): void;
@@ -25,7 +26,8 @@ export const EMPTY_SET_HASH = 'f5e1298911db13adf522a1b34d4d4f9291b42fa7a77f63a5f
 
 function withBytes<T>(M: PacksModule, bytes: Uint8Array, f: (ptr: number, len: number) => T): T {
   const ptr = M._malloc(Math.max(1, bytes.length));
-  M.HEAPU8.set(bytes, ptr);
+  const mem = M.wasmMemory;
+  (mem && M.HEAPU8.buffer !== mem.buffer ? new Uint8Array(mem.buffer) : M.HEAPU8).set(bytes, ptr);
   try {
     return f(ptr, bytes.length);
   } finally {

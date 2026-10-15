@@ -43,6 +43,15 @@ if(EMSCRIPTEN)
   add_compile_options(-fwasm-exceptions)
   add_link_options(-fwasm-exceptions -sNODERAWFS=1 -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=64MB -sMAXIMUM_MEMORY=4GB -sSTACK_SIZE=16MB
                    -sEXIT_RUNTIME=1 -sENVIRONMENT=node)
+  # P2: the threaded browser engine (mvp-web-mt) is built in a second tree with
+  # everything compiled for wasm threads (shared memory, atomics); the main tree
+  # builds that tree as part of mvp-web (web/CMakeLists.txt). Its targets are
+  # the same; only mvp-web is used from it.
+  option(MVP_WEB_THREADS "Emscripten: compile everything with wasm threads (-pthread), for mvp-web-mt (P2)" OFF)
+  if(MVP_WEB_THREADS)
+    add_compile_options(-pthread)
+    add_link_options(-pthread)
+  endif()
 endif()
 
 enable_testing()

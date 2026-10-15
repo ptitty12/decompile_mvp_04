@@ -232,6 +232,14 @@ describe('static site', () => {
     }
   });
 
+  it('makes the pages cross-origin isolated (P2: the threaded engine), the login page too', async () => {
+    for (const r of [await fetch(`${app.url}/sub/a.txt`, { headers: { Cookie: cookie } }), await fetch(`${app.url}/`)]) {
+      assert.equal(r.headers.get('cross-origin-opener-policy'), 'same-origin');
+      assert.equal(r.headers.get('cross-origin-embedder-policy'), 'require-corp');
+      assert.equal(r.headers.get('cross-origin-resource-policy'), 'same-origin');
+    }
+  });
+
   it('revalidates with an ETag', async () => {
     let r = await fetch(`${app.url}/main.js`, { headers: { Cookie: cookie } });
     const etag = r.headers.get('etag')!;

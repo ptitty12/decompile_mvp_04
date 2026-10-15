@@ -12,6 +12,7 @@
 #include "ppc/mem_access.h"
 #include "ppc/sem.h"
 #include "runtime/hle.h"
+#include "runtime/hw.h"
 #include "runtime/native.h"
 
 using namespace mvp;
@@ -21,6 +22,18 @@ using ppc::Cpu;
 namespace {
 
 std::unordered_map<u32, u32> g_resume_index;  // resume label -> its function's dispatcher index
+
+// P2: the write-gather pipe's buffer the translated module's store helpers append
+// to (env.wgp; Hardware uses it once given: wasm_wgp_state()). `fast` stays 0
+// until a Hardware takes it over, so tools and tests without one are unchanged.
+WgpState g_wgp;
+using L = xlat::WasmWgpLayout;
+static_assert(offsetof(WgpState, buf) == L::kBuf && offsetof(WgpState, n) == L::kN &&
+                  offsetof(WgpState, fast) == L::kFast && offsetof(WgpState, last_read) == L::kLastRead &&
+                  offsetof(WgpState, fast_stores) == L::kFastStores,
+              "the translator's view of WgpState");
+static_assert(ppc::kGpShift == xlat::WasmGpLayout::kShift && ppc::kGpEntries - 1 == xlat::WasmGpLayout::kMask,
+              "the translator's view of ppc::g_gp_pages");
 
 // Development (E2d): MVP_WASM_EXEC_STATS=1 counts rt.exec calls by opcode (the
 // instructions, or slow paths, the module left to the interpreter's semantics)
@@ -67,22 +80,34 @@ EMSCRIPTEN_KEEPALIVE u32 mvp_rt_read32(Cpu* c, u32 ea, u32 pc, std::uint64_t t) 
   c->ticks = t;
   return ppc::read32(*c, ea);
 }
+// The write-gather pipe (the GX FIFO, thousands of stores per field: P1 for
+// words, P2 for bytes and halfwords, the command opcodes) straight to the
+// hardware model, as slow_write would send it (an unmapped page).
+inline bool wgp_store(Cpu* c, u32 ea) {
+  return ea - 0xCC008000u < 0x1000u && c->mem->io && !c->mem->page[ea >> ppc::Memory::kPageShift];
+}
 EMSCRIPTEN_KEEPALIVE void mvp_rt_write8(Cpu* c, u32 ea, u32 v, u32 pc, std::uint64_t t) {
   c->pc = pc;
   c->ticks = t;
+  if (wgp_store(c, ea)) {
+    c->mem->io->write(ea, v & 0xFF, 1);
+    return;
+  }
   ppc::write8(*c, ea, v);
 }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_write16(Cpu* c, u32 ea, u32 v, u32 pc, std::uint64_t t) {
   c->pc = pc;
   c->ticks = t;
+  if (wgp_store(c, ea)) {
+    c->mem->io->write(ea, v & 0xFFFF, 2);
+    return;
+  }
   ppc::write16(*c, ea, v);
 }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_write32(Cpu* c, u32 ea, u32 v, u32 pc, std::uint64_t t) {
   c->pc = pc;
   c->ticks = t;
-  // P1: the write-gather pipe (the GX FIFO, thousands of stores per field) straight
-  // to the hardware model, as slow_write would send it (an unmapped page).
-  if (ea - 0xCC008000u < 0x1000u && c->mem->io && !c->mem->page[ea >> ppc::Memory::kPageShift]) {
+  if (wgp_store(c, ea)) {
     c->mem->io->write(ea, v, 4);
     return;
   }
@@ -112,6 +137,10 @@ EMSCRIPTEN_KEEPALIVE void mvp_rt_trap(Cpu* c, u32 a, u32 code) { trap(*c, a, xla
 EMSCRIPTEN_KEEPALIVE void mvp_rt_rfi(Cpu* c) { ppc::sem::rfi(*c); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_system_call(Cpu* c) { c->hooks->system_call(*c); }
 EMSCRIPTEN_KEEPALIVE void mvp_rt_fp_unavailable(Cpu* c, u32 at) { fp_unavailable(*c, at); }
+// P2: a store into memory the render thread has still to read (ppc/mem_access.h).
+EMSCRIPTEN_KEEPALIVE void mvp_rt_gp_wait(Cpu*, u32 first, u32 last) {
+  if (ppc::g_gp_wait_hook) ppc::g_gp_wait_hook(first, last);
+}
 EMSCRIPTEN_KEEPALIVE void mvp_rt_tw(Cpu* c, u32 w, u32 pc) {
   ppc::Insn i{w};
   bool is_tw = ppc::decode(w) == ppc::Op::tw;
@@ -124,15 +153,19 @@ EMSCRIPTEN_KEEPALIVE void mvp_rt_tw(Cpu* c, u32 w, u32 pc) {
 // the table base, or -1 with the message in the console.
 EM_JS(int, mvp_js_instantiate,
       (const void* bytes, unsigned len, unsigned slots, unsigned unwinding, unsigned resume, unsigned hook,
-       double* times),
+       unsigned wgp, unsigned gp_pages, double* times),
       {
         var names = ["on_entry", "safepoint", "read8", "read16", "read32", "write8", "write16", "write32", "exec",
                      "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap", "rfi",
-                     "system_call", "tw", "fp_unavailable"];
+                     "system_call", "tw", "fp_unavailable", "gp_wait"];
         try {
           var table = (typeof wasmTable != 'undefined') ? wasmTable : __indirect_function_table;
           var t0 = performance.now();
-          var mod = new WebAssembly.Module(new Uint8Array(wasmMemory.buffer, bytes, len));
+          var view = new Uint8Array(wasmMemory.buffer, bytes, len);
+          // A shared memory (the threaded engine, P2): WebAssembly.Module takes no shared view.
+          if (typeof SharedArrayBuffer != 'undefined' && wasmMemory.buffer instanceof SharedArrayBuffer)
+            view = view.slice();
+          var mod = new WebAssembly.Module(view);
           var t1 = performance.now();
           var rt = {};
           for (var n of names) {
@@ -150,7 +183,9 @@ EM_JS(int, mvp_js_instantiate,
               table_base: base,
               unwinding: unwinding,
               resume: resume,
-              entry_hook: hook
+              entry_hook: hook,
+              wgp: wgp,
+              gp_pages: gp_pages
             }
           });
           var t2 = performance.now();
@@ -166,13 +201,17 @@ EM_JS(int, mvp_js_instantiate,
 
 namespace mvp::rt {
 
+WgpState* wasm_wgp_state() { return &g_wgp; }
+
 bool load_wasm_module(const xlat::WasmModule& m, WasmLoadStats* stats, std::string* error) {
   static_assert(sizeof(GuestFn) == 4, "wasm32: a function pointer is a table index");
   alignas(8) double times[2] = {0, 0};
   int base = mvp_js_instantiate(m.bytes.data(), static_cast<unsigned>(m.bytes.size()), m.slots,
                                 static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(&g_unwinding)),
                                 static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(&g_resume)),
-                                static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(&g_entry_hook)), times);
+                                static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(&g_entry_hook)),
+                                static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(&g_wgp)),
+                                static_cast<unsigned>(reinterpret_cast<std::uintptr_t>(ppc::g_gp_pages)), times);
   if (base < 0) {
     if (error) *error = "the translated module did not compile or instantiate (see the console)";
     return false;

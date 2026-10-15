@@ -5,6 +5,9 @@
 #     index.html, style.css      the page (static/)
 #     main.js, worker.js, ...    the shell (src/*.ts, compiled by tsc)
 #     mvp-web.js, mvp-web.wasm   the engine: translator, runtime, renderer
+#     mvp-web-mt.js, .wasm       the same engine with a render thread (P2), for
+#                                pages with cross-origin isolation; built in a
+#                                second tree (build/engine/emscripten/mt)
 #     symbols.txt                config/GV4E69/symbols.txt (repository metadata,
 #                                not game data: ARCHITECTURE.md §4)
 #
@@ -27,7 +30,11 @@ add_executable(mvp-web-cache-sim wasm/tools/cache_sim.cpp)
 target_link_libraries(mvp-web-cache-sim PRIVATE engine_web_core)
 target_compile_options(mvp-web-cache-sim PRIVATE ${ENGINE_WARN})
 
-add_executable(mvp-web wasm/mvp_web.cpp wasm/web_disc.cpp wasm/net_web.cpp wasm/packs_web.cpp)
+set(_mvp_web_sources wasm/mvp_web.cpp wasm/web_disc.cpp wasm/net_web.cpp wasm/packs_web.cpp wasm/render_side.cpp)
+if(MVP_WEB_THREADS)
+  list(APPEND _mvp_web_sources wasm/render_thread.cpp)
+endif()
+add_executable(mvp-web ${_mvp_web_sources})
 target_link_libraries(mvp-web PRIVATE engine_wasm_host engine_audio engine_web_core engine_net engine_mods)
 target_compile_options(mvp-web PRIVATE ${ENGINE_WARN})
 if(TARGET engine_gfx_wgpu)
@@ -50,6 +57,22 @@ target_link_options(mvp-web PRIVATE
   -sALLOW_TABLE_GROWTH=1
   "-sEXPORTED_RUNTIME_METHODS=['UTF8ToString','HEAPU8','specialHTMLTargets']"
   "-sEXPORTED_FUNCTIONS=['_malloc','_free']")
+
+# ---- The threaded engine (P2): this tree is the second one (MVP_WEB_THREADS) ----
+# mvp-web-mt.js / .wasm: shared memory; the render thread (render_thread.cpp) is
+# a pthread whose Worker is created with the module, before the engine starts.
+# wasmMemory: the Worker makes fresh views when another thread grew the memory.
+if(MVP_WEB_THREADS)
+  set_target_properties(mvp-web PROPERTIES OUTPUT_NAME mvp-web-mt)
+  target_compile_definitions(mvp-web PRIVATE MVP_WEB_THREADS=1)
+  # (-pthread with memory growth makes JavaScript's heap accesses check for growth; the
+  # engine's few are not hot.)
+  target_link_options(mvp-web PRIVATE
+    -sPTHREAD_POOL_SIZE=1
+    -Wno-pthreads-mem-growth
+    "-sEXPORTED_RUNTIME_METHODS=['UTF8ToString','HEAPU8','specialHTMLTargets','wasmMemory']")
+  return()  # the page, the shell and the rest come from the main tree
+endif()
 
 # The page's roster-pack checker (E6): engine/mods alone (no disc, no game), so the
 # Roster packs panel shows each pack's problems and hashes before a game starts,
@@ -128,13 +151,48 @@ foreach(pair ${_mvp_web_notices})
   list(APPEND _mvp_web_copies ${MVP_WEB_SITE}/licenses/${name})
 endforeach()
 
-# build-id.json: the engine module's and symbols.txt's hashes, the key of the
-# browser's cache of the translated module (E2c).
-add_custom_command(TARGET mvp-web POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -DWASM=${MVP_WEB_SITE}/mvp-web.wasm
-                           -DSYMBOLS=${MVP_REPO_ROOT}/config/GV4E69/symbols.txt
-                           -DOUT=${MVP_WEB_SITE}/build-id.json -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/build_id.cmake
-                   VERBATIM)
+# build-id.json: the engine modules' and symbols.txt's hashes, the key of the
+# browser's cache of the translated module (E2c; P2: the threaded engine's too).
+set(_mvp_build_id ${CMAKE_COMMAND} -DWASM=${MVP_WEB_SITE}/mvp-web.wasm -DWASM_MT=${MVP_WEB_SITE}/mvp-web-mt.wasm
+                  -DSYMBOLS=${MVP_REPO_ROOT}/config/GV4E69/symbols.txt
+                  -DOUT=${MVP_WEB_SITE}/build-id.json -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/build_id.cmake)
+add_custom_command(TARGET mvp-web POST_BUILD COMMAND ${_mvp_build_id} VERBATIM)
+
+# The threaded engine (P2), built by the same build in a second tree with every
+# library compiled for wasm threads (MVP_WEB_THREADS), after this tree's
+# libraries (so the two compiles do not run at once), and copied into the site.
+option(MVP_WEB_MT "Build the threaded engine mvp-web-mt in a second tree (P2)" ON)
+if(MVP_WEB_MT AND TARGET engine_gfx_wgpu)
+  include(ExternalProject)
+  cmake_host_system_information(RESULT _mvp_jobs QUERY NUMBER_OF_LOGICAL_CORES)
+  if(_mvp_jobs GREATER 8)
+    set(_mvp_jobs 8)
+  endif()
+  set(_mvp_mt ${CMAKE_BINARY_DIR}/mt)
+  ExternalProject_Add(mvp-web-mt
+    SOURCE_DIR ${PROJECT_SOURCE_DIR}
+    BINARY_DIR ${_mvp_mt}
+    PREFIX ${CMAKE_BINARY_DIR}/mt-ep
+    CMAKE_GENERATOR ${CMAKE_GENERATOR}
+    CMAKE_CACHE_ARGS
+      -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${CMAKE_TOOLCHAIN_FILE}
+      -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+      -DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}
+      -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
+      -DCMAKE_EXE_LINKER_FLAGS:STRING=${CMAKE_EXE_LINKER_FLAGS}
+      -DMVP_WEB_THREADS:BOOL=ON
+      -DMVP_GFX_WEBGPU:BOOL=ON
+      -DMVP_EMDAWNWEBGPU_DIR:PATH=${MVP_EMDAWNWEBGPU_DIR}
+      -DMVP_DISC:FILEPATH=
+    BUILD_COMMAND ${CMAKE_COMMAND} --build ${_mvp_mt} --target mvp-web --parallel ${_mvp_jobs}
+    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_mvp_mt}/web/site/mvp-web-mt.js
+                    ${_mvp_mt}/web/site/mvp-web-mt.wasm ${MVP_WEB_SITE}
+            COMMAND ${_mvp_build_id}
+    BUILD_ALWAYS ON
+    USES_TERMINAL_BUILD ON
+    DEPENDS engine_wasm_host engine_gfx_wgpu engine_audio engine_web_core engine_net engine_mods)
+  add_dependencies(mvp-web mvp-web-mt)
+endif()
 
 add_custom_target(mvp-web-shell ALL DEPENDS ${_mvp_web_js} ${_mvp_web_copies} ${MVP_WEB_SITE}/symbols.txt)
 add_dependencies(mvp-web mvp-web-shell)

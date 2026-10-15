@@ -61,6 +61,11 @@ struct WasmEmitOptions {
   // first of each block, as the C++ emitter does. Off only for tests that compare
   // single instructions with execute_plain(), which has no such check.
   bool fpu_checks = true;
+  // Import the memory as shared, with a maximum of 4 GiB (P2: the threaded
+  // browser engine, whose memory is a SharedArrayBuffer), and check each store
+  // to guest memory against env.gp_pages first (WasmGpLayout): only there can a
+  // render thread still have to read what the store overwrites.
+  bool shared_memory = false;
 };
 
 // A guest address and the table slot (relative to the module's table base) of
@@ -92,6 +97,23 @@ struct WasmModule {
 
 // Import names, in import order ("rt" module). The host must provide each one.
 const std::vector<std::string>& wasm_import_names();
+
+// P2: the write-gather pipe's state the module's store helpers append to
+// directly (env.wgp, the address of runtime/hw.h's WgpState): a store of 1, 2
+// or 4 bytes to 0xCC008000 that leaves fewer than 32 bytes gathered, while
+// `fast` is set, is appended big-endian at buf + n without calling the runtime,
+// which then counts it (fast_stores) and ends the poll detector's run
+// (last_read = 0), as Hardware::write would. Offsets (the runtime checks them):
+struct WasmWgpLayout {
+  static constexpr std::uint32_t kBuf = 0, kN = 32, kFast = 36, kLastRead = 40, kFastStores = 48;
+};
+
+// P2: env.gp_pages (ppc::g_gp_pages): one 32-bit entry per 2^kShift bytes of
+// the 32 MiB physical space, nonzero while the render thread has still to read
+// them (the runtime checks that it agrees: ppc/mem_access.h).
+struct WasmGpLayout {
+  static constexpr std::uint32_t kShift = 6, kMask = (1u << (25 - kShift)) - 1;
+};
 
 // Trap codes passed to rt.trap.
 enum class WasmTrap : std::uint32_t {

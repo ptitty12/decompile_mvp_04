@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "common/bytes.h"
+#include "ppc/mem_access.h"
 #include "runtime/ax.h"
 #include "vfs/source.h"
 
@@ -218,21 +219,24 @@ u32 Hardware::cp_status() const {
 }
 
 void Hardware::wgp_write(u32 value, int size) {
-  if (gather_n_ + static_cast<u32>(size) <= 32) {  // P1: the whole value fits (always, for aligned stores)
-    u8* g = gather_ + gather_n_;
+  u8* const gather = wgp_->buf;
+  u32& gathered = wgp_->n;
+  if (gathered + static_cast<u32>(size) <= 32) {  // P1: the whole value fits (always, for aligned stores)
+    u8* g = gather + gathered;
     for (int k = 0; k < size; ++k) g[k] = static_cast<u8>(value >> (8 * (size - 1 - k)));
-    gather_n_ += static_cast<u32>(size);
-    if (gather_n_ == 32) wgp_burst();
+    gathered += static_cast<u32>(size);
+    if (gathered == 32) wgp_burst();
     return;
   }
   for (int k = 0; k < size; ++k) {
-    gather_[gather_n_++] = static_cast<u8>(value >> (8 * (size - 1 - k)));
-    if (gather_n_ == 32) wgp_burst();
+    gather[gathered++] = static_cast<u8>(value >> (8 * (size - 1 - k)));
+    if (gathered == 32) wgp_burst();
   }
 }
 
 void Hardware::wgp_burst() {
-  gather_n_ = 0;
+  wgp_->n = 0;
+  const u8* const gather = wgp_->buf;
   // The FIFO end may be 0x04000000, the top of the 64 MiB physical space: that is
   // how GXRedirectWriteGatherPipe turns the pipe into a plain memory writer (base
   // 0, end 0x04000000, write pointer at the destination, the GP unlinked). Bit 26
@@ -240,12 +244,13 @@ void Hardware::wgp_burst() {
   u32 base = reg(0xCC00300Cu) & 0x03FFFFE0u, end = reg(0xCC003010u) & 0x07FFFFFFu;
   u32 wp = reg(0xCC003014u);
   if (end == 0) {  // no CPU FIFO set up yet: straight to the GP
-    gp_consume(gather_, 32);
+    gp_consume(gather, 32);
     return;
   }
   u32 pa = wp & 0x03FFFFE0u, wrap = wp & 0x04000000u;
   if (pa + 32 > mem1_size_) throw StopRun{"GX FIFO burst outside MEM1"};
-  std::memcpy(mem1_ + pa, gather_, 32);
+  ppc::gp_check(pa, 32);  // P2: memory the render thread still reads (a redirected pipe writes anywhere)
+  std::memcpy(mem1_ + pa, gather, 32);
   ++gp_bursts_;
   pa += 32;
   if (pa > end) {
@@ -271,6 +276,7 @@ void Hardware::gp_run() {
     moved = true;
   }
   if (moved || gp_at_breakpoint()) kick();
+  if (gfx_ && gp_at_breakpoint()) gfx_->gp_sync();  // P2: the guest can see where the GP stopped
 }
 
 void Hardware::gp_consume(const u8* bytes, std::size_t n) {
@@ -284,6 +290,8 @@ void Hardware::gp_consume(const u8* bytes, std::size_t n) {
     ++draw_dones_;
   }
   if (fx.token_int || fx.draw_done) kick();
+  // P2: from here the guest can know that the GP consumed every command so far.
+  if (gfx_ && (fx.draw_done || fx.token_set)) gfx_->gp_sync();
 }
 
 // ---- AI ----
@@ -373,6 +381,7 @@ void Hardware::di_complete() {
   if (di_cr_ & 2) {  // DMA from the drive
     u32 pa = di_mar_ & 0x01FFFFE0u, n = di_len_;
     if (pa + n > mem1_size_) throw StopRun{"DI DMA outside MEM1"};
+    ppc::gp_check(pa, n);  // P2: memory the render thread still reads
     if (cmd == 0xA8) {
       std::uint64_t off = std::uint64_t(di_cmd_[1]) << 2;
       if (!disc_ || !disc_->read(off, mem1_ + pa, n)) {
@@ -401,6 +410,7 @@ void Hardware::di_complete() {
 void Hardware::dsp_aram_dma() {
   u32 mm = ar_mm_ & 0x01FFFFE0u, ar = ar_ar_ & 0x00FFFFE0u, n = ar_cnt_ & 0x7FFFFFE0u;
   bool to_mem = (ar_cnt_ & 0x80000000u) != 0;
+  if (to_mem) ppc::gp_check(mm, n);  // P2: memory the render thread still reads
   for (u32 k = 0; k < n; ++k) {
     if (mm + k >= mem1_size_ || ar + k >= aram_.size()) break;
     if (to_mem) mem1_[mm + k] = aram_[ar + k];
@@ -697,7 +707,7 @@ u32 Hardware::read(u32 addr, int size) {
     throw StopRun{b};
   }
   ++reads_[addr - kRegBase];
-  if (addr == last_read_) {
+  if (addr == wgp_->last_read) {
     if (++same_reads_ >= poll_limit) {
       char b[112];
       std::snprintf(b, sizeof b, "%s register 0x%08X polled %llu times in a row (from 0x%08X)", block_name(addr), addr,
@@ -705,7 +715,7 @@ u32 Hardware::read(u32 addr, int size) {
       throw StopRun{b};
     }
   } else {
-    last_read_ = addr;
+    wgp_->last_read = addr;
     same_reads_ = 1;
   }
   u32 v;
@@ -729,11 +739,17 @@ u32 Hardware::read(u32 addr, int size) {
       word = ai_count(now());
     } else if ((addr & ~3u) == 0xCC003000u) {
       word = pi_cause();
+      if (gfx_ && (word & 0x800)) gfx_->gp_sync();  // P2: a CP interrupt tells where the GP is
     } else if ((addr & ~3u) == 0xCC000000u) {
       word = cp_status() << 16 | cp16(0x02);
+      if (gfx_ && (size == 4 || (addr & 3) < 2)) gfx_->gp_sync();  // P2: the CP status (GP idle)
     } else if ((addr & ~3u) == 0xCC000030u) {
       u32 d = gp_distance();
       word = (d & 0xFFFFu) << 16 | d >> 16;
+      if (gfx_) gfx_->gp_sync();  // P2: the read-write distance
+    } else if ((addr & ~3u) == 0xCC000038u) {
+      word = reg(addr);
+      if (gfx_) gfx_->gp_sync();  // P2: the GP's read pointer
     } else if ((addr & ~3u) == 0xCC001008u) {
       word = (reg(0xCC001008u) & 0xFFFF0000u) | pe_ctrl_;
     } else if ((addr & ~3u) == 0xCC00100Cu) {
@@ -758,9 +774,10 @@ void Hardware::write(u32 addr, u32 value, int size) {
     throw StopRun{b};
   }
   ++writes_[addr - kRegBase];
-  last_read_ = 0;
+  wgp_->last_read = 0;
   if (log_.size() < 100000) log_.push_back({cpu_->pc, addr, value, size, true});
   if (wgp) {  // write-gather pipe: the GX FIFO
+    wgp_->fast = log_.size() >= 100000 ? 1u : 0u;  // P2: translated code may append once nothing is logged
     wgp_write(value, size);
     return;
   }

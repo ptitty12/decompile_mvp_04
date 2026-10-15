@@ -29,6 +29,14 @@ class GfxObserver {
   virtual void gx_command(const std::uint8_t* cmd, std::size_t len) = 0;
   // `xfb` is the physical address of the top field's frame buffer (VI TFBL).
   virtual void vi_field(std::uint64_t field, std::uint32_t xfb) = 0;
+  // P2: the guest is about to be able to learn that the graphics processor has
+  // consumed every command so far (a draw-done or token command completed; it
+  // reads the CP status, read pointer or read-write distance; the GP stopped at
+  // a breakpoint). From then on it may rewrite memory those commands point at
+  // (vertex arrays, matrices, palettes, textures). A renderer that runs behind
+  // the emulation (on its own thread) must have read that memory by now; an
+  // inline renderer has nothing to do. Nothing here changes guest state.
+  virtual void gp_sync() {}
 };
 
 class GxFifo {

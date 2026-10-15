@@ -1,16 +1,19 @@
 // Local development server for the browser build (E2): serves the engine's
 // static site directory, and nothing else, on localhost.
 //
-//   node engine/web/tools/serve.mjs [--root DIR] [--port N]
+//   node engine/web/tools/serve.mjs [--root DIR] [--port N] [--no-isolation]
 //        [--disc PATH [--login] [--latency MS] [--rate MBPS]]
 //
 // DIR defaults to build/engine/emscripten/web/site (what the "emscripten"
 // preset's mvp-web target assembles: the page, the shell, the engine module and
 // symbols.txt). It holds no game data: the player's browser reads the disc
 // image the player picks, and nothing is ever uploaded here. Only GET and HEAD,
-// only files inside DIR, no directory listings. No COOP/COEP headers: the
-// engine uses no SharedArrayBuffer. Prints "serving http://127.0.0.1:PORT/" once
-// it listens (port 0 picks a free one).
+// only files inside DIR, no directory listings. Every response carries the
+// cross-origin isolation headers (P2: COOP same-origin, COEP require-corp, CORP
+// same-origin), so the page may share memory with threads and loads the
+// threaded engine; --no-isolation leaves them out (the single-threaded
+// fallback). Prints "serving http://127.0.0.1:PORT/" once it listens (port 0
+// picks a free one).
 //
 // --disc PATH (E2c, local tests only): a mock of the owner's deployment
 // (engine/server/, E5, is the real one) on 127.0.0.1: GET /config.json answers
@@ -38,6 +41,7 @@ const disc = arg('--disc', '');
 const login = args.includes('--login');
 const latencyMs = Number(arg('--latency', '0'));
 const rateMBps = Number(arg('--rate', '0'));
+const isolate = !args.includes('--no-isolation');
 
 const types = {
   '.html': 'text/html; charset=utf-8',
@@ -111,6 +115,11 @@ function mock(req, res, path) {
 }
 
 const server = createServer((req, res) => {
+  if (isolate) {  // P2: cross-origin isolation (SharedArrayBuffer, wasm threads); everything here is same-origin
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+  }
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { Allow: 'GET, HEAD' }).end();
     return;

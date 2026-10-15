@@ -22,6 +22,10 @@
 //   ioLog=1         log every guest DVD read with its host timing (P1 measurements)
 //   store=0         read the server's image over the network instead of keeping it in this browser
 //   storeSpare=MB   free space the download must leave (tests of the storage-quota error)
+//   threads=0       the single-threaded engine even where the page is cross-origin isolated (P2)
+//   bitmaps=0       threaded: the render thread draws into the page's canvas instead of sending ImageBitmaps
+//   digest=1        a renderer digest per VI field (window.mvp.digest; digestDetail=F1-F2: per draw)
+//   rtTune=US,MS,KIB,SYNC   the render thread's waiting (fence poll, record poll, publish step, sync fences)
 // The page publishes its state as `window.mvp` for the browser check.
 
 import { AudioOut, type AudioState } from './audio.js';
@@ -60,6 +64,7 @@ interface PageState {
   stopped?: { status: Status; guestLine: string };
   discTrace?: string;
   ioLog?: string;              // every guest DVD read: "field at_ms offset size ms" lines (ioLog=1)
+  digest?: string;             // P2: the renderer digest, "field digest draws" lines (digest=1)
   error?: { stage: string; message: string };
   progress?: { text: string; step: number; steps: number };
   cache?: CacheReport;
@@ -106,6 +111,10 @@ const options: RunOptions = {
   fastUntil: Number(params.get('fastUntil') ?? 0) || 0,
   pacing: params.get('pacing') === 'raf' ? 'raf' : 'chase',
   ioLog: params.get('ioLog') === '1',
+  threads: params.get('threads') !== '0',
+  digest: params.get('digest') === '1',
+  digestDetail: params.has('digestDetail') ? (params.get('digestDetail') ?? '').split('-').map(Number) : undefined,
+  rtTune: params.has('rtTune') ? (params.get('rtTune') ?? '').split(',').map(Number) : undefined,
   discCache: {
     blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
     maxRun: Number(params.get('discRun') ?? 0) || undefined,
@@ -289,7 +298,9 @@ function onWorker(msg: FromWorker): void {
       updateHint();
       break;
     case 'stats': {
-      state.stats = { status: msg.status, window: msg.window };
+      if (msg.window.digest) state.digest = (state.digest ?? '') + msg.window.digest;
+      const { digest: _d, ...win } = msg.window;
+      state.stats = { status: msg.status, window: win };
       const s = msg.status, w = msg.window;
       const perField = w.fields ? w.ms / w.fields : 0;
       const a = state.audio?.worklet;
@@ -340,7 +351,23 @@ function startEngine(disc: DiscSource): void {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const width = Math.round(canvas.clientWidth * dpr), height = Math.round(canvas.clientHeight * dpr);
   let off: OffscreenCanvas | null = null;
-  if (hasOffscreen && options.render) {
+  let frames: MessagePort | undefined;
+  if (vsync && options.render && options.threads !== false && params.get('bitmaps') !== '0') {
+    // P2, cross-origin isolated (the threaded engine): the page keeps the canvas
+    // and shows each frame the render thread sends as an ImageBitmap. A Worker
+    // started by a Worker cannot keep an OffscreenCanvas of the page on screen
+    // steadily (its frames reach the screen only between its tasks, and the
+    // render thread waits inside long tasks for the emulation); the page's main
+    // thread is idle and shows each bitmap at the next refresh.
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('bitmaprenderer');
+    if (ctx) {
+      const chan = new MessageChannel();
+      chan.port1.onmessage = (ev: MessageEvent<ImageBitmap>) => ctx.transferFromImageBitmap(ev.data);
+      frames = chan.port2;
+    }
+  } else if (hasOffscreen && options.render) {
     canvas.width = width;
     canvas.height = height;
     off = canvas.transferControlToOffscreen();
@@ -352,7 +379,9 @@ function startEngine(disc: DiscSource): void {
   packPanel?.lock();
   const transfer: Transferable[] = packs.flatMap((p) => p.files.map((f) => f.data));
   if (off) transfer.unshift(off);
-  send({ type: 'start', disc, canvas: off, width, height, options: { ...options, netplay, packs } }, transfer);
+  if (frames) transfer.unshift(frames);
+  send({ type: 'start', disc, canvas: off, width, height, options: { ...options, netplay, packs },
+         vsync: vsync ? (vsync.buffer as SharedArrayBuffer) : undefined, frames }, transfer);
   if (pendingAudioPort) {
     send({ type: 'audio-port', port: pendingAudioPort }, [pendingAudioPort]);
     pendingAudioPort = null;
@@ -423,8 +452,20 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// P2: the display's refreshes, for the threaded engine's render thread, which
+// presents once per refresh (a Worker of a Worker has no requestAnimationFrame of
+// its own): a counter in shared memory, bumped and notified at every animation
+// frame. Only where the page is cross-origin isolated (else no shared memory, and
+// the single-threaded engine presents from its own animation frames).
+const vsync = (self as unknown as { crossOriginIsolated?: boolean }).crossOriginIsolated === true &&
+              typeof SharedArrayBuffer !== 'undefined' ? new Int32Array(new SharedArrayBuffer(4)) : null;
+
 function tick(now: number): void {
   input.poll();
+  if (vsync) {
+    Atomics.add(vsync, 0, 1);
+    Atomics.notify(vsync, 0);
+  }
   send({ type: 'tick', now });
   requestAnimationFrame(tick);
 }

@@ -65,11 +65,17 @@ export const SITE_CSP =
   "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; " +
   "img-src 'self' data: blob:; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
 
+// Cross-origin isolation (P2): COOP same-origin with COEP require-corp makes the
+// pages cross-origin isolated, so the engine may share memory with its render
+// thread (SharedArrayBuffer, wasm threads). Everything the site loads is its
+// own (same-origin), which COEP allows; CORP says the same of each response.
 const COMMON_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'no-referrer',
   'X-Frame-Options': 'DENY',
   'Cross-Origin-Opener-Policy': 'same-origin',
+  'Cross-Origin-Embedder-Policy': 'require-corp',
+  'Cross-Origin-Resource-Policy': 'same-origin',
 };
 
 export interface App {

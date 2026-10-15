@@ -78,6 +78,7 @@ class Renderer : public Backend {
     std::uint64_t copy_textures_used = 0, xfb_copies = 0, tex_copies = 0, clears = 0;
     std::uint64_t copies_dropped = 0;    // EFB-copy textures dropped: their memory changed since the copy
     std::uint64_t copy_size_misses = 0;  // a texture at an EFB copy's address with another size
+    std::uint64_t copy_tall = 0;         // P2: a taller texture over a copy (the copy's rows, then memory)
     std::uint64_t unknown_formats = 0, indirect_draws = 0, fog_draws = 0;
     std::uint64_t merged = 0, encoded = 0;  // draws appended to the previous one; WebGPU draws encoded
     std::uint64_t same_state = 0;           // draws that reused the previous draw's resolved state
@@ -104,6 +105,7 @@ class Renderer : public Backend {
   wgpu::TextureView texture(const TextureDesc& t, std::uint32_t* w, std::uint32_t* h);
   wgpu::Sampler sampler(const TextureDesc& t);
   wgpu::TextureView tmem_texture(const TextureDesc& t);
+  wgpu::TextureView tall_copy(CopyEntry& e, const TextureDesc& t);
   void clear_efb(const EfbCopy& c);
   void copy_to_texture(const EfbCopy& c);
   std::uint64_t hash_memory(std::uint32_t addr, std::uint32_t size) const;
@@ -191,6 +193,7 @@ class Renderer : public Backend {
   wgpu::RenderPipeline mix_pipe_;
   ScanStats scan_stats_;
   std::uint64_t serial_ = 0;
+  std::uint64_t copy_serial_ = 0;  // EFB copies to textures (CopyEntry::serial)
   Stats stats_;
 };
 
