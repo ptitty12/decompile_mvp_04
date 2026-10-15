@@ -207,3 +207,14 @@ the deploy package (`engine/server/tools/package.mjs`) with its own license file
 |---|---|---|
 | xxHash's XXH64 description ([Cyan4973/xxHash](https://github.com/Cyan4973/xxHash), `doc/xxhash_spec.md`) | BSD-2-Clause | `engine/net/state_hash.cpp` implements XXH64 from the published algorithm (no code copied); its reference vectors are in `test_net_protocol` |
 | coturn's documentation ("TURN REST API", `use-auth-secret`) | BSD-3-Clause | The credential format `engine/server/src/turn.ts` derives and the `deploy/turnserver.conf.template` settings |
+
+The Docker deployment (`deploy/`) vendors nothing either; it builds on pinned
+upstream images and downloads (by digest or SHA-256, in `deploy/Dockerfile` and
+`deploy/coturn/Dockerfile`):
+
+| Piece | License | Used as |
+|---|---|---|
+| `emscripten/emsdk:6.0.12` image | MIT/NCSA (Emscripten), others as shipped | Build stage only (not in the runtime image) |
+| `node:24.22.0-trixie-slim` image | MIT (Node.js), Debian packages | Runtime and server build |
+| Ninja 1.13.1 release binary | Apache-2.0 | Build stage only |
+| `coturn/coturn:4.18.0` image | BSD-3-Clause | The STUN/TURN service, unmodified (an entrypoint script is added) |
