@@ -12,7 +12,7 @@
 //        [--disc PATH] [--script FILE] [--frames N] [--delay D] [--fast] [--headed]
 //        [--expect "guest: ..."] [--out DIR] [--tag NAME] [--timeout SECONDS] [--no-render]
 //        [--steady-from FRAME] [--netsim LATENCY,JITTER,LOSS]
-//        [--packs P1,P2,...] [--packs2 P1,...|none] [--expect-reject]
+//        [--packs P1,P2,...] [--packs2 P1,...|none] [--expect-reject] [--server-disc]
 //
 //   --expect   a guest line both pages must also match (e.g. the native
 //              `mvp-netplay solo` run of the same script, frames and delay)
@@ -25,6 +25,10 @@
 //   --packs2   player 2's packs instead (`none`: no packs)
 //   --expect-reject  the two pack sets differ on purpose: pass when both pages are
 //              refused at the handshake with the roster-packs reason, and neither boots
+//   --server-disc  the deployment's way (P1): the server serves the disc, each page
+//              downloads it into its own browser storage before its lobby opens, and
+//              the engines start on creating and joining the game (no file inputs;
+//              no packs)
 //
 // Writes netplay-BROWSER[-TAG].json to --out (default build/engine/web-check).
 // Exit status: 0 when both pages stopped at frame N with identical guest lines
@@ -63,6 +67,7 @@ const packsList = (v) => (v === 'none' ? [] : v.split(',').filter(Boolean).map((
 const packs1 = packsList(opt('--packs', ''));
 const packs2 = argv.includes('--packs2') ? packsList(opt('--packs2', '')) : packs1;
 const expectReject = flag('--expect-reject');
+const serverDisc = flag('--server-disc');
 const timeoutS = Number(opt('--timeout', '900'));
 const site = resolve(opt('--site', join(repo, 'build', 'engine', 'emscripten', 'web', 'site')));
 const serverMain = join(repo, 'engine', 'server', 'dist', 'src', 'main.js');
@@ -79,10 +84,12 @@ if (!existsSync(serverMain)) {
 mkdirSync(out, { recursive: true });
 const script = scriptFile ? readFileSync(scriptFile, 'utf8') : '';
 
-// The server: a throwaway password, port 0, no disc route (the pages use the file input).
+// The server: a throwaway password, port 0, no disc route (the pages use the file input),
+// or with --server-disc the disc configured.
 const password = randomBytes(18).toString('base64url');
 const server = spawn(process.execPath, [serverMain], {
-  env: { ...process.env, MVP_PASSWORD: password, MVP_SITE: site, MVP_PORT: '0', MVP_HOST: '127.0.0.1', MVP_DISC_IMAGE: '' },
+  env: { ...process.env, MVP_PASSWORD: password, MVP_SITE: site, MVP_PORT: '0', MVP_HOST: '127.0.0.1',
+         MVP_DISC_IMAGE: serverDisc ? disc : '' },
   stdio: ['ignore', 'pipe', 'inherit'],
 });
 const base = await new Promise((resolveUrl, reject) => {
@@ -125,10 +132,10 @@ try {
     page.on('pageerror', (e) => errors.push(String(e)));
     const requests = [];
     page.on('request', (r) => requests.push(r.url()));
-    // Log in through the form, as a player would.
-    await page.goto(`${base}/`);
+    // Log in through the form, as a player would (to a page that starts nothing).
+    await page.goto(`${base}/login?next=%2Fhealthz`);
     await page.fill('input[name=password]', password);
-    await Promise.all([page.waitForURL(`${base}/`), page.click('button[type=submit]')]);
+    await Promise.all([page.waitForURL(`${base}/healthz`), page.click('button[type=submit]')]);
     pages.push({ who, page, errors, requests });
   }
   const q = new URLSearchParams();
@@ -140,11 +147,13 @@ try {
 
   const [a, b] = pages;
   await a.page.goto(`${base}/?online=create&delay=${delay}&${q}`);
-  await a.page.waitForFunction(() => window.mvp?.net?.invite, null, { timeout: 15000 });
+  // With --server-disc each page first downloads the disc (its lobby opens afterwards).
+  const lobbyMs = serverDisc ? timeoutS * 1000 : 15000;
+  await a.page.waitForFunction(() => window.mvp?.net?.invite, null, { timeout: lobbyMs });
   const invite = await a.page.evaluate(() => window.mvp.net.invite);
   summary.invite = invite.replace(/room=[a-z0-9]+/, 'room=<id>');
   await b.page.goto(`${invite}&${q}`);
-  await b.page.waitForFunction(() => window.mvp?.net?.player === 2, null, { timeout: 15000 });
+  await b.page.waitForFunction(() => window.mvp?.net?.player === 2, null, { timeout: lobbyMs });
   // Roster packs (E6), through each page's panel, before the disc starts the engine.
   for (const [k, list] of [packs1, packs2].entries()) {
     for (const [i, p] of list.entries()) {
@@ -156,7 +165,8 @@ try {
   summary.packSets = await Promise.all(pages.map((p) => p.page.evaluate(() => window.mvp.packs?.setHash ?? null)));
   console.log(`pack sets: ${summary.packSets.join(' / ')}`);
   const t0 = Date.now();
-  await Promise.all(pages.map((p) => p.page.setInputFiles('#disc', disc)));
+  if (serverDisc) summary.download = await Promise.all(pages.map((p) => p.page.evaluate(() => window.mvp.download)));
+  else await Promise.all(pages.map((p) => p.page.setInputFiles('#disc', disc)));
 
   const read = (p) => p.page.evaluate(() => {
     const s = window.mvp;
