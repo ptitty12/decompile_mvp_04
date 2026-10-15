@@ -204,4 +204,33 @@ void decode_texture(u8 format, u32 w, u32 h, const u8* src, u8* out, const u8* t
   }
 }
 
+bool gather_tmem_texture(const std::uint8_t* tmem, std::uint32_t even, std::uint32_t odd, std::uint8_t format,
+                         std::uint32_t w, std::uint32_t h, std::uint32_t levels, std::vector<std::uint8_t>& out) {
+  out.clear();
+  std::uint64_t pe = even, po = odd;
+  for (std::uint32_t l = 0; l < levels; ++l) {
+    const std::uint32_t size = texture_level_size(format, w, h);
+    const std::size_t at = out.size();
+    out.resize(at + size);
+    if (format == kTexRGBA8) {  // 64-byte tiles: 32 bytes of AR, then 32 of GB
+      const std::uint32_t tiles = size / 64;
+      if (pe + 32ull * tiles > kTmemSize || po + 32ull * tiles > kTmemSize) return false;
+      for (std::uint32_t k = 0; k < tiles; ++k) {
+        std::memcpy(out.data() + at + 64 * k, tmem + pe + 32 * k, 32);
+        std::memcpy(out.data() + at + 64 * k + 32, tmem + po + 32 * k, 32);
+      }
+      pe += 32ull * tiles;
+      po += 32ull * tiles;
+    } else {
+      std::uint64_t& p = (l & 1) ? po : pe;
+      if (p + size > kTmemSize) return false;
+      std::memcpy(out.data() + at, tmem + p, size);
+      p += size;
+    }
+    w = w > 1 ? w / 2 : 1;
+    h = h > 1 ? h / 2 : 1;
+  }
+  return true;
+}
+
 }  // namespace mvp::gfx

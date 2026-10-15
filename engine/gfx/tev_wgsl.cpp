@@ -35,19 +35,6 @@ struct U {
 @group(1) @binding(14) var samp6: sampler;
 @group(1) @binding(15) var samp7: sampler;
 
-struct VIn {
-  @location(0) pos: vec4f,
-  @location(1) c0: vec4f,
-  @location(2) c1: vec4f,
-  @location(3) t0: vec3f,
-  @location(4) t1: vec3f,
-  @location(5) t2: vec3f,
-  @location(6) t3: vec3f,
-  @location(7) t4: vec3f,
-  @location(8) t5: vec3f,
-  @location(9) t6: vec3f,
-  @location(10) t7: vec3f,
-};
 struct VOut {
   @builtin(position) pos: vec4f,
   @location(0) c0: vec4f,
@@ -61,16 +48,6 @@ struct VOut {
   @location(8) t6: vec3f,
   @location(9) t7: vec3f,
 };
-
-@vertex fn vs_main(v: VIn) -> VOut {
-  var o: VOut;
-  o.pos = v.pos;
-  o.c0 = v.c0;
-  o.c1 = v.c1;
-  o.t0 = v.t0; o.t1 = v.t1; o.t2 = v.t2; o.t3 = v.t3;
-  o.t4 = v.t4; o.t5 = v.t5; o.t6 = v.t6; o.t7 = v.t7;
-  return o;
-}
 
 // Texture coordinate (s/q, t/q) of `t`, scaled from the rasterizer's size for
 // its coordinate to the sampled map's size.
@@ -145,6 +122,23 @@ std::string str(const char* fmt, ...) {
 
 const char* kRegNames[4] = {"prev", "r0", "r1", "r2"};
 
+// The vertex stage: passes through the attributes the vertex buffer has (the
+// fragment stage reads no others; the rest are zero, as E1's OutVertex had them).
+std::string vertex_stage(u32 attrs) {
+  std::string s = "struct VIn {\n  @location(0) pos: vec4f,\n";
+  for (int k = 0; k < 2; ++k)
+    if (attrs & (1u << k)) s += str("  @location(%d) c%d: vec4f,\n", 1 + k, k);
+  for (int k = 0; k < 8; ++k)
+    if (attrs & (4u << k)) s += str("  @location(%d) t%d: vec3f,\n", 3 + k, k);
+  s += "};\n@vertex fn vs_main(v: VIn) -> VOut {\n  var o: VOut;\n  o.pos = v.pos;\n";
+  for (int k = 0; k < 2; ++k)
+    s += (attrs & (1u << k)) ? str("  o.c%d = v.c%d;\n", k, k) : str("  o.c%d = vec4f(0.0);\n", k);
+  for (int k = 0; k < 8; ++k)
+    s += (attrs & (4u << k)) ? str("  o.t%d = v.t%d;\n", k, k) : str("  o.t%d = vec3f(0.0);\n", k);
+  s += "  return o;\n}\n";
+  return s;
+}
+
 std::string swizzle(const u8 sw[4]) {
   static const char comp[4] = {'r', 'g', 'b', 'a'};
   std::string s = ".";
@@ -211,8 +205,35 @@ const char* kBias[4] = {"0", "128", "-128", "0"};
 
 }  // namespace
 
+u32 vertex_attrs(const PipelineConfig& c) {
+  const int n = c.num_stages < 1 ? 1 : c.num_stages > 16 ? 16 : c.num_stages;
+  bool indirect = false;
+  for (int i = 0; i < n; ++i) indirect = indirect || c.stages[i].ind_cmd != 0;
+  u32 attrs = 0;
+  for (int i = 0; i < n; ++i) {
+    const TevStage& st = c.stages[i];
+    if (indirect || st.tex_enable) attrs |= 4u << (st.texcoord & 7);
+    if (st.ras_chan == 0 || st.ras_chan == 1) attrs |= 1u << st.ras_chan;
+  }
+  if (indirect) {
+    const int nind = c.num_ind > 4 ? 4 : c.num_ind;
+    for (int k = 0; k < nind; ++k) attrs |= 4u << (c.iref_coord[k] & 7);
+  }
+  return attrs;
+}
+
+u32 vertex_stride(u32 attrs) {
+  u32 s = 16;
+  for (int k = 0; k < 2; ++k)
+    if (attrs & (1u << k)) s += 16;
+  for (int k = 0; k < 8; ++k)
+    if (attrs & (4u << k)) s += 12;
+  return s;
+}
+
 std::string generate_wgsl(const PipelineConfig& c) {
   std::string s = kCommon;
+  s += vertex_stage(vertex_attrs(c));
   s += "\n@fragment fn fs_main(in: VOut) -> @location(0) vec4f {\n";
   s += "  var prev = u.tev_regs[0];\n  var r0 = u.tev_regs[1];\n  var r1 = u.tev_regs[2];\n  var r2 = u.tev_regs[3];\n";
   const int n = c.num_stages < 1 ? 1 : c.num_stages > 16 ? 16 : c.num_stages;

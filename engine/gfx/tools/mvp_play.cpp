@@ -8,6 +8,10 @@
 //
 //   --input, --ports  controller input, as mvp-boot (runtime/input.h scripts)
 //   --frames N        stop at the frame poll of frame N; --fields N: after N VI fields
+//   --stop-file F     (E3c) stop at the first frame poll that is a multiple of 60 once
+//                     file F exists (for long unattended runs; host-side only)
+//   --hash-every N    (E3c) print the SHA-1 of MEM1, the instruction count and the time
+//                     base at every Nth frame poll (determinism checkpoints)
 //   --max-ticks N     instruction budget (default: none)
 //   --headless        no window: render off-screen only (captures still work)
 //   --no-render       no renderer at all (the guest runs alone; for the determinism check)
@@ -18,18 +22,32 @@
 //   --capture DIR     write the scanned-out frame as DIR/field_N_frame_F.png (VI field N,
 //                     game frame poll F, the number input scripts use) every
 //                     --capture-every N fields (default 60) and at the --capture-at
-//                     fields; only frames that changed since the last capture
+//                     fields (--capture-from N: periodic captures from VI field N on);
+//                     only frames that changed since the last capture
 //   --draw-log FILE   one line per draw and EFB copy (state, textures) from VI field
 //                     --draw-log-from N (default 0) to --draw-log-to N
+//   --gx-log FILE     (E3c) every GX command with the guest PC that delivered it, from VI
+//                     field --gx-log-from N to --gx-log-to N
 //   --dump-textures DIR at VI field --dump-field N: every texture each draw
 //                     samples, decoded from guest memory, as DIR/tex_F_D_M.png
 //                     (--dump-to M: every field from N to M)
 //   --perf-every N    print guest and host seconds every N VI fields (speed per stretch)
 //   --profile N       sample the guest PC (a host thread); print the N busiest functions
 //                     (--profile-from F: from VI field F on)
+//   --host-profile N  (Windows) sample the host thread's instruction pointer; print the N
+//                     busiest host functions (translated guest code as one bucket),
+//                     from --profile-from on
 //   --trace-entry A,B registers and memory at r3/r4 at each entry of those functions (hex
 //                     addresses), from VI field --trace-from to --trace-to, to --trace-file;
 //                     --trace-peek O1,O2: also the words at r3 + those (hex) offsets
+//   --record-input F  (E3c) write port 1's input, as the guest received it, as an input
+//                     script (with a window: the keyboard merged in; Enter START,
+//                     X A, Z B, C X, V Y, arrows, I/J/K/L stick, Q L, E R, Space Z)
+//   --pacing-from N   (E3c) frame pacing statistics (window) from VI field N on
+//   --pace            (E3c, window) show each VI field at its own time (59.94 Hz) and
+//                     present without waiting for the display (mailbox) when it can
+//   --cpi N           (E3c, experiments) CPU cycles charged per guest instruction instead of
+//                     E0b-CLK1's 2: changes guest timing (not the netplay default)
 //   --audio-wav FILE  (E3b) the AX mix as a 16-bit stereo WAV, exactly as virtual
 //                     time produced it (keep it under build/; never commit it)
 //   --no-audio        no playback (default: SDL3 playback when a window is open)
@@ -50,13 +68,17 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <map>
 #include <set>
 #include <string>
 #include <thread>
 #include <vector>
+
+#include <SDL3/SDL_keyboard.h>
 
 #include "audio/mixer.h"
 #include "audio/sdl_out.h"
@@ -69,6 +91,7 @@
 #include "gfx/wgpu/gpu.h"
 #include "gfx/wgpu/renderer.h"
 #include "gfx/wgpu/window.h"
+#include "host_profiler.h"
 #include "mods/mount.h"
 #include "runtime/boot.h"
 #include "runtime/hle.h"
@@ -105,9 +128,16 @@ struct DrawLog : gfx::Backend {
       if (!t.valid || !gfx::texture_format_known(t.format)) continue;
       const std::uint32_t a = t.addr & 0x01FFFFFFu;
       const std::uint32_t bytes = gfx::texture_level_size(t.format, t.width, t.height);
-      if (a > mem_size || bytes > mem_size - a) continue;
+      const std::uint8_t* src = mem + a;
+      std::vector<std::uint8_t> tm;
+      if (t.tmem) {  // preloaded: from TMEM
+        if (!gfx::gather_tmem_texture(t.tmem, t.tmem_even, t.tmem_odd, t.format, t.width, t.height, 1, tm)) continue;
+        src = tm.data();
+      } else if (a > mem_size || bytes > mem_size - a) {
+        continue;
+      }
       std::vector<std::uint8_t> rgba(static_cast<std::size_t>(t.width) * t.height * 4);
-      gfx::decode_texture(t.format, t.width, t.height, mem + a, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
+      gfx::decode_texture(t.format, t.width, t.height, src, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
       char name[96];
       std::snprintf(name, sizeof name, "/tex_%llu_%llu_%d.png", static_cast<unsigned long long>(*field),
                     static_cast<unsigned long long>(dump_draw), m);
@@ -118,9 +148,9 @@ struct DrawLog : gfx::Backend {
   void draw(const gfx::DrawCall& d) override {
     if (on()) {
       const gfx::PipelineConfig& c = d.cfg;
-      std::fprintf(f, "field %llu draw %zu verts topo %u stages %u texgens %u chans %u ind %u blend %u/%u/%u/%u z %u/%u/%u "
+      std::fprintf(f, "field %llu draw %zu verts %zu indices topo %u stages %u texgens %u chans %u ind %u blend %u/%u/%u/%u z %u/%u/%u "
                    "cull %u fmt %u acmp %u/%u/%u ref %d/%d logic %u/%u fog %u scissor %u,%u-%u,%u\n",
-                   static_cast<unsigned long long>(*field), d.verts.size(), c.topology, c.num_stages, c.num_texgens,
+                   static_cast<unsigned long long>(*field), d.verts.size(), d.index.size(), c.topology, c.num_stages, c.num_texgens,
                    c.num_chans, c.num_ind, c.blend_enable, c.blend_src, c.blend_dst, c.blend_sub, c.z_enable, c.z_func,
                    c.z_update, c.cull, c.pixel_format, c.alpha_comp0, c.alpha_comp1, c.alpha_logic, d.u.alpha_ref[0],
                    d.u.alpha_ref[1], c.logic_enable, c.logic_op, c.fog_type, d.scissor[0], d.scissor[1], d.scissor[2],
@@ -146,9 +176,11 @@ struct DrawLog : gfx::Backend {
       for (int m = 0; m < 8; ++m) {
         const gfx::TextureDesc& t = d.tex[static_cast<std::size_t>(m)];
         if (!t.valid) continue;
-        std::fprintf(f, "  map %d addr %08X fmt %u %ux%u levels %u wrap %u/%u filter %u/%u tlut %u@%X\n", m, t.addr,
+        std::fprintf(f, "  map %d addr %08X fmt %u %ux%u levels %u wrap %u/%u filter %u/%u tlut %u@%X", m, t.addr,
                      t.format, t.width, t.height, t.levels, t.wrap_s, t.wrap_t, t.mag_linear, t.min_filter,
                      t.tlut_format, t.tlut_offset);
+        if (t.tmem) std::fprintf(f, " tmem %05X/%05X", t.tmem_even, t.tmem_odd);
+        std::fprintf(f, "\n");
       }
       for (int r = 0; r < 4; ++r)
         std::fprintf(f, "  reg%d %d %d %d %d konst %d %d %d %d\n", r, d.u.tev_regs[r][0], d.u.tev_regs[r][1],
@@ -175,6 +207,78 @@ struct DrawLog : gfx::Backend {
   void invalidate_textures() override { next->invalidate_textures(); }
 };
 
+// Port 1 from the keyboard in the window (E3c), mapped as the browser maps it
+// (web/src/input.ts): Enter = START, X = A, Z = B, C = X, V = Y, arrows = D-pad,
+// I/J/K/L = main stick, Q = L, E = R, Space = Z. Read at each VI field after the
+// window's events; it reaches the guest only through the frame poll.
+PadState keyboard_pad() {
+  int n = 0;
+  const bool* k = SDL_GetKeyboardState(&n);
+  auto on = [&](SDL_Scancode s) { return k && static_cast<int>(s) < n && k[s]; };
+  PadState p;
+  p.connected = true;
+  const struct {
+    SDL_Scancode key;
+    u16 bit;
+  } map[] = {{SDL_SCANCODE_RETURN, pad::kStart}, {SDL_SCANCODE_X, pad::kA},     {SDL_SCANCODE_Z, pad::kB},
+             {SDL_SCANCODE_C, pad::kX},          {SDL_SCANCODE_V, pad::kY},     {SDL_SCANCODE_UP, pad::kUp},
+             {SDL_SCANCODE_DOWN, pad::kDown},    {SDL_SCANCODE_LEFT, pad::kLeft}, {SDL_SCANCODE_RIGHT, pad::kRight},
+             {SDL_SCANCODE_Q, pad::kL},          {SDL_SCANCODE_E, pad::kR},     {SDL_SCANCODE_SPACE, pad::kZ}};
+  for (const auto& m : map)
+    if (on(m.key)) p.buttons = static_cast<u16>(p.buttons | m.bit);
+  int sx = 0, sy = 0;
+  if (on(SDL_SCANCODE_I)) sy += 100;
+  if (on(SDL_SCANCODE_K)) sy -= 100;
+  if (on(SDL_SCANCODE_J)) sx -= 100;
+  if (on(SDL_SCANCODE_L)) sx += 100;
+  p.stick_x = static_cast<s8>(sx);
+  p.stick_y = static_cast<s8>(sy);
+  if (p.buttons & pad::kL) p.trigger_l = 255;
+  if (p.buttons & pad::kR) p.trigger_r = 255;
+  return p;
+}
+
+// The script's input with the keyboard merged into port 1 (window mode), and
+// optionally every change of port 1 written as an input script (--record-input),
+// so a window session replays headless.
+struct HostInputSource : InputSource {
+  InputSource* base = nullptr;
+  bool keyboard = false;
+  PadState host;  // the latest keyboard state
+  std::FILE* rec = nullptr;
+  PadState last;
+  bool have_last = false;
+  FrameInput input_for(u64 frame) override {
+    FrameInput in = base->input_for(frame);
+    PadState& p = in.pad[0];
+    if (keyboard && p.connected) {
+      p.buttons = static_cast<u16>(p.buttons | host.buttons);
+      p.stick_x = static_cast<s8>(std::clamp(p.stick_x + host.stick_x, -128, 127));
+      p.stick_y = static_cast<s8>(std::clamp(p.stick_y + host.stick_y, -128, 127));
+      p.trigger_l = std::max(p.trigger_l, host.trigger_l);
+      p.trigger_r = std::max(p.trigger_r, host.trigger_r);
+    }
+    if (rec) record(frame, p);
+    return in;
+  }
+  void record(u64 frame, const PadState& p) {
+    static const char* names[] = {"LEFT", "RIGHT", "DOWN", "UP", "Z", "R", "L", "", "A", "B", "X", "Y", "START"};
+    const PadState prev = have_last ? last : PadState{true};
+    const unsigned long long f = static_cast<unsigned long long>(frame);
+    for (int b = 0; b < 13; ++b) {
+      if (!names[b][0]) continue;
+      const bool now = p.buttons >> b & 1, was = prev.buttons >> b & 1;
+      if (now != was) std::fprintf(rec, "%llu 1 %s %s\n", f, now ? "press" : "release", names[b]);
+    }
+    if (p.stick_x != prev.stick_x || p.stick_y != prev.stick_y)
+      std::fprintf(rec, "%llu 1 stick %d %d\n", f, p.stick_x, p.stick_y);
+    if (p.trigger_l != prev.trigger_l || p.trigger_r != prev.trigger_r)
+      std::fprintf(rec, "%llu 1 trigger %u %u\n", f, p.trigger_l, p.trigger_r);
+    last = p;
+    have_last = true;
+  }
+};
+
 struct Play : GfxObserver {
   YieldingHooks* yield_hooks = nullptr;  // --yield
   gfx::GxProcessor* proc = nullptr;
@@ -183,7 +287,73 @@ struct Play : GfxObserver {
   audio::SdlAudioOut* audio_out = nullptr;
   std::uint64_t present_every = 1, max_fields = ~0ull;
   std::string capture_dir;
-  std::uint64_t capture_every = 60;
+  std::string stop_file;  // --stop-file
+  HostInputSource* host_input = nullptr;  // window mode: the keyboard on port 1
+  // Frame pacing (window mode): host time between presents.
+  std::vector<double> present_ms;
+  std::uint64_t pacing_from = 0;  // --pacing-from
+  double wait_s = 0, present_s = 0;  // host time waiting for the schedule, and in window events + present
+  // --pace (window): each VI field is shown at its own time, 1001/60000 s apart
+  // (59.94 Hz), measured from the first field shown; a field that is late runs
+  // at once, and one more than 100 ms late restarts the schedule. Host only.
+  bool pace = false;
+  bool paced = false;
+  std::uint64_t pace_field0 = 0, late_fields = 0, restarts = 0, overslept = 0;
+  double overslept_s = 0;
+  std::chrono::steady_clock::time_point pace_t0;
+#ifdef _WIN32
+  HANDLE timer = nullptr;
+#endif
+  void pace_field(std::uint64_t field) {
+    using clock = std::chrono::steady_clock;
+    const auto now = clock::now();
+    if (!paced) {
+      paced = true;
+      pace_field0 = field;
+      pace_t0 = now;
+      return;
+    }
+    const auto due = pace_t0 + std::chrono::nanoseconds((field - pace_field0) * 1001000000000ull / 60000ull);
+    if (now > due + std::chrono::milliseconds(100)) {
+      ++restarts;
+      pace_field0 = field;
+      pace_t0 = now;
+      return;
+    }
+    if (now > due) {
+      ++late_fields;
+      return;
+    }
+    // Sleep to about a millisecond before, then spin. On Windows a
+    // high-resolution waitable timer: Windows 11 ignores timeBeginPeriod for a
+    // window that is occluded, and a plain sleep then oversleeps by up to 15 ms.
+    const auto wake = due - std::chrono::microseconds(1500);
+    if (now < wake) {
+#ifdef _WIN32
+      if (!timer) timer = CreateWaitableTimerExW(nullptr, nullptr, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+      if (timer) {
+        LARGE_INTEGER rel;
+        rel.QuadPart = -std::chrono::duration_cast<std::chrono::nanoseconds>(wake - now).count() / 100;
+        if (SetWaitableTimer(timer, &rel, 0, nullptr, nullptr, FALSE)) WaitForSingleObject(timer, INFINITE);
+      } else {
+        std::this_thread::sleep_until(wake);
+      }
+#else
+      std::this_thread::sleep_until(wake);
+#endif
+      const auto woke = clock::now();
+      if (woke > due) {
+        ++overslept;
+        overslept_s += std::chrono::duration<double>(woke - due).count();
+      }
+    }
+    while (clock::now() < due) std::this_thread::yield();
+  }
+  std::chrono::steady_clock::time_point last_present;
+  std::uint64_t hash_every = 0;  // --hash-every
+  const std::uint8_t* mem1 = nullptr;
+  std::uint32_t mem1_size = 0;
+  std::uint64_t capture_every = 60, capture_from = 0;
   std::set<std::uint64_t> capture_at;
   std::uint64_t last_capture_serial = 0, captures = 0, fields = 0, presents = 0;
   std::uint64_t frames = 0, max_frames = ~0ull;
@@ -199,11 +369,37 @@ struct Play : GfxObserver {
     const double guest = static_cast<double>(hooks->time_base(*cpu)) / 40500000.0;
     std::printf("perf: field %llu frame %llu guest %.3f s host %.3f s\n", static_cast<unsigned long long>(field),
                 static_cast<unsigned long long>(frames), guest, host);
+    std::fflush(stdout);  // long runs are watched while they run
   }
 
   // Without a renderer (--no-render) the observer only counts fields.
   void gx_command(const std::uint8_t* cmd, std::size_t len) override {
+    if (gx_log && fields >= gx_log_from && fields <= gx_log_to) log_command(cmd, len);
     if (proc) proc->command(cmd, len);
+  }
+  // --gx-log FILE (E3c): every GX command the GP executes, with the guest PC of
+  // the store that delivered it, from VI field --gx-log-from to --gx-log-to.
+  std::FILE* gx_log = nullptr;
+  std::uint64_t gx_log_from = 0, gx_log_to = ~0ull;
+  void log_command(const std::uint8_t* c, std::size_t len) {
+    auto be32 = [](const std::uint8_t* p) {
+      return std::uint32_t(p[0]) << 24 | std::uint32_t(p[1]) << 16 | std::uint32_t(p[2]) << 8 | p[3];
+    };
+    std::fprintf(gx_log, "%llu pc %08X ", static_cast<unsigned long long>(fields), cpu ? cpu->pc : 0u);
+    const std::uint8_t op = c[0];
+    if (op == 0x61 && len >= 5) std::fprintf(gx_log, "BP %02X %06X", c[1], be32(c + 1) & 0xFFFFFF);
+    else if (op == 0x08 && len >= 6) std::fprintf(gx_log, "CP %02X %08X", c[1], be32(c + 2));
+    else if (op == 0x10 && len >= 5) {
+      const std::uint32_t w = be32(c + 1);
+      std::fprintf(gx_log, "XF %04X x%u", w & 0xFFFF, (w >> 16) + 1);
+      for (std::size_t k = 0; k < ((w >> 16) + 1) && k < 4 && 5 + 4 * k + 4 <= len; ++k)
+        std::fprintf(gx_log, " %08X", be32(c + 5 + 4 * k));
+    } else if (op >= 0x20 && op < 0x40 && len >= 5) std::fprintf(gx_log, "XF indexed %02X %08X", op, be32(c + 1));
+    else if (op >= 0x80 && op < 0xC0 && len >= 3) {
+      std::fprintf(gx_log, "DRAW %02X x%u", op, std::uint32_t(c[1]) << 8 | c[2]);
+      for (std::size_t k = 3; k < len && k < 3 + 24; ++k) std::fprintf(gx_log, " %02X", c[k]);
+    } else std::fprintf(gx_log, "op %02X len %zu", op, len);
+    std::fprintf(gx_log, "\n");
   }
 
   void vi_field(std::uint64_t field, std::uint32_t xfb) override {
@@ -219,14 +415,27 @@ struct Play : GfxObserver {
     if (!f) f = renderer->latest_xfb();
     if (window && field % present_every == 0) {
       if (audio_out) audio_out->throttle();  // keep the host near real time (host pacing only)
+      const auto c0 = std::chrono::steady_clock::now();
+      if (pace) pace_field(field);
+      const auto c1 = std::chrono::steady_clock::now();
       if (!window->pump()) throw StopRun{"window closed"};
+      if (host_input) host_input->host = keyboard_pad();
       if (f) {
         window->present(f->view, f->width, f->height);
+        const auto c2 = std::chrono::steady_clock::now();
+        if (field >= pacing_from) {
+          wait_s += std::chrono::duration<double>(c1 - c0).count();
+          present_s += std::chrono::duration<double>(c2 - c1).count();
+        }
         ++presents;
+        const auto now = std::chrono::steady_clock::now();
+        if (presents > 1 && field >= pacing_from)
+          present_ms.push_back(std::chrono::duration<double, std::milli>(now - last_present).count());
+        last_present = now;
       }
     }
     if (!capture_dir.empty() && f && f->serial != last_capture_serial &&
-        (field % capture_every == 0 || capture_at.count(field))) {
+        ((field >= capture_from && field % capture_every == 0) || capture_at.count(field))) {
       auto px = renderer->read_frame(*f);
       char name[64];
       std::snprintf(name, sizeof name, "/field_%06llu_frame_%06llu.png", static_cast<unsigned long long>(field),
@@ -239,9 +448,22 @@ struct Play : GfxObserver {
 };
 Play* g_play = nullptr;
 
-void frame_hook(ppc::Cpu&, std::uint64_t frame) {
+void frame_hook(ppc::Cpu& c, std::uint64_t frame) {
   g_play->frames = frame;
   if (frame >= g_play->max_frames) throw StopRun{"ran " + std::to_string(frame) + " frames (--frames)"};
+  // --hash-every N: the guest state at every Nth frame poll (compare two runs line by line).
+  if (g_play->hash_every && frame % g_play->hash_every == 0) {
+    Sha1 h;
+    h.update(g_play->mem1, g_play->mem1_size);
+    std::printf("hash: frame %llu instructions %llu time base %llu MEM1 sha1 %s\n",
+                static_cast<unsigned long long>(frame), static_cast<unsigned long long>(c.ticks),
+                static_cast<unsigned long long>(g_play->hooks->time_base(c)), Sha1::hex(h.finish()).c_str());
+    std::fflush(stdout);
+  }
+  // --stop-file: checked every 60 frames; the run then ends at a frame poll,
+  // so `--frames` with the reported count reproduces the same stopping point.
+  if (!g_play->stop_file.empty() && frame % 60 == 0 && std::filesystem::exists(g_play->stop_file))
+    throw StopRun{"ran " + std::to_string(frame) + " frames (--stop-file)"};
 }
 
 // --trace-entry ADDR[,ADDR...] (debugging): at each translated entry of those
@@ -343,13 +565,14 @@ int main(int argc, char** argv) {
   std::setvbuf(stdout, nullptr, _IOLBF, 1 << 16);
   std::string input_path, capture_at, draw_log_path;
   std::uint64_t draw_log_from = 0, draw_log_to = ~0ull, dump_field = ~0ull, dump_to = 0;
-  std::string dump_dir, audio_wav;
+  std::string dump_dir, audio_wav, record_input;
   bool no_audio = false;
   std::uint32_t audio_latency = 100;
+  std::uint32_t cpi = 0;  // --cpi (0: the default, E0b-CLK1)
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
   bool headless = false, no_render = false, yield = false;
-  int profile_top = 0;
+  int profile_top = 0, host_profile_top = 0;
   std::uint64_t profile_from = 0;
   std::string trace_entry, trace_file;
   std::vector<std::string> packs;
@@ -369,6 +592,16 @@ int main(int argc, char** argv) {
     else if (a == "--capture") play.capture_dir = next();
     else if (a == "--capture-every") play.capture_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
     else if (a == "--capture-at") capture_at = next();
+    else if (a == "--capture-from") play.capture_from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--stop-file") play.stop_file = next();
+    else if (a == "--record-input") record_input = next();
+    else if (a == "--pacing-from") play.pacing_from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--cpi") cpi = static_cast<std::uint32_t>(std::strtoul(next().c_str(), nullptr, 10));
+    else if (a == "--pace") play.pace = true;
+    else if (a == "--gx-log") play.gx_log = std::fopen(next().c_str(), "w");
+    else if (a == "--gx-log-from") play.gx_log_from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--gx-log-to") play.gx_log_to = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--hash-every") play.hash_every = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--draw-log") draw_log_path = next();
     else if (a == "--draw-log-from") draw_log_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--draw-log-to") draw_log_to = std::strtoull(next().c_str(), nullptr, 10);
@@ -378,6 +611,7 @@ int main(int argc, char** argv) {
     else if (a == "--perf-every") play.perf_every = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--profile") profile_top = std::atoi(next().c_str());
     else if (a == "--profile-from") profile_from = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--host-profile") host_profile_top = std::atoi(next().c_str());
     else if (a == "--trace-entry") trace_entry = next();
     else if (a == "--trace-file") trace_file = next();
     else if (a == "--trace-from") g_trace.from = std::strtoull(next().c_str(), nullptr, 10);
@@ -389,10 +623,10 @@ int main(int argc, char** argv) {
     else if (a == "--pack") packs.push_back(next());
     else {
       std::fprintf(stderr,
-                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
-                   "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
+                   "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--stop-file F] [--hash-every N] [--record-input F] [--pacing-from N] [--pace] [--cpi N] [--max-ticks N] "
+                   "[--headless] [--no-render] [--yield] [--present-every N] [--capture DIR] [--capture-every N] [--capture-from N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
-                   "[--perf-every N] [--profile N [--profile-from F]] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
+                   "[--perf-every N] [--profile N] [--host-profile N] [--profile-from F] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
                    "[--trace-to N] [--trace-peek HEX,...]] [--audio-wav FILE] [--no-audio] [--audio-latency MS] [--pack PATH]...\n");
       return 2;
     }
@@ -435,7 +669,19 @@ int main(int argc, char** argv) {
     return 2;
   }
   InputQueue input(boot_input);
-  input.set_source(&*script);
+  HostInputSource host_input;
+  host_input.base = &*script;
+  host_input.keyboard = !headless;
+  if (!record_input.empty()) {
+    host_input.rec = std::fopen(record_input.c_str(), "w");
+    if (!host_input.rec) {
+      std::fprintf(stderr, "mvp-play: cannot write %s\n", record_input.c_str());
+      return 2;
+    }
+    std::fprintf(host_input.rec, "mvp-input 1\n# recorded by mvp-play (port 1)\n");
+  }
+  input.set_source(&host_input);
+  if (!headless) play.host_input = &host_input;
 
   // Renderer.
   std::unique_ptr<gfx::Window> window;
@@ -455,6 +701,7 @@ int main(int argc, char** argv) {
     }
     std::printf("gpu: %s\n", gpu->adapter_name().c_str());
   }
+  if (window) window->prefer_mailbox(play.pace);
   if (window && !window->attach(*gpu, &err)) {
     std::fprintf(stderr, "mvp-play: %s\n", err.c_str());
     return 1;
@@ -465,7 +712,9 @@ int main(int argc, char** argv) {
   setup_boot_environment(m, in->disc);
   Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size);
   hw.set_disc(in->disc.image.get());
-  YieldingHooks hooks(&m, &hw);
+  ClockConfig clock;
+  if (cpi) clock.cpi = cpi;
+  YieldingHooks hooks(&m, &hw, clock);
   m.memory().io = &hw;
   m.cpu().hooks = &hooks;
   hooks.tick_limit = max_ticks;
@@ -489,6 +738,7 @@ int main(int argc, char** argv) {
   const bool wrap = draw_log.f || !dump_dir.empty();
   gfx::GxProcessor proc(wrap ? static_cast<gfx::Backend*>(&draw_log) : renderer);
   draw_log.proc = &proc;
+  proc.set_keep_primitive_info(draw_log.f != nullptr);
   proc.set_memory(m.mem1(), Machine::kMem1Size);
   play.proc = &proc;
   play.renderer = renderer;
@@ -542,11 +792,15 @@ int main(int argc, char** argv) {
   const auto t0 = std::chrono::steady_clock::now();
   play.t0 = t0;
   play.hooks = &hooks;
+  play.mem1 = m.mem1();
+  play.mem1_size = Machine::kMem1Size;
   play.cpu = &m.cpu();
   std::string why;
   int rc = 0;
   GuestProfiler profiler;
   if (profile_top > 0) profiler.start(&m.cpu(), &play.fields, profile_from);
+  tools::HostProfiler host_profiler;
+  if (host_profile_top > 0) host_profiler.start(&play.fields, profile_from);
   try {
     for (;;) rt::run(m.cpu());  // returns at each VI field with --yield
   } catch (const StopRun& s) {
@@ -557,6 +811,7 @@ int main(int argc, char** argv) {
   }
   const double secs = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
   if (profile_top > 0) profiler.finish(in->symbols, profile_top);
+  if (host_profile_top > 0) host_profiler.finish(host_profile_top);
   hw.set_gfx_observer(nullptr);
   hw.set_ax_observer(nullptr);
   rt::g_input = nullptr;
@@ -568,6 +823,8 @@ int main(int argc, char** argv) {
     gpu->wait_idle();
   }
   if (draw_log.f) std::fclose(draw_log.f);
+  if (play.gx_log) std::fclose(play.gx_log);
+  if (host_input.rec) std::fclose(host_input.rec);
 
   auto ull = [](std::uint64_t v) { return static_cast<unsigned long long>(v); };
   const double guest = static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0;
@@ -608,17 +865,47 @@ int main(int argc, char** argv) {
   if (!renderer) return rc;
   const auto& ps = proc.stats();
   std::printf("gx: %llu commands, %llu draws, %llu vertices, %llu triangles, %llu EFB copies (%llu to the XFB), "
-              "%llu TLUT loads, %llu unknown\n",
+              "%llu TLUT loads, %llu unknown; %llu state snapshots, %llu TMEM preloads\n",
               ull(ps.commands), ull(ps.draws), ull(ps.vertices), ull(ps.triangles), ull(ps.copies), ull(ps.xfb_copies),
-              ull(ps.tlut_loads), ull(ps.unknown));
+              ull(ps.tlut_loads), ull(ps.unknown), ull(ps.snapshots), ull(ps.preloads));
   const auto& rs = renderer->stats();
   std::printf("renderer: %llu draws (%llu skipped, %llu merged into the one before; %llu encoded), %llu passes, "
               "%llu pipelines, %llu textures decoded, %llu hits, "
               "%llu EFB-copy textures used, %llu texture copies, %llu clears; %llu unknown formats, "
-              "%llu indirect draws, %llu fog draws\n",
+              "%llu indirect draws, %llu fog draws; %llu with the previous draw's state; %llu preloaded textures; uploaded %.1f MB of vertices, "
+              "%.1f MB of indices\n",
               ull(rs.draws), ull(rs.skipped), ull(rs.merged), ull(rs.encoded), ull(rs.passes), ull(rs.pipelines),
               ull(rs.textures_decoded), ull(rs.texture_hits), ull(rs.copy_textures_used), ull(rs.tex_copies),
-              ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws));
+              ull(rs.clears), ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws), ull(rs.same_state), ull(rs.tmem_textures),
+              static_cast<double>(rs.vertex_bytes) / 1e6, static_cast<double>(rs.index_bytes) / 1e6);
+  if (!play.present_ms.empty()) {
+    std::vector<double> v = play.present_ms;
+    std::sort(v.begin(), v.end());
+    double sum = 0, sq = 0;
+    for (double x : v) sum += x;
+    const double mean = sum / static_cast<double>(v.size());
+    for (double x : v) sq += (x - mean) * (x - mean);
+    auto pct = [&](double q) { return v[std::min(v.size() - 1, static_cast<std::size_t>(q * static_cast<double>(v.size())))]; };
+    std::size_t late = 0;
+    for (double x : v) late += x > 25.0 ? 1 : 0;
+    std::printf("pacing: %zu present intervals: mean %.3f ms (%.2f per second), sd %.3f ms, p1 %.2f, p50 %.2f, p99 %.2f, "
+                "max %.2f ms; %zu over 25 ms; present mode %s%s\n",
+                v.size(), mean, mean > 0 ? 1000.0 / mean : 0.0, std::sqrt(sq / static_cast<double>(v.size())), pct(0.01),
+                pct(0.5), pct(0.99), v.back(), late, window ? window->present_mode_name() : "-",
+                play.pace ? "" : " (not paced: --pace)");
+    std::printf("pacing: %.1f s waiting for the field schedule, %.1f s in window events and present\n", play.wait_s,
+                play.present_s);
+    if (play.pace)
+      std::printf("pacing: %llu fields shown late, %llu schedule restarts; %llu sleeps woke after the field's time "
+                  "(%.1f s in all)%s\n",
+                  ull(play.late_fields), ull(play.restarts), ull(play.overslept), play.overslept_s,
+#ifdef _WIN32
+                  play.timer ? "" : " (no high-resolution timer)"
+#else
+                  ""
+#endif
+      );
+  }
   std::printf("display: %llu presents, %llu captures%s%s; WebGPU errors %llu\n", ull(play.presents), ull(play.captures),
               play.capture_dir.empty() ? "" : " in ", play.capture_dir.c_str(), ull(gpu->errors()));
   if (gpu->errors() || ps.xfb_copies == 0) rc = 1;

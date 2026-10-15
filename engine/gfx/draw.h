@@ -89,6 +89,11 @@ struct TextureDesc {
   u32 tlut_offset = 0;     // byte offset in TLUT memory
   const u8* tlut = nullptr;
   u32 tlut_entries = 0;
+  // Preloaded textures (E3c): the texels are in TMEM, not at `addr`. `tmem` points at
+  // the processor's 1 MiB TMEM (valid until the next preload); levels start in the
+  // even bank at `tmem_even` (RGBA8: AR tiles there, GB tiles at `tmem_odd`).
+  const u8* tmem = nullptr;
+  u32 tmem_even = 0, tmem_odd = 0;
   // Sampler state.
   u8 wrap_s = 0, wrap_t = 0;  // 0 clamp, 1 repeat, 2 mirror
   u8 mag_linear = 0, min_filter = 0;  // min: 0 near, 1 linear, 2-5 with mip modes
@@ -102,7 +107,23 @@ struct DrawCall {
   // Scissor rectangle in EFB pixels (x0, y0 inclusive, x1, y1 exclusive),
   // already clamped to the EFB.
   u32 scissor[4] = {0, 0, kEfbWidth, kEfbHeight};
-  std::vector<OutVertex> verts;  // triangle list (or line list, point list) by cfg.topology
+  // The primitive's vertices, each once, as the transform unit produced them,
+  // and the triangle list (or line list, point list, by cfg.topology) as
+  // indices into them (E3c: strips and quads no longer repeat vertices).
+  std::vector<OutVertex> verts;
+  std::vector<u32> index;
+  // Pixel state identity (E3c): two draws with the same nonzero `state` have the
+  // same cfg (topology aside), u, tex and scissor, because no register they come
+  // from was written in between. A backend may skip its lookups then. 0: unknown.
+  std::uint64_t state = 0;
+
+  // The triangle (line, point) list with the vertices repeated, as in E1.
+  std::vector<OutVertex> expanded() const {
+    std::vector<OutVertex> out;
+    out.reserve(index.size());
+    for (u32 i : index) out.push_back(verts[i]);
+    return out;
+  }
 };
 
 // An EFB copy (BP 0x52): to the external frame buffer, or into a texture.

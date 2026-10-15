@@ -177,6 +177,75 @@ TEST_CASE("textured quad from synthetic RGB565 memory, with konst modulation") {
   CHECK(gpu().errors() == 0);
 }
 
+TEST_CASE("indexed draws: strips, merged runs and vertex layouts of different strides in one pass (E3c)") {
+  Scene sc;
+  // A 4 x 4 RGB565 texture at 0x40000, all blue.
+  for (u32 k = 0; k < 16; ++k) put_be16(&sc.mem[0x40000 + k * 2], 0x001F);
+  Stream s = base();
+  s.xf(xf::kNumTexGens, {1});
+  s.xf(xf::kTexGen, {5u << 7});
+  s.xff(60 * 4, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0});
+  s.cp(cp::kMatIndexA, 60u << 6);
+  s.bp(bp::kGenMode, 1u | 1u << 4);
+  s.bp(bp::tex_reg(bp::kTexImage0, 0), 3u | 3u << 10 | 4u << 20);
+  s.bp(bp::tex_reg(bp::kTexImage3, 0), 0x40000 >> 5);
+  s.bp(bp::tex_reg(bp::kTexMode0, 0), 0);
+  s.bp(bp::kSuSSize, 3);
+  s.bp(bp::kSuTSize, 3);
+  copy_xfb(s, 0x000000FF);
+  // Rasterized color only: position + color0 (32-byte vertices).
+  s.bp(bp::kTref, 0u << 7);
+  s.bp(bp::kTevColorEnv, color_env(kZeroC, kZeroC, kZeroC, kRasC));
+  quad(s, 0, 0, 100, 100, 0xFF0000FF);
+  quad(s, 0, 100, 100, 200, 0xFF0000FF);  // the same state: appended to the draw before
+  {  // a strip of two triangles, green
+    s.cp(cp::kVcdLo, 1u << 9 | 1u << 13);
+    std::vector<std::uint8_t> v;
+    auto vert = [&](float x, float y) {
+      f32(v, x);
+      f32(v, y);
+      Stream::put32(v, 0x00FF00FF);
+      f32(v, 0);
+      f32(v, 0);
+    };
+    vert(100, 0);
+    vert(200, 0);
+    vert(100, 100);
+    vert(200, 100);
+    s.prim(cmd::kTriStrip, 4, v);
+  }
+  // Texture only: position + texcoord 0 (28-byte vertices).
+  s.bp(bp::kTref, 0u | 0u << 3 | 1u << 6 | 7u << 7);
+  s.bp(bp::kTevColorEnv, color_env(kZeroC, kZeroC, kZeroC, kTexC));
+  quad(s, 200, 0, 300, 100, 0xFFFFFFFF);
+  // Back to the rasterized color: a new run must start at a multiple of 32 bytes.
+  s.bp(bp::kTref, 0u << 7);
+  s.bp(bp::kTevColorEnv, color_env(kZeroC, kZeroC, kZeroC, kRasC));
+  quad(s, 300, 0, 400, 100, 0xFFFF00FF);
+  copy_xfb(s, 0x000000FF, false);
+  s.run(sc.p);
+  const Renderer::Frame* f = sc.r.xfb(0x80000);
+  REQUIRE(f != nullptr);
+  auto img = sc.r.read_frame(*f);
+  CHECK(near(px(img, 640, 50, 50), 255, 0, 0));
+  CHECK(near(px(img, 640, 50, 150), 255, 0, 0));
+  CHECK(near(px(img, 640, 150, 50), 0, 255, 0));
+  CHECK(near(px(img, 640, 120, 20), 0, 255, 0));   // both strip triangles
+  CHECK(near(px(img, 640, 180, 80), 0, 255, 0));
+  CHECK(near(px(img, 640, 250, 50), 0, 0, 255));
+  CHECK(near(px(img, 640, 350, 50), 255, 255, 0));
+  CHECK(near(px(img, 640, 450, 50), 0, 0, 0));
+  const Renderer::Stats& st = sc.r.stats();
+  CHECK(st.draws == 5);
+  CHECK(st.merged == 2);        // the second red quad and the strip
+  CHECK(st.encoded == 3);
+  CHECK(st.same_state == 2);    // the second red quad and the strip: only CP writes in between
+  // 12 vertices of 32 bytes, 8 bytes of padding to a multiple of 28, 4 of 28, 8 to a multiple of 32, 4 of 32.
+  CHECK(st.vertex_bytes == 12 * 32 + 8 + 4 * 28 + 8 + 4 * 32);
+  CHECK(st.index_bytes == (6 + 6 + 6 + 6 + 6) * 4);
+  CHECK(gpu().errors() == 0);
+}
+
 TEST_CASE("indirect texturing: the coordinate comes from an indirect texture through a matrix") {
   Scene sc;
   // Map 0: the 8 x 8 red | green texture of the previous case.

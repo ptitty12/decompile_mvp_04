@@ -85,6 +85,32 @@ TEST_CASE("swap tables, konst selection, registers, compare modes and the alpha 
   CHECK(has(w, "var outc = clamp(vec4i(prev.rgb, prev.a)"));
 }
 
+TEST_CASE("vertex layout: only the attributes the stages read (E3c)") {
+  PipelineConfig c = blank();
+  c.num_stages = 2;
+  c.stages[0].tex_enable = 1;
+  c.stages[0].texcoord = 2;
+  c.stages[0].ras_chan = 7;
+  c.stages[1].tex_enable = 0;
+  c.stages[1].texcoord = 5;  // not sampled: not needed
+  c.stages[1].ras_chan = 1;
+  CHECK(vertex_attrs(c) == (2u | 4u << 2));
+  CHECK(vertex_stride(vertex_attrs(c)) == 16 + 16 + 12);
+  std::string w = generate_wgsl(c);
+  CHECK(has(w, "@location(2) c1: vec4f"));
+  CHECK(has(w, "@location(5) t2: vec3f"));
+  CHECK(!has(w, "@location(1) c0"));
+  CHECK(!has(w, "@location(8) t5"));
+  CHECK(has(w, "o.c0 = vec4f(0.0);"));
+  CHECK(has(w, "o.t2 = v.t2;"));
+  // Indirect stages read every stage's coordinate and the indirect ones.
+  c.num_ind = 1;
+  c.iref_coord[0] = 6;
+  c.stages[1].ind_cmd = 1;
+  CHECK(vertex_attrs(c) == (2u | 4u << 2 | 4u << 5 | 4u << 6));
+  CHECK(vertex_stride(0) == 16);
+}
+
 TEST_CASE("logic ops without blending") {
   PipelineConfig c = blank();
   c.logic_enable = 1;

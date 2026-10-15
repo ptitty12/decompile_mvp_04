@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 namespace mvp::gfx {
 
@@ -45,6 +46,15 @@ std::uint32_t texture_size(std::uint8_t format, std::uint32_t w, std::uint32_t h
 void decode_texture(std::uint8_t format, std::uint32_t w, std::uint32_t h, const std::uint8_t* src,
                     std::uint8_t* out, const std::uint8_t* tlut = nullptr, std::uint8_t tlut_format = 0,
                     std::uint32_t tlut_entries = 0);
+
+// A preloaded texture's levels gathered from TMEM (1 MiB at `tmem`) into the
+// main-memory layout (texture_size bytes), as GXPreLoadEntireTexture placed them:
+// levels alternate between the even bank (level 0, 2, ...) and the odd bank
+// (1, 3, ...), each bank's levels back to back; RGBA8 keeps its AR tiles in the
+// even bank and its GB tiles in the odd bank. False if it runs past TMEM.
+bool gather_tmem_texture(const std::uint8_t* tmem, std::uint32_t even, std::uint32_t odd, std::uint8_t format,
+                         std::uint32_t w, std::uint32_t h, std::uint32_t levels, std::vector<std::uint8_t>& out);
+constexpr std::uint32_t kTmemSize = 1u << 20;
 
 // One 16-bit color of the given palette format as RGBA8.
 void decode_tlut_entry(std::uint16_t v, std::uint8_t tlut_format, std::uint8_t out[4]);

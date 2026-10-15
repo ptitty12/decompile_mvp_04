@@ -39,6 +39,12 @@ class Window {
   // pipeline. Call once.
   bool attach(Gpu& gpu, std::string* err);
 
+  // Present without waiting for the display when the surface supports it
+  // (mailbox: the newest frame is shown at each refresh; E3c). The caller then
+  // paces the frames itself. Call before attach(). Default: FIFO.
+  void prefer_mailbox(bool on) { want_mailbox_ = on; }
+  const char* present_mode_name() const;
+
   // Handles pending window events; false once the user closed the window.
   // (The browser's page handles its own events: always true there.)
   bool pump();
@@ -65,6 +71,8 @@ class Window {
   wgpu::Buffer params_;
   int width_ = 0, height_ = 0;
   bool configured_ = false;
+  bool want_mailbox_ = false, have_mailbox_ = false;
+  wgpu::PresentMode mode_ = wgpu::PresentMode::Fifo;
 };
 
 }  // namespace mvp::gfx

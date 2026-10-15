@@ -72,8 +72,8 @@ const char* Hardware::block_name(u32 a) {
 }
 
 u32 Hardware::reg(u32 addr) const {
-  auto it = regs_.find(addr & ~3u);
-  return it == regs_.end() ? 0 : it->second;
+  const u32 off = (addr & ~3u) - kRegBase;
+  return off < kRegBytes ? regs_[off >> 2] : 0;
 }
 
 void Hardware::set_reg(u32 addr, u32 value, int size) {
@@ -81,7 +81,7 @@ void Hardware::set_reg(u32 addr, u32 value, int size) {
   u32 old = reg(a);
   u32 sh = (4 - (addr & 3) - static_cast<u32>(size)) * 8;
   u32 mask = size == 4 ? 0xFFFFFFFFu : ((1u << (8 * size)) - 1) << sh;
-  regs_[a] = (old & ~mask) | ((value << sh) & mask);
+  if (a - kRegBase < kRegBytes) regs_[(a - kRegBase) >> 2] = (old & ~mask) | ((value << sh) & mask);
 }
 
 // ---- EXI ----
@@ -624,7 +624,7 @@ void Hardware::advance(std::uint64_t tb) {
       u32 a = 0xCC002030u + 4u * static_cast<u32>(n);
       u32 di = reg(a);
       if (di & 0x10000000u) {  // still enabled: raise its interrupt status
-        regs_[a] = di | 0x80000000u;
+        regs_[(a - kRegBase) >> 2] = di | 0x80000000u;
         if (n < 2) {
           ++vi_fields_;
           if (gfx_) {  // the top field's frame buffer (TFBL: address, or address >> 5 with POFF)
@@ -689,7 +689,7 @@ u32 Hardware::read(u32 addr, int size) {
     std::snprintf(b, sizeof b, "read of %d bytes at 0x%08X, outside the hardware blocks", size, addr);
     throw StopRun{b};
   }
-  ++reads_[addr];
+  ++reads_[addr - kRegBase];
   if (addr == last_read_) {
     if (++same_reads_ >= poll_limit) {
       char b[112];
@@ -744,15 +744,16 @@ u32 Hardware::read(u32 addr, int size) {
 }
 
 void Hardware::write(u32 addr, u32 value, int size) {
-  if (!block_name(addr)) {
+  const bool wgp = addr - 0xCC008000u < 0x1000u;  // the common case, first
+  if (!wgp && !block_name(addr)) {
     char b[96];
     std::snprintf(b, sizeof b, "write of %d bytes at 0x%08X, outside the hardware blocks", size, addr);
     throw StopRun{b};
   }
-  ++writes_[addr];
+  ++writes_[addr - kRegBase];
   last_read_ = 0;
   if (log_.size() < 100000) log_.push_back({cpu_->pc, addr, value, size, true});
-  if (addr >= 0xCC008000u && addr < 0xCC009000u) {  // write-gather pipe: the GX FIFO
+  if (wgp) {  // write-gather pipe: the GX FIFO
     wgp_write(value, size);
     return;
   }

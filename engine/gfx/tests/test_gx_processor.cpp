@@ -9,6 +9,7 @@
 
 #include "common/bytes.h"
 #include "gfx/gx_processor.h"
+#include "gfx/texture_decode.h"
 #include "tests/gx_stream.h"
 
 using namespace mvp;
@@ -115,6 +116,47 @@ TEST_CASE("strips, fans, lines and points") {
   CHECK(cap.draws[2].cfg.topology == static_cast<u8>(Topology::Lines));
   CHECK(xs(cap.draws[3]) == std::vector<int>{0, 1, 2, 3, 4});
   CHECK(cap.draws[3].cfg.topology == static_cast<u8>(Topology::Points));
+}
+
+TEST_CASE("draws carry each vertex once, with indices, and a pixel-state identity (E3c)") {
+  Capture cap;
+  GxProcessor p(&cap);
+  Stream s = setup_2d();
+  s.cp(cp::kVcdLo, 1u << 9);
+  s.cp(cp::kVatA, 0u /*xy*/ | 4u << 1);
+  std::vector<std::uint8_t> v;
+  for (int k = 0; k < 5; ++k) {
+    f32(v, static_cast<float>(k));
+    f32(v, 0);
+  }
+  std::vector<std::uint8_t> quad(v.begin(), v.begin() + 32);
+  s.prim(cmd::kTriStrip, 5, v);
+  s.prim(cmd::kQuads, 4, quad);
+  s.cp(cp::kMatIndexA, 0);              // CP and XF writes keep the pixel state
+  s.xf(xf::kNumColors, {0});
+  s.prim(cmd::kTriFan, 5, v);
+  s.bp(bp::kTevReg, 0);                 // any BP write starts a new one
+  s.prim(cmd::kTriFan, 5, v);
+  s.prim(cmd::kTriFan, 5, v);
+  s.run(p);
+  REQUIRE(cap.raw.size() == 5);
+  const DrawCall& strip = cap.raw[0];
+  CHECK(strip.verts.size() == 5);
+  CHECK(strip.index == std::vector<u32>{0, 1, 2, 2, 1, 3, 2, 3, 4});
+  const DrawCall& q = cap.raw[1];
+  CHECK(q.verts.size() == 4);
+  CHECK(q.index == std::vector<u32>{0, 1, 2, 0, 2, 3});
+  CHECK(q.expanded().size() == 6);
+  CHECK(q.expanded()[4].pos[0] == q.verts[2].pos[0]);
+  CHECK(cap.raw[0].state != 0);
+  CHECK(cap.raw[1].state == cap.raw[0].state);
+  CHECK(cap.raw[2].state == cap.raw[0].state);
+  CHECK(cap.raw[3].state != cap.raw[2].state);
+  CHECK(cap.raw[4].state == cap.raw[3].state);
+  // The rebuilt state equals the reused one when nothing changed.
+  CHECK(cap.raw[3].cfg == cap.raw[2].cfg);
+  CHECK(std::memcmp(&cap.raw[3].u, &cap.raw[2].u, sizeof(DrawUniforms)) == 0);
+  CHECK(p.stats().snapshots == 2);
 }
 
 TEST_CASE("indexed attributes from arrays, fixed-point formats, matrix indices") {
@@ -274,6 +316,62 @@ TEST_CASE("texture descriptors and TLUT loads") {
   REQUIRE(t.tlut != nullptr);
   CHECK(std::memcmp(t.tlut, &mem[0x20000], 64) == 0);
   CHECK(t.tlut[64] == 0);  // only 32 entries were loaded
+}
+
+TEST_CASE("TMEM preloads and preloaded textures (E3c)") {
+  std::vector<std::uint8_t> mem(0x40000, 0);
+  for (int k = 0; k < 0x800; ++k) mem[0x8000 + k] = static_cast<std::uint8_t>(k * 7 + 3);
+  Capture cap;
+  GxProcessor p(&cap);
+  p.set_memory(mem.data(), static_cast<u32>(mem.size()));
+  Stream s;
+  // An I8 texture of 16 x 8 (two 8x4 blocks... 128 bytes) at TMEM 0x4000.
+  s.bp(bp::kPreloadAddr, 0x8000 >> 5);
+  s.bp(bp::kPreloadTmemEven, 0x4000 >> 5);
+  s.bp(bp::kPreloadTmemOdd, 0x84000 >> 5);
+  s.bp(bp::kPreloadMode, 4u);  // 4 lines of 32 bytes
+  // RGBA8, 4 x 4 (one 64-byte tile): AR to the even bank, GB to the odd one.
+  s.bp(bp::kPreloadAddr, 0x8400 >> 5);
+  s.bp(bp::kPreloadTmemEven, 0x6000 >> 5);
+  s.bp(bp::kPreloadTmemOdd, 0x86000 >> 5);
+  s.bp(bp::kPreloadMode, 1u | 3u << 15);
+  s.bp(bp::kTref, 0u | 1u << 6 | (1u | 1u << 6) << 12);  // stage 0 map 0, stage 1 map 1
+  s.bp(bp::kGenMode, 1u << 10);                          // two stages
+  s.bp(bp::tex_reg(bp::kTexImage0, 0), 15u | 7u << 10 | 1u << 20);  // 16 x 8, I8
+  s.bp(bp::tex_reg(bp::kTexImage1, 0), (0x4000 >> 5) | 1u << 21);  // preloaded
+  s.bp(bp::tex_reg(bp::kTexImage3, 0), 0x20000 >> 5);                // (not where the texels are)
+  s.bp(bp::tex_reg(bp::kTexImage0, 1), 3u | 3u << 10 | 6u << 20);    // 4 x 4, RGBA8
+  s.bp(bp::tex_reg(bp::kTexImage1, 1), (0x6000 >> 5) | 1u << 21);
+  s.bp(bp::tex_reg(bp::kTexImage2, 1), 0x86000 >> 5);
+  s.run(p);
+  CHECK(p.stats().preloads == 2);
+  DrawCall d;
+  p.snapshot(d);
+  const TextureDesc& t = d.tex[0];
+  REQUIRE(t.valid);
+  REQUIRE(t.tmem != nullptr);
+  CHECK(t.tmem_even == 0x4000);
+  std::vector<std::uint8_t> got;
+  REQUIRE(gather_tmem_texture(t.tmem, t.tmem_even, t.tmem_odd, t.format, t.width, t.height, 1, got));
+  REQUIRE(got.size() == 128);
+  CHECK(std::memcmp(got.data(), &mem[0x8000], 128) == 0);
+  const TextureDesc& r = d.tex[1];
+  REQUIRE(r.tmem != nullptr);
+  CHECK(r.tmem_odd == 0x86000);
+  REQUIRE(gather_tmem_texture(r.tmem, r.tmem_even, r.tmem_odd, r.format, r.width, r.height, 1, got));
+  REQUIRE(got.size() == 64);
+  CHECK(std::memcmp(got.data(), &mem[0x8400], 64) == 0);  // the tile put back together
+  CHECK(std::memcmp(p.tmem() + 0x6000, &mem[0x8400], 32) == 0);
+  CHECK(std::memcmp(p.tmem() + 0x86000, &mem[0x8420], 32) == 0);
+  // Mip levels alternate banks: level 1 of an I8 texture starts in the odd bank.
+  std::vector<std::uint8_t> tm(kTmemSize, 0);
+  tm[0x100] = 1;
+  tm[0x90000] = 2;
+  REQUIRE(gather_tmem_texture(tm.data(), 0x100, 0x90000, kTexI8, 16, 8, 2, got));
+  CHECK(got.size() == 128 + 32);
+  CHECK(got[0] == 1);
+  CHECK(got[128] == 2);
+  CHECK(!gather_tmem_texture(tm.data(), kTmemSize - 32, 0, kTexI8, 16, 8, 1, got));
 }
 
 TEST_CASE("indexed XF loads read matrices from memory") {
