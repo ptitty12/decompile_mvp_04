@@ -119,6 +119,7 @@ class GxProcessor {
   // The same with the state unpacked once per primitive.
   void setup_transform(XformSetup& x) const;
   OutVertex transform(const InVertex& v, XformSetup& x) const;
+  void transform(const InVertex& v, XformSetup& x, OutVertex& out) const;  // the same, into `out`
   // The pipeline configuration, uniforms and textures for a draw now.
   void snapshot(DrawCall& d) const;
 
