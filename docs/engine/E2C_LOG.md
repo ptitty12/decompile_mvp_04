@@ -83,6 +83,11 @@ deployment), `browser_check.mjs` (`--server-disc`, `--audio`, `--pad`, `--runs`,
 
 Machine as in WEB.md §3 (i7-14700K, RTX 4070 SUPER, Windows 11; other agents shared it).
 
+**The engine's memory:** 220 MB of WebAssembly memory after a cold start that fills the
+cache (213 MB without the cache: the kept module reuses the translator's peak; the entry is
+copied out in two pieces, header and bytes, so no second copy enters the heap), 146-155 MB
+after a warm start (no translator peak at all).
+
 **Audio latency** (from the mixer to the speaker):
 - the worklet's buffer target is 60 ms; at full speed its smoothed fill averaged 1,930-2,360
   frames (60-74 ms);

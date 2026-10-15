@@ -161,6 +161,9 @@ TEST_CASE("module cache: a module survives the round trip; damage is refused") {
   m.stats.code_bytes = 9;
   m.stats.helper_by_op = {0, 1, 2, 3};
   const auto blob = serialize_module(m);
+  auto joined = serialize_module_header(m);
+  joined.insert(joined.end(), m.bytes.begin(), m.bytes.end());
+  CHECK(joined == blob);
   xlat::WasmModule r;
   std::string err;
   REQUIRE(deserialize_module(blob.data(), blob.size(), &r, &err));

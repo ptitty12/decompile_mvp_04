@@ -76,10 +76,10 @@ struct Reader {
 
 }  // namespace
 
-std::vector<std::uint8_t> serialize_module(const xlat::WasmModule& m) {
+std::vector<std::uint8_t> serialize_module_header(const xlat::WasmModule& m) {
   Writer w;
-  w.out.reserve(m.bytes.size() + 64 + 8 * (m.entries.size() + m.resume.size() + m.resume_index.size()) +
-                4 * (m.safe.size() + m.idle.size()) + 8 * m.hle_sites.size());
+  w.out.reserve(64 + 8 * (m.entries.size() + m.resume.size() + m.resume_index.size()) +
+                4 * (m.safe.size() + m.idle.size()) + 8 * m.hle_sites.size() + 8 * m.stats.helper_by_op.size());
   w.out.insert(w.out.end(), kMagic, kMagic + 8);
   w.u32(kVersion);
   w.u32(m.slots);
@@ -107,8 +107,13 @@ std::vector<std::uint8_t> serialize_module(const xlat::WasmModule& m) {
   w.u32(static_cast<std::uint32_t>(s.helper_by_op.size()));
   for (std::size_t v : s.helper_by_op) w.u64(v);
   w.u64(m.bytes.size());
-  w.out.insert(w.out.end(), m.bytes.begin(), m.bytes.end());
   return std::move(w.out);
+}
+
+std::vector<std::uint8_t> serialize_module(const xlat::WasmModule& m) {
+  std::vector<std::uint8_t> out = serialize_module_header(m);
+  out.insert(out.end(), m.bytes.begin(), m.bytes.end());
+  return out;
 }
 
 bool deserialize_module(const std::uint8_t* p, std::size_t n, xlat::WasmModule* m, std::string* error) {

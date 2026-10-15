@@ -262,7 +262,8 @@ cache cleared before the first; "server": the mock deployment on localhost):
 
 Warm, the translation phase is reading the 52 MB entry, unpacking it and compiling
 (Firefox's compile alone is 122-133 ms); the first frame then waits for the WebGPU
-device. Writing the entry after the first frame takes 110-410 ms.
+device. Writing the entry after the first frame takes 110-410 ms. A warm start also
+leaves the engine's memory at 146-155 MB instead of 213-220 MB (no translator peak).
 
 **Frame time** (host milliseconds per VI field inside `rt::run` and the renderer,
 averaged over half-second windows; achieved fields per second in brackets; E2):

@@ -420,15 +420,18 @@ EMSCRIPTEN_KEEPALIVE int mvp_translate(const char* text, int len) {
 // Keep the translated module after mvp_translate, for the browser's cache.
 EMSCRIPTEN_KEEPALIVE void mvp_keep_module(int keep) { g.keep_module = keep != 0; }
 
-// Serializes the kept module (module_cache.h) and frees it: returns the blob's
-// size in bytes; mvp_module_blob_ptr() is its address until mvp_module_release().
+// The kept module for the cache (module_cache.h), in two pieces the Worker
+// writes one after the other: the header (its tables; mvp_module_blob returns
+// its size, mvp_module_blob_ptr its address) and the wasm bytes
+// (mvp_module_bytes_ptr, mvp_module_bytes_len); valid until mvp_module_release().
 EMSCRIPTEN_KEEPALIVE double mvp_module_blob() {
   if (g.kept.bytes.empty()) return 0;
-  g.blob = web::serialize_module(g.kept);
-  g.kept = xlat::WasmModule{};
+  g.blob = web::serialize_module_header(g.kept);
   return static_cast<double>(g.blob.size());
 }
 EMSCRIPTEN_KEEPALIVE const std::uint8_t* mvp_module_blob_ptr() { return g.blob.data(); }
+EMSCRIPTEN_KEEPALIVE const std::uint8_t* mvp_module_bytes_ptr() { return g.kept.bytes.data(); }
+EMSCRIPTEN_KEEPALIVE double mvp_module_bytes_len() { return static_cast<double>(g.kept.bytes.size()); }
 EMSCRIPTEN_KEEPALIVE void mvp_module_release() {
   g.kept = xlat::WasmModule{};
   std::vector<std::uint8_t>().swap(g.blob);

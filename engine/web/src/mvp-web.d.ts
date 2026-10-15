@@ -34,6 +34,8 @@ export interface MvpEngine {
   _mvp_keep_module(keep: number): void;
   _mvp_module_blob(): number;
   _mvp_module_blob_ptr(): number;
+  _mvp_module_bytes_ptr(): number;
+  _mvp_module_bytes_len(): number;
   _mvp_module_release(): void;
   _mvp_translate_cached(blob: number, len: number): number;
   _mvp_audio_enable(on: number): void;

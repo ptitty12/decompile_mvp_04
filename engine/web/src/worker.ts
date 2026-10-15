@@ -118,10 +118,14 @@ async function loadCached(key: string, report: CacheReport): Promise<boolean> {
 
 // After the first frame: serialize the module the translator kept and store it.
 async function storeModule(key: string): Promise<void> {
-  const n = M!._mvp_module_blob();
-  if (!n) return;
-  const ptr = M!._mvp_module_blob_ptr();
-  const bytes = M!.HEAPU8.slice(ptr, ptr + n);  // a copy: the heap can grow while the write awaits
+  const head = M!._mvp_module_blob();
+  if (!head) return;
+  const len = M!._mvp_module_bytes_len(), n = head + len;
+  // A copy outside the engine's heap (which can grow while the write awaits).
+  const bytes = new Uint8Array(n);
+  const hp = M!._mvp_module_blob_ptr(), bp = M!._mvp_module_bytes_ptr();
+  bytes.set(M!.HEAPU8.subarray(hp, hp + head), 0);
+  bytes.set(M!.HEAPU8.subarray(bp, bp + len), head);
   M!._mvp_module_release();
   const r = await writeCached(key, bytes);
   post({ type: 'cache', report: { key, hit: false, bytes: n, ...('ms' in r ? { storedMs: r.ms } : { error: r.error }) } });

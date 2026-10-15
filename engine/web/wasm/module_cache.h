@@ -20,6 +20,9 @@ namespace mvp::web {
 
 // Format: "MVPXLAT\0", a version, the module's tables, then its bytes.
 std::vector<std::uint8_t> serialize_module(const xlat::WasmModule& m);
+// Everything before the bytes: header + m.bytes is serialize_module(m), so the
+// Worker writes the two pieces without a second copy of the module in the heap.
+std::vector<std::uint8_t> serialize_module_header(const xlat::WasmModule& m);
 bool deserialize_module(const std::uint8_t* p, std::size_t n, xlat::WasmModule* m, std::string* error);
 
 }  // namespace mvp::web
