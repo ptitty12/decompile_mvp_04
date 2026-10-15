@@ -23,6 +23,7 @@
 //                     (--dump-to M: every field from N to M)
 //   --perf-every N    print guest and host seconds every N VI fields (speed per stretch)
 //   --profile N       sample the guest PC (a host thread); print the N busiest functions
+//                     (--profile-from F: from VI field F on)
 //   --trace-entry A,B registers and memory at r3/r4 at each entry of those functions (hex
 //                     addresses), from VI field --trace-from to --trace-to, to --trace-file;
 //                     --trace-peek O1,O2: also the words at r3 + those (hex) offsets
@@ -281,12 +282,15 @@ struct GuestProfiler {
   std::thread thread;
   std::map<std::uint32_t, std::uint64_t> pcs;
   std::uint64_t samples = 0;
-  void start(const ppc::Cpu* cpu) {
-    thread = std::thread([this, cpu] {
+  // Samples from VI field `from` on (--profile-from).
+  void start(const ppc::Cpu* cpu, const std::uint64_t* field, std::uint64_t from) {
+    thread = std::thread([this, cpu, field, from] {
       while (!stop.load(std::memory_order_relaxed)) {
-        const std::uint32_t pc = reinterpret_cast<const volatile std::uint32_t&>(cpu->pc);
-        ++pcs[pc];
-        ++samples;
+        if (reinterpret_cast<const volatile std::uint64_t&>(*field) >= from) {
+          const std::uint32_t pc = reinterpret_cast<const volatile std::uint32_t&>(cpu->pc);
+          ++pcs[pc];
+          ++samples;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
       }
     });
@@ -324,6 +328,7 @@ int main(int argc, char** argv) {
   u32 ports = 1;
   bool headless = false, no_render = false;
   int profile_top = 0;
+  std::uint64_t profile_from = 0;
   std::string trace_entry, trace_file;
   Play play;
   for (int k = 1; k < argc; ++k) {
@@ -348,6 +353,7 @@ int main(int argc, char** argv) {
     else if (a == "--dump-to") dump_to = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--perf-every") play.perf_every = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--profile") profile_top = std::atoi(next().c_str());
+    else if (a == "--profile-from") profile_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--trace-entry") trace_entry = next();
     else if (a == "--trace-file") trace_file = next();
     else if (a == "--trace-from") g_trace.from = std::strtoull(next().c_str(), nullptr, 10);
@@ -358,7 +364,7 @@ int main(int argc, char** argv) {
                    "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
                    "[--headless] [--no-render] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
                    "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N [--dump-to M]] "
-                   "[--perf-every N] [--profile N] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
+                   "[--perf-every N] [--profile N [--profile-from F]] [--trace-entry HEX,... [--trace-file F] [--trace-from N] "
                    "[--trace-to N] [--trace-peek HEX,...]]\n");
       return 2;
     }
@@ -470,7 +476,7 @@ int main(int argc, char** argv) {
   std::string why;
   int rc = 0;
   GuestProfiler profiler;
-  if (profile_top > 0) profiler.start(&m.cpu());
+  if (profile_top > 0) profiler.start(&m.cpu(), &play.fields, profile_from);
   try {
     rt::run(m.cpu());
   } catch (const StopRun& s) {
