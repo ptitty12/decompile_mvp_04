@@ -61,7 +61,8 @@ never committed):
   `MEM1 eef70ba3...` at 700 fields. E5's `netplay_check` on the merged shell: two pages, the
   `menus` script to frame 400, identical guest lines (`MEM1 92cab63f...`), no desync; and the
   same with the disc on the server instead of the file inputs (both engines started on joining
-  the room): the same line, no desync.
+  the room): the same line, no desync. Firefox (headed) against E5's server: the same, sound
+  (RMS up to 0.16), `MEM1 41a3f60e...` at 800 fields, as Chrome.
 
 **Tests:** `ctest --preset emscripten -LE local`: 25 of 25 before the merge, 28 of 28 after (new: `test_web_cache`, 5 cases;
 `test_web_shell`, 17 node tests). No native code changed (only `engine/web/`).
