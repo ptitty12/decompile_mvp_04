@@ -108,14 +108,14 @@ hash records out of order) is dropped and counted; it never changes the session.
 | 8 | seed proposal (player 1's is used; reserved for engine-side randomness, unused today) |
 | 20 | disc identity (SHA-1, §3) |
 | 32 | pack-set hash (SHA-256, `docs/MODDING.md` §10) |
-| 4 | CLK1: CPU cycles per guest instruction (2) |
+| 4 | CLK2: CPU cycles per guest instruction, in thousandths (1,250; E0b-CLK1 builds sent whole cycles, 2, so the two refuse each other) |
 | 4 | DVD1: command latency in time-base ticks (40,500) |
 | 4 | DVD1: transfer time in time-base ticks per KiB (13,184) |
 | 1 + n | engine build id (n <= 64 bytes) |
 | 2 + n | canonical settings string (n <= 512 bytes) |
 
 The game starts only if the two HELLOs agree on the build id, disc identity,
-pack-set hash, CLK1/DVD1 constants, settings string and K, and the players are 1
+pack-set hash, CLK2/DVD1 constants, settings string and K, and the players are 1
 and 2. Otherwise both sides stop with the reason (for example "different disc
 identities" or "both players chose player 1"). A side is running once it has the
 peer's HELLO with flag bit 0 set, or any INPUT from it. A second HELLO with another

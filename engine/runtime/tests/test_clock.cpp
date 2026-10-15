@@ -25,7 +25,7 @@ void put(Machine& m, u32 addr, const std::vector<u32>& words) {
 
 TEST_CASE("time base and decrementer follow the instruction count") {
   Machine m;
-  SystemHooks h(&m, nullptr, ClockConfig{2});
+  SystemHooks h(&m, nullptr, ClockConfig{2000});
   ppc::Cpu& c = m.cpu();
   c.hooks = &h;
   c.ticks = 600;
@@ -40,6 +40,27 @@ TEST_CASE("time base and decrementer follow the instruction count") {
   CHECK(h.decrementer(c) == 0);
   // The decrementer fires when it turns negative: one tick later.
   CHECK(c.next_event == h.ticks_for(5010 + 101));
+}
+
+TEST_CASE("fractional charges per instruction (CLK2) and a change of charge mid-run") {
+  Machine m;
+  SystemHooks h(&m, nullptr, ClockConfig{1250});  // 1.25 cycles: 48 instructions per 5 time-base ticks
+  ppc::Cpu& c = m.cpu();
+  c.hooks = &h;
+  c.ticks = 48;
+  CHECK(h.time_base(c) == 5);
+  c.ticks = 47;
+  CHECK(h.time_base(c) == 4);  // rounds down
+  CHECK(h.ticks_for(5) == 48);  // the first count that reaches it
+  CHECK(h.ticks_for(4) == 39);  // 39 * 1.25 / 12 = 4.06; 38 gives 3.96
+  // The charge changes at 4,800 instructions (500 ticks); the time base goes on from there.
+  c.ticks = 4800;
+  h.set_clock(c, ClockConfig{1000});
+  CHECK(h.clock().cpi_milli == 1000);
+  CHECK(h.time_base(c) == 500);
+  c.ticks += 120;  // 120 more at one cycle each
+  CHECK(h.time_base(c) == 510);
+  CHECK(h.ticks_for(510) == c.ticks);
 }
 
 namespace {
@@ -89,11 +110,12 @@ TEST_CASE("decrementer interrupts are delivered at safe points while EE is set")
   } catch (const StopRun&) {
   }
   u32 count = be32(m.mem1() + 0x1000);
-  // 200,000 instructions = 33,333 time-base ticks; the decrementer fires every
-  // 1,201 ticks plus the handler's own run time: 27 interrupts.
+  // At the default charge (CLK2, 1.25 cycles) 200,000 instructions = 20,833
+  // time-base ticks; the decrementer fires every 1,201 ticks plus the handler's
+  // own run time: 17 interrupts (27 at E0b-CLK1's 2 cycles).
   CHECK(count == h.decrementer_interrupts);
-  CHECK(count >= 26);
-  CHECK(count <= 28);
+  CHECK(count >= 16);
+  CHECK(count <= 18);
   CHECK(h.idle_skips == 0);
   CHECK((c.pc == 0x80003100 || c.pc == 0x80003104));
   CHECK((c.msr & ppc::msr::EE) != 0);  // restored by rfi
@@ -130,9 +152,9 @@ TEST_CASE("the idle skip jumps virtual time to the next interrupt") {
   CHECK(h.decrementer_interrupts == 3);
   // The pass that leaves the loop (r4 == 3 already) skips nothing.
   CHECK(h.idle_skips == 3);
-  // Three waits of 1,201 time-base ticks (7,206 instructions each) passed with
-  // only a few dozen instructions actually run.
-  CHECK(c.ticks >= 3 * 7206);
+  // Three waits of 1,201 time-base ticks (11,530 instructions each at the default
+  // 1.25 cycles) passed with only a few dozen instructions actually run.
+  CHECK(c.ticks >= 3 * 11530);
   CHECK(g_interpreted - interpreted < 100);
   CHECK(h.idle_ticks_skipped + (g_interpreted - interpreted) == c.ticks);
   g_safe.set(idle, 0);

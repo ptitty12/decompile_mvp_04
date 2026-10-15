@@ -360,6 +360,17 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/p1-gfx
 
+- 2026-10-15 | **CLK2: freezes and slow motion fixed; the clock recalibrated** (lead, under the owner's delegation; docs/engine/CLK2_LOG.md).
+  - **E0b-IDLE2:** an idle spin must read the same addresses on every pass. The idle skip had treated 6 list walks (EA `FREE_add` and others) as spins, jumping virtual time once per node visited.
+    - Effect: 30% of play time showed frozen pictures (up to 8-10 s), logic ran at about 43 Hz (slow motion), and the match load took 69 s.
+    - After the fix: about 60 fps rendered, 60.4 logic ticks/s, an 8.5 s match load, and the longest held picture 0.7 s.
+  - **CLK2 replaces E0b-CLK1:** 1.25 cycles per instruction, the smallest charge with no CPU-bound second in heavy play and within the Gekko's plausible range. The netplay handshake carries it in thousandths (1250), so CLK1 peers are refused.
+  - The open CLK2 question is resolved: the 38 fps came from freezes, not the clock.
+  - Frame-keyed input scripts need re-timing.
+  - Remaining browser choppiness is host cost (the Worker is 96% busy in heavy play); the render thread (P2) addresses it.
+
+  | | merge of engine/clk2
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:

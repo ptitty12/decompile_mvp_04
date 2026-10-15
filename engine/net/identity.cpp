@@ -60,7 +60,7 @@ Identity make_identity(const std::string& build, const vfs::Disc& disc, const rt
   id.disc = disc_identity(disc);
   id.packset = empty_packset_hash();
   id.settings = settings_string(hw, boot, port_mask);
-  id.cpi = clk.cpi;
+  id.cpi_milli = clk.cpi_milli;
   id.di_latency_tb = hw.di_latency_tb;
   id.di_tb_per_kib = hw.di_tb_per_kib;
   return id;
