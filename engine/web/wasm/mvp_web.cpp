@@ -22,6 +22,11 @@
 //   mvp_set_pad(...)             the host's controller state for the next frame polls
 //   mvp_status() / mvp_guest_line()   JSON status, and the determinism line
 //
+// E2c adds: mvp_open_disc_url (the image from the server, web_disc.h), the
+// translated module's cache (mvp_keep_module, mvp_module_blob,
+// mvp_translate_cached: module_cache.h), audio (mvp_audio_*: web_audio.h) and
+// read-ahead for the server's image (mvp_disc_want / mvp_disc_insert).
+//
 // Determinism: guest state depends only on the disc and the per-frame inputs.
 // Wall time never reaches it: the shell decides *how many* fields to run per
 // animation frame, never what happens inside one; the renderer only reads guest
@@ -38,6 +43,7 @@
 #include <string>
 #include <vector>
 
+#include "audio/mixer.h"
 #include "common/sha1.h"
 #include "gfx/gx_processor.h"
 #include "gfx/wgpu/gpu.h"
@@ -56,6 +62,9 @@
 #include "translator/wasm_emit.h"
 #include "vfs/disc_check.h"
 #include "vfs/source.h"
+#include "web/wasm/module_cache.h"
+#include "web/wasm/web_audio.h"
+#include "web/wasm/web_disc.h"
 
 using namespace mvp;
 using namespace mvp::rt;
@@ -78,6 +87,12 @@ EM_JS(void, mvp_js_on_gfx, (int ok, const char* msg), {
   if (Module['mvpOnGfx']) Module['mvpOnGfx'](ok, UTF8ToString(msg));
 });
 
+// Loading progress for the page's status line (posted while the Worker is
+// still busy: the page shows it at once).
+EM_JS(void, mvp_js_progress, (const char* what, int step, int steps), {
+  if (Module['mvpOnProgress']) Module['mvpOnProgress'](UTF8ToString(what), step, steps);
+});
+
 namespace {
 
 double now_ms() { return emscripten_get_now(); }
@@ -92,9 +107,13 @@ class JsFileSource final : public vfs::Source {
     if (n == 0) return true;
     ++reads;
     bytes += n;
+    if (trace) trace->push_back({off, static_cast<std::uint32_t>(n)});
     return mvp_js_disc_read(static_cast<double>(off), dst, static_cast<double>(n)) != 0;
   }
   std::uint64_t reads = 0, bytes = 0;
+  // Development: every read's offset and size (mvp_disc_trace), to tune the
+  // server image's block cache (block_cache.h) offline. Offsets only, no data.
+  std::vector<std::pair<std::uint64_t, std::uint32_t>>* trace = nullptr;
 
  private:
   std::uint64_t size_;
@@ -109,6 +128,8 @@ class JsFileSource final : public vfs::Source {
 struct LiveInput : InputSource {
   FrameInput state = neutral_input(1);
   std::array<u16, kPorts> latched{};
+  u16 last_buttons = 0;        // port 1's buttons at the last poll
+  u64 polls_with_buttons = 0;  // polls that returned a pressed button on any port
   void set(int port, const PadState& p) {
     const std::size_t k = static_cast<std::size_t>(port);
     latched[k] |= static_cast<u16>(p.buttons & ~state.pad[k].buttons);
@@ -122,6 +143,12 @@ struct LiveInput : InputSource {
       if (latched[k] & pad::kB) in.pad[k].analog_b = 255;
       latched[k] = 0;
     }
+    last_buttons = in.pad[0].buttons;
+    for (const PadState& p : in.pad)
+      if (p.buttons) {
+        ++polls_with_buttons;
+        break;
+      }
     return in;
   }
 };
@@ -137,7 +164,9 @@ struct Observer : GfxObserver {
 
 struct Engine {
   std::string error;
-  JsFileSource* file = nullptr;  // owned by disc
+  JsFileSource* file = nullptr;  // owned by disc (a picked File)
+  web::BlockCacheSource* http = nullptr;  // owned by disc (the server's image)
+  std::uint64_t want_first = 0;           // mvp_disc_want's run
   std::optional<vfs::Disc> disc;
   std::string image_kind;
 
@@ -147,6 +176,10 @@ struct Engine {
   WasmLoadStats load;
   xlat::WasmEmitStats emit_stats;
   std::size_t module_bytes = 0;
+  bool keep_module = false;      // keep the module for the cache (mvp_module_blob)
+  bool from_cache = false;
+  xlat::WasmModule kept;
+  std::vector<std::uint8_t> blob;
 
   // The machine.
   std::unique_ptr<Machine> m;
@@ -160,6 +193,11 @@ struct Engine {
   std::uint64_t frames = 0;
   bool stopped = false;
   std::string why;
+
+  // Audio (E2c): the mixer observes the DSP; its frames wait in `audio` for the Worker.
+  bool audio_on = false;
+  std::unique_ptr<audio::AxMixer> mixer;
+  web::PendingAudio audio;
 
   // Rendering.
   std::unique_ptr<gfx::Gpu> gpu;
@@ -204,6 +242,22 @@ std::string json_escape(const std::string& s) {
 
 std::string g_text;  // the last string handed to JS
 
+// Attaches or detaches the mixer (a fresh one each time: its per-voice state
+// starts over). Between run batches only, never inside an AX frame.
+void apply_audio() {
+  if (!g.hw) return;
+  if (g.audio_on && !g.mixer) {
+    g.mixer = std::make_unique<audio::AxMixer>(&g.audio);
+    Hardware* hw = g.hw.get();
+    g.mixer->set_rate([hw] { return hw->ai_dsp_rate(); });
+    g.hw->set_ax_observer(g.mixer.get());
+  } else if (!g.audio_on && g.mixer) {
+    g.hw->set_ax_observer(nullptr);
+    g.mixer.reset();
+    g.audio.clear();
+  }
+}
+
 // The renderer needs both the device and the machine's memory; whichever of
 // mvp_gfx_init's callback and mvp_boot comes second attaches it.
 void attach_renderer() {
@@ -219,27 +273,98 @@ extern "C" {
 
 EMSCRIPTEN_KEEPALIVE const char* mvp_last_error() { return g.error.c_str(); }
 
-// Opens the picked image (Module.mvpDisc, `size` bytes) and checks that it is
-// GV4E69 rev 0. Returns 1, or 0 with mvp_last_error() set.
-EMSCRIPTEN_KEEPALIVE int mvp_open_disc(double size) {
-  g.error.clear();
-  auto src = std::make_unique<JsFileSource>(static_cast<std::uint64_t>(size));
-  JsFileSource* raw = src.get();
+}  // extern "C"
+
+namespace {
+
+// CISO or ISO, then the identity check (GV4E69 rev 0, by the DOL's SHA-1).
+bool open_image(std::unique_ptr<vfs::Source> src) {
+  vfs::Source* raw = src.get();
   std::unique_ptr<vfs::Source> image;
   char magic[4] = {};
   if (raw->size() >= 4 && raw->read(0, magic, 4) && std::string(magic, 4) == "CISO") {
     image = vfs::CisoSource::open(std::move(src), &g.error);
     g.image_kind = "CISO";
-    if (!image) return 0;
+    if (!image) return false;
   } else {
     image = std::move(src);
     g.image_kind = "ISO";
   }
+  mvp_js_progress("Checking the disc (main.dol SHA-1)", 0, 0);
   auto disc = vfs::open_disc(std::move(image), true, &g.error);
-  if (!disc) return 0;
-  g.file = raw;
+  if (!disc) return false;
   g.disc = std::move(*disc);
+  return true;
+}
+
+}  // namespace
+
+extern "C" {
+
+// Opens the picked image (Module.mvpDisc, `size` bytes) and checks that it is
+// GV4E69 rev 0. Returns 1, or 0 with mvp_last_error() set.
+std::vector<std::pair<std::uint64_t, std::uint32_t>> g_trace;
+bool g_tracing = false;
+
+EMSCRIPTEN_KEEPALIVE int mvp_open_disc(double size) {
+  g.error.clear();
+  auto src = std::make_unique<JsFileSource>(static_cast<std::uint64_t>(size));
+  JsFileSource* raw = src.get();
+  if (g_tracing) raw->trace = &g_trace;
+  if (!open_image(std::move(src))) return 0;
+  g.file = raw;
   return 1;
+}
+
+// Development: record the picked image's reads (call before mvp_open_disc),
+// and return them as "offset size" lines, with "F field" lines where a run
+// batch starts (the image's offsets and sizes, no data).
+EMSCRIPTEN_KEEPALIVE void mvp_disc_trace_enable() { g_tracing = true; }
+EMSCRIPTEN_KEEPALIVE const char* mvp_disc_trace() {
+  g_text.clear();
+  for (const auto& [off, n] : g_trace)
+    g_text += (off == ~0ull ? "F " + std::to_string(n) : std::to_string(off) + " " + std::to_string(n)) + '\n';
+  return g_text.c_str();
+}
+
+// The same for the server's image (Module.mvpDiscUrl, `size` bytes), read by
+// Range requests through a block cache (block_cache.h): `block_kib` KiB
+// blocks, at most `max_blocks` of them, runs of at most `max_run` blocks per
+// request, `ahead` blocks of read-ahead (0 or less: the defaults, 256 KiB x
+// 256, runs of 4, 8 ahead; ahead < 0: the default, 0: none).
+EMSCRIPTEN_KEEPALIVE int mvp_open_disc_url(double size, int block_kib, int max_blocks, int max_run, int ahead) {
+  g.error.clear();
+  web::BlockCacheSource::Options opt;
+  if (block_kib > 0) opt.block = static_cast<std::uint32_t>(block_kib) << 10;
+  if (max_blocks > 0) opt.max_blocks = static_cast<std::uint32_t>(max_blocks);
+  if (max_run > 0) opt.max_run = static_cast<std::uint32_t>(max_run);
+  if (ahead >= 0) opt.ahead = static_cast<std::uint32_t>(ahead);
+  auto src = web::open_http_disc(static_cast<std::uint64_t>(size), opt);
+  web::BlockCacheSource* raw = src.get();
+  if (!open_image(std::move(src))) {
+    if (!web::last_http_error().empty()) g.error += " (" + web::last_http_error() + ")";
+    return 0;
+  }
+  g.http = raw;
+  return 1;
+}
+
+// Read-ahead for the server's image: the run of blocks a sequential stream
+// wants next (0: none). mvp_disc_want_first() and mvp_disc_block() give the
+// first block and the block size; mvp_disc_insert() hands the bytes back
+// (ok = 0: the fetch failed, the blocks are released).
+EMSCRIPTEN_KEEPALIVE int mvp_disc_want() {
+  if (!g.http) return 0;
+  const auto w = g.http->want();
+  g.want_first = w.first;
+  return static_cast<int>(w.count);
+}
+EMSCRIPTEN_KEEPALIVE double mvp_disc_want_first() { return static_cast<double>(g.want_first); }
+EMSCRIPTEN_KEEPALIVE double mvp_disc_block() { return g.http ? g.http->options().block : 0; }
+EMSCRIPTEN_KEEPALIVE void mvp_disc_insert(double first, int count, const std::uint8_t* data, double n, int ok) {
+  if (g.http)
+    g.http->insert(static_cast<std::uint64_t>(first), static_cast<std::uint32_t>(count), data,
+                   static_cast<std::size_t>(n), ok != 0);
 }
 
 EMSCRIPTEN_KEEPALIVE const char* mvp_disc_info() {
@@ -259,6 +384,7 @@ EMSCRIPTEN_KEEPALIVE int mvp_translate(const char* text, int len) {
     return 0;
   }
   double t0 = now_ms();
+  mvp_js_progress("Translating: reading the symbol map", 1, 5);
   std::vector<std::string> errs;
   xlat::SymbolTable syms = xlat::SymbolTable::parse(std::string(text, static_cast<std::size_t>(len)), &errs);
   if (!errs.empty()) {
@@ -268,8 +394,10 @@ EMSCRIPTEN_KEEPALIVE int mvp_translate(const char* text, int len) {
   double t1 = now_ms();
   xlat::WasmModule mod;
   {
+    mvp_js_progress("Translating: finding the control flow of every function", 2, 5);
     xlat::ProgramCfg cfg = xlat::build_cfg(g.disc->dol, syms);
     double t2 = now_ms();
+    mvp_js_progress("Translating: emitting WebAssembly", 3, 5);
     xlat::WasmEmitOptions opt;
     const auto& table = hle_table();
     for (std::size_t k = 0; k < table.size(); ++k)
@@ -282,8 +410,50 @@ EMSCRIPTEN_KEEPALIVE int mvp_translate(const char* text, int len) {
   }  // the CFG is freed here
   g.module_bytes = mod.bytes.size();
   g.emit_stats = mod.stats;
+  mvp_js_progress("Translating: compiling the module", 4, 5);
   if (!load_wasm_module(mod, &g.load, &g.error)) return 0;
   g.translated = true;
+  if (g.keep_module) g.kept = std::move(mod);  // serialized later, off the critical path
+  return 1;
+}
+
+// Keep the translated module after mvp_translate, for the browser's cache.
+EMSCRIPTEN_KEEPALIVE void mvp_keep_module(int keep) { g.keep_module = keep != 0; }
+
+// Serializes the kept module (module_cache.h) and frees it: returns the blob's
+// size in bytes; mvp_module_blob_ptr() is its address until mvp_module_release().
+EMSCRIPTEN_KEEPALIVE double mvp_module_blob() {
+  if (g.kept.bytes.empty()) return 0;
+  g.blob = web::serialize_module(g.kept);
+  g.kept = xlat::WasmModule{};
+  return static_cast<double>(g.blob.size());
+}
+EMSCRIPTEN_KEEPALIVE const std::uint8_t* mvp_module_blob_ptr() { return g.blob.data(); }
+EMSCRIPTEN_KEEPALIVE void mvp_module_release() {
+  g.kept = xlat::WasmModule{};
+  std::vector<std::uint8_t>().swap(g.blob);
+}
+
+// Loads a module from the browser's cache (a blob mvp_module_blob made for a
+// disc with the same DOL, by the same engine build) instead of translating.
+// Returns 1, or 0 with mvp_last_error() set (the Worker then translates).
+EMSCRIPTEN_KEEPALIVE int mvp_translate_cached(const std::uint8_t* blob, double len) {
+  g.error.clear();
+  if (!g.disc) {
+    g.error = "no disc";
+    return 0;
+  }
+  xlat::WasmModule mod;
+  const double t0 = now_ms();
+  if (!web::deserialize_module(blob, static_cast<std::size_t>(len), &mod, &g.error)) return 0;
+  g.t_symbols = g.t_cfg = 0;
+  g.t_emit = now_ms() - t0;  // unpacking the blob stands in for the emitter
+  g.module_bytes = mod.bytes.size();
+  g.emit_stats = mod.stats;
+  mvp_js_progress("Loading the cached translation: compiling", 4, 5);
+  if (!load_wasm_module(mod, &g.load, &g.error)) return 0;
+  g.translated = true;
+  g.from_cache = true;
   return 1;
 }
 
@@ -293,9 +463,10 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_translate_info() {
   std::snprintf(b, sizeof b,
                 "{\"symbols_ms\":%.1f,\"cfg_ms\":%.1f,\"emit_ms\":%.1f,\"compile_ms\":%.1f,\"instantiate_ms\":%.1f,"
                 "\"module_bytes\":%zu,\"functions\":%zu,\"wasm_functions\":%zu,\"instructions\":%zu,"
-                "\"inline\":%zu,\"helper\":%zu,\"branch\":%zu}",
+                "\"inline\":%zu,\"helper\":%zu,\"branch\":%zu,\"cached\":%s}",
                 g.t_symbols, g.t_cfg, g.t_emit, g.load.compile_ms, g.load.instantiate_ms, g.module_bytes, s.functions,
-                s.wasm_functions, s.instructions, s.inline_insns, s.helper_insns, s.branch_insns);
+                s.wasm_functions, s.instructions, s.inline_insns, s.helper_insns, s.branch_insns,
+                g.from_cache ? "true" : "false");
   g_text = b;
   return g_text.c_str();
 }
@@ -339,8 +510,22 @@ EMSCRIPTEN_KEEPALIVE int mvp_boot(const char* script, int len, double stop_field
   g_input = g.input.get();
   g_frame_hook = &frame_hook;
   attach_renderer();
+  apply_audio();
   return 1;
 }
+
+// Audio on or off (the mixer attached or not), before or after mvp_boot.
+// Guest state is the same either way (E3b-MIX1).
+EMSCRIPTEN_KEEPALIVE void mvp_audio_enable(int on) {
+  g.audio_on = on != 0;
+  apply_audio();
+}
+
+// The frames mixed since the last call (interleaved 16-bit stereo at
+// mvp_audio_rate() Hz); mvp_audio_ptr() is valid until the next call.
+EMSCRIPTEN_KEEPALIVE int mvp_audio_take() { return static_cast<int>(g.audio.take()); }
+EMSCRIPTEN_KEEPALIVE const std::int16_t* mvp_audio_ptr() { return g.audio.taken(); }
+EMSCRIPTEN_KEEPALIVE int mvp_audio_rate() { return static_cast<int>(g.audio.rate()); }
 
 // Starts the renderer on the canvas the page registered under `selector`
 // (Module.specialHTMLTargets). Asynchronous; Module.mvpOnGfx(ok, message) runs
@@ -378,6 +563,7 @@ EMSCRIPTEN_KEEPALIVE void mvp_canvas_resize(int width, int height) {
 EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
   if (!g.m || g.stopped) return -1;
   const std::uint64_t start = g.hw->vi_fields(), target = start + static_cast<std::uint64_t>(n);
+  if (g_tracing) g_trace.push_back({~0ull, static_cast<std::uint32_t>(start)});
   double t0 = now_ms();
   try {
     while (g.hw->vi_fields() < target) {
@@ -389,6 +575,7 @@ EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
   } catch (const StopRun& s) {
     g.stopped = true;
     g.why = s.why;
+    if (g.http && !g.http->error().empty()) g.why += ": " + g.http->error();
   } catch (const ppc::GuestFault& f) {
     g.stopped = true;
     g.why = std::string("guest fault: ") + f.what();
@@ -453,6 +640,33 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_status() {
   if (g.stopped) s += ",\"why\":\"" + json_escape(g.why) + "\"";
   if (g.file)
     s += ",\"disc_reads\":" + std::to_string(g.file->reads) + ",\"disc_bytes\":" + std::to_string(g.file->bytes);
+  if (g.http) {
+    const auto& h = g.http->stats();
+    std::snprintf(b, sizeof b,
+                  ",\"disc_reads\":%llu,\"disc_bytes\":%llu,\"net\":{\"requests\":%llu,\"fetched\":%llu,\"hits\":%llu,"
+                  "\"misses\":%llu,\"prefetched\":%llu,\"prefetch_used\":%llu,\"prefetch_wasted\":%llu,"
+                  "\"blocked_ms\":%.1f}",
+                  static_cast<unsigned long long>(h.reads), static_cast<unsigned long long>(h.bytes),
+                  static_cast<unsigned long long>(h.requests), static_cast<unsigned long long>(h.fetched),
+                  static_cast<unsigned long long>(h.hits), static_cast<unsigned long long>(h.misses),
+                  static_cast<unsigned long long>(h.prefetched), static_cast<unsigned long long>(h.prefetch_used),
+                  static_cast<unsigned long long>(h.prefetch_wasted), h.blocked_ms);
+    s += b;
+  }
+  if (g.mixer) {
+    const auto& ms = g.mixer->stats();
+    std::snprintf(b, sizeof b,
+                  ",\"audio\":{\"frames\":%llu,\"rate\":%u,\"voice_ms\":%llu,\"aux_returns\":%llu,\"nonsilent\":%llu,"
+                  "\"peak\":%d,\"dropped\":%llu}",
+                  static_cast<unsigned long long>(ms.frames), g.audio.rate(),
+                  static_cast<unsigned long long>(ms.voice_ms),
+                  static_cast<unsigned long long>(ms.aux_return_frames[0]),
+                  static_cast<unsigned long long>(ms.nonsilent_frames), ms.peak,
+                  static_cast<unsigned long long>(g.audio.dropped()));
+    s += b;
+  }
+  s += ",\"pad_last\":" + std::to_string(g.live.last_buttons) +
+       ",\"pad_polls\":" + std::to_string(g.live.polls_with_buttons);
   if (g.renderer) {
     const auto& rs = g.renderer->stats();
     const auto& ps = g.proc->stats();
