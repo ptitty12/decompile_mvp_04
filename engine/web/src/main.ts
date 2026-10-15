@@ -1,66 +1,109 @@
-// The page (E2): the disc picker, the canvas, input, and what the engine
-// Worker reports. The player's disc image is handed to the Worker as a File
-// (a local handle); it is never uploaded, and the page fetches nothing but
-// the engine's own files from its origin.
+// The page (E2, E2c): where the disc comes from, the canvas, input, sound, and
+// what the engine Worker reports.
+//
+// The disc: on load the page asks for /config.json (disc.ts). On the owner's
+// private deployment it names the server's image and the game starts without a
+// picker; anywhere else the player picks their own image, which is handed to
+// the Worker as a File (a local handle, never uploaded). The page itself holds
+// no engine state.
 //
 // URL parameters (development and the local browser check, tools/browser_check.mjs):
-//   script=TEXT   an mvp-input script instead of live input (newlines as %0A)
-//   fields=N      stop after N VI fields; frames=N: at the poll of frame N
-//   fast=1        run unpaced, as fast as possible
-//   render=0      no WebGPU at all
+//   script=TEXT     an mvp-input script instead of live input (newlines as %0A)
+//   fields=N        stop after N VI fields; frames=N: at the poll of frame N
+//   fast=1          run unpaced, as fast as possible
+//   render=0        no WebGPU at all
+//   audio=0         never mix audio (the guest is the same either way)
+//   cache=0         neither use nor fill the browser's cache of the translation
+//   audioLatency=MS the worklet's buffer target (default 60)
+//   discBlock=KIB, discBlocks=N, discRun=N, discAhead=N   the server image's block cache
+//   traceDisc=1     record the picked image's reads (offsets and sizes) for tuning that cache
 // The page publishes its state as `window.mvp` for the browser check.
 
+import { AudioOut, type AudioState } from './audio.js';
+import { findServerDisc } from './disc.js';
+import { GamepadPanel } from './gamepad-ui.js';
 import { HostInput } from './input.js';
 import { Online, type OnlineState } from './netplay.js';
-import type { FromWorker, Pad, RunOptions, Status, ToWorker } from './protocol.js';
+import type { CacheReport, DiscSource, FromWorker, Pad, RunOptions, Status, ToWorker } from './protocol.js';
 
 interface PageState {
-  pickedAt: number;            // performance.now() when the image was picked
+  source?: 'file' | 'url';
+  startedAt: number;           // performance.now() when the disc was chosen (picked, or named by the server)
   phases: Record<string, number>;
   translate?: unknown;
   disc?: unknown;
   gfx?: { ok: boolean; message: string };
-  firstFrameMs?: number;       // from the pick to the first frame on the canvas
+  firstFrameMs?: number;       // from the start to the first frame on the canvas
   firstFrameField?: number;
   stats?: { status: Status; window: { fields: number; ms: number; wallMs: number } };
   stopped?: { status: Status; guestLine: string };
+  discTrace?: string;
   error?: { stage: string; message: string };
+  progress?: { text: string; step: number; steps: number };
+  cache?: CacheReport;
+  audio?: AudioState;
+  audioAttachedAtField?: number;
+  paused: boolean;
+  pad?: Pad;
   log: string[];
+  audioProbe: () => { rms: number; peak: number } | null;
   net?: OnlineState;  // online play (E5, netplay.ts)
 }
 
-const state: PageState = { pickedAt: 0, phases: {}, log: [] };
-(window as unknown as { mvp: PageState }).mvp = state;
-
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const picker = $<HTMLInputElement>('disc');
+const pickerBox = $<HTMLElement>('picker');
+const stage = $<HTMLElement>('stage');
 const canvas = $<HTMLCanvasElement>('screen');
 const statusEl = $<HTMLElement>('status');
+const progressEl = $<HTMLProgressElement>('progress');
+const hintEl = $<HTMLElement>('hint');
 const phasesEl = $<HTMLElement>('phases');
 const statsEl = $<HTMLElement>('stats');
 const logEl = $<HTMLElement>('log');
 const errorEl = $<HTMLElement>('error');
+const fullscreenBtn = $<HTMLButtonElement>('fullscreen');
+const soundBtn = $<HTMLButtonElement>('sound');
+const pauseBtn = $<HTMLButtonElement>('pause');
+const startBox = $<HTMLElement>('start-box');
+const playBtn = $<HTMLButtonElement>('play');
 
 const params = new URLSearchParams(location.search);
-// Online play (E5): the lobby panel, when the page comes from the netplay server.
-const onlineEl = document.getElementById('online');
-const online = onlineEl ? new Online(onlineEl, params) : null;
-if (online) {
-  state.net = online.state;
-  online.init().catch(() => {});
-}
 const options: RunOptions = {
   script: params.get('script') ?? '',
   stopFields: Number(params.get('fields') ?? 0) || 0,
   stopFrames: Number(params.get('frames') ?? 0) || 0,
   fast: params.get('fast') === '1',
   render: params.get('render') !== '0',
+  audio: params.get('audio') !== '0',
+  cache: params.get('cache') !== '0',
+  traceDisc: params.get('traceDisc') === '1',
+  discCache: {
+    blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
+    maxRun: Number(params.get('discRun') ?? 0) || undefined,
+    ahead: params.has('discAhead') ? Number(params.get('discAhead')) : undefined,
+  },
 };
+const audioLatencyMs = Math.min(500, Math.max(20, Number(params.get('audioLatency') ?? 60) || 60));
+
+let audio: AudioOut | null = null;
+const state: PageState = {
+  startedAt: 0, phases: {}, paused: false, log: [],
+  audioProbe: () => audio?.probe() ?? null,
+};
+(window as unknown as { mvp: PageState }).mvp = state;
+
+// Online play (E5): the lobby panel, when the page comes from the netplay server.
+const onlineEl = document.getElementById('online');
+const online = onlineEl ? new Online(onlineEl, params) : null;
+let onlineReady: Promise<void> = Promise.resolve();
+if (online) {
+  state.net = online.state;
+  onlineReady = online.init().catch(() => {});
+}
 
 const hasWebGPU = 'gpu' in navigator;
 const hasOffscreen = typeof canvas.transferControlToOffscreen === 'function';
-setStatus(hasWebGPU ? 'Pick your disc image to start.'
-                    : 'This browser has no WebGPU: the game can run, but nothing will be drawn.');
 
 function setStatus(text: string): void {
   statusEl.textContent = text;
@@ -76,14 +119,24 @@ function log(text: string, error = false): void {
   while (logEl.childElementCount > 500) logEl.firstElementChild?.remove();
 }
 
+const NO_WEBGPU = 'This browser has no WebGPU, so the game cannot be drawn. Use a current Chrome or Edge ' +
+                  '(113 or newer), Firefox 141 or newer on Windows, or Safari 26 or newer, with hardware ' +
+                  'acceleration on.';
+
 function showError(stage: string, message: string): void {
   state.error = { stage, message };
-  const reason = stage === 'disc'
-    ? `This image cannot be used. The engine runs MVP Baseball 2005 for GameCube, USA (GV4E69), revision 0 only. (${message})`
-    : `${stage}: ${message}`;
+  const reason =
+    stage === 'disc' ? `This image cannot be used. The engine runs MVP Baseball 2005 for GameCube, USA (GV4E69), ` +
+                       `revision 0 only. (${message})`
+    : stage === 'server' ? message
+    : stage === 'webgpu' ? message
+    : stage === 'gfx' ? `WebGPU is present, but the game cannot draw: ${message}. Check that hardware acceleration ` +
+                        `is on, or try another browser.`
+    : `The engine stopped (${stage}): ${message}`;
   errorEl.textContent = reason;
   errorEl.hidden = false;
-  setStatus('Stopped.');
+  progressEl.hidden = true;
+  if (stage !== 'gfx') setStatus('Stopped.');
 }
 
 function showPhases(): void {
@@ -93,56 +146,118 @@ function showPhases(): void {
   };
   const rows = Object.entries(state.phases).map(([k, v]) => `${names[k] ?? k}: ${v.toFixed(0)} ms`);
   const t = state.translate as Record<string, number> | undefined;
-  if (t) rows.push(`  (CFG ${t.cfg_ms.toFixed(0)} ms, emit ${t.emit_ms.toFixed(0)} ms, compile ${t.compile_ms.toFixed(0)} ms, ` +
+  if (t) rows.push(`  (${t.cached ? 'from this browser\'s cache: unpack' : `CFG ${t.cfg_ms.toFixed(0)} ms, emit`} ` +
+                   `${t.emit_ms.toFixed(0)} ms, compile ${t.compile_ms.toFixed(0)} ms, ` +
                    `instantiate ${t.instantiate_ms.toFixed(0)} ms, module ${(t.module_bytes / 1048576).toFixed(1)} MB)`);
-  if (state.firstFrameMs !== undefined) rows.push(`first frame: ${state.firstFrameMs.toFixed(0)} ms after the pick`);
+  if (state.cache?.storedMs !== undefined) rows.push(`translation cached in this browser (${state.cache.storedMs.toFixed(0)} ms)`);
+  if (state.firstFrameMs !== undefined) rows.push(`first frame: ${state.firstFrameMs.toFixed(0)} ms after the start`);
   phasesEl.textContent = rows.join('\n');
 }
 
+function showSound(s: AudioState): void {
+  state.audio = s;
+  const labels: Record<AudioState['state'], string> = {
+    off: 'Sound: off', 'waiting-for-gesture': 'Sound: off', starting: 'Sound: starting', running: 'Sound: on',
+    suspended: 'Sound: paused', failed: 'Sound: failed', muted: 'Sound: muted',
+  };
+  soundBtn.textContent = labels[s.state];
+  soundBtn.title = s.error ?? 'Turn the sound on or off (M)';
+  updateHint();
+}
+
+function updateHint(): void {
+  const waiting = options.audio && (!state.audio || state.audio.state === 'waiting-for-gesture');
+  hintEl.hidden = !(worker && waiting && !state.error);
+  hintEl.textContent = 'Click the game or press any key to turn on the sound.';
+}
+
 let worker: Worker | null = null;
-const input = new HostInput(window, (pad: Pad) => send({ type: 'pad', port: 0, pad }));
+let pendingAudioPort: MessagePort | null = null;
+const input = new HostInput(window, (pad: Pad) => {
+  state.pad = pad;
+  send({ type: 'pad', port: 0, pad });
+});
+new GamepadPanel($<HTMLElement>('gamepad'), input);
 
 function send(msg: ToWorker, transfer: Transferable[] = []): void {
   worker?.postMessage(msg, transfer);
 }
+
+if (options.audio) {
+  audio = new AudioOut((port) => {
+    if (worker) send({ type: 'audio-port', port }, [port]);
+    else pendingAudioPort = port;
+  }, audioLatencyMs, showSound);
+  showSound(audio.info);
+} else {
+  soundBtn.disabled = true;
+  showSound({ state: 'off' });
+}
+
+// The first user gesture starts audio (the browsers' autoplay policy). Later
+// gestures resume a context the browser suspended.
+const gesture = () => audio?.unlock();
+for (const type of ['pointerdown', 'keydown', 'touchend'])
+  window.addEventListener(type, gesture, { capture: true });
 
 function onWorker(msg: FromWorker): void {
   switch (msg.type) {
     case 'log':
       log(msg.text, msg.error);
       break;
+    case 'progress':
+      state.progress = { text: msg.text, step: msg.step, steps: msg.steps };
+      setStatus(msg.steps ? `${msg.text} (${msg.step}/${msg.steps})...` : `${msg.text}...`);
+      progressEl.hidden = false;
+      if (msg.steps) progressEl.value = msg.step / msg.steps;
+      else progressEl.removeAttribute('value');
+      break;
     case 'phase':
       state.phases[msg.name] = msg.ms;
       if (msg.name === 'translate') state.translate = msg.detail;
-      if (msg.name === 'translate') setStatus('Booting...');
       showPhases();
       break;
     case 'disc':
       state.disc = msg.info;
-      setStatus(`${msg.info.title} (${msg.info.game} rev ${msg.info.revision}, ${msg.info.image}): translating...`);
+      log(`disc: ${msg.info.title} (${msg.info.game} rev ${msg.info.revision}, ${msg.info.image}), main.dol ${msg.info.dol_sha1}`);
+      break;
+    case 'cache':
+      state.cache = { ...state.cache, ...msg.report };
+      if (msg.report.error) log(`translation cache: ${msg.report.error}`, true);
+      showPhases();
+      break;
+    case 'audio':
+      state.audioAttachedAtField = msg.attachedAtField;
       break;
     case 'gfx':
       state.gfx = { ok: msg.ok, message: msg.message };
       log(`WebGPU: ${msg.ok ? 'ready on ' : ''}${msg.message}`, !msg.ok);
+      if (!msg.ok && options.render) showError('gfx', msg.message);
       break;
     case 'first-frame':
-      state.firstFrameMs = performance.now() - state.pickedAt;
+      state.firstFrameMs = performance.now() - state.startedAt;
       state.firstFrameField = msg.fields;
-      setStatus('Running. Enter = START, X = A, Z = B, arrows = D-pad.');
+      progressEl.hidden = true;
+      setStatus('Running. Enter = START, X = A, Z = B, arrows = D-pad; or a gamepad. F = fullscreen, M = sound, P = pause.');
       showPhases();
+      updateHint();
       break;
     case 'stats': {
       state.stats = { status: msg.status, window: msg.window };
       const s = msg.status, w = msg.window;
       const perField = w.fields ? w.ms / w.fields : 0;
+      const a = state.audio?.worklet;
       statsEl.textContent =
         `field ${s.fields}, frame ${s.frames}, guest ${s.guest_s.toFixed(1)} s | ` +
         `${w.fields} fields in ${(w.wallMs / 1000).toFixed(2)} s (${(w.fields / (w.wallMs / 1000)).toFixed(1)}/s), ` +
-        `${perField.toFixed(2)} ms per field | draws ${s.draws ?? 0}, GPU errors ${s.gpu_errors ?? 0}`;
+        `${perField.toFixed(2)} ms per field | draws ${s.draws ?? 0}, GPU errors ${s.gpu_errors ?? 0}` +
+        (a ? ` | sound ${(a.fill / a.inRate * 1000).toFixed(0)} ms buffered, ${a.underruns} underruns` : '') +
+        (s.net ? ` | server reads ${s.net.requests} (+${s.net.prefetched} ahead), waited ${s.net.blocked_ms.toFixed(0)} ms` : '');
       break;
     }
     case 'stopped':
       state.stopped = { status: msg.status, guestLine: msg.guestLine };
+      state.discTrace = msg.discTrace;
       setStatus(`Stopped: ${msg.status.why ?? ''}`);
       log(msg.guestLine);
       break;
@@ -158,16 +273,18 @@ function onWorker(msg: FromWorker): void {
   }
 }
 
-picker.addEventListener('change', () => {
-  const file = picker.files?.[0];
-  if (!file || worker) return;
-  state.pickedAt = performance.now();
-  picker.disabled = true;
+function startEngine(disc: DiscSource): void {
+  if (worker) return;
+  state.source = disc.kind;
+  state.startedAt = performance.now();
   errorEl.hidden = true;
-  setStatus(`Reading ${file.name}...`);
+  picker.disabled = true;
+  pickerBox.hidden = disc.kind === 'url';
+  startBox.hidden = true;
+  setStatus(disc.kind === 'file' ? `Reading ${disc.file.name}...` : 'Loading the disc from the server...');
   worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
   worker.onmessage = (ev: MessageEvent<FromWorker>) => onWorker(ev.data);
-  worker.onerror = (ev) => showError('worker', ev.message || 'the engine Worker failed to start');
+  worker.onerror = (ev) => showError('worker', ev.message || 'the engine Worker failed to start (out of memory?)');
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const width = Math.round(canvas.clientWidth * dpr), height = Math.round(canvas.clientHeight * dpr);
   let off: OffscreenCanvas | null = null;
@@ -176,9 +293,13 @@ picker.addEventListener('change', () => {
     canvas.height = height;
     off = canvas.transferControlToOffscreen();
   }
-  // In an online game the Worker boots only after the handshake with the other player.
+  // In an online game (E5) the Worker boots only after the handshake with the other player.
   const netplay = online?.netOptions();
-  send({ type: 'start', file, canvas: off, width, height, options: { ...options, netplay } }, off ? [off] : []);
+  send({ type: 'start', disc, canvas: off, width, height, options: { ...options, netplay } }, off ? [off] : []);
+  if (pendingAudioPort) {
+    send({ type: 'audio-port', port: pendingAudioPort }, [pendingAudioPort]);
+    pendingAudioPort = null;
+  }
   if (online && netplay) {
     online.onDatagram = (data) => send({ type: 'net-recv', data }, [data]);
     online.whenOpen().then(() => send({ type: 'net-open' })).catch(() => {});
@@ -189,9 +310,61 @@ picker.addEventListener('change', () => {
     const w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
     if (w > 0 && h > 0) send({ type: 'resize', width: w, height: h });
   }).observe(canvas);
+  updateHint();
+}
+
+picker.addEventListener('change', () => {
+  const file = picker.files?.[0];
+  if (file) startEngine({ kind: 'file', file });
 });
 
-document.addEventListener('visibilitychange', () => send({ type: 'pause', paused: document.hidden }));
+// ---- pause, fullscreen, sound ----
+
+let userPaused = false;
+function applyPause(): void {
+  const paused = userPaused || document.hidden;
+  if (paused === state.paused) return;
+  state.paused = paused;
+  send({ type: 'pause', paused });
+  audio?.setPaused(paused);
+  pauseBtn.textContent = userPaused ? 'Resume' : 'Pause';
+  if (worker && !state.error && state.firstFrameMs !== undefined)
+    setStatus(paused ? (userPaused ? 'Paused. P or the Resume button continues.' : 'Paused (tab hidden).') : 'Running.');
+}
+document.addEventListener('visibilitychange', applyPause);
+pauseBtn.addEventListener('click', () => {
+  userPaused = !userPaused;
+  applyPause();
+});
+
+function toggleFullscreen(): void {
+  if (document.fullscreenElement) void document.exitFullscreen();
+  else void stage.requestFullscreen?.({ navigationUI: 'hide' }).catch((e: unknown) => log(`fullscreen: ${e}`, true));
+}
+fullscreenBtn.addEventListener('click', toggleFullscreen);
+canvas.addEventListener('dblclick', toggleFullscreen);
+document.addEventListener('fullscreenchange', () => {
+  fullscreenBtn.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+  canvas.focus();
+});
+
+soundBtn.addEventListener('click', () => {
+  if (!audio) return;
+  if (audio.info.state === 'waiting-for-gesture' || audio.info.state === 'starting') return;  // this click unlocked it
+  audio.setMuted(!audio.isMuted());
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
+  if (e.target instanceof HTMLInputElement || e.target instanceof HTMLButtonElement) return;
+  if (e.code === 'KeyF') toggleFullscreen();
+  else if (e.code === 'KeyM' && audio && audio.info.state !== 'waiting-for-gesture' && audio.info.state !== 'starting')
+    audio.setMuted(!audio.isMuted());
+  else if (e.code === 'KeyP') {
+    userPaused = !userPaused;
+    applyPause();
+  }
+});
 
 function tick(now: number): void {
   input.poll();
@@ -199,3 +372,46 @@ function tick(now: number): void {
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);
+
+// ---- where the disc comes from ----
+
+async function init(): Promise<void> {
+  if (options.render && !hasWebGPU) {
+    pickerBox.hidden = true;
+    showError('webgpu', NO_WEBGPU);
+    return;
+  }
+  setStatus('Looking for the disc...');
+  const found = await findServerDisc(location.href);
+  await onlineReady;
+  if (found.kind === 'url') {
+    log(`disc: from the server (${new URL(found.url).pathname})`);
+    const disc: DiscSource = { kind: 'url', url: found.url };
+    if (online?.state.available) offerStart(disc);
+    else startEngine(disc);
+  } else if (found.kind === 'error') {
+    pickerBox.hidden = true;
+    showError('server', found.message);
+  } else {
+    log(`disc: pick one (${found.why})`);
+    pickerBox.hidden = false;
+    setStatus('Pick your disc image to start.');
+  }
+}
+// With the lobby (E5) on the page and the disc on the server: Play starts a
+// game alone at once; creating or joining an online game starts the engine as
+// soon as this page has its player number (the Worker then waits for the
+// other player's handshake before it boots).
+function offerStart(disc: DiscSource): void {
+  startBox.hidden = false;
+  setStatus('The disc is on this server. Press Play, or create or join an online game.');
+  playBtn.addEventListener('click', () => startEngine(disc), { once: true });
+  const waitForRoom = () => {
+    if (worker) return;
+    if (online?.netOptions()) startEngine(disc);
+    else setTimeout(waitForRoom, 250);
+  };
+  waitForRoom();
+}
+
+void init();

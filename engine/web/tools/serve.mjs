@@ -2,6 +2,7 @@
 // static site directory, and nothing else, on localhost.
 //
 //   node engine/web/tools/serve.mjs [--root DIR] [--port N]
+//        [--disc PATH [--login] [--latency MS] [--rate MBPS]]
 //
 // DIR defaults to build/engine/emscripten/web/site (what the "emscripten"
 // preset's mvp-web target assembles: the page, the shell, the engine module and
@@ -10,6 +11,15 @@
 // only files inside DIR, no directory listings. No COOP/COEP headers: the
 // engine uses no SharedArrayBuffer. Prints "serving http://127.0.0.1:PORT/" once
 // it listens (port 0 picks a free one).
+//
+// --disc PATH (E2c, local tests only): a mock of the owner's deployment
+// (engine/server/, E5, is the real one) on 127.0.0.1: GET /config.json answers
+// {"disc": "/api/disc/image"}, and /api/disc/image serves PATH to HEAD and to
+// GET with a Range header (206, Cache-Control: private, no-store), so the page
+// loads the disc without the picker. --login: /api/* answers 401 unless the
+// request carries the cookie mvp_session=ok (the page then shows the login
+// error). --latency MS / --rate MBPS: each image response waits MS first and
+// is sent at that rate (a remote server, for the read-ahead measurements).
 
 import { createServer } from 'node:http';
 import { createReadStream, statSync } from 'node:fs';
@@ -24,6 +34,10 @@ const arg = (name, fallback) => {
 };
 const root = resolve(arg('--root', join(here, '..', '..', '..', 'build', 'engine', 'emscripten', 'web', 'site')));
 const port = Number(arg('--port', '8000'));
+const disc = arg('--disc', '');
+const login = args.includes('--login');
+const latencyMs = Number(arg('--latency', '0'));
+const rateMBps = Number(arg('--rate', '0'));
 
 const types = {
   '.html': 'text/html; charset=utf-8',
@@ -37,6 +51,65 @@ const types = {
   '.svg': 'image/svg+xml',
 };
 
+const stats = { imageRequests: 0, imageBytes: 0, heads: 0 };
+
+// ---- the mock deployment (--disc) ----
+function mock(req, res, path) {
+  if (path === '/config.json') {
+    const body = JSON.stringify({ disc: '/api/disc/image' });
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'Content-Length': body.length });
+    res.end(req.method === 'HEAD' ? undefined : body);
+    return true;
+  }
+  if (!path.startsWith('/api/')) return false;
+  if (login && !/(?:^|;\s*)mvp_session=ok(?:;|$)/.test(req.headers.cookie ?? '')) {
+    res.writeHead(401, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end('{"error":"login"}');
+    return true;
+  }
+  if (path !== '/api/disc/image') {
+    res.writeHead(404).end();
+    return true;
+  }
+  const size = statSync(disc).size;
+  const common = { 'Content-Type': 'application/octet-stream', 'Accept-Ranges': 'bytes',
+                   'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' };
+  const send = (fn) => (latencyMs > 0 ? setTimeout(fn, latencyMs) : fn());
+  if (req.method === 'HEAD') {
+    ++stats.heads;
+    send(() => res.writeHead(200, { ...common, 'Content-Length': size }).end());
+    return true;
+  }
+  const m = /^bytes=(\d+)-(\d*)$/.exec(req.headers.range ?? '');
+  if (!m) {  // the engine never asks for the whole image
+    res.writeHead(200, { ...common, 'Content-Length': size });
+    createReadStream(disc).pipe(res);
+    return true;
+  }
+  const start = Number(m[1]), end = m[2] ? Math.min(Number(m[2]), size - 1) : size - 1;
+  if (start >= size || end < start) {
+    res.writeHead(416, { ...common, 'Content-Range': `bytes */${size}` }).end();
+    return true;
+  }
+  ++stats.imageRequests;
+  stats.imageBytes += end - start + 1;
+  send(() => {
+    res.writeHead(206, { ...common, 'Content-Length': end - start + 1, 'Content-Range': `bytes ${start}-${end}/${size}` });
+    const stream = createReadStream(disc, { start, end, highWaterMark: 64 * 1024 });
+    if (!(rateMBps > 0)) {
+      stream.pipe(res);
+      return;
+    }
+    // Throttled: pause after each chunk for as long as the rate says.
+    stream.on('data', (chunk) => {
+      stream.pause();
+      res.write(chunk);
+      setTimeout(() => stream.resume(), (chunk.length / (rateMBps * 1e6)) * 1000);
+    });
+    stream.on('end', () => res.end());
+  });
+  return true;
+}
+
 const server = createServer((req, res) => {
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { Allow: 'GET, HEAD' }).end();
@@ -47,6 +120,11 @@ const server = createServer((req, res) => {
     path = decodeURIComponent(new URL(req.url ?? '/', 'http://localhost').pathname);
   } catch {
     res.writeHead(400).end();
+    return;
+  }
+  if (disc && mock(req, res, path)) return;
+  if (path === '/_stats') {  // the mock's counters, for the browser check
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }).end(JSON.stringify(stats));
     return;
   }
   if (path.endsWith('/')) path += 'index.html';
@@ -74,5 +152,5 @@ const server = createServer((req, res) => {
 
 server.listen(port, '127.0.0.1', () => {
   const { port: p } = server.address();
-  console.log(`serving http://127.0.0.1:${p}/ from ${root}`);
+  console.log(`serving http://127.0.0.1:${p}/ from ${root}${disc ? ' (mock deployment: /config.json, /api/disc/image)' : ''}`);
 });

@@ -15,8 +15,20 @@
 set(MVP_WEB_SITE ${CMAKE_CURRENT_BINARY_DIR}/site)
 
 # ---- The engine module ----
-add_executable(mvp-web wasm/mvp_web.cpp wasm/net_web.cpp)
-target_link_libraries(mvp-web PRIVATE engine_wasm_host engine_net)
+# The browser client's caches (E2c), data-free and tested under Node: the
+# server image's block cache and the translated module's serialization.
+add_library(engine_web_core STATIC wasm/block_cache.cpp wasm/module_cache.cpp)
+target_link_libraries(engine_web_core PUBLIC engine_translator engine_runtime)
+target_compile_options(engine_web_core PRIVATE ${ENGINE_WARN})
+engine_test(test_web_cache SOURCES wasm/tests/test_web_cache.cpp LIBS engine_web_core)
+# Development: replays a disc read trace through that cache over a modelled
+# network (wasm/tools/cache_sim.cpp), to choose its settings.
+add_executable(mvp-web-cache-sim wasm/tools/cache_sim.cpp)
+target_link_libraries(mvp-web-cache-sim PRIVATE engine_web_core)
+target_compile_options(mvp-web-cache-sim PRIVATE ${ENGINE_WARN})
+
+add_executable(mvp-web wasm/mvp_web.cpp wasm/web_disc.cpp wasm/net_web.cpp)
+target_link_libraries(mvp-web PRIVATE engine_wasm_host engine_audio engine_web_core engine_net)
 target_compile_options(mvp-web PRIVATE ${ENGINE_WARN})
 if(TARGET engine_gfx_wgpu)
   target_link_libraries(mvp-web PRIVATE engine_gfx_wgpu)
@@ -55,6 +67,11 @@ if(EXISTS ${MVP_WEB_TSC} AND MVP_NODE)
     COMMENT "web: compiling the shell (tsc)"
     VERBATIM)
   set(_mvp_web_js ${MVP_WEB_SITE}/main.js ${MVP_WEB_SITE}/worker.js)
+  # The shell's data-free unit tests (E2c): the gamepad mapping, the audio
+  # resampler, the disc's server contract; node --test on the compiled modules.
+  file(GLOB MVP_WEB_TESTS CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.test.mjs)
+  add_test(NAME test_web_shell COMMAND ${MVP_NODE} --test ${MVP_WEB_TESTS})
+  set_tests_properties(test_web_shell PROPERTIES ENVIRONMENT "MVP_WEB_SITE=${MVP_WEB_SITE}")
 else()
   message(STATUS "web: TypeScript not installed in engine/web/node_modules (npm ci); the shell is not compiled")
   set(_mvp_web_js)
@@ -90,6 +107,14 @@ foreach(pair ${_mvp_web_notices})
                      DEPENDS ${src} VERBATIM)
   list(APPEND _mvp_web_copies ${MVP_WEB_SITE}/licenses/${name})
 endforeach()
+
+# build-id.json: the engine module's and symbols.txt's hashes, the key of the
+# browser's cache of the translated module (E2c).
+add_custom_command(TARGET mvp-web POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -DWASM=${MVP_WEB_SITE}/mvp-web.wasm
+                           -DSYMBOLS=${MVP_REPO_ROOT}/config/GV4E69/symbols.txt
+                           -DOUT=${MVP_WEB_SITE}/build-id.json -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/build_id.cmake
+                   VERBATIM)
 
 add_custom_target(mvp-web-shell ALL DEPENDS ${_mvp_web_js} ${_mvp_web_copies} ${MVP_WEB_SITE}/symbols.txt)
 add_dependencies(mvp-web mvp-web-shell)

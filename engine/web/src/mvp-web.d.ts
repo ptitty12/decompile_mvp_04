@@ -23,6 +23,26 @@ export interface MvpEngine {
   _mvp_status(): number;
   _mvp_guest_line(): number;
 
+  // E2c: the server's image, the module cache, audio.
+  _mvp_open_disc_url(size: number, blockKib: number, maxBlocks: number, maxRun: number, ahead: number): number;
+  _mvp_disc_trace_enable(): void;
+  _mvp_disc_trace(): number;
+  _mvp_disc_want(): number;
+  _mvp_disc_want_first(): number;
+  _mvp_disc_block(): number;
+  _mvp_disc_insert(first: number, count: number, data: number, n: number, ok: number): void;
+  _mvp_keep_module(keep: number): void;
+  _mvp_module_blob(): number;
+  _mvp_module_blob_ptr(): number;
+  _mvp_module_bytes_ptr(): number;
+  _mvp_module_bytes_len(): number;
+  _mvp_module_release(): void;
+  _mvp_translate_cached(blob: number, len: number): number;
+  _mvp_audio_enable(on: number): void;
+  _mvp_audio_take(): number;
+  _mvp_audio_ptr(): number;
+  _mvp_audio_rate(): number;
+
   // Netplay (E5, wasm/net_web.cpp).
   _mvp_net_begin(player: number, delay: number, hashEvery: number, build: number, buildLen: number, nonce: number): number;
   _mvp_net_recv(data: number, len: number): void;
@@ -34,7 +54,9 @@ export interface MvpEngine {
 
   // Set by the Worker before the calls that use them.
   mvpDisc?: File;
+  mvpDiscUrl?: string;
   mvpOnGfx?: (ok: number, message: string) => void;
+  mvpOnProgress?: (text: string, step: number, steps: number) => void;
   mvpNetSend?: (datagram: Uint8Array) => void;
 }
 
