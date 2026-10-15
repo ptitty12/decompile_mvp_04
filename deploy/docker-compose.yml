@@ -1,0 +1,59 @@
+# MVP Baseball 2005: the private netplay site, for a Dokploy "Docker Compose" app
+# (compose path ./deploy/docker-compose.yml; the owner's guide: docs/engine/DEPLOY_DOKPLOY.md).
+#
+#   mvp     the site behind its password, the Server disc page, the disc route, the lobby and
+#           signaling: plain HTTP on port 8080, which Dokploy's Traefik serves over HTTPS on the domain
+#   coturn  STUN, and the TURN relay for players whose networks block a direct connection:
+#           UDP 3478, TCP 3478 and UDP 49160-49200 published on the host (Traefik handles HTTP only)
+#
+# Optional settings (Dokploy: the app's Environment tab). Each has a working default:
+#   TURN_MODE         relay (default): STUN and the relay; stun: STUN only; off: neither (one network only)
+#   TURN_EXTERNAL_IP  the server's public IPv4 address, for coturn; detected when empty
+#   TURN_HOST         where players reach coturn; default: the site's own host name. Set it to the
+#                     server's IP address when the domain goes through a proxy (e.g. Cloudflare's orange cloud)
+#   SETUP_HOURS       how long the first-run password page stays open after the first start (default 48)
+#   RESET_PASSWORD    any new word: on the next deploy the stored password is removed once and the
+#                     first-run page opens again (the same word again changes nothing)
+#
+# Everything that must survive a redeploy is in the named volume mvp-data (/data):
+#   state.json   the site password's scrypt hash (created on the first-run page)
+#   disc/        the disc image uploaded on the Server disc page (owner-only directory)
+#   turn/secret  the TURN shared secret, generated on the first start and read by coturn
+# The images hold no game data and no secrets.
+
+services:
+  mvp:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    environment:
+      MVP_TURN_MODE: ${TURN_MODE:-relay}
+      MVP_TURN_HOST: ${TURN_HOST:-}
+      MVP_SETUP_HOURS: ${SETUP_HOURS:-48}
+      MVP_RESET_PASSWORD: ${RESET_PASSWORD:-}
+    volumes:
+      - mvp-data:/data
+    expose:
+      - "8080"
+    stop_grace_period: 10s
+
+  coturn:
+    build:
+      context: coturn
+    restart: unless-stopped
+    depends_on:
+      mvp:
+        condition: service_healthy
+    environment:
+      TURN_MODE: ${TURN_MODE:-relay}
+      TURN_EXTERNAL_IP: ${TURN_EXTERNAL_IP:-}
+    volumes:
+      - mvp-data:/mvp-data:ro
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+      - "49160-49200:49160-49200/udp"
+
+volumes:
+  mvp-data:
