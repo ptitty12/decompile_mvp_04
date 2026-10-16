@@ -400,6 +400,18 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | | merge of engine/q1-visual
 
+- 2026-10-15 | **Q2: sound dropouts; weaker machines** (lead, under the owner's delegation; docs/engine/Q2_LOG.md).
+  - **Q2-A1:** on pages with the isolation headers, the mixed sound reaches the audio thread through a shared-memory ring. Pages without them keep the message path.
+  - **Q2-A2:** when the emulation runs behind, the sound is time-stretched with pitch kept (down to quarter speed) instead of going silent.
+    - After an underrun, playback resumes once 30 ms is buffered. The buffer target grows by 20 ms per underrun, up to 200 ms.
+    - Underruns per minute in play: 7.2 → 0.7 on this PC (threaded); 251 → 0.5 at a simulated 2× slower machine; 170 → 0 on 4 efficiency cores.
+  - **Q2-P1:** the default pacing stays the chase, which drops frames evenly when behind. Even slow motion is opt-in with `?slowMotion=1`.
+    - It shows more new frames (37.7 vs 25.9 at 2× slower) but the game runs 9% slower.
+  - **Q2-S1:** the translator has no inline memory path. It made the module 62 → 90 MB and play slower.
+  - **The limit on weaker machines is the emulation thread:** 0.69× speed at a simulated 2× slower. The next speed work goes there.
+
+  | Guest lines equal to native threaded, single-threaded and in Firefox; netplay_check passes. | merge of engine/q2-perf
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
