@@ -129,3 +129,43 @@ thread still reads guest memory as the inline renderer does: every write to memo
 command still has to read waits for that command, as before (renderer digests, section 7).
 Unit tests: a range reported once per epoch, only the new elements of an overlapping one,
 everything again after `forget` or in a new epoch; the ring's publish history.
+
+## 4. Levers 2 and 4: floating-point loads and stores, psq
+
+The hot functions are paired-single and single-precision matrix code: `lfs`/`stfs`,
+`lfd`/`stfd` (the FPR saves of every prologue and epilogue), `psq_l`/`psq_st` with GQR 0
+(float), and `ps_madds0`/`fmadds`. Node A/B (CPU vs CPU, the stretch of play from frame
+7,300 to 10,544, ms per field; parallel pairs, so about 1 % noise):
+
+| Variant | ms/field |
+|---|---:|
+| before (after lever 1) | 8.58-8.68 |
+| `lfd`/`stfd` through one 64-bit helper each (`h.rd64`, `h.wr64`) | 8.53 |
+| + `lfs`'s conversion inline at each site | 8.62 |
+| + `stfs`'s conversion inline at each site | 8.44 |
+| + float `psq_l`/`psq_st` inline at each site (GQR type tested in the code) | 8.76 |
+| all of them inline (module 62.7 -> 66.6 MB) | 8.88-8.92 |
+| **fat helpers instead** (below; module 62.1 MB) | **8.10-8.16** |
+
+Inline expansion at the call sites made V8's code slower, as Q2 found for the MEM1 path
+(Q2-S1): bigger functions with more branches cost more than the calls save. What paid was
+the opposite: fewer, fuller helper calls, each with its common case first.
+
+- `lfd`, `stfd`: `h.rd64` / `h.wr64`, one page check for both words (plain loads or stores,
+  the threaded engine's write check over the 8 bytes), else the two 32-bit helpers, high
+  word first, as before.
+- `lfs`: `h.lfs`, read32 and `fp::single_to_double` in one call (`f64.promote_f32`, exact for
+  every non-NaN single; a NaN takes `h.s2d`'s bit formula).
+- `stfs`: `h.stfs`, `fp::double_to_single` (the bit formula; `h.d2s` where the result is a
+  single denormal, exponents 874-896) and write32 in one call.
+- `psq_l`: the helper first tries a float pair (load type 0-3, W clear) in one mapped page:
+  both words read, both converted as `lfs` does, both halves written; anything else as
+  before.
+- `psq_st`: the helper first tries a float pair (store type 0-3, W clear): both words
+  (`fp::double_to_single_ftz`) to one mapped page, or appended to the write-gather pipe
+  while they leave its burst unfinished (as two `h.wr32` would), else through `h.wr32`.
+
+Exactness: `test_wasm_digest` (every GQR type and scale, NaNs, infinities, denormals, the
+flush boundary, page-crossing accesses: translated code against the interpreter, state and
+RAM after every execution) and `test_wasm_lockstep` (the FP moves and conversions on edge
+cases; the pipe test of section 2) pass; guest lines in section 7.

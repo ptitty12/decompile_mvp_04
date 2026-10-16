@@ -63,7 +63,9 @@ u32 reg_offset(int r) {
 }
 
 // ---- module interface ----
-enum Ty : u32 { tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, tL_I, tI_L, tV_IIIIIL, kTypes };
+enum Ty : u32 {
+  tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, tL_I, tI_L, tV_IIIIIL, tL_IIIL, tV_IILIL, kTypes
+};
 enum Imp : u32 {
   iOnEntry, iSafepoint, iRead8, iRead16, iRead32, iWrite8, iWrite16, iWrite32, iExec, iCallIndirect,
   iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, iFpUnavailable, iGpWait, iWgpStore,
@@ -75,14 +77,16 @@ constexpr Ty kImportType[kImports] = {tV_II,   tV_I,  tI_IIIL, tI_IIIL, tI_IIIL,
 // Helpers defined in every module, after the imports.
 enum Hlp : u32 {
   hRd8 = kImports, hRd16, hRd32, hWr8, hWr16, hWr32, hCmps, hCmpu, hDivw, hDivwu, hS2D, hD2S,
-  hLmw, hStmw, hPsqL, hPsqSt, kFirstGuest
+  hLmw, hStmw, hPsqL, hPsqSt, hRd64, hWr64, hLfs, hStfs, kFirstGuest
 };
 constexpr u32 kHelperCount = static_cast<u32>(kFirstGuest) - static_cast<u32>(kImports);
 constexpr Ty kHelperType[kHelperCount] = {tI_IIIL,  tI_IIIL,  tI_IIIL,   tV_IIIIL,  tV_IIIIL, tV_IIIIL,
                                           tI_III,   tI_III,   tI_II,     tI_II,     tL_I,     tI_L,
-                                          tV_IIIIL, tV_IIIIL, tV_IIIIIL, tV_IIIIIL};
+                                          tV_IIIIL, tV_IIIIL, tV_IIIIIL, tV_IIIIIL, tL_IIIL, tV_IILIL,
+                                          tL_IIIL,  tV_IILIL};
 constexpr const char* kHelperName[kHelperCount] = {"rd8",  "rd16", "rd32", "wr8",   "wr16", "wr32", "cmps", "cmpu",
-                                                   "divw", "divwu", "s2d", "d2s",   "lmw",  "stmw", "psq_l", "psq_st"};
+                                                   "divw", "divwu", "s2d", "d2s",   "lmw",  "stmw", "psq_l", "psq_st",
+                                                   "rd64", "wr64", "lfs", "stfs"};
 // Imported globals (immutable i32): the table base and three runtime addresses.
 enum Glb : u32 { gTableBase, gUnwinding, gResume, gHook, gWgp, gGpPages, kGlobals };
 
@@ -1191,8 +1195,11 @@ void FuncGen::emit_inline(const InsnInfo& x) {
       int mode = o == Op::lfs ? 0 : o == Op::lfsu ? 1 : o == Op::lfsx ? 2 : 3;
       ea_tmp(mode);
       b.get(kCpu);
-      rd32_tmp(0);
-      b.call(hS2D);
+      b.get(kCpu);  // Q4: read32 and fp::single_to_double in one helper
+      b.get(L_tmp);
+      b.i32c(a);
+      ticks_expr();
+      b.call(hLfs);
       b.tee(L_w);
       b.mem(op::i64_store, 3, ps0(i.rD()));
       b.get(kCpu);
@@ -1205,13 +1212,11 @@ void FuncGen::emit_inline(const InsnInfo& x) {
       int mode = o == Op::lfd ? 0 : o == Op::lfdu ? 1 : o == Op::lfdx ? 2 : 3;
       ea_tmp(mode);
       b.get(kCpu);
-      rd32_tmp(0);  // read64: the high word, then the low word
-      b.op(op::i64_extend_i32_u);
-      b.i64c(32);
-      b.op(op::i64_shl);
-      rd32_tmp(4);
-      b.op(op::i64_extend_i32_u);
-      b.op(op::i64_or);
+      b.get(kCpu);  // read64 (h.rd64: the high word, then the low word, where they are not plain memory)
+      b.get(L_tmp);
+      b.i32c(a);
+      ticks_expr();
+      b.call(hRd64);
       b.mem(op::i64_store, 3, ps0(i.rD()));
       update(mode);
       return;
@@ -1219,31 +1224,34 @@ void FuncGen::emit_inline(const InsnInfo& x) {
     case Op::stfs: case Op::stfsu: case Op::stfsx: case Op::stfsux: {
       int mode = o == Op::stfs ? 0 : o == Op::stfsu ? 1 : o == Op::stfsx ? 2 : 3;
       ea_tmp(mode);
-      wr32_tmp(0, [&] {
-        b.get(kCpu);
-        b.mem(op::i64_load, 3, ps0(i.rS()));
-        b.call(hD2S);
-      });
+      b.get(kCpu);  // Q4: fp::double_to_single and write32 in one helper
+      b.get(L_tmp);
+      b.get(kCpu);
+      b.mem(op::i64_load, 3, ps0(i.rS()));
+      b.i32c(a);
+      ticks_expr();
+      b.call(hStfs);
       update(mode);
       return;
     }
     case Op::stfd: case Op::stfdu: case Op::stfdx: case Op::stfdux: case Op::stfiwx: {
       int mode = (o == Op::stfd) ? 0 : o == Op::stfdu ? 1 : (o == Op::stfdx || o == Op::stfiwx) ? 2 : 3;
       ea_tmp(mode);
-      if (o != Op::stfiwx) {
-        wr32_tmp(0, [&] {  // write64: the high word, then the low word
+      if (o != Op::stfiwx) {  // write64 (h.wr64: the high word, then the low word, where they are not plain memory)
+        b.get(kCpu);
+        b.get(L_tmp);
+        b.get(kCpu);
+        b.mem(op::i64_load, 3, ps0(i.rS()));
+        b.i32c(a);
+        ticks_expr();
+        b.call(hWr64);
+      } else {
+        wr32_tmp(0, [&] {
           b.get(kCpu);
           b.mem(op::i64_load, 3, ps0(i.rS()));
-          b.i64c(32);
-          b.op(op::i64_shr_u);
           b.op(op::i32_wrap_i64);
         });
       }
-      wr32_tmp(o == Op::stfiwx ? 0 : 4, [&] {
-        b.get(kCpu);
-        b.mem(op::i64_load, 3, ps0(i.rS()));
-        b.op(op::i32_wrap_i64);
-      });
       update(mode);
       return;
     }
@@ -2663,6 +2671,277 @@ Fn helper_read(int bytes, u32 slow) {
   return h;
 }
 
+// Q4: fp::single_to_double of the word in `word` (an i32 local) as an i64 on
+// the stack: f64.promote_f32 is exact for every non-NaN single; a NaN takes
+// h.s2d (its bit formula).
+void single_to_double_inline(Fn& h, u32 word) {
+  h.get(word);
+  h.i32c(0x7FFFFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x7F800000);
+  h.op(op::i32_gt_u);
+  h.if_i64();
+  h.get(word);
+  h.call(hS2D);
+  h.else_();
+  h.get(word);
+  h.op(op::f32_reinterpret_i32);
+  h.op(op::f64_promote_f32);
+  h.op(op::i64_reinterpret_f64);
+  h.end();
+}
+
+// Q4: fp::double_to_single_ftz (psq_st, float types) of the bits in the i64 local
+// `bits`, as an i32 on the stack: the bit formula, or the sign alone below the
+// single normal range.
+void double_to_single_ftz_inline(Fn& h, u32 bits) {
+  h.get(bits);
+  h.i64c(32);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0xC0000000u);
+  h.op(op::i32_and);
+  h.get(bits);
+  h.i64c(29);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x3FFFFFFF);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.get(bits);
+  h.i64c(32);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x80000000u);
+  h.op(op::i32_and);
+  h.get(bits);
+  h.i64c(52);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x7FF);
+  h.op(op::i32_and);
+  h.i32c(896);
+  h.op(op::i32_gt_u);
+  h.get(bits);
+  h.i64c(0x7FFFFFFFFFFFFFFFll);
+  h.op(op::i64_and);
+  h.op(op::i64_eqz);
+  h.op(op::i32_or);
+  h.op(op::select);
+}
+
+// Q4: lfs: (cpu, ea, pc, ticks) -> the double's bits: read32 (a mapped page
+// without crossing: a plain load; else h.rd32) and fp::single_to_double, in one call.
+Fn helper_load_single() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 4: the page pointer; 5: the word
+  page_ptr(h, 4);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 4);
+  h.op(op::i32_le_u);
+  h.if_();
+  host_addr(h, 4);
+  h.mem(op::i32_load, 0, 0);
+  h.tee(5);
+  swap32_from_local(h, 5);
+  h.set(5);
+  single_to_double_inline(h, 5);
+  h.op(op::return_);
+  h.end();
+  h.end();
+  h.get(0);
+  h.get(1);
+  h.get(2);
+  h.get(3);
+  h.call(hRd32);
+  h.set(5);
+  single_to_double_inline(h, 5);
+  h.byte(op::end);
+  return h;
+}
+
+// Q4: stfs: (cpu, ea, double bits, pc, ticks): fp::double_to_single (the bit
+// formula, or h.d2s where the result is a single denormal, exponents 874-896)
+// and write32 (a mapped page without crossing: a plain store after the threaded
+// engine's check; else h.wr32), in one call.
+Fn helper_store_single() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 5: the page pointer; 6: the word
+  h.get(2);
+  h.i64c(52);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x7FF);
+  h.op(op::i32_and);
+  h.i32c(874);
+  h.op(op::i32_sub);
+  h.i32c(896 - 874);
+  h.op(op::i32_le_u);
+  h.if_i32();
+  h.get(2);
+  h.call(hD2S);
+  h.else_();
+  h.get(2);
+  h.i64c(32);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0xC0000000u);
+  h.op(op::i32_and);
+  h.get(2);
+  h.i64c(29);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x3FFFFFFF);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.end();
+  h.set(6);
+  page_ptr(h, 5);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 4);
+  h.op(op::i32_le_u);
+  h.if_();
+  gp_check(h, [&] { h.get(1); }, [&] {
+    h.get(1);
+    h.i32c(3);
+    h.op(op::i32_add);
+  });
+  host_addr(h, 5);
+  h.get(6);
+  swap32_from_local(h, 6);
+  h.mem(op::i32_store, 0, 0);
+  h.op(op::return_);
+  h.end();
+  h.end();
+  h.get(0);
+  h.get(1);
+  h.get(6);
+  h.get(3);
+  h.get(4);
+  h.call(hWr32);
+  h.byte(op::end);
+  return h;
+}
+
+// Q4: (cpu, ea, pc, ticks) -> the big-endian doubleword (lfd, psq_l of float
+// pairs): read64, the high word then the low word. Both in one mapped page:
+// plain loads; otherwise two h.rd32 (which take the runtime's path where needed).
+Fn helper_read64() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 4: the page pointer; 5: a word
+  page_ptr(h, 4);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 8);
+  h.op(op::i32_le_u);
+  h.if_();
+  for (u32 off : {0u, 4u}) {
+    host_addr(h, 4);
+    h.mem(op::i32_load, 0, off);
+    h.tee(5);
+    swap32_from_local(h, 5);
+    h.op(op::i64_extend_i32_u);
+    if (!off) {
+      h.i64c(32);
+      h.op(op::i64_shl);
+    }
+  }
+  h.op(op::i64_or);
+  h.op(op::return_);
+  h.end();
+  h.end();
+  for (u32 off : {0u, 4u}) {
+    h.get(0);
+    h.get(1);
+    if (off) {
+      h.i32c(off);
+      h.op(op::i32_add);
+    }
+    h.get(2);
+    h.get(3);
+    h.call(hRd32);
+    h.op(op::i64_extend_i32_u);
+    if (!off) {
+      h.i64c(32);
+      h.op(op::i64_shl);
+    }
+  }
+  h.op(op::i64_or);
+  h.byte(op::end);
+  return h;
+}
+
+// Q4: (cpu, ea, value, pc, ticks), write64 (stfd, psq_st of float pairs): the
+// high word, then the low word. Both in one mapped page: plain stores (after the
+// threaded engine's check of the 8 bytes); otherwise two h.wr32.
+Fn helper_write64() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 5: the page pointer; 6: a word
+  page_ptr(h, 5);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 8);
+  h.op(op::i32_le_u);
+  h.if_();
+  gp_check(h, [&] { h.get(1); }, [&] {
+    h.get(1);
+    h.i32c(7);
+    h.op(op::i32_add);
+  });
+  for (u32 off : {0u, 4u}) {
+    host_addr(h, 5);
+    h.get(2);
+    if (!off) {
+      h.i64c(32);
+      h.op(op::i64_shr_u);
+    }
+    h.op(op::i32_wrap_i64);
+    h.tee(6);
+    swap32_from_local(h, 6);
+    h.mem(op::i32_store, 0, off);
+  }
+  h.op(op::return_);
+  h.end();
+  h.end();
+  for (u32 off : {0u, 4u}) {
+    h.get(0);
+    h.get(1);
+    if (off) {
+      h.i32c(off);
+      h.op(op::i32_add);
+    }
+    h.get(2);
+    if (!off) {
+      h.i64c(32);
+      h.op(op::i64_shr_u);
+    }
+    h.op(op::i32_wrap_i64);
+    h.get(3);
+    h.get(4);
+    h.call(hWr32);
+  }
+  h.byte(op::end);
+  return h;
+}
+
 // (cpu, ea, value, pc, ticks), as helper_read. P2: a store to the write-gather
 // pipe that leaves fewer than 32 bytes gathered is appended to the runtime's
 // buffer directly (WasmWgpLayout), as Hardware::write would append it; Q4: one
@@ -3119,6 +3398,50 @@ Fn helper_psq_load() {
   h.op(op::i32_add);
   h.mem(op::i32_load, 2, kGqr);
   h.set(6);
+  // Q4: the common case first: a float pair (load type 0-3, W clear) in one
+  // mapped page; both raw words are read, then both halves written.
+  h.get(6);
+  h.i32c(0x40000);
+  h.op(op::i32_and);
+  h.get(3);
+  h.i32c(8);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.op(op::i32_eqz);
+  h.if_();
+  page_ptr(h, 7);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 8);
+  h.op(op::i32_le_u);
+  h.if_();
+  host_addr(h, 7);
+  h.set(9);
+  for (u32 half : {0u, 1u}) {
+    h.get(9);
+    h.mem(op::i32_load, 0, 4 * half);
+    h.tee(8);
+    swap32_from_local(h, 8);
+    h.set(8);
+    single_to_double_inline(h, 8);
+    h.set(half ? 11 : 10);
+  }
+  h.get(0);
+  h.get(2);
+  h.op(op::i32_add);
+  h.get(10);
+  h.mem(op::i64_store, 3, 0);
+  h.get(0);
+  h.get(2);
+  h.op(op::i32_add);
+  h.get(11);
+  h.mem(op::i64_store, 3, 8);
+  h.op(op::return_);
+  h.end();
+  h.end();
+  h.end();
   // Element size: 4 (float types), 2 (types 5, 7) or 1 (types 4, 6); the access
   // covers one element with W set, else two.
   h.i32c(4);
@@ -3298,6 +3621,110 @@ Fn helper_psq_store() {
   h.op(op::i32_add);
   h.mem(op::i32_load, 2, kGqr);
   h.set(6);
+  // Q4: the common case first: a float pair (store type 0-3, W clear). Both
+  // words (ps0's first) to one mapped page, or appended to the write-gather pipe
+  // while they leave its burst unfinished (as two h.wr32 would append them);
+  // otherwise through h.wr32.
+  h.get(6);
+  h.i32c(4);
+  h.op(op::i32_and);
+  h.get(3);
+  h.i32c(8);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.op(op::i32_eqz);
+  h.if_();
+  for (u32 half : {0u, 1u}) {
+    h.get(0);
+    h.get(2);
+    h.op(op::i32_add);
+    h.mem(op::i64_load, 3, 8 * half);
+    h.set(12);
+    double_to_single_ftz_inline(h, 12);
+    h.set(half ? 8 : 9);
+  }
+  page_ptr(h, 7);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 8);
+  h.op(op::i32_le_u);
+  h.if_();
+  gp_check(h, [&] { h.get(1); }, [&] {
+    h.get(1);
+    h.i32c(7);
+    h.op(op::i32_add);
+  });
+  for (u32 half : {0u, 1u}) {
+    host_addr(h, 7);
+    h.get(half ? 8 : 9);
+    swap32_from_local(h, half ? 8 : 9);
+    h.mem(op::i32_store, 0, 4 * half);
+  }
+  h.op(op::return_);
+  h.end();
+  h.else_();
+  {
+    using L = WasmWgpLayout;
+    h.get(1);
+    h.i32c(0xCC008000u);
+    h.op(op::i32_sub);
+    h.i32c(0x1000);
+    h.op(op::i32_lt_u);
+    h.if_();
+    h.global(gWgp);
+    h.tee(10);
+    h.mem(op::i32_load, 2, L::kFast);
+    h.if_();
+    h.get(10);
+    h.mem(op::i32_load, 2, L::kN);
+    h.tee(11);
+    h.i32c(32 - 8);
+    h.op(op::i32_lt_u);
+    h.if_();
+    for (u32 half : {0u, 1u}) {
+      h.get(10);
+      h.get(11);
+      h.op(op::i32_add);
+      h.get(half ? 8 : 9);
+      swap32_from_local(h, half ? 8 : 9);
+      h.mem(op::i32_store, 0, L::kBuf + 4 * half);
+    }
+    h.get(10);
+    h.get(11);
+    h.i32c(8);
+    h.op(op::i32_add);
+    h.mem(op::i32_store, 2, L::kN);
+    h.get(10);
+    h.i32c(0);
+    h.mem(op::i32_store, 2, L::kLastRead);
+    h.get(10);
+    h.get(10);
+    h.mem(op::i64_load, 3, L::kFastStores);
+    h.i64c(2);
+    h.op(op::i64_add);
+    h.mem(op::i64_store, 3, L::kFastStores);
+    h.op(op::return_);
+    h.end();
+    h.end();
+    h.end();
+  }
+  h.end();
+  for (u32 half : {0u, 1u}) {
+    h.get(0);
+    h.get(1);
+    if (half) {
+      h.i32c(4);
+      h.op(op::i32_add);
+    }
+    h.get(half ? 8 : 9);
+    h.get(4);
+    h.get(5);
+    h.call(hWr32);
+  }
+  h.op(op::return_);
+  h.end();
   h.i32c(4);
   h.i32c(2);
   h.i32c(1);
@@ -3624,6 +4051,10 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
   put(helper_multiple(true));
   put(helper_psq_load());
   put(helper_psq_store());
+  put(helper_read64());
+  put(helper_write64());
+  put(helper_load_single());
+  put(helper_store_single());
   struct BodyInfo {  // per Body: its entries' dispatcher indices, and whether it has resume labels
     std::vector<std::pair<u32, u32>> entry_seg;
     bool resume = false;
@@ -3721,6 +4152,8 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
     functype(t, {kI32}, {kI64});                      // tL_I
     functype(t, {kI64}, {kI32});                      // tI_L
     functype(t, {kI32, kI32, kI32, kI32, kI32, kI64}, {});  // tV_IIIIIL
+    functype(t, {kI32, kI32, kI32, kI64}, {kI64});          // tL_IIIL
+    functype(t, {kI32, kI32, kI64, kI32, kI64}, {});        // tV_IILIL
     m.section(1, t);
   }
   {
