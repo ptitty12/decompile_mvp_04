@@ -7,7 +7,7 @@
 //                [--max-entries N] [--max-ticks N] [--unnamed stop|log]
 //                [--input SCRIPT] [--frames N] [--ports MASK] [--frame-log FILE]
 //                [--ax-voices on|off] [--trace on|off] [--audio-wav FILE]
-//                [--count NAME,...] [--peek ADDR:LEN,...]
+//                [--count NAME,...] [--peek ADDR:LEN,...] [--time-at F,...]
 //                       E0b items 7 and 8: boot with the IPL environment
 //                       (runtime/boot.h) and the hardware model (runtime/hw.h).
 //                       Prints the calls __start makes; logs every call from game
@@ -33,11 +33,14 @@
 //                       --count prints how often the listed functions (names
 //                       or 0x addresses) were entered, --peek prints guest
 //                       memory (hex, at most 256 bytes each) at the end of the
-//                       run (for investigations).
+//                       run (for investigations). --time-at prints (on stderr)
+//                       the host seconds spent in the run when the polls of the
+//                       listed frames come (Q4: the cost of a stretch of play).
 //
 // Needs the disc (MVP_DISC) and a build with the translated code. Prints register
 // values, names and addresses only; the log stays under build/ (only its hash may
 // be committed).
+#include <algorithm>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -149,12 +152,17 @@ struct FrameTrace {
   std::FILE* log = nullptr;
   Sha1 sha;
   std::uint64_t bytes = 0, stop_at = ~0ull;
+  std::vector<std::uint64_t> time_at;  // --time-at: frames whose host time is printed
+  std::chrono::steady_clock::time_point start;
 };
 FrameTrace* g_frames = nullptr;
 
 void frame_hook(ppc::Cpu& c, std::uint64_t frame) {
   FrameTrace& f = *g_frames;
   if (frame >= f.stop_at) throw StopRun{"ran " + std::to_string(f.stop_at) + " frames (--frames)"};
+  if (std::find(f.time_at.begin(), f.time_at.end(), frame) != f.time_at.end())
+    std::fprintf(stderr, "time-at frame %llu: %.3f s\n", static_cast<unsigned long long>(frame),
+                 std::chrono::duration<double>(std::chrono::steady_clock::now() - f.start).count());
   char b[160];
   int n = std::snprintf(b, sizeof b, "frame %llu tb %llu calls %llu in ", static_cast<unsigned long long>(frame),
                         static_cast<unsigned long long>(f.hooks->time_base(c)),
@@ -242,6 +250,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::string input_path, frame_log_path = "frames.log", audio_wav, count_list, peek_list;
   std::size_t mmio_lines = 40;
   std::uint64_t max_entries = 20000000, max_ticks = 2000000000ull, max_frames = ~0ull;
+  std::vector<std::uint64_t> time_at;
   bool trace = true;
   u32 ports = 1;
   HardwareConfig hw_cfg;
@@ -256,6 +265,13 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
     if (a == "--max-ticks") max_ticks = std::strtoull(argv[k + 1], nullptr, 10);
     if (a == "--input") input_path = argv[k + 1];
     if (a == "--frames") max_frames = std::strtoull(argv[k + 1], nullptr, 10);
+    if (a == "--time-at")
+      for (const char* p = argv[k + 1]; *p;) {
+        char* end = nullptr;
+        time_at.push_back(std::strtoull(p, &end, 10));
+        p = *end == ',' ? end + 1 : end;
+        if (end == p && *p) break;
+      }
     if (a == "--ports") ports = static_cast<u32>(std::strtoul(argv[k + 1], nullptr, 0)) & 0xF;
     if (a == "--frame-log") frame_log_path = argv[k + 1];
     if (a == "--ax-voices") hw_cfg.ax_voices = std::string(argv[k + 1]) != "off";
@@ -360,6 +376,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   FrameTrace ft;
   ft.hooks = &hooks;
   ft.stop_at = max_frames;
+  ft.time_at = time_at;
   ft.log = std::fopen(frame_log_path.c_str(), "wb");
   if (!ft.log) std::fprintf(stderr, "mvp-boot: cannot write %s\n", frame_log_path.c_str());
   g_frames = &ft;
@@ -370,6 +387,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   // Host time spent running guest code (E2 speed measurements): printed only,
   // never visible to the guest.
   auto run_start = std::chrono::steady_clock::now();
+  ft.start = run_start;
   try {
     rt::run(m.cpu());
   } catch (const StopRun& s) {
