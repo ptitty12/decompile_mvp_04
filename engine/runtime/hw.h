@@ -82,6 +82,7 @@ struct WgpState {
   std::uint32_t last_read = 0;    // the last register read (0 after a write): the poll detector
   std::uint32_t pad = 0;
   std::uint64_t fast_stores = 0;  // stores the translated code appended (accesses to 0xCC008000)
+  class Hardware* owner = nullptr;  // Q4: whose pipe it is (set_wgp_state; the module never reads it)
 };
 
 // What the AX voice model did (runtime/ax.h), summed over all frames.
@@ -108,8 +109,13 @@ class Hardware : public ppc::Io {
   void set_wgp_state(WgpState* s) {
     if (s == wgp_) return;
     *s = *wgp_;
+    s->owner = this;
     wgp_ = s;
   }
+  // Q4: a store to the write-gather pipe that translated code counted and ended
+  // the poll detector's run for (as write() does: WgpState), while `fast` is set
+  // (nothing is logged): what write() does for it from there on.
+  void wgp_store_counted(u32 value, int size) { wgp_write(value, size); }
   const std::vector<u8>& fifo() const { return fifo_; }  // the first bytes written to the write-gather pipe
   std::uint64_t fifo_bytes() const { return fifo_bytes_; }
   const GxFifo& gx() const { return gx_; }

@@ -40,6 +40,8 @@
 #include <cstdint>
 #include <string>
 
+#include "runtime/gx_fifo.h"
+
 namespace mvp::web {
 
 // Starts the render thread: WebGPU device first, then the canvas the page
@@ -66,6 +68,8 @@ double render_waited_ms();
 // From the emulation, in order (each appends to the ring).
 void render_memory(const std::uint8_t* mem, std::uint32_t size);
 void render_gx(const std::uint8_t* cmd, std::size_t len);
+// Q4: the commands of one GX FIFO push (rt::GfxObserver::gx_commands), as one record.
+void render_gx_batch(const rt::GxCommand* cmds, std::size_t n);
 void render_field(std::uint64_t field, std::uint32_t xfb);
 void render_sync();          // the fence: returns when the render thread finished every record so far
 void render_batch_begin();   // a run batch starts (the render thread waits in place for records)

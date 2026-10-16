@@ -102,6 +102,7 @@ enum : u32 {
   kGpLines,     // Q1: {first line, lines} + their contents as written back (lines that changed)
   kGpDrop,      // Q1: {addr, len}: memory written without the cache
   kScale,       // Q1: {internal resolution}
+  kGxBatch,     // Q4: {count n, n lengths, the n commands' bytes one after the other}
 };
 
 constexpr u32 kRingBytes = 16u << 20;
@@ -406,6 +407,19 @@ void handle(const gfx::RenderRing::Record& r) {
       S->side.gx(v.p, v.n);
       return;
     }
+    case kGxBatch: {
+      u32 n;
+      std::memcpy(&n, r.data, 4);
+      const u8* lens = r.data + 4;
+      const u8* p = lens + 4 * static_cast<std::size_t>(n);
+      for (u32 k = 0; k < n; ++k) {
+        u32 len;
+        std::memcpy(&len, lens + 4 * k, 4);
+        S->side.gx(p, len);
+        p += len;
+      }
+      return;
+    }
     case kField: {
       Field v;
       std::memcpy(&v, r.data, sizeof v);
@@ -682,6 +696,43 @@ void render_gx(const std::uint8_t* cmd, std::size_t len) {
   kick();
   S->fence_ms += S->ring.wait_read(S->ring.end());
   S->synced = S->ring.end();
+}
+
+// Q4: one record for the commands of a push (usually the few commands of a
+// 32-byte burst), instead of one each. The commands' reads are marked with the
+// position after the record: the render thread finishes the record as a whole,
+// so a write waits for the same commands to be done as with a record each, or
+// for the few after them in the same burst.
+void render_gx_batch(const rt::GxCommand* cmds, std::size_t n) {
+  if (disabled() || !n) return;
+  std::size_t total = 4 + 4 * n;
+  for (std::size_t k = 0; k < n; ++k) total += cmds[k].len;
+  if (total > S->ring.max_payload()) {  // a large command among them: one by one
+    for (std::size_t k = 0; k < n; ++k) render_gx(cmds[k].p, cmds[k].len);
+    return;
+  }
+  u8* d = S->ring.reserve(kGxBatch, static_cast<u32>(total));
+  const u32 count = static_cast<u32>(n);
+  std::memcpy(d, &count, 4);
+  u8* lens = d + 4;
+  u8* out = lens + 4 * n;
+  const u8* run = cmds[0].p;  // consecutive commands (a burst's) are copied at once
+  std::size_t run_len = 0;
+  for (std::size_t k = 0; k < n; ++k) {
+    std::memcpy(lens + 4 * k, &cmds[k].len, 4);
+    if (cmds[k].p != run + run_len) {
+      std::memcpy(out, run, run_len);
+      out += run_len;
+      run = cmds[k].p;
+      run_len = 0;
+    }
+    run_len += cmds[k].len;
+  }
+  std::memcpy(out, run, run_len);
+  S->ring.commit();
+  S->mark_pos = S->ring.end();
+  for (std::size_t k = 0; k < n; ++k) S->reads.command(cmds[k].p, cmds[k].len);
+  S->ring.publish_if(kPublishBytes);
 }
 
 void render_field(std::uint64_t field, std::uint32_t xfb) {

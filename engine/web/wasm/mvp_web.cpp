@@ -246,6 +246,7 @@ class TimedSource final : public vfs::Source {
 struct Observer : GfxObserver {
   Engine* e = nullptr;
   void gx_command(const std::uint8_t* cmd, std::size_t len) override;
+  void gx_commands(const rt::GxCommand* cmds, std::size_t n) override;  // Q4: a push's commands at once
   void vi_field(std::uint64_t field, std::uint32_t xfb) override;
   void gp_sync() override;  // P2: the render thread catches up (threaded only)
   void gp_write_through(std::uint32_t addr, std::uint32_t len) override;  // Q1 (gfx/gp_memory.h)
@@ -326,6 +327,16 @@ void Observer::gx_command(const std::uint8_t* cmd, std::size_t len) {
   }
 #endif
   e->rs.gx(cmd, len);
+}
+
+void Observer::gx_commands(const rt::GxCommand* cmds, std::size_t n) {
+#ifdef MVP_WEB_THREADS
+  if (e->threaded) {
+    web::render_gx_batch(cmds, n);
+    return;
+  }
+#endif
+  for (std::size_t k = 0; k < n; ++k) e->rs.gx(cmds[k].p, cmds[k].len);
 }
 
 void Observer::gp_sync() {

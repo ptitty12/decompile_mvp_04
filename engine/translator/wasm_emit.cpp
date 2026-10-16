@@ -66,11 +66,12 @@ u32 reg_offset(int r) {
 enum Ty : u32 { tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, tL_I, tI_L, tV_IIIIIL, kTypes };
 enum Imp : u32 {
   iOnEntry, iSafepoint, iRead8, iRead16, iRead32, iWrite8, iWrite16, iWrite32, iExec, iCallIndirect,
-  iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, iFpUnavailable, iGpWait, kImports
+  iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, iFpUnavailable, iGpWait, iWgpStore,
+  kImports
 };
 constexpr Ty kImportType[kImports] = {tV_II,   tV_I,  tI_IIIL, tI_IIIL, tI_IIIL, tV_IIIIL, tV_IIIIL, tV_IIIIL, tV_IIIL,
                                       tV_II,   tV_II, tI_III,  tV_III,  tV_II,   tV_III,   tV_I,     tV_I,     tV_III,
-                                      tV_II,   tV_III};
+                                      tV_II,   tV_III, tV_IIIIL};
 // Helpers defined in every module, after the imports.
 enum Hlp : u32 {
   hRd8 = kImports, hRd16, hRd32, hWr8, hWr16, hWr32, hCmps, hCmpu, hDivw, hDivwu, hS2D, hD2S,
@@ -2663,8 +2664,11 @@ Fn helper_read(int bytes, u32 slow) {
 }
 
 // (cpu, ea, value, pc, ticks), as helper_read. P2: a store to the write-gather
-// pipe that does not complete a burst is appended to the runtime's buffer
-// directly (WasmWgpLayout), as Hardware::write would append it.
+// pipe that leaves fewer than 32 bytes gathered is appended to the runtime's
+// buffer directly (WasmWgpLayout), as Hardware::write would append it; Q4: one
+// that completes the burst (or reaches into the next) goes to rt.wgp_store, which
+// gathers it as Hardware::write would, burst included, without the rest of the
+// MMIO path (the module counts it and ends the poll detector's run here too).
 Fn helper_write(int bytes, u32 slow) {
   Fn h;
   h.uleb(1);
@@ -2710,16 +2714,29 @@ Fn helper_write(int bytes, u32 slow) {
   h.op(op::return_);
   if (bytes != 1) h.end();
   h.end();
-  // The write-gather pipe (an unmapped page, so the runtime's path otherwise).
+  // The write-gather pipe (an unmapped page, so the runtime's path otherwise):
+  // any address in its 4 KiB block, as Hardware::write takes them (Q4: a psq_st
+  // writes its second element to 0xCC008004).
   using L = WasmWgpLayout;
   h.get(1);
   h.i32c(0xCC008000u);
-  h.op(op::i32_eq);
+  h.op(op::i32_sub);
+  h.i32c(0x1000);
+  h.op(op::i32_lt_u);
   h.if_();
   h.global(gWgp);
   h.tee(6);
   h.mem(op::i32_load, 2, L::kFast);
   h.if_();
+  h.get(6);
+  h.i32c(0);
+  h.mem(op::i32_store, 2, L::kLastRead);
+  h.get(6);
+  h.get(6);
+  h.mem(op::i64_load, 3, L::kFastStores);
+  h.i64c(1);
+  h.op(op::i64_add);
+  h.mem(op::i64_store, 3, L::kFastStores);
   h.get(6);
   h.mem(op::i32_load, 2, L::kN);
   h.tee(7);
@@ -2753,17 +2770,15 @@ Fn helper_write(int bytes, u32 slow) {
   h.i32c(static_cast<u32>(bytes));
   h.op(op::i32_add);
   h.mem(op::i32_store, 2, L::kN);
-  h.get(6);
-  h.i32c(0);
-  h.mem(op::i32_store, 2, L::kLastRead);
-  h.get(6);
-  h.get(6);
-  h.mem(op::i64_load, 3, L::kFastStores);
-  h.i64c(1);
-  h.op(op::i64_add);
-  h.mem(op::i64_store, 3, L::kFastStores);
   h.op(op::return_);
   h.end();
+  h.get(0);  // Q4: it completes the burst (or reaches into the next)
+  h.get(2);
+  h.i32c(static_cast<u32>(bytes));
+  h.get(3);
+  h.get(4);
+  h.call(iWgpStore);
+  h.op(op::return_);
   h.end();
   h.end();
   h.get(0);
@@ -3522,7 +3537,7 @@ const std::vector<std::string>& wasm_import_names() {
   static const std::vector<std::string> names = {
       "on_entry", "safepoint", "read8",    "read16",     "read32", "write8", "write16",     "write32", "exec",
       "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap",   "rfi",    "system_call", "tw",
-      "fp_unavailable", "gp_wait"};
+      "fp_unavailable", "gp_wait", "wgp_store"};
   return names;
 }
 

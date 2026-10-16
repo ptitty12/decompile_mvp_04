@@ -112,6 +112,82 @@ TEST_CASE("GX stream: display lists run from memory and may change the vertex fo
   CHECK(gx.display_list_errors() == 1);
 }
 
+// Q4: the observer gets the commands of each push at once (one gx_commands
+// call), in order and with their bytes, display lists' commands included; an
+// observer that takes them one by one (the default) sees the same sequence.
+namespace {
+struct Seen : GfxObserver {
+  std::vector<std::vector<u8>> cmds;
+  int batches = 0;
+  void gx_command(const u8* c, std::size_t n) override { cmds.emplace_back(c, c + n); }
+  void gx_commands(const GxCommand* c, std::size_t n) override {
+    ++batches;
+    GfxObserver::gx_commands(c, n);
+  }
+  void vi_field(std::uint64_t, std::uint32_t) override {}
+};
+struct OneByOne : GfxObserver {
+  std::vector<std::vector<u8>> cmds;
+  void gx_command(const u8* c, std::size_t n) override { cmds.emplace_back(c, c + n); }
+  void vi_field(std::uint64_t, std::uint32_t) override {}
+};
+}  // namespace
+
+TEST_CASE("GX stream: the observer gets each push's commands at once, in order") {
+  std::vector<u8> mem(0x1000, 0);
+  std::vector<u8> list;
+  cp_load(list, 0x50, 0x200);
+  bp_load(list, 0x66001234);
+  while (list.size() % 32) list.push_back(0);
+  std::memcpy(&mem[0x400], list.data(), list.size());
+  std::vector<u8> s;
+  cp_load(s, 0x50, 0x200);              // position direct
+  cp_load(s, 0x70, 0x1 | 4u << 1);      // XYZ f32: 12 bytes a vertex
+  s.push_back(0x90);                    // triangles, format 0, 7 vertices (84 bytes: over three bursts)
+  s.push_back(0);
+  s.push_back(7);
+  for (int k = 0; k < 84; ++k) s.push_back(static_cast<u8>(k));
+  s.push_back(0x40);  // a display list
+  put32(s, 0x400);
+  put32(s, static_cast<u32>(list.size()));
+  bp_load(s, 0x45000002);
+  while (s.size() % 32) s.push_back(0);
+  Seen seen;
+  OneByOne one;
+  GxFifo a, b;
+  a.set_memory(mem.data(), static_cast<u32>(mem.size()));
+  b.set_memory(mem.data(), static_cast<u32>(mem.size()));
+  a.set_observer(&seen);
+  b.set_observer(&one);
+  int pushes_with_commands = 0;
+  for (std::size_t at = 0; at < s.size(); at += 32) {
+    const std::size_t before = seen.cmds.size();
+    a.push(s.data() + at, 32);
+    b.push(s.data() + at, 32);
+    if (seen.cmds.size() > before) ++pushes_with_commands;
+  }
+  CHECK(seen.batches == pushes_with_commands);
+  CHECK(seen.cmds == one.cmds);
+  REQUIRE(seen.cmds.size() >= 6);
+  CHECK(seen.cmds[2].size() == 3 + 84);  // the primitive, whole
+  CHECK(seen.cmds[2][3 + 83] == 83);
+  CHECK(seen.cmds[3] == std::vector<u8>(list.begin(), list.begin() + 6));  // the list's first command
+}
+
+TEST_CASE("GX stream: a lost stream's report shows the last commands' first bytes") {
+  GxFifo gx;
+  std::vector<u8> s;
+  cp_load(s, 0x50, 0x200);
+  bp_load(s, 0x47001234);
+  s.push_back(0x77);  // starts no command
+  gx.push(s.data(), s.size());
+  REQUIRE(gx.broken());
+  const std::string r = gx.broken_context();
+  CHECK(r.find("len 6: 08 50 00 00 02 00") != std::string::npos);
+  CHECK(r.find("len 5: 61 47 00 12 34") != std::string::npos);
+  CHECK(r.find("lost at: 77") != std::string::npos);
+}
+
 TEST_CASE("GX FIFO: bursts to memory, the GP follows, and stops at a breakpoint") {
   Rig g;
   constexpr u32 kBase = 0x00100000, kEnd = 0x00100FFC;

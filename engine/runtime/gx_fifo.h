@@ -18,6 +18,12 @@
 
 namespace mvp::rt {
 
+// One command (Q4: GfxObserver::gx_commands).
+struct GxCommand {
+  const std::uint8_t* p;
+  std::uint32_t len;
+};
+
 // What the renderer (engine/gfx, E1) sees of the machine: every command the
 // graphics processor executes, in order and complete with its payload (display
 // lists arrive as the commands inside them, not as the call), and every VI
@@ -27,6 +33,12 @@ class GfxObserver {
  public:
   virtual ~GfxObserver() = default;
   virtual void gx_command(const std::uint8_t* cmd, std::size_t len) = 0;
+  // Q4: the commands one push() executed, in order (GxFifo hands them over
+  // together, before it returns; the bytes stay valid until then). By default
+  // each goes to gx_command.
+  virtual void gx_commands(const GxCommand* cmds, std::size_t n) {
+    for (std::size_t k = 0; k < n; ++k) gx_command(cmds[k].p, cmds[k].len);
+  }
   // `xfb` is the physical address of the top field's frame buffer (VI TFBL).
   virtual void vi_field(std::uint64_t field, std::uint32_t xfb) = 0;
   // P2: the guest is about to be able to learn that the graphics processor has
@@ -93,6 +105,11 @@ class GxFifo {
   std::size_t command_length(const std::uint8_t* p, std::size_t n) const;
   void execute(const std::uint8_t* cmd, std::size_t len, Effects& fx, bool in_list);
   void call_list(std::uint32_t addr, std::uint32_t size, Effects& fx);
+  // Q4: hands the commands collected since the last call to the observer.
+  void flush_commands() {
+    if (batch_n_) observer_->gx_commands(batch_.data(), batch_n_);
+    batch_n_ = 0;
+  }
 
   std::vector<std::uint8_t> pending_;
   // P1: the length of the incomplete command at the head of pending_, once known
@@ -112,13 +129,20 @@ class GxFifo {
   bool broken_ = false;
   std::uint8_t broken_opcode_ = 0;
   std::uint64_t broken_offset_ = 0;
+  // Q4: the commands executed by the current push(), for the observer.
+  std::array<GxCommand, 256> batch_{};
+  std::size_t batch_n_ = 0;
+  // The last commands' offsets and lengths, and (Q4) the stream's last bytes, from
+  // which the report takes their first bytes (instead of a copy per command).
   struct Recent {
     std::uint64_t offset = 0;
     std::uint32_t len = 0;
-    std::array<std::uint8_t, 24> head{};
   };
   std::array<Recent, 24> recent_{};
   std::uint64_t recent_n_ = 0;
+  static constexpr std::size_t kHistory = 4096;  // a power of two
+  std::array<std::uint8_t, kHistory> history_{};
+  std::uint64_t pushed_ = 0;  // stream bytes pushed (history_ holds the last kHistory of them)
   std::vector<std::uint8_t> broken_tail_;
 };
 
