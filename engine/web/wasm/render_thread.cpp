@@ -165,7 +165,6 @@ struct Shared {
   // The memory each command reads (gfx/gp_reads.h), marked in ppc::g_gp_pages
   // with the ring position after the command (+1); the pages marked so far.
   gfx::GpReads reads{[](u32 addr, u32 size, gfx::ReadKind kind) { mark(addr, size, kind); }};
-  u32 mark_pos = 0;
   std::vector<u32> marked;
   std::vector<u8> kinds = std::vector<u8>(ppc::kGpEntries);  // what each entry was last marked for (statistics)
   u64 write_waits = 0, write_checks = 0;
@@ -180,6 +179,7 @@ struct Shared {
   std::vector<u8> gp_sent;
   std::vector<u32> gp_gen_of, gp_page_gen;
   u64 gp_flushes = 0, gp_sent_bytes = 0, gp_flushed_bytes = 0, gp_unmarked = 0;
+  u64 mark_entries = 0;  // Q4: entries marked (statistics)
   u32 synced = 0;           // ring position of the last fence
   u32 present_pos[2] = {};  // ring positions after the last two presents
   u64 fences = 0, fence_waits = 0, lag_waits = 0, big = 0, resizes = 0;
@@ -190,23 +190,49 @@ struct Shared {
 
 Shared* S = nullptr;
 
+// Q4: what a marked entry holds: the epoch of the commands that read it (the
+// ring's publishes before them), with the top bit set (never 0). The epoch ends at
+// the next publish, which makes every one of its commands visible: a write waits
+// until the render thread has finished the records up to there, which includes
+// the command that marked the entry. GpReads reports a vertex range once per
+// epoch (gfx/gp_reads.h); with a ring position per command instead (P2), every
+// primitive had to mark again.
+constexpr u32 kTagBit = 0x80000000u;
+u32 current_tag() { return S->ring.publishes() | kTagBit; }
+// The ring position after every command an entry's tag stands for.
+u32 tag_end(u32 tag) {
+  const u32 epoch = tag & ~kTagBit, now = S->ring.publishes() & ~kTagBit;
+  const u32 age = (now - epoch) & ~kTagBit;
+  if (age == 0 || age >= gfx::RenderRing::kPubHistory) return S->ring.end();  // still open (or long gone): all so far
+  return S->ring.published_at(epoch + 1);
+}
+
 // Emulation thread: the command being appended reads [addr, addr + size).
 bool gp_snapshot_entry(u32 i);
+bool gp_page_snapshot(u32 entry);
 void mark(u32 addr, u32 size, gfx::ReadKind kind) {
   const u32 first = addr >> ppc::kGpShift, last = (addr + size - 1) >> ppc::kGpShift;
-  for (u32 p = first; p <= last; ++p) {
-    const u32 i = p & (ppc::kGpEntries - 1);
+  const u32 tag = current_tag();
+  S->mark_entries += last - first + 1;
+  constexpr u32 kPerPage = 4096u >> ppc::kGpShift;  // entries per 4 KiB page
+  for (u32 p = first; p <= last;) {
+    const u32 stop = std::min(last, p | (kPerPage - 1));
     // Q1: lines a cache write-back snapshot covers this field are read from the
     // snapshot (it came through the ring), not from memory: guest writes there
-    // need not wait.
-    if (gp_snapshot_entry(i)) {
-      ++S->gp_unmarked;
-      continue;
+    // need not wait. (Q4: looked at entry by entry only in 4 KiB pages that
+    // have a snapshot this field.)
+    const bool snapshots = gp_page_snapshot(p & (ppc::kGpEntries - 1));
+    for (; p <= stop; ++p) {
+      const u32 i = p & (ppc::kGpEntries - 1);
+      if (snapshots && gp_snapshot_entry(i)) {
+        ++S->gp_unmarked;
+        continue;
+      }
+      std::uint32_t& e = ppc::g_gp_pages[i];
+      if (!e) S->marked.push_back(i);
+      e = tag;
+      S->kinds[i] = static_cast<u8>(kind);
     }
-    std::uint32_t& e = ppc::g_gp_pages[i];
-    if (!e) S->marked.push_back(i);
-    e = S->mark_pos + 1;
-    S->kinds[i] = static_cast<u8>(kind);
   }
 }
 
@@ -219,7 +245,7 @@ void gp_wait(u32 first, u32 last) {
     const u32 i = p & (ppc::kGpEntries - 1);
     std::uint32_t& e = ppc::g_gp_pages[i];
     if (!e) continue;
-    const u32 pos = e - 1;
+    const u32 pos = tag_end(e);
     if (!S->ring.finished(pos)) {
       if (S->idle.load() == 1 && S->idle.exchange(0) == 1)
         emscripten_proxy_async(emscripten_proxy_get_system_queue(), S->tid, render_task_cb, nullptr);
@@ -230,6 +256,7 @@ void gp_wait(u32 first, u32 last) {
       S->kind_ms[S->kinds[i] % gfx::kReadKinds] += ms;
     }
     e = 0;
+    S->reads.forget();  // Q4: an entry it may count as marked is not any more
   }
 }
 
@@ -238,9 +265,10 @@ void sweep() {
   std::size_t n = 0;
   for (u32 p : S->marked) {
     std::uint32_t& e = ppc::g_gp_pages[p];
-    if (e && S->ring.finished(e - 1)) e = 0;
+    if (e && S->ring.finished(tag_end(e))) e = 0;
     if (e) S->marked[n++] = p;
   }
+  if (n != S->marked.size()) S->reads.forget();  // Q4: entries it may count as marked are not any more
   S->marked.resize(n);
 }
 
@@ -249,6 +277,13 @@ void sweep() {
 constexpr u32 kLine = 32, kLineShift = 5, kLinesPerPage = 128;  // 32-byte lines, 4 KiB pages
 
 bool gp_line_active(u32 line) { return line < S->gp_lines && S->gp_gen_of[line] == S->gp_gen; }
+
+// Q4: whether the 4 KiB page of entry `i` has lines snapshot this field (else none of its entries is).
+bool gp_page_snapshot(u32 i) {
+  if (!S->gp_lines) return false;
+  const u32 l0 = (i << ppc::kGpShift) >> kLineShift;
+  return l0 < S->gp_lines && S->gp_page_gen[l0 / kLinesPerPage] == S->gp_gen;
+}
 
 // A 2^kGpShift (64) byte entry of ppc::g_gp_pages whose lines are all snapshot this field.
 bool gp_snapshot_entry(u32 i) {
@@ -673,7 +708,10 @@ void render_gp_write_through(std::uint32_t addr, std::uint32_t len) {
         any = true;
       }
   }
-  if (any) put(kGpDrop, Pair{addr, len});
+  if (any) {
+    put(kGpDrop, Pair{addr, len});
+    S->reads.forget();  // Q4: what it counts as reported may include those lines, unmarked
+  }
 }
 
 void render_gx(const std::uint8_t* cmd, std::size_t len) {
@@ -682,7 +720,7 @@ void render_gx(const std::uint8_t* cmd, std::size_t len) {
   if (n <= S->ring.max_payload()) {
     std::memcpy(S->ring.reserve(kGx, n), cmd, n);
     S->ring.commit();
-    S->mark_pos = S->ring.end();
+    S->reads.set_epoch(S->ring.publishes());
     S->reads.command(cmd, n);  // what it reads, so that guest writes there wait for it
     S->ring.publish_if(kPublishBytes);
     return;
@@ -691,7 +729,7 @@ void render_gx(const std::uint8_t* cmd, std::size_t len) {
   // where it is, and the emulation waits until it has.
   put(kGxRef, Ref{cmd, n});
   ++S->big;
-  S->mark_pos = S->ring.end();
+  S->reads.set_epoch(S->ring.publishes());
   S->reads.command(cmd, n);
   kick();
   S->fence_ms += S->ring.wait_read(S->ring.end());
@@ -699,10 +737,7 @@ void render_gx(const std::uint8_t* cmd, std::size_t len) {
 }
 
 // Q4: one record for the commands of a push (usually the few commands of a
-// 32-byte burst), instead of one each. The commands' reads are marked with the
-// position after the record: the render thread finishes the record as a whole,
-// so a write waits for the same commands to be done as with a record each, or
-// for the few after them in the same burst.
+// 32-byte burst), instead of one each.
 void render_gx_batch(const rt::GxCommand* cmds, std::size_t n) {
   if (disabled() || !n) return;
   std::size_t total = 4 + 4 * n;
@@ -730,7 +765,7 @@ void render_gx_batch(const rt::GxCommand* cmds, std::size_t n) {
   }
   std::memcpy(out, run, run_len);
   S->ring.commit();
-  S->mark_pos = S->ring.end();
+  S->reads.set_epoch(S->ring.publishes());
   for (std::size_t k = 0; k < n; ++k) S->reads.command(cmds[k].p, cmds[k].len);
   S->ring.publish_if(kPublishBytes);
 }
@@ -846,14 +881,15 @@ std::string render_status_json() {
     kinds += kb;
   }
   kinds += "]";
-  char b[1024];
+  char b[1400];
   std::snprintf(b, sizeof b,
                 ",\"resizes\":%llu,\"thread\":{\"fences\":%llu,\"fence_waits\":%llu,\"fence_ms\":%.1f,"
                 "\"fence_hist\":[%llu,%llu,%llu,%llu],\"fence_hist_ms\":[%.0f,%.0f,%.0f,%.0f],"
                 "\"fence_behind_kb\":[%.0f,%.0f,%.0f,%.0f],\"write_checks\":%llu,\"write_waits\":%llu,"
                 "\"write_wait_ms\":%.1f,\"pending_pages\":%zu,\"read_ranges\":%llu,\"lag_waits\":%llu,"
                 "\"lag_ms\":%.1f,\"records\":%llu,\"ring_mb\":%.1f,\"full_waits\":%llu,\"big\":%llu,"
-                "\"wait_kinds\":%s,\"gp_flushes\":%llu,\"gp_flushed_mb\":%.1f,\"gp_sent_mb\":%.2f,\"gp_unmarked\":%llu}",
+                "\"wait_kinds\":%s,\"gp_flushes\":%llu,\"gp_flushed_mb\":%.1f,\"gp_sent_mb\":%.2f,\"gp_unmarked\":%llu,"
+                "\"read_primitives\":%llu,\"read_indexed\":%llu,\"read_skipped\":%llu,\"mark_entries\":%llu}",
                 static_cast<unsigned long long>(S->resizes), static_cast<unsigned long long>(S->fences),
                 static_cast<unsigned long long>(S->fence_waits), S->fence_ms,
                 static_cast<unsigned long long>(S->fence_hist[0]), static_cast<unsigned long long>(S->fence_hist[1]),
@@ -866,7 +902,11 @@ std::string render_status_json() {
                 static_cast<unsigned long long>(S->ring.records()), static_cast<double>(S->ring.bytes()) / (1 << 20),
                 static_cast<unsigned long long>(S->ring.full_waits()), static_cast<unsigned long long>(S->big),
                 kinds.c_str(), static_cast<unsigned long long>(S->gp_flushes), static_cast<double>(S->gp_flushed_bytes) / 1e6,
-                static_cast<double>(S->gp_sent_bytes) / 1e6, static_cast<unsigned long long>(S->gp_unmarked));
+                static_cast<double>(S->gp_sent_bytes) / 1e6, static_cast<unsigned long long>(S->gp_unmarked),
+                static_cast<unsigned long long>(S->reads.stats().primitives),
+                static_cast<unsigned long long>(S->reads.stats().indexed),
+                static_cast<unsigned long long>(S->reads.stats().skipped),
+                static_cast<unsigned long long>(S->mark_entries));
   return s + b;
 }
 

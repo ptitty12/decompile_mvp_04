@@ -85,3 +85,47 @@ and `stfd` to the pipe (straddling bursts, `0xCC008004` included) and compares t
 memory, its write pointer, the bursts and the store counts with the same values written
 through `Hardware::write`; another checks that an observer gets each push's commands at
 once and in order, the same as one that takes them one by one.
+
+## 3. Lever 3: write tracking's marks, once per epoch
+
+### What was slow
+
+`GpReads` reports, for every command, the guest memory the render thread will read for it,
+and the emulation thread marks those bytes (`ppc::g_gp_pages`, one entry per 64 bytes) with
+the ring position after the command, so that a guest write there waits until the render
+thread has finished that command. In play 99 % of the primitives use indexed attributes;
+each one reported its arrays' element ranges (3.2 a primitive) and each range was marked
+entry by entry: 1.17 billion entries over the CPU-vs-CPU session (about 100,000 a field),
+most of them static arrays the game never writes. With the format's layout worked out again
+for every primitive, `GpReads` and its marks cost about 1 ms of the 11 ms field.
+
+### The design
+
+- **Entries hold an epoch, not a position.** The epoch is the number of ring publishes so
+  far; it ends at the next publish, which makes every record committed during it visible.
+  The ring keeps the position each of its last 65,536 publishes made visible
+  (`RenderRing::publishes`, `published_at`). A guest write that meets a marked entry waits
+  until the render thread has finished every record up to the end of that entry's epoch
+  (for the epoch still open: up to everything committed so far). That end is at or after
+  the command that marked the entry: the write waits for that command, or also for the
+  few after it in the same epoch (a publish comes every 4 KiB of records, about 1/270 of a
+  field of play). The sweep at each VI field forgets entries whose epoch the render thread
+  has finished.
+- **Within an epoch, an array's elements are reported once.** Since every command of the
+  epoch is covered by the epoch's end, an entry marked once in an epoch stays good for the
+  epoch's later commands. `GpReads` keeps, per CP array, the element range it reported in the
+  current epoch (with the array's base, stride and element size); a primitive whose range
+  lies inside it reports nothing, one that overlaps or adjoins it reports only the new
+  elements. The owner starts a new epoch whenever a mark could have gone away: every
+  publish (the epoch changes), every write wait and sweep that clears entries
+  (`GpReads::forget`), and every snapshot a DMA or the pipe ends (Q1's GP view: those
+  lines are read from memory again and need marks). Without `set_epoch` (the unit tests'
+  default), every range is reported as before.
+- The format layouts are kept until a VCD or VAT write; the per-entry check for Q1's
+  snapshots is made only in 4 KiB pages that have a snapshot this field.
+
+Exactness: guest state cannot depend on it (waits change only host timing). The render
+thread still reads guest memory as the inline renderer does: every write to memory a
+command still has to read waits for that command, as before (renderer digests, section 7).
+Unit tests: a range reported once per epoch, only the new elements of an overlapping one,
+everything again after `forget` or in a new epoch; the ring's publish history.

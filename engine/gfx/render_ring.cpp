@@ -100,6 +100,7 @@ void RenderRing::commit() {
 void RenderRing::publish() {
   if (pub_local_ == wpos_) return;
   pub_local_ = wpos_;
+  pub_hist_[++publishes_ & (kPubHistory - 1)] = wpos_;
   pub_.store(wpos_, std::memory_order_seq_cst);
   if (cons_wait_.load(std::memory_order_seq_cst)) {
     cons_wait_.store(0, std::memory_order_relaxed);

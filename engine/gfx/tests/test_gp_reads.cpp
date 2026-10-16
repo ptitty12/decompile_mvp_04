@@ -125,3 +125,42 @@ TEST_CASE("textures: the first draw after an invalidation or a TLUT load") {
   CHECK(got[1] == std::pair<u32, u32>(0x900000, 32));
   CHECK(got[2].first == 0x800000);
 }
+
+TEST_CASE("indexed attributes: within an epoch, each array's elements are reported once") {
+  Recorder r;
+  Stream s;
+  s.cp(cp::kVcdLo, 2u << 9);  // position: 8-bit index
+  s.cp(cp::kVcdHi, 0);
+  s.cp(cp::kVatA, 1u | 3u << 1);  // xyz, s16: 6 bytes
+  s.cp(cp::kArrayBase + 0, 0x00100000);
+  s.cp(cp::kArrayStride + 0, 6);
+  r.run(s);
+  r.take();
+  auto draw = [&](std::vector<u8> idx) {
+    Stream p;
+    p.prim(cmd::kPoints, static_cast<std::uint16_t>(idx.size()), idx);
+    r.run(p);
+    return r.take();
+  };
+  using R = std::vector<std::pair<u32, u32>>;
+  // Without an epoch: every primitive reports what it reads.
+  CHECK(draw({10, 20}) == R{{0x100000 + 60, 10 * 6 + 6}});
+  CHECK(draw({12, 14}) == R{{0x100000 + 72, 2 * 6 + 6}});
+  r.reads.set_epoch(7);
+  CHECK(draw({10, 20}) == R{{0x100000 + 60, 10 * 6 + 6}});
+  CHECK(draw({12, 14}).empty());                                          // inside what the epoch reported
+  CHECK(draw({18, 25}) == R{{0x100000 + 21 * 6, 4 * 6 + 6}});              // only the new elements
+  CHECK(draw({5, 12}) == R{{0x100000 + 5 * 6, 4 * 6 + 6}});
+  CHECK(r.reads.stats().skipped == 1);
+  CHECK(draw({40, 41}) == R{{0x100000 + 40 * 6, 1 * 6 + 6}});              // elsewhere: reported, and now the one kept
+  CHECK(draw({10, 12}) == R{{0x100000 + 10 * 6, 2 * 6 + 6}});
+  r.reads.forget();  // the owner cleared marks: everything again
+  CHECK(draw({10, 12}) == R{{0x100000 + 10 * 6, 2 * 6 + 6}});
+  CHECK(draw({10, 12}).empty());
+  r.reads.set_epoch(8);  // a new epoch
+  CHECK(draw({10, 12}) == R{{0x100000 + 10 * 6, 2 * 6 + 6}});
+  s.cp(cp::kArrayBase + 0, 0x00200000);  // another array base: reported
+  r.run(s);
+  r.take();
+  CHECK(draw({10, 12}) == R{{0x200000 + 10 * 6, 2 * 6 + 6}});
+}

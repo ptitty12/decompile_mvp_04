@@ -35,8 +35,22 @@ class GpReads {
 
   void command(const u8* c, std::size_t len);
 
+  // Q4: the marks' epoch. Within one epoch the owner promises that a range
+  // marked once stays marked (its marks are good for every later command of the
+  // epoch, and nothing clears them), so a vertex array's elements are reported
+  // only the first time a primitive of the epoch reads them. The owner starts a
+  // new epoch (set_epoch with another value, or forget()) whenever that stops
+  // holding.
+  // Until the first set_epoch, every range is reported.
+  void set_epoch(std::uint32_t e) {
+    epoch_ = e;
+    once_ = true;
+  }
+  void forget() { ++gen_; }
+
   struct Stats {
     std::uint64_t primitives = 0, indexed = 0, ranges = 0, textures = 0;
+    std::uint64_t skipped = 0;  // Q4: vertex ranges an earlier primitive of the epoch had reported
   };
   const Stats& stats() const { return stats_; }
 
@@ -44,10 +58,32 @@ class GpReads {
   void load_cp(u8 reg, u32 v);
   void load_bp(u32 value);
   void primitive(u8 op, const u8* data, u32 count);
+  void vertex_range(u32 array, u32 lo, u32 hi, u32 elem);
+  struct Layout;
+  const Layout& layout(int fmt);
   void textures();
   void range(u32 addr, u32 size, ReadKind kind);
 
   Mark mark_;
+  // Q4: each vertex format's indexed attributes (from the VCD and VAT), until
+  // one of those changes.
+  struct Indexed {
+    u32 at, isize, array, elem, n;  // index offset, index bytes, array, element bytes, indices (3: NBT3)
+  };
+  struct Layout {
+    bool valid = false;
+    u32 vsize = 0, nix = 0;
+    Indexed ix[12];
+  };
+  std::array<Layout, 8> layouts_{};
+  // Q4: per array, the elements reported in the current epoch.
+  struct Reported {
+    std::uint32_t epoch = 0, gen = ~0u;
+    u32 base = 0, stride = 0, elem = 0, lo = 0, hi = 0;
+  };
+  std::array<Reported, 16> reported_{};
+  std::uint32_t epoch_ = 0, gen_ = 0;
+  bool once_ = false;  // ranges reported once per epoch (set_epoch was called)
   u32 vcd_lo_ = 0, vcd_hi_ = 0;
   std::array<u32, 8> vat_a_{}, vat_b_{}, vat_c_{};
   std::array<u32, 16> array_base_{}, array_stride_{};
