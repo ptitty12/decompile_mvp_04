@@ -75,7 +75,7 @@
 //              spin N - 1 times their working time (hostSlow=N&hostSlowFrom=F) and Chrome's CPU throttling
 //              slows the page's main thread N times (DevTools throttling reaches only the main thread)
 //   --affinity HEXMASK  (Q2, Windows) the browser's processes run only on these logical processors (e.g.
-//              the efficiency cores, a weaker CPU), set once the page has loaded and again at the first frame
+//              four efficiency cores, a weaker CPU), set once the page has loaded and again at the first frame
 //   --load N   (Q2) N busy processes (one thread each) at normal priority for the whole run
 //
 // Exit status: 0 when every run reached its first frame (and its stop, if any),
@@ -266,18 +266,18 @@ function summarizeIo(text, firstFrameField) {
            afterFirstFrame: part(rows.filter((r) => r[0] >= firstFrameField)), longest };
 }
 
-// --affinity (Windows): the logical processors the browser's processes may use. The browser's process
-// and every descendant (renderer, GPU, utility processes) get the mask; returns how many were set.
-let browserPid = 0;
+// --affinity (Windows): the logical processors the browser's processes may use: every chrome.exe (or
+// msedge.exe) descending from this check's process (Playwright starts the browser as its child; the
+// renderer, GPU and utility processes are the browser's). Returns how many were set.
 function setAffinity(mask) {
-  if (!browserPid) return { error: 'no browser process id' };
-  const ps = `$m=[IntPtr]0x${mask}; $all=Get-CimInstance Win32_Process; $ids=@(${browserPid}); $n=0; ` +
+  const ps = `$m=[IntPtr]0x${mask}; $all=Get-CimInstance Win32_Process; $ids=@(${process.pid}); ` +
     `do { $more=@($all | Where-Object { $ids -notcontains $_.ProcessId -and $ids -contains $_.ParentProcessId } | ` +
-    `ForEach-Object { $_.ProcessId }); $ids+=$more } while ($more.Count -gt 0); ` +
-    `foreach ($i in $ids) { try { (Get-Process -Id $i).ProcessorAffinity=$m; $n++ } catch {} }; $n`;
+    `ForEach-Object { $_.ProcessId }); $ids+=$more } while ($more.Count -gt 0); $n=0; ` +
+    `foreach ($p in ($all | Where-Object { $ids -contains $_.ProcessId -and $_.Name -match '^(chrome|msedge)[.]exe$' })) ` +
+    `{ try { (Get-Process -Id $p.ProcessId).ProcessorAffinity=$m; $n++ } catch {} }; $n`;
   const r = spawnSync('powershell', ['-NoProfile', '-Command', ps], { encoding: 'utf8' });
   const set = Number(String(r.stdout).trim().split(/\s+/).pop());
-  console.log(`affinity 0x${mask}: ${set} processes`);
+  console.log(`affinity 0x${mask}: ${set} browser processes`);
   return { mask, processes: set };
 }
 
@@ -610,7 +610,6 @@ try {
   } else {
     browser = await launchers[browserName]();
     all.version = browser.version();
-    browserPid = browser.process?.()?.pid ?? 0;
     context = await browser.newContext({ viewport: { width: vw, height: vh } });
   }
   for (let run = 1; run <= runs; ++run) {
