@@ -185,34 +185,45 @@ std::string GxFifo::broken_context() const {
 GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
   Effects fx;
   if (broken_) return fx;
-  pending_.insert(pending_.end(), bytes, bytes + n);
-  if (need_ > pending_.size()) return fx;  // the command at the head is still incomplete
+  // Q2: with nothing pending (the usual case: a burst holds whole commands and
+  // perhaps the start of one more), the commands are parsed where the bytes are
+  // and only an incomplete tail is kept; otherwise the bytes join what is pending.
+  const std::uint8_t* p = bytes;
+  std::size_t avail = n;
+  if (!pending_.empty()) {
+    pending_.insert(pending_.end(), bytes, bytes + n);
+    if (need_ > pending_.size()) return fx;  // the command at the head is still incomplete
+    p = pending_.data();
+    avail = pending_.size();
+  }
   need_ = 0;
   std::size_t at = 0;
-  while (at < pending_.size()) {
-    std::size_t len = command_length(pending_.data() + at, pending_.size() - at);
+  while (at < avail) {
+    std::size_t len = command_length(p + at, avail - at);
     if (len == ~std::size_t(0)) {
       broken_ = true;
-      broken_opcode_ = pending_[at];
+      broken_opcode_ = p[at];
       broken_offset_ = consumed_;
-      broken_tail_.assign(pending_.begin() + static_cast<std::ptrdiff_t>(at),
-                          pending_.begin() + static_cast<std::ptrdiff_t>(std::min(pending_.size(), at + 64)));
+      broken_tail_.assign(p + at, p + std::min(avail, at + 64));
       pending_.clear();
       return fx;
     }
-    if (len == 0 || len > pending_.size() - at) {  // the rest of the command is still to come
+    if (len == 0 || len > avail - at) {  // the rest of the command is still to come
       if (len) need_ = len;  // its length, from the head of pending_ after the erase below
       break;
     }
     Recent& r = recent_[recent_n_++ % recent_.size()];
     r.offset = consumed_;
     r.len = static_cast<std::uint32_t>(len);
-    for (std::size_t k = 0; k < r.head.size(); ++k) r.head[k] = k < len ? pending_[at + k] : 0;
-    execute(pending_.data() + at, len, fx, false);
+    const std::size_t h = std::min(len, r.head.size());
+    std::copy(p + at, p + at + h, r.head.begin());
+    std::fill(r.head.begin() + static_cast<std::ptrdiff_t>(h), r.head.end(), std::uint8_t{0});
+    execute(p + at, len, fx, false);
     consumed_ += len;
     at += len;
   }
-  pending_.erase(pending_.begin(), pending_.begin() + static_cast<std::ptrdiff_t>(at));
+  if (p == bytes) pending_.assign(bytes + at, bytes + n);
+  else pending_.erase(pending_.begin(), pending_.begin() + static_cast<std::ptrdiff_t>(at));
   return fx;
 }
 

@@ -14,6 +14,7 @@
 //        [--hide F:MS] [--trace-disc] [--disc-cache PARAMS] [--hold MS] [--real-server MAIN_JS [--disc-dir DIR]]
 //        [--throttle RTT_MS,MBIT] [--io-log] [--clear-disc] [--store-off] [--profile DIR]
 //        [--threads 0] [--no-isolation] [--digest] [--cast-size WxH]   (P2; see below)
+//        [--host-slow N[@F]] [--affinity HEXMASK] [--load N]   (Q2; see below)
 //
 //   --disc     the image (default: $MVP_DISC). It goes to the page's file input
 //              locally (or, with --server-disc, to the mock server on 127.0.0.1)
@@ -70,11 +71,17 @@
 //              into OUT/disc-trace-*.txt, to tune the server image's cache
 //   --disc-cache  that cache's settings as page parameters (discBlock=KIB&
 //              discBlocks=N&discRun=N&discAhead=N)
+//   --host-slow N[@F]  (Q2) a machine N times slower, simulated from VI field F on: the engine's threads
+//              spin N - 1 times their working time (hostSlow=N&hostSlowFrom=F) and Chrome's CPU throttling
+//              slows the page's main thread N times (DevTools throttling reaches only the main thread)
+//   --affinity HEXMASK  (Q2, Windows) the browser's processes run only on these logical processors (e.g.
+//              four efficiency cores, a weaker CPU), set once the page has loaded and again at the first frame
+//   --load N   (Q2) N busy processes (one thread each) at normal priority for the whole run
 //
 // Exit status: 0 when every run reached its first frame (and its stop, if any),
 // 1 otherwise, 77 without a disc.
 
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -162,6 +169,10 @@ const pads = opt('--pad', '').split(',').filter(Boolean).map((p) => {
 }).sort((a, b) => a.field - b.field);
 const hide = opt('--hide', '') ? opt('--hide', '').split(':').map(Number) : null;
 const holdMs = Number(opt('--hold', '150'));  // how long --keys and --pad buttons stay down
+// Q2: weaker machines, simulated.
+const hostSlow = opt('--host-slow', '') ? opt('--host-slow', '').split('@').map(Number) : null;
+const affinity = opt('--affinity', '');
+const loadProcs = Number(opt('--load', '0'));
 
 if (!disc || !existsSync(disc)) {
   console.error('browser_check: no disc image (--disc or MVP_DISC)');
@@ -255,6 +266,21 @@ function summarizeIo(text, firstFrameField) {
            afterFirstFrame: part(rows.filter((r) => r[0] >= firstFrameField)), longest };
 }
 
+// --affinity (Windows): the logical processors the browser's processes may use: every chrome.exe (or
+// msedge.exe) descending from this check's process (Playwright starts the browser as its child; the
+// renderer, GPU and utility processes are the browser's). Returns how many were set.
+function setAffinity(mask) {
+  const ps = `$m=[IntPtr]0x${mask}; $all=Get-CimInstance Win32_Process; $ids=@(${process.pid}); ` +
+    `do { $more=@($all | Where-Object { $ids -notcontains $_.ProcessId -and $ids -contains $_.ParentProcessId } | ` +
+    `ForEach-Object { $_.ProcessId }); $ids+=$more } while ($more.Count -gt 0); $n=0; ` +
+    `foreach ($p in ($all | Where-Object { $ids -contains $_.ProcessId -and $_.Name -match '^(chrome|msedge)[.]exe$' })) ` +
+    `{ try { (Get-Process -Id $p.ProcessId).ProcessorAffinity=$m; $n++ } catch {} }; $n`;
+  const r = spawnSync('powershell', ['-NoProfile', '-Command', ps], { encoding: 'utf8' });
+  const set = Number(String(r.stdout).trim().split(/\s+/).pop());
+  console.log(`affinity 0x${mask}: ${set} browser processes`);
+  return { mask, processes: set };
+}
+
 async function runOnce(context, run) {
   const summary = { run };
   const page = await context.newPage();
@@ -292,6 +318,10 @@ async function runOnce(context, run) {
   if (digest) q.set('digest', '1');
   if (fastUntil) q.set('fastUntil', String(fastUntil));
   if (ioLog) q.set('ioLog', '1');
+  if (hostSlow) {
+    q.set('hostSlow', String(hostSlow[0]));
+    if (hostSlow[1]) q.set('hostSlowFrom', String(hostSlow[1]));
+  }
   for (const [k, v] of new URLSearchParams(discParams)) q.set(k, v);
   for (const [k, v] of new URLSearchParams(pageParams)) q.set(k, v);
   if (storeOff) q.set('store', '0');
@@ -314,6 +344,7 @@ async function runOnce(context, run) {
   await page.goto(`${base}?${q}`);
   summary.webgpu = await page.evaluate(() => 'gpu' in navigator);
   summary.crossOriginIsolated = await page.evaluate(() => self.crossOriginIsolated === true);  // P2
+  if (affinity) summary.affinity = setAffinity(affinity);
   // The user gesture that starts audio: a real click on the page.
   if (audio) await page.mouse.click(5, 5);
   // Roster packs (E6): through the panel's inputs, as a player picks them, before the disc.
@@ -402,6 +433,7 @@ async function runOnce(context, run) {
     console.log(`screencast started at field ${lastField}`);
   };
   let lastField = 0;
+  let throttled = null, affinityAgain = false;  // Q2
   // --trace: the browser-wide tracing session (it records the Worker's thread too).
   let tracing = null, traceStart = 0;
   const startTrace = async () => {
@@ -437,8 +469,12 @@ async function runOnce(context, run) {
       lastWindow = JSON.stringify(state.stats);
       const w = state.audio?.worklet;
       const st = state.stats.status;
-      windows.push({ field: st.fields, ...state.stats.window,
-                     audio: w ? { fill: w.fill, underruns: w.underruns, skipped: w.skipped } : undefined,
+      windows.push({ field: st.fields, frame: st.frames, at: Date.now() - t0, ...state.stats.window,
+                     audio: w ? { fill: w.fill, underruns: w.underruns, skipped: w.skipped, target: w.target,
+                                  gaps20: w.gaps20, gapMs: w.gapMs, silent: w.silentFrames, out: w.outFrames,
+                                  ratio: w.ratio, stretch: w.stretch, stretched: w.stretched, splices: w.splices,
+                                  speed: w.speed, transport: w.transport, ringDropped: w.ringDropped,
+                                  inFrames: w.inFrames } : undefined,
                      // P2, threaded: the render thread's working time and the emulation's fence waits so far (ms)
                      renderBusyMs: st.render?.busy_ms, fenceMs: st.thread?.fence_ms, fences: st.thread?.fences,
                      writeWaitMs: st.thread?.write_wait_ms, writeWaits: st.thread?.write_waits });
@@ -446,6 +482,15 @@ async function runOnce(context, run) {
     const field = state.stats?.status.fields ?? 0;
     lastField = field;
     if (screencast && !cast && field >= screencast[0]) await startCast();
+    if (hostSlow && !throttled && field >= (hostSlow[1] || 0)) {
+      throttled = await page.context().newCDPSession(page);
+      await throttled.send('Emulation.setCPUThrottlingRate', { rate: hostSlow[0] });
+      console.log(`host slowed ${hostSlow[0]}x at field ${field}`);
+    }
+    if (affinity && !affinityAgain && state.firstFrameMs !== undefined) {
+      affinityAgain = true;
+      summary.affinity = setAffinity(affinity);
+    }
     if (traceAt && !tracing && field >= traceAt[0]) await startTrace();
     if (tracing && !summary.trace && Date.now() - traceStart >= traceAt[1]) await stopTrace();
     if (cast && castFrames.length >= screencast[1] && !summary.screencast) {
@@ -542,6 +587,10 @@ async function runOnce(context, run) {
   return summary;
 }
 
+// --load N: busy processes for the whole run (killed at the end).
+const loaders = [];
+for (let i = 0; i < loadProcs; ++i)
+  loaders.push(spawn(process.execPath, ['-e', 'for(;;){}'], { stdio: 'ignore' }));
 const all = { browser: browserName, tag: tag || null, jsFlags: jsFlags || null, headed, fast, fields, frames,
               script: scriptFile || null, serverDisc, login, latency: latency || null, rate: rate || null, runs: [] };
 let rc = 1;
@@ -575,6 +624,7 @@ try {
 } finally {
   await browser?.close();
   server.kill();
+  for (const l of loaders) l.kill();
 }
 writeFileSync(join(out, `summary-${label}.json`), JSON.stringify(all, null, 2));
 console.log(JSON.stringify(all, (k, v) => (k === 'windows' || k === 'requests' ? undefined : v), 2));

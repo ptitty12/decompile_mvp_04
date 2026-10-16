@@ -115,6 +115,7 @@ double kSpinMs = 1.0;
 // writes to memory the render thread still reads wait instead (GpReads), which
 // covers every case the fences cover.
 bool kSyncFences = false;
+std::atomic<double> g_host_slow{1.0};  // development (Q2): render_host_slow
 constexpr double kVsyncPollMs = 1.0;      // with a frame due, it looks at the refresh count this often
 constexpr double kVsyncStallMs = 50.0;    // a frame due this long shows even if the count did not move
 
@@ -499,7 +500,14 @@ void render_task() {
   ++S->tasks;
   S->idle.store(0, std::memory_order_seq_cst);
   double busy_from = emscripten_get_now();  // the thread's working time (statistics), between waits
-  auto rest = [&] { S->busy_ms += emscripten_get_now() - busy_from; };
+  auto rest = [&] {
+    const double now = emscripten_get_now(), work = now - busy_from;
+    S->busy_ms += work;
+    const double slow = g_host_slow.load(std::memory_order_relaxed);
+    if (slow > 1)  // development: a slower machine (render_host_slow)
+      while (emscripten_get_now() - now < (slow - 1) * work) {
+      }
+  };
   unsigned records = 0;
   for (;;) {
     // A due frame: the refresh count (a call into JavaScript) is read every 32
@@ -592,6 +600,10 @@ void render_tune(double fence_spin_us, double render_spin_ms, int publish_kib, i
   if (render_spin_ms >= 0) kSpinMs = render_spin_ms;
   if (publish_kib > 0) kPublishBytes = static_cast<u32>(publish_kib) << 10;
 }
+
+void render_host_slow(double factor) { g_host_slow.store(factor > 1 ? factor : 1.0); }
+
+double render_waited_ms() { return S ? S->write_wait_ms + S->lag_ms + S->fence_ms : 0; }
 
 void render_memory(const std::uint8_t* mem, std::uint32_t size) {
   gp_attach(mem, size);

@@ -28,6 +28,7 @@ export interface MvpEngine {
   _mvp_threaded(): number;
   _mvp_digest(on: number, detailFrom: number, detailTo: number): void;
   _mvp_render_tune(fenceSpinUs: number, renderSpinMs: number, publishKib: number, syncFences: number): void;
+  _mvp_host_slow(factor: number): void;  // Q2 (development): a slower machine, simulated
   _mvp_digest_take(): number;
   _mvp_gp_view(on: number): void;
   _mvp_render_scale(scale: number): void;  // Q1: the internal resolution, 1-3  // Q1 (development): the renderer's model of the data cache on or off
@@ -55,6 +56,7 @@ export interface MvpEngine {
   _mvp_audio_take(): number;
   _mvp_audio_ptr(): number;
   _mvp_audio_rate(): number;
+  _mvp_audio_ring(capacity: number): number;  // Q2: the threaded build's ring in shared memory (0: none)
 
   // P1: every guest DVD read with its host timing (development).
   _mvp_io_log_enable(): void;

@@ -47,6 +47,7 @@ let frames: MessagePort | null = null;       // P2: the page shows the frames se
 let opts: RunOptions | null = null;
 let running = false, paused = false, firstFrame = false, booted = false;
 let pacedStart = 0, pacedFields = 0;
+let fieldsRun = 0, slowApplied = false;  // Q2 (development): hostSlow from hostSlowFrom on
 // Stats window (reported about twice a second).
 let winFields = 0, winMs = 0, winWall = performance.now();
 // Audio: the worklet's channel, once the page has one (first user gesture).
@@ -257,15 +258,55 @@ function enableAudio(): void {
   if (!M || !booted || !opts?.audio || !audioPort || audioAttached) return;
   M._mvp_audio_enable(1);
   audioAttached = true;
+  audioRing();
   post({ type: 'audio', attachedAtField: status().fields });
 }
 
-// The batch's mixed frames, to the worklet (the buffer is transferred).
+// Q2: where memory can be shared (a cross-origin isolated page), the frames go
+// to the worklet through a ring in shared memory (web_audio.h's AudioRing
+// layout): the threaded engine's mixer writes into one in the engine's own
+// memory as it mixes; the single-threaded engine's batches are copied into one
+// here. Elsewhere (or audioRing=0) each batch is a message.
+const RING_FRAMES = 16384;  // about half a second at 32 kHz
+let ringOut: { h: Int32Array; frames: Int16Array; cap: number } | null = null;
+function audioRing(): void {
+  const canShare = (self as unknown as { crossOriginIsolated?: boolean }).crossOriginIsolated === true &&
+                   typeof SharedArrayBuffer !== 'undefined';
+  if (!M || !audioPort || opts?.audioRing === false || !canShare) return;
+  let msg: WorkletIn | null = null;
+  if (mt && M.wasmMemory) {
+    const header = M._mvp_audio_ring(RING_FRAMES);
+    if (header) msg = { type: 'ring', sab: M.wasmMemory.buffer as unknown as SharedArrayBuffer, header };
+  }
+  if (!msg) {
+    const sab = new SharedArrayBuffer(64 + 4 * RING_FRAMES);
+    const h = new Int32Array(sab, 0, 16);
+    h.set([0x4d565041, RING_FRAMES, 32000, 0, 0, 0, 64]);
+    ringOut = { h, frames: new Int16Array(sab, 64, 2 * RING_FRAMES), cap: RING_FRAMES };
+    msg = { type: 'ring', sab, header: 0 };
+  }
+  audioPort.postMessage(msg);
+}
+
+// The batch's mixed frames, to the worklet: into the Worker's ring, or as a
+// message (the buffer transferred). Nothing to do with the engine's own ring.
 function pumpAudio(): void {
   if (!audioAttached || !audioPort || !M) return;
   const n = M._mvp_audio_take();
   if (!n) return;
   const ptr = M._mvp_audio_ptr();
+  if (ringOut) {
+    const { h, frames, cap } = ringOut;
+    const w = Atomics.load(h, 3) >>> 0, used = (w - (Atomics.load(h, 4) >>> 0)) >>> 0;
+    const k = Math.min(n, cap - used), at = w & (cap - 1), first = Math.min(k, cap - at);
+    const src = new Int16Array(heap().buffer, ptr, 2 * n);
+    frames.set(src.subarray(0, 2 * first), 2 * at);
+    if (k > first) frames.set(src.subarray(2 * first, 2 * k), 0);
+    Atomics.store(h, 2, M._mvp_audio_rate());
+    Atomics.store(h, 3, (w + k) | 0);
+    if (k < n) Atomics.add(h, 5, n - k);
+    return;
+  }
   // A copy in its own (never shared) buffer, to transfer.
   const data = new Int16Array(heap().slice(ptr, ptr + 4 * n).buffer);
   const msg: WorkletIn = { type: 'pcm', rate: M._mvp_audio_rate(), data };
@@ -442,6 +483,11 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
 function afterRun(ran: number, ms: number): boolean {
   winFields += Math.max(0, ran);
   winMs += ms;
+  fieldsRun += Math.max(0, ran);
+  if (opts?.hostSlow && !slowApplied && fieldsRun >= (opts.hostSlowFrom ?? 0)) {
+    slowApplied = true;
+    M!._mvp_host_slow(opts.hostSlow);
+  }
   pumpAudio();
   pumpDisc();
   if (M!._mvp_present() && !firstFrame) {
@@ -457,8 +503,10 @@ function afterRun(ran: number, ms: number): boolean {
   if (now - winWall >= 500) {
     const trace = opts?.tracePresent ? JSON.parse(cstr(M!._mvp_trace_take())) as unknown[] : undefined;
     const digest = opts?.digest ? cstr(M!._mvp_digest_take()) : undefined;
+    const sat = saturatedMs + (saturated ? now - saturatedSince : 0);
     post({ type: 'stats', status: status(),
-           window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace, digest } });
+           window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace, digest, saturatedMs: sat,
+                     fieldCost } });
     winFields = 0;
     winMs = 0;
     winWall = now;
@@ -490,7 +538,25 @@ function afterRun(ran: number, ms: number): boolean {
 // waiting for an animation frame; each batch's frame is presented when its task
 // ends. Ahead of the clock the loop waits for animation frames as before.
 // pacing=raf (URL) keeps the earlier batches of up to four fields per animation frame.
+//
+// Q2 (slowMotion=1, opt-in): on a machine that cannot run the game at full
+// speed, while the host time per field (smoothed over about a second) is a
+// whole field or more, every batch is one field, each followed by its
+// present, back to back, and the clock runs at most two fields ahead: the game
+// runs evenly in slow motion with every frame shown, instead of the chase's
+// two-field batches (every other frame shown). Measured at a simulated 2x
+// slower machine (Q2_LOG.md section 4): 37.7 instead of 25.9 new frames a
+// second, but the game at 0.63x instead of 0.69x, so it is off by default.
+// Threaded engine only (the single-threaded one presents inline: a present
+// per field cost it about 10 % of its speed). Under 90 % it chases again.
+// Guest state is the same either way (wall time decides only how many fields
+// run per batch).
 const CHASE_FIELDS = 2;
+const SATURATED_ON = 1.0, SATURATED_OFF = 0.9, SATURATED_S = 1.0;
+let fieldCost = 0;          // smoothed host ms per field, as a share of a field
+let saturated = false;
+let saturatedMs = 0;        // statistics: wall time spent saturated
+let saturatedSince = 0;
 const chase = new MessageChannel();
 let chasePending = false;
 chase.port1.onmessage = () => {
@@ -501,19 +567,31 @@ chase.port1.onmessage = () => {
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
   let due = Math.floor((now - pacedStart) / FIELD_MS) - pacedFields;
-  if (due > MAX_FIELDS_PER_FRAME * 2) {
-    // Too far behind (a slow stretch, a background tab): drop the debt.
+  const slowMotion = saturated && mt && opts?.slowMotion === true;  // opt-in (slowMotion=1), threaded only
+  if (due > (slowMotion ? 2 : MAX_FIELDS_PER_FRAME * 2)) {
+    // Too far behind (a slow stretch, a background tab, a slow machine): drop the debt.
     pacedStart = now - pacedFields * FIELD_MS;
     due = 1;
   }
   const rafOnly = opts?.pacing === 'raf';
-  due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : due >= 3 ? CHASE_FIELDS : 1);
+  due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : slowMotion ? 1 : due >= 3 ? CHASE_FIELDS : 1);
   if (due <= 0) return;
   const t0 = performance.now();
   const ran = M._mvp_run_fields(due);
+  const ms = performance.now() - t0;
   pacedFields += Math.max(0, ran);
+  if (ran > 0) {
+    fieldCost += (1 - Math.exp(-(ran * FIELD_MS) / (1000 * SATURATED_S))) * (ms / ran / FIELD_MS - fieldCost);
+    if (!saturated && fieldCost >= SATURATED_ON) {
+      saturated = true;
+      saturatedSince = t0;
+    } else if (saturated && fieldCost < SATURATED_OFF) {
+      saturated = false;
+      saturatedMs += t0 - saturatedSince;
+    }
+  }
   gated = !!net && ran >= 0 && ran < due;
-  if (!afterRun(ran, performance.now() - t0) || rafOnly || gated) return;
+  if (!afterRun(ran, ms) || rafOnly || gated) return;
   // Still behind: the next batch now, in its own task (this one's frame is presented when it ends).
   if (!chasePending && Math.floor((performance.now() - pacedStart) / FIELD_MS) - pacedFields >= 1) {
     chasePending = true;

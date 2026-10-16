@@ -104,12 +104,16 @@ export interface RunOptions {
   tracePresent?: boolean;  // development (P1): what each present showed, in each stats window's `trace`
   fastUntil?: number;  // development (P1): run unpaced up to this VI field, then paced
   pacing?: 'chase' | 'raf';  // P1: 'raf' = batches of up to 4 fields per animation frame (the earlier loop)
+  slowMotion?: boolean;  // Q2: true = even slow motion (every frame shown) when the machine cannot keep up
   ioLog?: boolean;     // development: log every guest DVD read with its host timing (P1)
   inputLog?: boolean;  // development (Q3): the inputs the guest consumed, as an mvp-input script, in `stopped`
   threads?: boolean;   // P2: false = the inline renderer even where the threaded engine could run
   digest?: boolean;    // development (P2): the renderer digest per VI field, in each stats window's `digest`
   digestDetail?: number[];  // development (P2): VI fields [from, to] whose draws get a digest line each
   rtTune?: number[];   // development (P2): the render thread's waiting (mvp_render_tune: us, ms, KiB, sync fences)
+  audioRing?: boolean; // Q2: false = the frames go to the worklet as messages even where memory can be shared
+  hostSlow?: number;   // development (Q2): simulate a machine this many times slower (mvp_host_slow) ...
+  hostSlowFrom?: number;  // ... from this VI field on
   gpView?: boolean;    // development (Q1): false = the renderer reads guest memory as it is (gfx/gp_memory.h)
   scale?: number;      // Q1: the internal resolution, 1-3 times the console's (the Picture setting)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
@@ -194,7 +198,9 @@ export type FromWorker =
   | { type: 'cache'; report: CacheReport }
   | { type: 'audio'; attachedAtField: number }
   | { type: 'stats'; status: Status;
-      window: { fields: number; ms: number; wallMs: number; trace?: unknown[]; digest?: string } }
+      window: { fields: number; ms: number; wallMs: number; trace?: unknown[]; digest?: string;
+                saturatedMs?: number;  // Q2: wall ms so far with the machine saturated (one-field batches)
+                fieldCost?: number } }  // ... the smoothed host time per field, as a share of a field
   | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string; ioLog?: string; inputLog?: string }
   | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
   | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string };
@@ -203,6 +209,9 @@ export type FromWorker =
 export type WorkletIn =
   | { type: 'source'; port: MessagePort }               // the Worker's channel
   | { type: 'pcm'; rate: number; data: Int16Array }     // interleaved stereo frames
+  // Q2: from now on the frames come through a ring in shared memory (web_audio.h AudioRing: a 64-byte
+  // header of int32s at byte `header` of `sab`, the frames where the header says), not as 'pcm'
+  | { type: 'ring'; sab: SharedArrayBuffer; header: number }
   | { type: 'reset' }
   | { type: 'target'; ms: number };
 
@@ -226,4 +235,18 @@ export interface WorkletStats {
   available: number;
   chunks: number;
   maxGapMs: number;
+  // Q2
+  transport: 'port' | 'ring';
+  ringDropped: number;  // frames the producer found no room for in the ring
+  gaps: number;
+  gaps20: number;
+  gapMs: number;
+  longestGapMs: number;
+  speed: number;
+  stretch: number;
+  minStretch: number;
+  stretched: number;
+  splices: number;
+  targetMs: number;
+  maxTargetMs: number;
 }
