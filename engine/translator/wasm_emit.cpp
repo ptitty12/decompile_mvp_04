@@ -245,6 +245,32 @@ class FuncGen {
   // f64 temporaries (only in functions with inline floating-point arithmetic).
   u32 L_fa = 0, L_fb = 0, L_fc = 0, L_r = 0, L_f0 = 0, L_f1 = 0;
   bool uses_fp_ = false;
+  // Q4: FPR halves (2 r + h) cached in f64 locals within a run of straight-line
+  // code. Memory stays current (every write goes to both), so nothing is ever
+  // spilled; a local is used only while it is known to hold the half's value
+  // (fvalid_), which ends wherever something else may write FPRs (a call, a
+  // safe point, the MSR[FP] check, rt.exec, psq_l's helper) and at every label.
+  // FPSCR[RN, NI] == (0, 1), the fast paths' condition, is kept the same way.
+  int fpr_local_[64];
+  std::uint64_t fvalid_ = 0;
+  bool fpok_known_ = false, fp_cond_ = false;
+  u32 L_fpok = 0;
+  void fp_reset() {
+    fvalid_ = 0;
+    fpok_known_ = false;
+  }
+  void fp_drop(u32 r) { fvalid_ &= ~(3ull << (2 * r)); }
+  static u32 fp_half(u32 off) { return (off - kFpr) / 8; }
+  void fp_get(u32 off);                  // pushes the half at Cpu offset `off` as an f64
+  void fp_get_i64(u32 off) {             // ... as its i64 bits
+    fp_get(off);
+    body_->op(op::i64_reinterpret_f64);
+  }
+  void fp_load(u32 off);                 // makes the half's local current (on every path)
+  void fp_put_f64(u32 off, u32 local);   // writes the half from an f64 local
+  void fp_put_i64(u32 off, u32 local);   // ... from an i64 local
+  void fp_reload(std::uint64_t halves);  // after rt.exec wrote them in memory
+  void fpscr_ok();                       // pushes FPSCR[RN, NI] == (0, 1)
   int regloc_[reg::kCount];
 
   bool classify(std::string* error);
@@ -1194,30 +1220,27 @@ void FuncGen::emit_inline(const InsnInfo& x) {
     case Op::lfs: case Op::lfsu: case Op::lfsx: case Op::lfsux: {
       int mode = o == Op::lfs ? 0 : o == Op::lfsu ? 1 : o == Op::lfsx ? 2 : 3;
       ea_tmp(mode);
-      b.get(kCpu);
       b.get(kCpu);  // Q4: read32 and fp::single_to_double in one helper
       b.get(L_tmp);
       b.i32c(a);
       ticks_expr();
       b.call(hLfs);
-      b.tee(L_w);
-      b.mem(op::i64_store, 3, ps0(i.rD()));
-      b.get(kCpu);
-      b.get(L_w);
-      b.mem(op::i64_store, 3, ps1(i.rD()));
+      b.set(L_w);
+      fp_put_i64(ps0(i.rD()), L_w);
+      fp_put_i64(ps1(i.rD()), L_w);
       update(mode);
       return;
     }
     case Op::lfd: case Op::lfdu: case Op::lfdx: case Op::lfdux: {
       int mode = o == Op::lfd ? 0 : o == Op::lfdu ? 1 : o == Op::lfdx ? 2 : 3;
       ea_tmp(mode);
-      b.get(kCpu);
       b.get(kCpu);  // read64 (h.rd64: the high word, then the low word, where they are not plain memory)
       b.get(L_tmp);
       b.i32c(a);
       ticks_expr();
       b.call(hRd64);
-      b.mem(op::i64_store, 3, ps0(i.rD()));
+      b.set(L_w);
+      fp_put_i64(ps0(i.rD()), L_w);
       update(mode);
       return;
     }
@@ -1226,8 +1249,7 @@ void FuncGen::emit_inline(const InsnInfo& x) {
       ea_tmp(mode);
       b.get(kCpu);  // Q4: fp::double_to_single and write32 in one helper
       b.get(L_tmp);
-      b.get(kCpu);
-      b.mem(op::i64_load, 3, ps0(i.rS()));
+      fp_get_i64(ps0(i.rS()));
       b.i32c(a);
       ticks_expr();
       b.call(hStfs);
@@ -1240,15 +1262,13 @@ void FuncGen::emit_inline(const InsnInfo& x) {
       if (o != Op::stfiwx) {  // write64 (h.wr64: the high word, then the low word, where they are not plain memory)
         b.get(kCpu);
         b.get(L_tmp);
-        b.get(kCpu);
-        b.mem(op::i64_load, 3, ps0(i.rS()));
+        fp_get_i64(ps0(i.rS()));
         b.i32c(a);
         ticks_expr();
         b.call(hWr64);
       } else {
         wr32_tmp(0, [&] {
-          b.get(kCpu);
-          b.mem(op::i64_load, 3, ps0(i.rS()));
+          fp_get_i64(ps0(i.rS()));
           b.op(op::i32_wrap_i64);
         });
       }
@@ -1256,11 +1276,10 @@ void FuncGen::emit_inline(const InsnInfo& x) {
       return;
     }
     case Op::fmr: case Op::fneg: case Op::fabs: case Op::fnabs:
-      b.get(kCpu);
-      b.get(kCpu);
-      b.mem(op::i64_load, 3, ps0(i.rB()));
+      fp_get_i64(ps0(i.rB()));
       sign_op(o == Op::fmr ? 0 : o == Op::fneg ? 1 : o == Op::fabs ? 2 : 3);
-      b.mem(op::i64_store, 3, ps0(i.rD()));
+      b.set(L_w);
+      fp_put_i64(ps0(i.rD()), L_w);
       return;
     case Op::ps_mr: case Op::ps_neg: case Op::ps_abs: case Op::ps_nabs: case Op::ps_merge00: case Op::ps_merge01:
     case Op::ps_merge10: case Op::ps_merge11: {
@@ -1277,20 +1296,14 @@ void FuncGen::emit_inline(const InsnInfo& x) {
         case Op::ps_merge11: src0 = ps1(i.rA()); src1 = ps1(i.rB()); break;
         default: break;
       }
-      b.get(kCpu);
-      b.mem(op::i64_load, 3, src0);
+      fp_get_i64(src0);
       sign_op(sop);
       b.set(L_w);
-      b.get(kCpu);
-      b.mem(op::i64_load, 3, src1);
+      fp_get_i64(src1);
       sign_op(sop);
       b.set(L_w2);
-      b.get(kCpu);
-      b.get(L_w);
-      b.mem(op::i64_store, 3, ps0(i.rD()));
-      b.get(kCpu);
-      b.get(L_w2);
-      b.mem(op::i64_store, 3, ps1(i.rD()));
+      fp_put_i64(ps0(i.rD()), L_w);
+      fp_put_i64(ps1(i.rD()), L_w2);
       return;
     }
     case Op::sraw:
@@ -1352,6 +1365,7 @@ void FuncGen::emit_inline(const InsnInfo& x) {
       b.i32c(a);
       ticks_expr();
       b.call(st ? hPsqSt : hPsqL);
+      if (!st) fp_drop(static_cast<u32>(rD));  // Q4: the helper wrote it in memory
       if (upd) {
         b.get(L_tmp);
         S(rA);
@@ -1409,6 +1423,120 @@ constexpr u64 kF64One = 0x3FF0000000000000ull;
 constexpr u64 kDefaultNaNBits = 0x7FF8000000000000ull;
 }  // namespace
 
+void FuncGen::fp_get(u32 off) {
+  const u32 h = fp_half(off);
+  const int l = fpr_local_[h];
+  if (l >= 0 && (fvalid_ >> h & 1)) {
+    body_->get(static_cast<u32>(l));
+    return;
+  }
+  body_->get(kCpu);
+  body_->mem(op::f64_load, 3, off);
+  if (l >= 0 && !fp_cond_) {  // inside a conditional path a load stays a plain load
+    body_->tee(static_cast<u32>(l));
+    fvalid_ |= 1ull << h;
+  }
+}
+
+void FuncGen::fp_load(u32 off) {
+  const u32 h = fp_half(off);
+  const int l = fpr_local_[h];
+  if (l < 0 || (fvalid_ >> h & 1)) return;
+  body_->get(kCpu);
+  body_->mem(op::f64_load, 3, off);
+  body_->set(static_cast<u32>(l));
+  fvalid_ |= 1ull << h;
+}
+
+void FuncGen::fp_put_f64(u32 off, u32 local) {
+  body_->get(kCpu);
+  body_->get(local);
+  body_->mem(op::f64_store, 3, off);
+  const u32 h = fp_half(off);
+  if (const int l = fpr_local_[h]; l >= 0) {
+    body_->get(local);
+    body_->set(static_cast<u32>(l));
+    fvalid_ |= 1ull << h;
+  }
+}
+
+void FuncGen::fp_put_i64(u32 off, u32 local) {
+  body_->get(kCpu);
+  body_->get(local);
+  body_->mem(op::i64_store, 3, off);
+  const u32 h = fp_half(off);
+  if (const int l = fpr_local_[h]; l >= 0) {
+    body_->get(local);
+    body_->op(op::f64_reinterpret_i64);
+    body_->set(static_cast<u32>(l));
+    fvalid_ |= 1ull << h;
+  }
+}
+
+void FuncGen::fp_reload(std::uint64_t halves) {
+  for (u32 h = 0; h < 64; ++h) {
+    if (!(halves >> h & 1) || fpr_local_[h] < 0) continue;
+    body_->get(kCpu);
+    body_->mem(op::f64_load, 3, kFpr + 8 * h);
+    body_->set(static_cast<u32>(fpr_local_[h]));
+  }
+}
+
+// Called first thing in an instruction's fast path, before any branch: what it
+// computes holds on every path out of the instruction.
+void FuncGen::fpscr_ok() {
+  if (fpok_known_) {
+    body_->get(L_fpok);
+    return;
+  }
+  body_->get(kCpu);
+  body_->mem(op::i32_load, 2, kFpscr);
+  body_->i32c(7);
+  body_->op(op::i32_and);
+  body_->i32c(4);
+  body_->op(op::i32_eq);
+  body_->tee(L_fpok);
+  fpok_known_ = true;
+}
+
+// Q4: the FPR halves (2 r + h) an instruction emit_fp computes reads and writes.
+static void fp_halves(Op o, Insn i, std::uint64_t* src, std::uint64_t* dst) {
+  auto H = [](u32 r, u32 h) { return 1ull << (2 * r + h); };
+  const u32 a = i.rA(), b = i.rB(), c = i.rC(), d = i.rD();
+  const std::uint64_t d0 = H(d, 0), dd = H(d, 0) | H(d, 1);
+  std::uint64_t S = 0, D = 0;
+  switch (o) {
+    case Op::fcmpu: case Op::fcmpo: case Op::ps_cmpu0: case Op::ps_cmpo0: S = H(a, 0) | H(b, 0); break;
+    case Op::ps_cmpu1: case Op::ps_cmpo1: S = H(a, 1) | H(b, 1); break;
+    case Op::fsel: S = H(a, 0) | H(b, 0) | H(c, 0); D = d0; break;
+    case Op::ps_sel: S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1) | H(c, 0) | H(c, 1); D = dd; break;
+    case Op::fctiwz: case Op::fctiw: case Op::frsqrte: S = H(b, 0); D = d0; break;
+    case Op::fadd: case Op::fsub: case Op::fdiv: S = H(a, 0) | H(b, 0); D = d0; break;
+    case Op::fmul: S = H(a, 0) | H(c, 0); D = d0; break;
+    case Op::fmadd: case Op::fmsub: case Op::fnmadd: case Op::fnmsub: S = H(a, 0) | H(b, 0) | H(c, 0); D = d0; break;
+    case Op::fadds: case Op::fsubs: case Op::fdivs: S = H(a, 0) | H(b, 0); D = dd; break;
+    case Op::fmuls: S = H(a, 0) | H(c, 0); D = dd; break;
+    case Op::fres: case Op::frsp: S = H(b, 0); D = dd; break;
+    case Op::fmadds: case Op::fmsubs: case Op::fnmadds: case Op::fnmsubs: S = H(a, 0) | H(b, 0) | H(c, 0); D = dd; break;
+    case Op::ps_rsqrte: case Op::ps_res: S = H(b, 0) | H(b, 1); D = dd; break;
+    case Op::ps_add: case Op::ps_sub: case Op::ps_div: S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1); D = dd; break;
+    case Op::ps_mul: S = H(a, 0) | H(a, 1) | H(c, 0) | H(c, 1); D = dd; break;
+    case Op::ps_muls0: S = H(a, 0) | H(a, 1) | H(c, 0); D = dd; break;
+    case Op::ps_muls1: S = H(a, 0) | H(a, 1) | H(c, 1); D = dd; break;
+    case Op::ps_madd: case Op::ps_msub: case Op::ps_nmadd: case Op::ps_nmsub:
+      S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1) | H(c, 0) | H(c, 1);
+      D = dd;
+      break;
+    case Op::ps_madds0: S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1) | H(c, 0); D = dd; break;
+    case Op::ps_madds1: S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1) | H(c, 1); D = dd; break;
+    case Op::ps_sum0: S = H(a, 0) | H(b, 1) | H(c, 1); D = dd; break;
+    case Op::ps_sum1: S = H(a, 0) | H(b, 1) | H(c, 0); D = dd; break;
+    default: break;
+  }
+  *src = S;
+  *dst = D;
+}
+
 void FuncGen::exec_call(const InsnInfo& x) {
   body_->get(kCpu);
   body_->i32c(x.word);
@@ -1422,19 +1550,20 @@ void FuncGen::emit_fp(const InsnInfo& x) {
   const Insn i{x.word};
   const Op o = x.op;
   const u32 rD = i.rD(), rA = i.rA(), rB = i.rB(), rC = i.rC();
-  auto ld = [&](u32 off) {
-    b.get(kCpu);
-    b.mem(op::f64_load, 3, off);
-  };
-  auto ldi = [&](u32 off) {
-    b.get(kCpu);
-    b.mem(op::i64_load, 3, off);
-  };
-  auto st = [&](u32 off, u32 local) {  // an f64 local that holds no NaN
-    b.get(kCpu);
-    b.get(local);
-    b.mem(op::f64_store, 3, off);
-  };
+  // Q4: the sources go to their locals first (on every path) and the code reads
+  // them there; results go to memory and the locals; rt.exec's are reloaded.
+  std::uint64_t src = 0, dst = 0;
+  fp_halves(o, i, &src, &dst);
+  for (u32 h = 0; h < 64; ++h)
+    if (src >> h & 1) fp_load(kFpr + 8 * h);
+  struct Cond {
+    bool& f;
+    ~Cond() { f = false; }
+  } cond{fp_cond_};
+  fp_cond_ = true;
+  auto ld = [&](u32 off) { fp_get(off); };
+  auto ldi = [&](u32 off) { fp_get_i64(off); };
+  auto st = [&](u32 off, u32 local) { fp_put_f64(off, local); };  // an f64 local that holds no NaN
   // force25(c) as an f64 (fp::force25 on the bits).
   auto force25 = [&](u32 off) {
     ldi(off);
@@ -1731,20 +1860,13 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       };
       sel(0, L_w);
       if (o == Op::ps_sel) sel(1, L_w2);
-      b.get(kCpu);
-      b.get(L_w);
-      b.mem(op::i64_store, 3, ps0(rD));
-      if (o == Op::ps_sel) {
-        b.get(kCpu);
-        b.get(L_w2);
-        b.mem(op::i64_store, 3, ps1(rD));
-      }
+      fp_put_i64(ps0(rD), L_w);
+      if (o == Op::ps_sel) fp_put_i64(ps1(rD), L_w2);
       return;
     }
     case Op::fctiwz: {
       // fp::to_int32 toward zero: NaN -> 0x80000000, saturating, and bit 32 set
       // for a zero result from a negative source.
-      b.get(kCpu);
       ld(ps0(rB));
       b.tee(L_fa);
       b.fc(op::fc_i32_trunc_sat_f64_s);
@@ -1771,7 +1893,8 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       b.i64c(32);
       b.op(op::i64_shl);
       b.op(op::i64_or);
-      b.mem(op::i64_store, 3, ps0(rD));
+      b.set(L_w);
+      fp_put_i64(ps0(rD), L_w);
       return;
     }
     default:
@@ -1782,12 +1905,8 @@ void FuncGen::emit_fp(const InsnInfo& x) {
   const int done = b.block();
   const int slow = b.block();
   // FPSCR: round to nearest, NI set.
-  b.get(kCpu);
-  b.mem(op::i32_load, 2, kFpscr);
-  b.i32c(7);
-  b.op(op::i32_and);
-  b.i32c(4);
-  b.op(op::i32_ne);
+  fpscr_ok();
+  b.op(op::i32_eqz);
   b.br_if(slow);
   auto both = [&](u32 local) {  // a single result fills both halves
     st(ps0(rD), local);
@@ -1838,7 +1957,6 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       break;
     case Op::fctiw:
       // fp::to_int32 in round to nearest (the guard): ties to even, then as fctiwz.
-      b.get(kCpu);
       ld(ps0(rB));
       b.tee(L_fa);
       b.op(op::f64_nearest);
@@ -1866,7 +1984,8 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       b.i64c(32);
       b.op(op::i64_shl);
       b.op(op::i64_or);
-      b.mem(op::i64_store, 3, ps0(rD));
+      b.set(L_w);
+      fp_put_i64(ps0(rD), L_w);
       break;
     case Op::frsqrte: case Op::ps_rsqrte: {
       // fp::rsqrt_estimate: 1 / sqrt_rn(b) in double; NaN operand -> runtime; a
@@ -1908,18 +2027,12 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       };
       if (o == Op::frsqrte) {
         half(ps0(rB), false, L_w);
-        b.get(kCpu);
-        b.get(L_w);
-        b.mem(op::i64_store, 3, ps0(rD));
+        fp_put_i64(ps0(rD), L_w);
       } else {
         half(ps0(rB), true, L_w);
         half(ps1(rB), true, L_w2);
-        b.get(kCpu);
-        b.get(L_w);
-        b.mem(op::i64_store, 3, ps0(rD));
-        b.get(kCpu);
-        b.get(L_w2);
-        b.mem(op::i64_store, 3, ps1(rD));
+        fp_put_i64(ps0(rD), L_w);
+        fp_put_i64(ps1(rD), L_w2);
       }
       break;
     }
@@ -1950,12 +2063,11 @@ void FuncGen::emit_fp(const InsnInfo& x) {
           ldi(s0 ? ps1(rC) : ps0(rC));
           b.set(L_w);
           st(s0 ? ps0(rD) : ps1(rD), L_f0);
-          b.get(kCpu);
-          b.get(L_w);
-          b.mem(op::i64_store, 3, s0 ? ps1(rD) : ps0(rD));
+          fp_put_i64(s0 ? ps1(rD) : ps0(rD), L_w);
           b.br(done);
           b.end();
           exec_call(x);
+          fp_reload(dst);
           b.end();
           return;
         }
@@ -1972,6 +2084,7 @@ void FuncGen::emit_fp(const InsnInfo& x) {
   b.br(done);
   b.end();
   exec_call(x);
+  fp_reload(dst);
   b.end();
 }
 
@@ -2054,6 +2167,7 @@ void FuncGen::emit_node(std::size_t k) {
     reload(N.Lm);
     load_ticks();
   };
+  if (N.pre != pNone || N.fpchk) fp_reset();  // Q4: a safe point or the FP check may switch FPR contents
   if (N.pre == pIdle) {
     materialize();
     safepoint();
@@ -2110,6 +2224,7 @@ void FuncGen::emit_node(std::size_t k) {
       reload(N.W & N.Lout);
       return;
     case kHelper:
+      fp_reset();  // Q4: rt.exec (mffs, mtfsf, ...)
       ++ctx_.out->stats.helper_insns;
       ++ctx_.out->stats.helper_by_op[static_cast<std::size_t>(x.op)];
       flush(N.R & D);
@@ -2142,6 +2257,7 @@ void FuncGen::emit_node(std::size_t k) {
       b.op(op::unreachable);
       return;
     case kSc:
+      fp_reset();
       ++ctx_.out->stats.helper_insns;
       materialize();
       flush(D);
@@ -2222,6 +2338,7 @@ void FuncGen::emit_node(std::size_t k) {
       return;
     }
     case kCall: {
+      fp_reset();  // Q4: the callee may change any FPR (its return is a label anyway)
       const bool indirect = x.flow == Flow::IndirectCall;
       if (N.cond) {
         cond_expr(x);
@@ -2421,6 +2538,7 @@ bool FuncGen::run(Fn& body, std::string* error) {
   L_tc = next++;
   L_tgt = next++;
   L_tmp = next++;
+  L_fpok = next++;
   for (int r = 0; r < reg::kCount; ++r) regloc_[r] = (used_ & ppc::bit(r)) ? static_cast<int>(next++) : -1;
   const u32 n_i32 = next - params;
   L_t = next++;
@@ -2434,13 +2552,28 @@ bool FuncGen::run(Fn& body, std::string* error) {
     L_f0 = next++;
     L_f1 = next++;
   }
-  body.uleb(uses_fp_ ? 3 : 2);
+  // Q4: the halves of every FPR the function's floating-point code names.
+  u32 n_fpr_locals = 0;
+  {
+    std::uint32_t fprs = 0;
+    for (std::size_t k = 0; k < n; ++k) {
+      if (!f_.reachable[k] || !ppc::uses_fpu(f_.insns[k].op) || f_.insns[k].flow != Flow::Plain) continue;
+      const Insn w{f_.insns[k].word};
+      fprs |= 1u << w.rD() | 1u << w.rA() | 1u << w.rB() | 1u << w.rC();
+    }
+    for (int h = 0; h < 64; ++h) {
+      fpr_local_[h] = (fprs >> (h / 2) & 1) ? static_cast<int>(next++) : -1;
+      if (fpr_local_[h] >= 0) ++n_fpr_locals;
+    }
+  }
+  const u32 n_f64 = (uses_fp_ ? 6 : 0) + n_fpr_locals;
+  body.uleb(n_f64 ? 3 : 2);
   body.uleb(n_i32);
   body.byte(kI32);
   body.uleb(3);
   body.byte(kI64);
-  if (uses_fp_) {
-    body.uleb(6);
+  if (n_f64) {
+    body.uleb(n_f64);
     body.byte(kF64);
   }
 
@@ -2499,6 +2632,7 @@ bool FuncGen::run(Fn& body, std::string* error) {
       return;
     }
     p_ = 0;
+    fp_reset();  // Q4: a label: other paths arrive here
     std::size_t k = (seg_start_[static_cast<std::size_t>(s)] - f_.start) / 4;
     std::size_t end = s + 1 < nseg ? (seg_start_[static_cast<std::size_t>(s) + 1] - f_.start) / 4 : n;
     // A segment that branches back to its own start (a loop without inner
