@@ -430,6 +430,21 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | Unlocks faster FP, paired-single and memory paths (Q4) and native versions of hot game functions. | owner, in chat
 
+- 2026-10-17 | **Q5: online play between unequal machines** (lead, under the owner's delegation; docs/engine/Q5_LOG.md).
+  - **Q5-N1, even lockstep pacing:**
+    - Each side proposes its capacity × 0.98, and both run at the lower proposal, one field per slot.
+    - Phases are centred by the input lead. Host timing only; solo keeps Q2-P1.
+    - At a partner 1.3× slower: the slow page shows 33.5 → 43.0 new frames/s, its frames over 50 ms fall from 6.9% to 1.0%, and the fast page's waits fall from 34.7 to 1.6 per second.
+    - The cost: game speed 0.81× → 0.72× at 1.3× slower. At 1.6× slower there is no cost (0.68×). The lead accepted this cost for smoothness and has a follow-up to win it back.
+  - **Q5-N2, Auto input delay:** the lobby default is Auto: 20 pings, then E5's rule, between 2 and 6. Room delay 0 means Auto; a manual choice overrides it.
+  - **Q5-N3, data-channel text messages:** `pace` (4 Hz), `stats` (1 Hz), `ping`/`pong` join `pad`. They are JSON with `v: 1`, the engine never sees them, and the wire protocol stays at v1.
+  - **Q5-W1, statistics overlay:** the Stats button or the ` key, off by default, with Copy stats for field reports.
+  - **Q5-W2, slow-machine note:** a dismissible note below 0.93× that suggests plugging in and the Best performance power mode.
+  - **Q5-G1, GPU-aware Picture Auto:** render passes are timed with WebGPU timestamp queries. Auto steps down above 85% GPU busy for 2 s and back up after a hold below 60%. Fixed scales are never changed.
+  - **Q5-T1, measuring two machines on one PC:** two browser instances pinned to the performance cores.
+
+  | Guest lines unchanged; 48 two-page games with mismatched machines, 0 desyncs; msvc 46/47 (+1 skip), emscripten 39/40 (+1 skip), web shell 87/87. | merge of engine/q5-netpace
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
