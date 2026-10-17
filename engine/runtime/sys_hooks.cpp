@@ -80,11 +80,13 @@ void SystemHooks::icbi(ppc::Cpu& c, u32 ea) {
   }
 }
 
-void SystemHooks::reschedule(ppc::Cpu& c) {
+void SystemHooks::reschedule(ppc::Cpu& c) { reschedule(c, hw_ && hw_->interrupt_pending()); }
+
+void SystemHooks::reschedule(ppc::Cpu& c, bool external_pending) {
   std::uint64_t next_tb = dec_fire_tb_;
   if (hw_) next_tb = std::min(next_tb, hw_->next_event_tb());
   std::uint64_t next = next_tb == ~0ull ? ~0ull : ticks_for(next_tb);
-  bool pending = dec_pending_ || (hw_ && hw_->interrupt_pending());
+  bool pending = dec_pending_ || external_pending;
   if ((c.msr & kEE) && pending) next = c.ticks;  // deliverable at the next safe point
   c.next_event = std::min(next, tick_limit);
 }
@@ -149,6 +151,11 @@ void SystemHooks::safepoint(ppc::Cpu& c) {
     ++decrementer_interrupts;
     dec_pending_ = false;
     deliver(c, 0x900);
+  } else {
+    // Q4: nothing ran since `external` was worked out (no handler, no device
+    // moved): the hardware's interrupt state is the one it saw.
+    reschedule(c, external);
+    return;
   }
   reschedule(c);
 }

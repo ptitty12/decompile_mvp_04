@@ -70,6 +70,12 @@ class SystemHooks : public ppc::Hooks {
   // Recomputes c.next_event from the scheduled events.
   void reschedule(ppc::Cpu& c);
 
+ private:
+  // Q4: the same, where the caller knows whether a hardware interrupt is pending.
+  void reschedule(ppc::Cpu& c, bool external_pending);
+
+ public:
+
   std::uint64_t tick_limit = ~0ull;
   std::uint64_t syscalls = 0, icbi_blocks = 0, real_mode_switches = 0;
   std::uint64_t external_interrupts = 0, decrementer_interrupts = 0, idle_skips = 0, idle_ticks_skipped = 0;

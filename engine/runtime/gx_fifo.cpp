@@ -170,7 +170,7 @@ std::string GxFifo::broken_context() const {
   const std::uint64_t n = recent_n_ < recent_.size() ? recent_n_ : recent_.size();
   constexpr std::uint32_t kHead = 24;  // bytes shown per command
   for (std::uint64_t k = recent_n_ - n; k < recent_n_; ++k) {
-    const Recent& r = recent_[k % recent_.size()];
+    const Recent& r = recent_[k & (recent_.size() - 1)];
     std::snprintf(b, sizeof b, "  @%llu len %u:", static_cast<unsigned long long>(r.offset), r.len);
     out += b;
     const std::uint32_t h = r.len < kHead ? r.len : kHead;
@@ -212,11 +212,11 @@ GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
   // and only an incomplete tail is kept; otherwise the bytes join what is pending.
   const std::uint8_t* p = bytes;
   std::size_t avail = n;
-  if (!pending_.empty()) {
-    pending_.insert(pending_.end(), bytes, bytes + n);
-    if (need_ > pending_.size()) return fx;  // the command at the head is still incomplete
-    p = pending_.data();
-    avail = pending_.size();
+  if (pend_ != pbeg_) {
+    pending_append(bytes, n);
+    if (need_ > pend_ - pbeg_) return fx;  // the command at the head is still incomplete
+    p = pending_.data() + pbeg_;
+    avail = pend_ - pbeg_;
   }
   need_ = 0;
   std::size_t at = 0;
@@ -228,24 +228,42 @@ GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
       broken_opcode_ = p[at];
       broken_offset_ = consumed_;
       broken_tail_.assign(p + at, p + std::min(avail, at + 64));
-      pending_.clear();
+      pbeg_ = pend_ = 0;
       return fx;
     }
     if (len == 0 || len > avail - at) {  // the rest of the command is still to come
-      if (len) need_ = len;  // its length, from the head of pending_ after the erase below
+      if (len) need_ = len;  // its length, from the head of the pending bytes kept below
       break;
     }
-    Recent& r = recent_[recent_n_++ % recent_.size()];
+    Recent& r = recent_[recent_n_++ & (recent_.size() - 1)];
     r.offset = consumed_;
     r.len = static_cast<std::uint32_t>(len);
     execute(p + at, len, fx, false);
     consumed_ += len;
     at += len;
   }
-  if (observer_) flush_commands();  // before pending_ changes: some of them point into it
-  if (p == bytes) pending_.assign(bytes + at, bytes + n);
-  else pending_.erase(pending_.begin(), pending_.begin() + static_cast<std::ptrdiff_t>(at));
+  if (observer_) flush_commands();  // before the pending bytes change: some of them point into them
+  if (p == bytes) {
+    pbeg_ = pend_ = 0;
+    if (at < n) pending_append(bytes + at, n - at);
+  } else {
+    pbeg_ += at;
+    if (pbeg_ == pend_) pbeg_ = pend_ = 0;
+  }
   return fx;
+}
+
+void GxFifo::pending_append(const std::uint8_t* bytes, std::size_t n) {
+  if (pend_ + n > pending_.size()) {
+    if (pbeg_) {  // move what is pending to the front first
+      std::memmove(pending_.data(), pending_.data() + pbeg_, pend_ - pbeg_);
+      pend_ -= pbeg_;
+      pbeg_ = 0;
+    }
+    if (pend_ + n > pending_.size()) pending_.resize(std::max(2 * pending_.size(), pend_ + n));
+  }
+  std::memcpy(pending_.data() + pend_, bytes, n);
+  pend_ += n;
 }
 
 }  // namespace mvp::rt

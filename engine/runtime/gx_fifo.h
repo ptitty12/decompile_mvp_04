@@ -111,8 +111,12 @@ class GxFifo {
     batch_n_ = 0;
   }
 
-  std::vector<std::uint8_t> pending_;
-  // P1: the length of the incomplete command at the head of pending_, once known
+  // Bytes of an incomplete command (and what follows it), waiting for the rest:
+  // pending_[pbeg_, pend_) (Q4: appended and consumed in place).
+  std::vector<std::uint8_t> pending_ = std::vector<std::uint8_t>(4096);
+  std::size_t pbeg_ = 0, pend_ = 0;
+  void pending_append(const std::uint8_t* bytes, std::size_t n);
+  // P1: the length of the incomplete command at the head of the pending bytes, once known
   // (a long primitive arrives over many bursts: it is measured once, not per burst).
   std::size_t need_ = 0;
   // P1: vertex sizes per format, valid until a VCD or VAT write.
@@ -138,7 +142,7 @@ class GxFifo {
     std::uint64_t offset = 0;
     std::uint32_t len = 0;
   };
-  std::array<Recent, 24> recent_{};
+  std::array<Recent, 32> recent_{};  // a power of two
   std::uint64_t recent_n_ = 0;
   static constexpr std::size_t kHistory = 4096;  // a power of two
   std::array<std::uint8_t, kHistory> history_{};
