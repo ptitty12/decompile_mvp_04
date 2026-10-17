@@ -340,6 +340,7 @@ class FuncGen {
   void ea_x(Insn i);         // (rA|0) + rB
   void emit_inline(const InsnInfo& x);
   void emit_fp(const InsnInfo& x);
+  void emit_fp_fast(const InsnInfo& x, std::uint64_t dst);  // Q4, F1
   void emit_memh(const InsnInfo& x, RegSet flush_set);
   void exec_call(const InsnInfo& x);  // rt.exec of the instruction (no spills: callers decide)
   void emit_node(std::size_t k);
@@ -2021,6 +2022,15 @@ void FuncGen::emit_fp(const InsnInfo& x) {
   fpscr_ok();
   b.op(op::i32_eqz);
   b.br_if(slow);
+  if (!ctx_.opt.fp_exact && o != Op::fctiw) {  // Q4, F1: the fast model, no other way out
+    emit_fp_fast(x, dst);
+    b.br(done);
+    b.end();
+    exec_call(x);
+    fp_reload(dst);
+    b.end();
+    return;
+  }
   auto both = [&](u32 local) {  // a single result fills both halves
     st(ps0(rD), local);
     st(ps1(rD), local);
@@ -2199,6 +2209,160 @@ void FuncGen::emit_fp(const InsnInfo& x) {
   exec_call(x);
   fp_reload(dst);
   b.end();
+}
+
+// Q4, F1: the fast model of ppc/fp.h (its comment has the rules), for every
+// instruction emit_fp computes but fctiw (exact in both models). Every step is one
+// IEEE double operation in the order fp.cpp writes it, a single result is the
+// double rounded to f32 and back, a result below the normal range of its
+// precision becomes a signed zero, and a NaN result becomes the default NaN,
+// whatever bits the host's arithmetic gave it. Called inside emit_fp's fast-path
+// block, after the FPSCR check; the sources are in their locals.
+void FuncGen::emit_fp_fast(const InsnInfo& x, std::uint64_t) {
+  Fn& b = *body_;
+  const Insn i{x.word};
+  const Op o = x.op;
+  const u32 rD = i.rD(), rA = i.rA(), rB = i.rB(), rC = i.rC();
+  constexpr u64 kOne = 0x3FF0000000000000ull, kMinSingle = 0x3810000000000000ull, kMinDouble = 0x0010000000000000ull;
+  auto ld = [&](u32 off) { fp_get(off); };
+  // The result for the double in L_r, as i64 bits into `out` (fp::fast_finish).
+  auto fin = [&](bool single, u32 out) {
+    b.i64c(static_cast<s64>(kDefaultNaNBits));
+    b.get(L_r);
+    if (single) {
+      b.op(op::f32_demote_f64);
+      b.op(op::f64_promote_f32);
+    }
+    b.set(L_fa);
+    b.f64c_bits(0);
+    b.get(L_fa);
+    b.op(op::f64_copysign);
+    b.get(L_fa);
+    b.get(L_fa);
+    b.op(op::f64_abs);
+    b.f64c_bits(single ? kMinSingle : kMinDouble);
+    b.op(op::f64_lt);
+    b.op(op::select);  // below the normal range: a signed zero
+    b.op(op::i64_reinterpret_f64);
+    b.get(L_r);
+    b.get(L_r);
+    b.op(op::f64_ne);
+    b.op(op::select);  // NaN: the default NaN
+    b.set(out);
+  };
+  auto binary = [&](u8 opc, u32 x_off, u32 y_off) {
+    ld(x_off);
+    ld(y_off);
+    b.op(opc);
+    b.set(L_r);
+  };
+  auto madd = [&](u32 a_off, u32 c_off, u32 b_off, bool neg_b, bool neg_r) {
+    ld(a_off);
+    ld(c_off);
+    b.op(op::f64_mul);
+    ld(b_off);
+    b.op(neg_b ? op::f64_sub : op::f64_add);
+    if (neg_r) b.op(op::f64_neg);
+    b.set(L_r);
+  };
+  auto recip = [&](u32 b_off) {
+    b.f64c_bits(kOne);
+    ld(b_off);
+    b.op(op::f64_div);
+    b.set(L_r);
+  };
+  auto rsqrt = [&](u32 b_off) {
+    ld(b_off);
+    b.op(op::f64_sqrt);
+    b.set(L_fb);
+    b.f64c_bits(kOne);
+    b.get(L_fb);
+    b.op(op::f64_div);
+    b.set(L_r);
+  };
+  const bool nm = o == Op::fnmadd || o == Op::fnmsub || o == Op::fnmadds || o == Op::fnmsubs ||
+                  o == Op::ps_nmadd || o == Op::ps_nmsub;
+  const bool ms = o == Op::fmsub || o == Op::fnmsub || o == Op::fmsubs || o == Op::fnmsubs || o == Op::ps_msub ||
+                  o == Op::ps_nmsub;
+  switch (o) {
+    case Op::fadd: case Op::fsub: case Op::fmul: case Op::fdiv:
+      binary(o == Op::fadd ? op::f64_add : o == Op::fsub ? op::f64_sub : o == Op::fmul ? op::f64_mul : op::f64_div,
+             ps0(rA), o == Op::fmul ? ps0(rC) : ps0(rB));
+      fin(false, L_w);
+      fp_put_i64(ps0(rD), L_w);
+      return;
+    case Op::fmadd: case Op::fmsub: case Op::fnmadd: case Op::fnmsub:
+      madd(ps0(rA), ps0(rC), ps0(rB), ms, nm);
+      fin(false, L_w);
+      fp_put_i64(ps0(rD), L_w);
+      return;
+    case Op::frsqrte:
+      rsqrt(ps0(rB));
+      fin(false, L_w);
+      fp_put_i64(ps0(rD), L_w);
+      return;
+    case Op::fadds: case Op::fsubs: case Op::fmuls: case Op::fdivs: case Op::fres: case Op::frsp:
+    case Op::fmadds: case Op::fmsubs: case Op::fnmadds: case Op::fnmsubs:
+      switch (o) {
+        case Op::fadds: binary(op::f64_add, ps0(rA), ps0(rB)); break;
+        case Op::fsubs: binary(op::f64_sub, ps0(rA), ps0(rB)); break;
+        case Op::fmuls: binary(op::f64_mul, ps0(rA), ps0(rC)); break;
+        case Op::fdivs: binary(op::f64_div, ps0(rA), ps0(rB)); break;
+        case Op::fres: recip(ps0(rB)); break;
+        case Op::frsp:
+          ld(ps0(rB));
+          b.set(L_r);
+          break;
+        default: madd(ps0(rA), ps0(rC), ps0(rB), ms, nm); break;
+      }
+      fin(true, L_w);
+      fp_put_i64(ps0(rD), L_w);  // a single result fills both halves
+      fp_put_i64(ps1(rD), L_w);
+      return;
+    case Op::ps_rsqrte:  // round_to_single(rsqrt_estimate(b)) per half
+      for (u32 h : {0u, 1u}) {
+        const u32 out = h ? L_w2 : L_w;
+        rsqrt(h ? ps1(rB) : ps0(rB));
+        fin(false, out);
+        b.get(out);
+        b.op(op::f64_reinterpret_i64);
+        b.set(L_r);
+        fin(true, out);
+      }
+      break;
+    case Op::ps_sum0: case Op::ps_sum1: {  // s = A.ps0 + B.ps1; ps_sum0: (s, C.ps1), ps_sum1: (C.ps0, s)
+      binary(op::f64_add, ps0(rA), ps1(rB));
+      const bool s0 = o == Op::ps_sum0;
+      fin(true, s0 ? L_w : L_w2);
+      fp_get_i64(s0 ? ps1(rC) : ps0(rC));
+      b.set(s0 ? L_w2 : L_w);
+      break;
+    }
+    default: {
+      // Paired singles, both halves computed before either is stored (rD may be a source).
+      for (u32 h : {0u, 1u}) {
+        const u32 a = h ? ps1(rA) : ps0(rA), bb = h ? ps1(rB) : ps0(rB), c = h ? ps1(rC) : ps0(rC);
+        const u32 c0 = ps0(rC), c1 = ps1(rC);
+        switch (o) {
+          case Op::ps_add: binary(op::f64_add, a, bb); break;
+          case Op::ps_sub: binary(op::f64_sub, a, bb); break;
+          case Op::ps_div: binary(op::f64_div, a, bb); break;
+          case Op::ps_mul: binary(op::f64_mul, a, c); break;
+          case Op::ps_muls0: binary(op::f64_mul, a, c0); break;
+          case Op::ps_muls1: binary(op::f64_mul, a, c1); break;
+          case Op::ps_res: recip(bb); break;
+          case Op::ps_madd: case Op::ps_msub: case Op::ps_nmadd: case Op::ps_nmsub: madd(a, c, bb, ms, nm); break;
+          case Op::ps_madds0: madd(a, c0, bb, false, false); break;
+          case Op::ps_madds1: madd(a, c1, bb, false, false); break;
+          default: break;  // is_fp_inline() lists the same opcodes
+        }
+        fin(true, h ? L_w2 : L_w);
+      }
+      break;
+    }
+  }
+  fp_put_i64(ps0(rD), L_w);
+  fp_put_i64(ps1(rD), L_w2);
 }
 
 // lmw / stmw: the in-module helper moves the words between guest memory and the

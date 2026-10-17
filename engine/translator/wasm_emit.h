@@ -66,6 +66,11 @@ struct WasmEmitOptions {
   // to guest memory against env.gp_pages first (WasmGpLayout): only there can a
   // render thread still have to read what the store overwrites.
   bool shared_memory = false;
+  // Q4, F1: floating-point arithmetic in the exact Gekko model (ppc/fp.h) with
+  // the fast paths E2d proved equal to it. Off (the default): the fast model of
+  // ppc/fp.h, which the runtime's semantics library must use too
+  // (ppc::fp::g_model); on, it must be Model::Exact.
+  bool fp_exact = false;
 };
 
 // A guest address and the table slot (relative to the module's table base) of

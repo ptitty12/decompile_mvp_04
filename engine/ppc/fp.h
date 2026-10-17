@@ -23,6 +23,25 @@
 // - Single-precision instructions multiply by frC rounded to a 25-bit significand
 //   (force25), as the Gekko multiplier does.
 // - fmadd-family results are fused: one rounding of a*c+b.
+//
+// Q4, F1 (owner, 2026-10-16: the engine must be the same on every host, not
+// bit-exact to the Gekko): the **fast model**, the default, replaces the
+// arithmetic above whenever FPSCR[RN] = 0 and FPSCR[NI] = 1 (round to nearest
+// with NI, the game's setting; anything else keeps the exact model):
+// - a, b, c are used as the doubles they are; one IEEE double operation per
+//   step, in the order written: a*c, then +-b (no fused multiply-add), then the
+//   negation of the nm forms; no force25;
+// - a single-precision result is that double rounded to single (round to
+//   nearest), as a double; a result below the normal range of its precision
+//   (single: 2^-126, double: 2^-1022) flushes to a signed zero (NI);
+// - a NaN result is the default NaN 0x7FF8000000000000 (operand payloads do not
+//   propagate: hosts differ there);
+// - reciprocal and reciprocal square root estimates: 1/b rounded to single, and
+//   1/sqrt(b) in double.
+// Every step is IEEE round to nearest without flush to zero, so the results are
+// the same on every host (x86, ARM; WebAssembly, native without contraction).
+// The WebAssembly emitter computes the same inline (translator/wasm_emit.cpp);
+// the exact model stays for tests and as the fallback (g_model = Model::Exact).
 #pragma once
 
 #include <cstdint>
@@ -33,6 +52,11 @@ using u32 = std::uint32_t;
 using u64 = std::uint64_t;
 
 enum class Prec { Single, Double };
+
+enum class Model : std::uint8_t { Exact, Fast };
+extern Model g_model;  // the interpreter's and C++-emitted code's (default: Fast)
+// Whether an instruction with this FPSCR uses the fast model.
+inline bool fast_model(u32 fpscr) { return g_model == Model::Fast && (fpscr & 7) == 4; }
 
 inline constexpr u64 kSign = 0x8000000000000000ull;
 inline constexpr u64 kExpMask = 0x7FF0000000000000ull;
@@ -54,6 +78,8 @@ u32 double_to_single_ftz(u64 d);  // psq_st type 0: below the single normal rang
 
 // The Gekko's rounding of a multiplier operand to a 25-bit significand.
 u64 force25(u64 x);
+// force25 for an instruction with this FPSCR: the fast model does not apply it.
+inline u64 force25(u64 x, u32 fpscr) { return fast_model(fpscr) ? x : force25(x); }
 
 // Arithmetic. `fpscr` supplies the rounding mode and NI.
 u64 add(u64 a, u64 b, Prec p, u32 fpscr);

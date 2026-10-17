@@ -14,6 +14,10 @@ using namespace mvp::ppc::fp;
 
 namespace {
 
+// These tests are about the exact Gekko model (Q4, F1: the engine's default is the
+// fast model, which the last test case here checks).
+const bool g_exact = (g_model = Model::Exact, true);
+
 u64 bits(double d) {
   u64 b;
   std::memcpy(&b, &d, 8);
