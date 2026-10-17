@@ -693,8 +693,8 @@ u32 Hardware::pi_cause() const {
   if (((di_sr_ & 0x4) && (di_sr_ & 0x2)) || ((di_sr_ & 0x10) && (di_sr_ & 0x8)) || ((di_sr_ & 0x40) && (di_sr_ & 0x20)) ||
       ((di_cvr_ & 0x4) && (di_cvr_ & 0x2)))
     cause |= 0x4;  // DI
-  {
-    u32 sr = cp_status(), cr = cp16(0x02);
+  if (const u32 cr = cp16(0x02); cr & (0x4 | 0x8 | 0x20)) {  // Q4: the CP status only when it can raise one
+    const u32 sr = cp_status();
     if (((sr & 0x1) && (cr & 0x4)) || ((sr & 0x2) && (cr & 0x8)) || ((sr & 0x10) && (cr & 0x20))) cause |= 0x800;  // CP
   }
   if ((pe_ctrl_ & 0x4) && (pe_ctrl_ & 0x1)) cause |= 0x200;  // PE token

@@ -1,5 +1,5 @@
-add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp gx_fifo.cpp sys_hooks.cpp hle.cpp input.cpp ax.cpp
-            host_yield.cpp)
+add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp gx_fifo.cpp sys_hooks.cpp hle.cpp hle_game.cpp
+            input.cpp ax.cpp host_yield.cpp)
 target_link_libraries(engine_runtime PUBLIC engine_ppc engine_vfs)
 target_compile_options(engine_runtime PRIVATE ${ENGINE_WARN})
 
@@ -8,6 +8,16 @@ engine_test(test_clock SOURCES tests/test_clock.cpp LIBS engine_runtime)
 engine_test(test_devices SOURCES tests/test_devices.cpp LIBS engine_runtime)
 engine_test(test_input SOURCES tests/test_input.cpp LIBS engine_runtime)
 engine_test(test_ax SOURCES tests/test_ax.cpp LIBS engine_runtime)
+
+# Local only (Q4): the native implementations of game functions (hle_game.h)
+# against the interpreter running the originals from the disc's main.dol.
+# Skipped (77) without the disc.
+add_executable(local_hle_native tests/local_hle_native.cpp)
+target_link_libraries(local_hle_native PRIVATE engine_runtime engine_vfs)
+target_compile_options(local_hle_native PRIVATE ${ENGINE_WARN})
+target_compile_definitions(local_hle_native PRIVATE MVP_DISC_DEFAULT="${MVP_DISC_PATH}")
+add_test(NAME local_hle_native COMMAND local_hle_native)
+set_tests_properties(local_hle_native PROPERTIES SKIP_RETURN_CODE 77 LABELS local)
 
 # Lockstep checker (development): translated code against the interpreter.
 add_library(engine_lockstep STATIC lockstep.cpp)

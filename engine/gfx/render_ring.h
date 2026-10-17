@@ -64,6 +64,12 @@ class RenderRing {
   }
   // The position after the last committed record.
   std::uint32_t end() const { return wpos_; }
+  // Q4: publishes so far (the ones that made new records visible), and the
+  // position publish number k (counted from 1) made visible, for the last
+  // kPubHistory publishes.
+  static constexpr std::uint32_t kPubHistory = 1u << 16;
+  std::uint32_t publishes() const { return publishes_; }
+  std::uint32_t published_at(std::uint32_t k) const { return pub_hist_[k & (kPubHistory - 1)]; }
   // Publishes, then waits until the consumer has finished every record before
   // `pos`. Spins for `spin_us` microseconds first. Returns the time waited (ms).
   double wait_read(std::uint32_t pos, double spin_us = 50);
@@ -111,6 +117,8 @@ class RenderRing {
 
   // Producer-local.
   alignas(64) std::uint32_t wpos_ = 0, pub_local_ = 0, rd_cached_ = 0, open_ = 0;
+  std::uint32_t publishes_ = 0;
+  std::vector<std::uint32_t> pub_hist_ = std::vector<std::uint32_t>(kPubHistory, 0);
   std::uint64_t records_ = 0, bytes_ = 0, full_waits_ = 0;
   // Consumer-local.
   alignas(64) std::uint32_t cpos_ = 0, cnext_ = 0, pub_cached_ = 0;

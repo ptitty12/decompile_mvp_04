@@ -37,6 +37,9 @@ class Io {
   virtual ~Io() = default;
   virtual u32 read(u32 addr, int size) = 0;               // size 1, 2 or 4; value right-aligned
   virtual void write(u32 addr, u32 value, int size) = 0;  // size 1, 2 or 4
+  // The runtime's hardware model returns itself (Q4: host code that runs a game
+  // function natively stores to its write-gather pipe directly); others null.
+  virtual void* hardware() { return nullptr; }
 };
 
 // Guest address space: 65,536 pages of 64 KiB. A mapped page points at host bytes

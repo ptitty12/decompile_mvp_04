@@ -33,6 +33,9 @@ using namespace mvp::ppc::digest;
 
 namespace {
 
+// The digest is the exact Gekko model's (Q4, F1: the engine's default is the fast model).
+const bool g_exact = (fp::g_model = fp::Model::Exact, true);
+
 constexpr const char* kFpDigest = "408b94ae7108349bd90bac160b82fc0f19c8f78e";
 
 }  // namespace

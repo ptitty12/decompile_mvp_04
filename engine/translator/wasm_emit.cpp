@@ -63,25 +63,30 @@ u32 reg_offset(int r) {
 }
 
 // ---- module interface ----
-enum Ty : u32 { tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, tL_I, tI_L, tV_IIIIIL, kTypes };
+enum Ty : u32 {
+  tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, tL_I, tI_L, tV_IIIIIL, tL_IIIL, tV_IILIL, kTypes
+};
 enum Imp : u32 {
   iOnEntry, iSafepoint, iRead8, iRead16, iRead32, iWrite8, iWrite16, iWrite32, iExec, iCallIndirect,
-  iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, iFpUnavailable, iGpWait, kImports
+  iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, iFpUnavailable, iGpWait, iWgpStore,
+  kImports
 };
 constexpr Ty kImportType[kImports] = {tV_II,   tV_I,  tI_IIIL, tI_IIIL, tI_IIIL, tV_IIIIL, tV_IIIIL, tV_IIIIL, tV_IIIL,
                                       tV_II,   tV_II, tI_III,  tV_III,  tV_II,   tV_III,   tV_I,     tV_I,     tV_III,
-                                      tV_II,   tV_III};
+                                      tV_II,   tV_III, tV_IIIIL};
 // Helpers defined in every module, after the imports.
 enum Hlp : u32 {
   hRd8 = kImports, hRd16, hRd32, hWr8, hWr16, hWr32, hCmps, hCmpu, hDivw, hDivwu, hS2D, hD2S,
-  hLmw, hStmw, hPsqL, hPsqSt, kFirstGuest
+  hLmw, hStmw, hPsqL, hPsqSt, hRd64, hWr64, hLfs, hStfs, kFirstGuest
 };
 constexpr u32 kHelperCount = static_cast<u32>(kFirstGuest) - static_cast<u32>(kImports);
 constexpr Ty kHelperType[kHelperCount] = {tI_IIIL,  tI_IIIL,  tI_IIIL,   tV_IIIIL,  tV_IIIIL, tV_IIIIL,
                                           tI_III,   tI_III,   tI_II,     tI_II,     tL_I,     tI_L,
-                                          tV_IIIIL, tV_IIIIL, tV_IIIIIL, tV_IIIIIL};
+                                          tV_IIIIL, tV_IIIIL, tV_IIIIIL, tV_IIIIIL, tL_IIIL, tV_IILIL,
+                                          tL_IIIL,  tV_IILIL};
 constexpr const char* kHelperName[kHelperCount] = {"rd8",  "rd16", "rd32", "wr8",   "wr16", "wr32", "cmps", "cmpu",
-                                                   "divw", "divwu", "s2d", "d2s",   "lmw",  "stmw", "psq_l", "psq_st"};
+                                                   "divw", "divwu", "s2d", "d2s",   "lmw",  "stmw", "psq_l", "psq_st",
+                                                   "rd64", "wr64", "lfs", "stfs"};
 // Imported globals (immutable i32): the table base and three runtime addresses.
 enum Glb : u32 { gTableBase, gUnwinding, gResume, gHook, gWgp, gGpPages, kGlobals };
 
@@ -240,6 +245,38 @@ class FuncGen {
   // f64 temporaries (only in functions with inline floating-point arithmetic).
   u32 L_fa = 0, L_fb = 0, L_fc = 0, L_r = 0, L_f0 = 0, L_f1 = 0;
   bool uses_fp_ = false;
+  // Q4: FPR halves (2 r + h) cached in f64 locals within a run of straight-line
+  // code. Memory stays current (every write goes to both), so nothing is ever
+  // spilled; a local is used only while it is known to hold the half's value
+  // (fvalid_), which ends wherever something else may write FPRs (a call, a
+  // safe point, the MSR[FP] check, rt.exec, psq_l's helper) and at every label.
+  // FPSCR[RN, NI] == (0, 1), the fast paths' condition, is kept the same way.
+  int fpr_local_[64];
+  std::uint64_t fvalid_ = 0;
+  bool fpok_known_ = false, fp_cond_ = false;
+  u32 L_fpok = 0;
+  void fp_reset() {
+    fvalid_ = 0;
+    fpok_known_ = false;
+  }
+  void fp_drop(u32 r) { fvalid_ &= ~(3ull << (2 * r)); }
+  static u32 fp_half(u32 off) { return (off - kFpr) / 8; }
+  void fp_get(u32 off);                  // pushes the half at Cpu offset `off` as an f64
+  void fp_get_i64(u32 off) {             // ... as its i64 bits
+    fp_get(off);
+    body_->op(op::i64_reinterpret_f64);
+  }
+  void fp_load(u32 off);                 // makes the half's local current (on every path)
+  void fp_put_f64(u32 off, u32 local);   // writes the half from an f64 local
+  void fp_put_i64(u32 off, u32 local);   // ... from an i64 local
+  void fp_reload(std::uint64_t halves);  // after rt.exec wrote them in memory
+  void fpscr_ok();                       // pushes FPSCR[RN, NI] == (0, 1)
+  // Q4: an integer compare whose CR field only the conditional branch right
+  // after it reads (the field is dead after the branch): the compare sets no CR
+  // bits, the branch tests the operands (cond_expr). fuse_[k] marks the compare.
+  std::vector<bool> fuse_;
+  int fused_ = -1;  // the compare at the node before the one being emitted, when fused
+  void cr_liveness();
   int regloc_[reg::kCount];
 
   bool classify(std::string* error);
@@ -303,6 +340,7 @@ class FuncGen {
   void ea_x(Insn i);         // (rA|0) + rB
   void emit_inline(const InsnInfo& x);
   void emit_fp(const InsnInfo& x);
+  void emit_fp_fast(const InsnInfo& x, std::uint64_t dst);  // Q4, F1
   void emit_memh(const InsnInfo& x, RegSet flush_set);
   void exec_call(const InsnInfo& x);  // rt.exec of the instruction (no spills: callers decide)
   void emit_node(std::size_t k);
@@ -561,6 +599,95 @@ void FuncGen::dataflow() {
   }
 }
 
+// Q4: which CR fields are live after each node (8 bits, field f = bit f), and
+// so which integer compares can feed the next conditional branch directly.
+// Conservative: calls, returns, helpers, safe points and the MSR[FP] check read
+// every field; an instruction that changes CR in a way not listed here reads
+// and keeps them all.
+void FuncGen::cr_liveness() {
+  const std::size_t n = f_.insns.size();
+  constexpr unsigned kAll = 0xFF;
+  std::vector<unsigned> R(n + 1, 0), W(n + 1, 0), in(n + 1, 0), out(n + 1, 0);
+  R[n] = kAll;  // running off the end: the next function
+  for (std::size_t k = 0; k < n; ++k) {
+    if (!f_.reachable[k]) continue;
+    const Node& N = nodes_[k];
+    const InsnInfo& x = f_.insns[k];
+    const Insn i{x.word};
+    unsigned r = 0, w = 0;
+    switch (N.kind) {
+      case kJump: case kNop: case kMemH: case kJTab: break;
+      case kCJump:
+        if (!(i.bo() & 16)) r = 1u << (i.bi() >> 2);
+        break;
+      case kInline: case kFp: {
+        const Op o = x.op;
+        if (o == Op::cmp || o == Op::cmpi || o == Op::cmpl || o == Op::cmpli || o == Op::fcmpu || o == Op::fcmpo ||
+            o == Op::ps_cmpu0 || o == Op::ps_cmpo0 || o == Op::ps_cmpu1 || o == Op::ps_cmpo1) {
+          w = 1u << i.crfD();
+        } else if (o == Op::mtcrf) {
+          for (u32 f = 0; f < 8; ++f)
+            if (i.crm() & (0x80u >> f)) w |= 1u << f;
+        } else if (o == Op::mcrf) {
+          r = 1u << i.crfS();
+          w = 1u << i.crfD();
+        } else if (N.R & ppc::bit(reg::CR)) {
+          r = kAll;  // mfcr, the CR logical ops, ...
+        } else if (N.W & ppc::bit(reg::CR)) {
+          const bool int_rc = o == Op::andi_rc || o == Op::andis_rc || o == Op::addic_rc ||
+                              (N.kind == kInline && i.rc() && o != Op::addi && o != Op::addis);
+          if (int_rc && N.kind == kInline) w = 1u;  // CR0 of a record form
+          else r = kAll;
+        }
+        break;
+      }
+      default: r = kAll; break;  // calls, returns, rt.exec, sc, traps, ...
+    }
+    if (N.pre != pNone || N.fpchk) r = kAll;  // an interrupt or the FPU exception sees CR
+    R[k] = r;
+    W[k] = w & ~r;
+  }
+  auto each_succ = [&](const Node& N, auto&& fn) {
+    if (N.s0 >= 0) fn(N.s0);
+    if (N.s1 >= 0) fn(N.s1);
+    if (N.jt >= 0)
+      for (int s : jt_succ_[static_cast<std::size_t>(N.jt)]) fn(s);
+  };
+  in[n] = kAll;
+  for (bool changed = true; changed;) {
+    changed = false;
+    for (std::size_t k = n; k-- > 0;) {
+      if (!f_.reachable[k]) continue;
+      unsigned o = 0;
+      each_succ(nodes_[k], [&](int s) { o |= in[static_cast<std::size_t>(s)]; });
+      const unsigned v = (o & ~W[k]) | R[k];
+      if (v != in[k] || o != out[k]) changed = true;
+      in[k] = v;
+      out[k] = o;
+    }
+  }
+  fuse_.assign(n, false);
+  for (std::size_t k = 0; k + 1 < n; ++k) {
+    if (!f_.reachable[k] || !f_.reachable[k + 1]) continue;
+    const Node& N = nodes_[k];
+    const Node& B = nodes_[k + 1];
+    const InsnInfo& x = f_.insns[k];
+    const InsnInfo& y = f_.insns[k + 1];
+    const Op o = x.op;
+    if (N.kind != kInline || !(o == Op::cmp || o == Op::cmpi || o == Op::cmpl || o == Op::cmpli)) continue;
+    if (N.pre != pNone || B.pre != pNone || B.fpchk) continue;
+    if (seg_at_[k + 1] != seg_at_[k]) continue;  // a label: other paths reach the branch
+    const Insn bi{y.word};
+    const bool uses_cond = B.kind == kCJump || (B.cond && (B.kind == kCall || B.kind == kTail || B.kind == kRet ||
+                                                           B.kind == kIJump));
+    if (!uses_cond || y.op == Op::b) continue;
+    if (!(bi.bo() & 4) || (bi.bo() & 16)) continue;  // CTR counted, or no CR test
+    const u32 f = Insn{x.word}.crfD();
+    if ((bi.bi() >> 2) != f || (out[k + 1] >> f & 1)) continue;
+    fuse_[k] = true;
+  }
+}
+
 void FuncGen::flush(RegSet s) {
   for (int r = 0; r < reg::kCount; ++r) {
     if (!(s & ppc::bit(r)) || regloc_[r] < 0) continue;
@@ -620,6 +747,24 @@ void FuncGen::cond_expr(const InsnInfo& x) {
   Insn i{x.word};
   if (x.op == Op::b) {
     body_->i32c(1);
+    return;
+  }
+  if (fused_ >= 0) {  // Q4: the compare before this branch, tested directly
+    const InsnInfo& cx = f_.insns[static_cast<std::size_t>(fused_)];
+    const Insn ci{cx.word};
+    fused_ = -1;
+    const bool sgn = cx.op == Op::cmp || cx.op == Op::cmpi;
+    const u32 bit = i.bi() & 3;  // LT GT EQ SO
+    if (bit == 3) {
+      reg_get(reg::SO);
+    } else {
+      reg_get(static_cast<int>(ci.rA()));
+      if (cx.op == Op::cmp || cx.op == Op::cmpl) reg_get(static_cast<int>(ci.rB()));
+      else body_->i32c(cx.op == Op::cmpi ? static_cast<u32>(ci.simm()) : ci.uimm());
+      body_->op(bit == 0 ? (sgn ? op::i32_lt_s : op::i32_lt_u)
+                         : bit == 1 ? (sgn ? op::i32_gt_s : op::i32_gt_u) : op::i32_eq);
+    }
+    if (!((i.bo() >> 3) & 1)) body_->op(op::i32_eqz);
     return;
   }
   u32 bo = i.bo();
@@ -1189,69 +1334,66 @@ void FuncGen::emit_inline(const InsnInfo& x) {
     case Op::lfs: case Op::lfsu: case Op::lfsx: case Op::lfsux: {
       int mode = o == Op::lfs ? 0 : o == Op::lfsu ? 1 : o == Op::lfsx ? 2 : 3;
       ea_tmp(mode);
-      b.get(kCpu);
-      rd32_tmp(0);
-      b.call(hS2D);
-      b.tee(L_w);
-      b.mem(op::i64_store, 3, ps0(i.rD()));
-      b.get(kCpu);
-      b.get(L_w);
-      b.mem(op::i64_store, 3, ps1(i.rD()));
+      b.get(kCpu);  // Q4: read32 and fp::single_to_double in one helper
+      b.get(L_tmp);
+      b.i32c(a);
+      ticks_expr();
+      b.call(hLfs);
+      b.set(L_w);
+      fp_put_i64(ps0(i.rD()), L_w);
+      fp_put_i64(ps1(i.rD()), L_w);
       update(mode);
       return;
     }
     case Op::lfd: case Op::lfdu: case Op::lfdx: case Op::lfdux: {
       int mode = o == Op::lfd ? 0 : o == Op::lfdu ? 1 : o == Op::lfdx ? 2 : 3;
       ea_tmp(mode);
-      b.get(kCpu);
-      rd32_tmp(0);  // read64: the high word, then the low word
-      b.op(op::i64_extend_i32_u);
-      b.i64c(32);
-      b.op(op::i64_shl);
-      rd32_tmp(4);
-      b.op(op::i64_extend_i32_u);
-      b.op(op::i64_or);
-      b.mem(op::i64_store, 3, ps0(i.rD()));
+      b.get(kCpu);  // read64 (h.rd64: the high word, then the low word, where they are not plain memory)
+      b.get(L_tmp);
+      b.i32c(a);
+      ticks_expr();
+      b.call(hRd64);
+      b.set(L_w);
+      fp_put_i64(ps0(i.rD()), L_w);
       update(mode);
       return;
     }
     case Op::stfs: case Op::stfsu: case Op::stfsx: case Op::stfsux: {
       int mode = o == Op::stfs ? 0 : o == Op::stfsu ? 1 : o == Op::stfsx ? 2 : 3;
       ea_tmp(mode);
-      wr32_tmp(0, [&] {
-        b.get(kCpu);
-        b.mem(op::i64_load, 3, ps0(i.rS()));
-        b.call(hD2S);
-      });
+      b.get(kCpu);  // Q4: fp::double_to_single and write32 in one helper
+      b.get(L_tmp);
+      fp_get_i64(ps0(i.rS()));
+      b.i32c(a);
+      ticks_expr();
+      b.call(hStfs);
       update(mode);
       return;
     }
     case Op::stfd: case Op::stfdu: case Op::stfdx: case Op::stfdux: case Op::stfiwx: {
       int mode = (o == Op::stfd) ? 0 : o == Op::stfdu ? 1 : (o == Op::stfdx || o == Op::stfiwx) ? 2 : 3;
       ea_tmp(mode);
-      if (o != Op::stfiwx) {
-        wr32_tmp(0, [&] {  // write64: the high word, then the low word
-          b.get(kCpu);
-          b.mem(op::i64_load, 3, ps0(i.rS()));
-          b.i64c(32);
-          b.op(op::i64_shr_u);
+      if (o != Op::stfiwx) {  // write64 (h.wr64: the high word, then the low word, where they are not plain memory)
+        b.get(kCpu);
+        b.get(L_tmp);
+        fp_get_i64(ps0(i.rS()));
+        b.i32c(a);
+        ticks_expr();
+        b.call(hWr64);
+      } else {
+        wr32_tmp(0, [&] {
+          fp_get_i64(ps0(i.rS()));
           b.op(op::i32_wrap_i64);
         });
       }
-      wr32_tmp(o == Op::stfiwx ? 0 : 4, [&] {
-        b.get(kCpu);
-        b.mem(op::i64_load, 3, ps0(i.rS()));
-        b.op(op::i32_wrap_i64);
-      });
       update(mode);
       return;
     }
     case Op::fmr: case Op::fneg: case Op::fabs: case Op::fnabs:
-      b.get(kCpu);
-      b.get(kCpu);
-      b.mem(op::i64_load, 3, ps0(i.rB()));
+      fp_get_i64(ps0(i.rB()));
       sign_op(o == Op::fmr ? 0 : o == Op::fneg ? 1 : o == Op::fabs ? 2 : 3);
-      b.mem(op::i64_store, 3, ps0(i.rD()));
+      b.set(L_w);
+      fp_put_i64(ps0(i.rD()), L_w);
       return;
     case Op::ps_mr: case Op::ps_neg: case Op::ps_abs: case Op::ps_nabs: case Op::ps_merge00: case Op::ps_merge01:
     case Op::ps_merge10: case Op::ps_merge11: {
@@ -1268,20 +1410,14 @@ void FuncGen::emit_inline(const InsnInfo& x) {
         case Op::ps_merge11: src0 = ps1(i.rA()); src1 = ps1(i.rB()); break;
         default: break;
       }
-      b.get(kCpu);
-      b.mem(op::i64_load, 3, src0);
+      fp_get_i64(src0);
       sign_op(sop);
       b.set(L_w);
-      b.get(kCpu);
-      b.mem(op::i64_load, 3, src1);
+      fp_get_i64(src1);
       sign_op(sop);
       b.set(L_w2);
-      b.get(kCpu);
-      b.get(L_w);
-      b.mem(op::i64_store, 3, ps0(i.rD()));
-      b.get(kCpu);
-      b.get(L_w2);
-      b.mem(op::i64_store, 3, ps1(i.rD()));
+      fp_put_i64(ps0(i.rD()), L_w);
+      fp_put_i64(ps1(i.rD()), L_w2);
       return;
     }
     case Op::sraw:
@@ -1343,6 +1479,7 @@ void FuncGen::emit_inline(const InsnInfo& x) {
       b.i32c(a);
       ticks_expr();
       b.call(st ? hPsqSt : hPsqL);
+      if (!st) fp_drop(static_cast<u32>(rD));  // Q4: the helper wrote it in memory
       if (upd) {
         b.get(L_tmp);
         S(rA);
@@ -1400,6 +1537,120 @@ constexpr u64 kF64One = 0x3FF0000000000000ull;
 constexpr u64 kDefaultNaNBits = 0x7FF8000000000000ull;
 }  // namespace
 
+void FuncGen::fp_get(u32 off) {
+  const u32 h = fp_half(off);
+  const int l = fpr_local_[h];
+  if (l >= 0 && (fvalid_ >> h & 1)) {
+    body_->get(static_cast<u32>(l));
+    return;
+  }
+  body_->get(kCpu);
+  body_->mem(op::f64_load, 3, off);
+  if (l >= 0 && !fp_cond_) {  // inside a conditional path a load stays a plain load
+    body_->tee(static_cast<u32>(l));
+    fvalid_ |= 1ull << h;
+  }
+}
+
+void FuncGen::fp_load(u32 off) {
+  const u32 h = fp_half(off);
+  const int l = fpr_local_[h];
+  if (l < 0 || (fvalid_ >> h & 1)) return;
+  body_->get(kCpu);
+  body_->mem(op::f64_load, 3, off);
+  body_->set(static_cast<u32>(l));
+  fvalid_ |= 1ull << h;
+}
+
+void FuncGen::fp_put_f64(u32 off, u32 local) {
+  body_->get(kCpu);
+  body_->get(local);
+  body_->mem(op::f64_store, 3, off);
+  const u32 h = fp_half(off);
+  if (const int l = fpr_local_[h]; l >= 0) {
+    body_->get(local);
+    body_->set(static_cast<u32>(l));
+    fvalid_ |= 1ull << h;
+  }
+}
+
+void FuncGen::fp_put_i64(u32 off, u32 local) {
+  body_->get(kCpu);
+  body_->get(local);
+  body_->mem(op::i64_store, 3, off);
+  const u32 h = fp_half(off);
+  if (const int l = fpr_local_[h]; l >= 0) {
+    body_->get(local);
+    body_->op(op::f64_reinterpret_i64);
+    body_->set(static_cast<u32>(l));
+    fvalid_ |= 1ull << h;
+  }
+}
+
+void FuncGen::fp_reload(std::uint64_t halves) {
+  for (u32 h = 0; h < 64; ++h) {
+    if (!(halves >> h & 1) || fpr_local_[h] < 0) continue;
+    body_->get(kCpu);
+    body_->mem(op::f64_load, 3, kFpr + 8 * h);
+    body_->set(static_cast<u32>(fpr_local_[h]));
+  }
+}
+
+// Called first thing in an instruction's fast path, before any branch: what it
+// computes holds on every path out of the instruction.
+void FuncGen::fpscr_ok() {
+  if (fpok_known_) {
+    body_->get(L_fpok);
+    return;
+  }
+  body_->get(kCpu);
+  body_->mem(op::i32_load, 2, kFpscr);
+  body_->i32c(7);
+  body_->op(op::i32_and);
+  body_->i32c(4);
+  body_->op(op::i32_eq);
+  body_->tee(L_fpok);
+  fpok_known_ = true;
+}
+
+// Q4: the FPR halves (2 r + h) an instruction emit_fp computes reads and writes.
+static void fp_halves(Op o, Insn i, std::uint64_t* src, std::uint64_t* dst) {
+  auto H = [](u32 r, u32 h) { return 1ull << (2 * r + h); };
+  const u32 a = i.rA(), b = i.rB(), c = i.rC(), d = i.rD();
+  const std::uint64_t d0 = H(d, 0), dd = H(d, 0) | H(d, 1);
+  std::uint64_t S = 0, D = 0;
+  switch (o) {
+    case Op::fcmpu: case Op::fcmpo: case Op::ps_cmpu0: case Op::ps_cmpo0: S = H(a, 0) | H(b, 0); break;
+    case Op::ps_cmpu1: case Op::ps_cmpo1: S = H(a, 1) | H(b, 1); break;
+    case Op::fsel: S = H(a, 0) | H(b, 0) | H(c, 0); D = d0; break;
+    case Op::ps_sel: S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1) | H(c, 0) | H(c, 1); D = dd; break;
+    case Op::fctiwz: case Op::fctiw: case Op::frsqrte: S = H(b, 0); D = d0; break;
+    case Op::fadd: case Op::fsub: case Op::fdiv: S = H(a, 0) | H(b, 0); D = d0; break;
+    case Op::fmul: S = H(a, 0) | H(c, 0); D = d0; break;
+    case Op::fmadd: case Op::fmsub: case Op::fnmadd: case Op::fnmsub: S = H(a, 0) | H(b, 0) | H(c, 0); D = d0; break;
+    case Op::fadds: case Op::fsubs: case Op::fdivs: S = H(a, 0) | H(b, 0); D = dd; break;
+    case Op::fmuls: S = H(a, 0) | H(c, 0); D = dd; break;
+    case Op::fres: case Op::frsp: S = H(b, 0); D = dd; break;
+    case Op::fmadds: case Op::fmsubs: case Op::fnmadds: case Op::fnmsubs: S = H(a, 0) | H(b, 0) | H(c, 0); D = dd; break;
+    case Op::ps_rsqrte: case Op::ps_res: S = H(b, 0) | H(b, 1); D = dd; break;
+    case Op::ps_add: case Op::ps_sub: case Op::ps_div: S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1); D = dd; break;
+    case Op::ps_mul: S = H(a, 0) | H(a, 1) | H(c, 0) | H(c, 1); D = dd; break;
+    case Op::ps_muls0: S = H(a, 0) | H(a, 1) | H(c, 0); D = dd; break;
+    case Op::ps_muls1: S = H(a, 0) | H(a, 1) | H(c, 1); D = dd; break;
+    case Op::ps_madd: case Op::ps_msub: case Op::ps_nmadd: case Op::ps_nmsub:
+      S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1) | H(c, 0) | H(c, 1);
+      D = dd;
+      break;
+    case Op::ps_madds0: S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1) | H(c, 0); D = dd; break;
+    case Op::ps_madds1: S = H(a, 0) | H(a, 1) | H(b, 0) | H(b, 1) | H(c, 1); D = dd; break;
+    case Op::ps_sum0: S = H(a, 0) | H(b, 1) | H(c, 1); D = dd; break;
+    case Op::ps_sum1: S = H(a, 0) | H(b, 1) | H(c, 0); D = dd; break;
+    default: break;
+  }
+  *src = S;
+  *dst = D;
+}
+
 void FuncGen::exec_call(const InsnInfo& x) {
   body_->get(kCpu);
   body_->i32c(x.word);
@@ -1413,19 +1664,20 @@ void FuncGen::emit_fp(const InsnInfo& x) {
   const Insn i{x.word};
   const Op o = x.op;
   const u32 rD = i.rD(), rA = i.rA(), rB = i.rB(), rC = i.rC();
-  auto ld = [&](u32 off) {
-    b.get(kCpu);
-    b.mem(op::f64_load, 3, off);
-  };
-  auto ldi = [&](u32 off) {
-    b.get(kCpu);
-    b.mem(op::i64_load, 3, off);
-  };
-  auto st = [&](u32 off, u32 local) {  // an f64 local that holds no NaN
-    b.get(kCpu);
-    b.get(local);
-    b.mem(op::f64_store, 3, off);
-  };
+  // Q4: the sources go to their locals first (on every path) and the code reads
+  // them there; results go to memory and the locals; rt.exec's are reloaded.
+  std::uint64_t src = 0, dst = 0;
+  fp_halves(o, i, &src, &dst);
+  for (u32 h = 0; h < 64; ++h)
+    if (src >> h & 1) fp_load(kFpr + 8 * h);
+  struct Cond {
+    bool& f;
+    ~Cond() { f = false; }
+  } cond{fp_cond_};
+  fp_cond_ = true;
+  auto ld = [&](u32 off) { fp_get(off); };
+  auto ldi = [&](u32 off) { fp_get_i64(off); };
+  auto st = [&](u32 off, u32 local) { fp_put_f64(off, local); };  // an f64 local that holds no NaN
   // force25(c) as an f64 (fp::force25 on the bits).
   auto force25 = [&](u32 off) {
     ldi(off);
@@ -1722,20 +1974,13 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       };
       sel(0, L_w);
       if (o == Op::ps_sel) sel(1, L_w2);
-      b.get(kCpu);
-      b.get(L_w);
-      b.mem(op::i64_store, 3, ps0(rD));
-      if (o == Op::ps_sel) {
-        b.get(kCpu);
-        b.get(L_w2);
-        b.mem(op::i64_store, 3, ps1(rD));
-      }
+      fp_put_i64(ps0(rD), L_w);
+      if (o == Op::ps_sel) fp_put_i64(ps1(rD), L_w2);
       return;
     }
     case Op::fctiwz: {
       // fp::to_int32 toward zero: NaN -> 0x80000000, saturating, and bit 32 set
       // for a zero result from a negative source.
-      b.get(kCpu);
       ld(ps0(rB));
       b.tee(L_fa);
       b.fc(op::fc_i32_trunc_sat_f64_s);
@@ -1762,7 +2007,8 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       b.i64c(32);
       b.op(op::i64_shl);
       b.op(op::i64_or);
-      b.mem(op::i64_store, 3, ps0(rD));
+      b.set(L_w);
+      fp_put_i64(ps0(rD), L_w);
       return;
     }
     default:
@@ -1773,13 +2019,18 @@ void FuncGen::emit_fp(const InsnInfo& x) {
   const int done = b.block();
   const int slow = b.block();
   // FPSCR: round to nearest, NI set.
-  b.get(kCpu);
-  b.mem(op::i32_load, 2, kFpscr);
-  b.i32c(7);
-  b.op(op::i32_and);
-  b.i32c(4);
-  b.op(op::i32_ne);
+  fpscr_ok();
+  b.op(op::i32_eqz);
   b.br_if(slow);
+  if (!ctx_.opt.fp_exact && o != Op::fctiw) {  // Q4, F1: the fast model, no other way out
+    emit_fp_fast(x, dst);
+    b.br(done);
+    b.end();
+    exec_call(x);
+    fp_reload(dst);
+    b.end();
+    return;
+  }
   auto both = [&](u32 local) {  // a single result fills both halves
     st(ps0(rD), local);
     st(ps1(rD), local);
@@ -1829,7 +2080,6 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       break;
     case Op::fctiw:
       // fp::to_int32 in round to nearest (the guard): ties to even, then as fctiwz.
-      b.get(kCpu);
       ld(ps0(rB));
       b.tee(L_fa);
       b.op(op::f64_nearest);
@@ -1857,7 +2107,8 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       b.i64c(32);
       b.op(op::i64_shl);
       b.op(op::i64_or);
-      b.mem(op::i64_store, 3, ps0(rD));
+      b.set(L_w);
+      fp_put_i64(ps0(rD), L_w);
       break;
     case Op::frsqrte: case Op::ps_rsqrte: {
       // fp::rsqrt_estimate: 1 / sqrt_rn(b) in double; NaN operand -> runtime; a
@@ -1899,18 +2150,12 @@ void FuncGen::emit_fp(const InsnInfo& x) {
       };
       if (o == Op::frsqrte) {
         half(ps0(rB), false, L_w);
-        b.get(kCpu);
-        b.get(L_w);
-        b.mem(op::i64_store, 3, ps0(rD));
+        fp_put_i64(ps0(rD), L_w);
       } else {
         half(ps0(rB), true, L_w);
         half(ps1(rB), true, L_w2);
-        b.get(kCpu);
-        b.get(L_w);
-        b.mem(op::i64_store, 3, ps0(rD));
-        b.get(kCpu);
-        b.get(L_w2);
-        b.mem(op::i64_store, 3, ps1(rD));
+        fp_put_i64(ps0(rD), L_w);
+        fp_put_i64(ps1(rD), L_w2);
       }
       break;
     }
@@ -1941,12 +2186,11 @@ void FuncGen::emit_fp(const InsnInfo& x) {
           ldi(s0 ? ps1(rC) : ps0(rC));
           b.set(L_w);
           st(s0 ? ps0(rD) : ps1(rD), L_f0);
-          b.get(kCpu);
-          b.get(L_w);
-          b.mem(op::i64_store, 3, s0 ? ps1(rD) : ps0(rD));
+          fp_put_i64(s0 ? ps1(rD) : ps0(rD), L_w);
           b.br(done);
           b.end();
           exec_call(x);
+          fp_reload(dst);
           b.end();
           return;
         }
@@ -1963,7 +2207,162 @@ void FuncGen::emit_fp(const InsnInfo& x) {
   b.br(done);
   b.end();
   exec_call(x);
+  fp_reload(dst);
   b.end();
+}
+
+// Q4, F1: the fast model of ppc/fp.h (its comment has the rules), for every
+// instruction emit_fp computes but fctiw (exact in both models). Every step is one
+// IEEE double operation in the order fp.cpp writes it, a single result is the
+// double rounded to f32 and back, a result below the normal range of its
+// precision becomes a signed zero, and a NaN result becomes the default NaN,
+// whatever bits the host's arithmetic gave it. Called inside emit_fp's fast-path
+// block, after the FPSCR check; the sources are in their locals.
+void FuncGen::emit_fp_fast(const InsnInfo& x, std::uint64_t) {
+  Fn& b = *body_;
+  const Insn i{x.word};
+  const Op o = x.op;
+  const u32 rD = i.rD(), rA = i.rA(), rB = i.rB(), rC = i.rC();
+  constexpr u64 kOne = 0x3FF0000000000000ull, kMinSingle = 0x3810000000000000ull, kMinDouble = 0x0010000000000000ull;
+  auto ld = [&](u32 off) { fp_get(off); };
+  // The result for the double in L_r, as i64 bits into `out` (fp::fast_finish).
+  auto fin = [&](bool single, u32 out) {
+    b.i64c(static_cast<s64>(kDefaultNaNBits));
+    b.get(L_r);
+    if (single) {
+      b.op(op::f32_demote_f64);
+      b.op(op::f64_promote_f32);
+    }
+    b.set(L_fa);
+    b.f64c_bits(0);
+    b.get(L_fa);
+    b.op(op::f64_copysign);
+    b.get(L_fa);
+    b.get(L_fa);
+    b.op(op::f64_abs);
+    b.f64c_bits(single ? kMinSingle : kMinDouble);
+    b.op(op::f64_lt);
+    b.op(op::select);  // below the normal range: a signed zero
+    b.op(op::i64_reinterpret_f64);
+    b.get(L_r);
+    b.get(L_r);
+    b.op(op::f64_ne);
+    b.op(op::select);  // NaN: the default NaN
+    b.set(out);
+  };
+  auto binary = [&](u8 opc, u32 x_off, u32 y_off) {
+    ld(x_off);
+    ld(y_off);
+    b.op(opc);
+    b.set(L_r);
+  };
+  auto madd = [&](u32 a_off, u32 c_off, u32 b_off, bool neg_b, bool neg_r) {
+    ld(a_off);
+    ld(c_off);
+    b.op(op::f64_mul);
+    ld(b_off);
+    b.op(neg_b ? op::f64_sub : op::f64_add);
+    if (neg_r) b.op(op::f64_neg);
+    b.set(L_r);
+  };
+  auto recip = [&](u32 b_off) {
+    b.f64c_bits(kOne);
+    ld(b_off);
+    b.op(op::f64_div);
+    b.set(L_r);
+  };
+  auto rsqrt = [&](u32 b_off) {
+    ld(b_off);
+    b.op(op::f64_sqrt);
+    b.set(L_fb);
+    b.f64c_bits(kOne);
+    b.get(L_fb);
+    b.op(op::f64_div);
+    b.set(L_r);
+  };
+  const bool nm = o == Op::fnmadd || o == Op::fnmsub || o == Op::fnmadds || o == Op::fnmsubs ||
+                  o == Op::ps_nmadd || o == Op::ps_nmsub;
+  const bool ms = o == Op::fmsub || o == Op::fnmsub || o == Op::fmsubs || o == Op::fnmsubs || o == Op::ps_msub ||
+                  o == Op::ps_nmsub;
+  switch (o) {
+    case Op::fadd: case Op::fsub: case Op::fmul: case Op::fdiv:
+      binary(o == Op::fadd ? op::f64_add : o == Op::fsub ? op::f64_sub : o == Op::fmul ? op::f64_mul : op::f64_div,
+             ps0(rA), o == Op::fmul ? ps0(rC) : ps0(rB));
+      fin(false, L_w);
+      fp_put_i64(ps0(rD), L_w);
+      return;
+    case Op::fmadd: case Op::fmsub: case Op::fnmadd: case Op::fnmsub:
+      madd(ps0(rA), ps0(rC), ps0(rB), ms, nm);
+      fin(false, L_w);
+      fp_put_i64(ps0(rD), L_w);
+      return;
+    case Op::frsqrte:
+      rsqrt(ps0(rB));
+      fin(false, L_w);
+      fp_put_i64(ps0(rD), L_w);
+      return;
+    case Op::fadds: case Op::fsubs: case Op::fmuls: case Op::fdivs: case Op::fres: case Op::frsp:
+    case Op::fmadds: case Op::fmsubs: case Op::fnmadds: case Op::fnmsubs:
+      switch (o) {
+        case Op::fadds: binary(op::f64_add, ps0(rA), ps0(rB)); break;
+        case Op::fsubs: binary(op::f64_sub, ps0(rA), ps0(rB)); break;
+        case Op::fmuls: binary(op::f64_mul, ps0(rA), ps0(rC)); break;
+        case Op::fdivs: binary(op::f64_div, ps0(rA), ps0(rB)); break;
+        case Op::fres: recip(ps0(rB)); break;
+        case Op::frsp:
+          ld(ps0(rB));
+          b.set(L_r);
+          break;
+        default: madd(ps0(rA), ps0(rC), ps0(rB), ms, nm); break;
+      }
+      fin(true, L_w);
+      fp_put_i64(ps0(rD), L_w);  // a single result fills both halves
+      fp_put_i64(ps1(rD), L_w);
+      return;
+    case Op::ps_rsqrte:  // round_to_single(rsqrt_estimate(b)) per half
+      for (u32 h : {0u, 1u}) {
+        const u32 out = h ? L_w2 : L_w;
+        rsqrt(h ? ps1(rB) : ps0(rB));
+        fin(false, out);
+        b.get(out);
+        b.op(op::f64_reinterpret_i64);
+        b.set(L_r);
+        fin(true, out);
+      }
+      break;
+    case Op::ps_sum0: case Op::ps_sum1: {  // s = A.ps0 + B.ps1; ps_sum0: (s, C.ps1), ps_sum1: (C.ps0, s)
+      binary(op::f64_add, ps0(rA), ps1(rB));
+      const bool s0 = o == Op::ps_sum0;
+      fin(true, s0 ? L_w : L_w2);
+      fp_get_i64(s0 ? ps1(rC) : ps0(rC));
+      b.set(s0 ? L_w2 : L_w);
+      break;
+    }
+    default: {
+      // Paired singles, both halves computed before either is stored (rD may be a source).
+      for (u32 h : {0u, 1u}) {
+        const u32 a = h ? ps1(rA) : ps0(rA), bb = h ? ps1(rB) : ps0(rB), c = h ? ps1(rC) : ps0(rC);
+        const u32 c0 = ps0(rC), c1 = ps1(rC);
+        switch (o) {
+          case Op::ps_add: binary(op::f64_add, a, bb); break;
+          case Op::ps_sub: binary(op::f64_sub, a, bb); break;
+          case Op::ps_div: binary(op::f64_div, a, bb); break;
+          case Op::ps_mul: binary(op::f64_mul, a, c); break;
+          case Op::ps_muls0: binary(op::f64_mul, a, c0); break;
+          case Op::ps_muls1: binary(op::f64_mul, a, c1); break;
+          case Op::ps_res: recip(bb); break;
+          case Op::ps_madd: case Op::ps_msub: case Op::ps_nmadd: case Op::ps_nmsub: madd(a, c, bb, ms, nm); break;
+          case Op::ps_madds0: madd(a, c0, bb, false, false); break;
+          case Op::ps_madds1: madd(a, c1, bb, false, false); break;
+          default: break;  // is_fp_inline() lists the same opcodes
+        }
+        fin(true, h ? L_w2 : L_w);
+      }
+      break;
+    }
+  }
+  fp_put_i64(ps0(rD), L_w);
+  fp_put_i64(ps1(rD), L_w2);
 }
 
 // lmw / stmw: the in-module helper moves the words between guest memory and the
@@ -2045,6 +2444,7 @@ void FuncGen::emit_node(std::size_t k) {
     reload(N.Lm);
     load_ticks();
   };
+  if (N.pre != pNone || N.fpchk) fp_reset();  // Q4: a safe point or the FP check may switch FPR contents
   if (N.pre == pIdle) {
     materialize();
     safepoint();
@@ -2089,6 +2489,10 @@ void FuncGen::emit_node(std::size_t k) {
     case kInline:
       ++ctx_.out->stats.inline_insns;
       if (ctx_.opt.precise_io && N.mem) flush(D);
+      if (fuse_[k]) {  // Q4: the next node's branch tests it
+        fused_ = static_cast<int>(k);
+        return;
+      }
       emit_inline(x);
       return;
     case kFp:
@@ -2101,6 +2505,7 @@ void FuncGen::emit_node(std::size_t k) {
       reload(N.W & N.Lout);
       return;
     case kHelper:
+      fp_reset();  // Q4: rt.exec (mffs, mtfsf, ...)
       ++ctx_.out->stats.helper_insns;
       ++ctx_.out->stats.helper_by_op[static_cast<std::size_t>(x.op)];
       flush(N.R & D);
@@ -2133,6 +2538,7 @@ void FuncGen::emit_node(std::size_t k) {
       b.op(op::unreachable);
       return;
     case kSc:
+      fp_reset();
       ++ctx_.out->stats.helper_insns;
       materialize();
       flush(D);
@@ -2213,6 +2619,7 @@ void FuncGen::emit_node(std::size_t k) {
       return;
     }
     case kCall: {
+      fp_reset();  // Q4: the callee may change any FPR (its return is a label anyway)
       const bool indirect = x.flow == Flow::IndirectCall;
       if (N.cond) {
         cond_expr(x);
@@ -2394,6 +2801,7 @@ bool FuncGen::run(Fn& body, std::string* error) {
       if (f_.reachable[k] && is_fpu(k) && !(known_in[k] && nodes_[k].pre == pNone)) nodes_[k].fpchk = true;
   }
   dataflow();
+  cr_liveness();
   dispatch_ = has_resume_ || mode_ == Mode::Body || !f_.tables.empty();
   for (std::size_t k = 0; k < n && !dispatch_; ++k) {
     if (!f_.reachable[k]) continue;
@@ -2412,6 +2820,7 @@ bool FuncGen::run(Fn& body, std::string* error) {
   L_tc = next++;
   L_tgt = next++;
   L_tmp = next++;
+  L_fpok = next++;
   for (int r = 0; r < reg::kCount; ++r) regloc_[r] = (used_ & ppc::bit(r)) ? static_cast<int>(next++) : -1;
   const u32 n_i32 = next - params;
   L_t = next++;
@@ -2425,13 +2834,28 @@ bool FuncGen::run(Fn& body, std::string* error) {
     L_f0 = next++;
     L_f1 = next++;
   }
-  body.uleb(uses_fp_ ? 3 : 2);
+  // Q4: the halves of every FPR the function's floating-point code names.
+  u32 n_fpr_locals = 0;
+  {
+    std::uint32_t fprs = 0;
+    for (std::size_t k = 0; k < n; ++k) {
+      if (!f_.reachable[k] || !ppc::uses_fpu(f_.insns[k].op) || f_.insns[k].flow != Flow::Plain) continue;
+      const Insn w{f_.insns[k].word};
+      fprs |= 1u << w.rD() | 1u << w.rA() | 1u << w.rB() | 1u << w.rC();
+    }
+    for (int h = 0; h < 64; ++h) {
+      fpr_local_[h] = (fprs >> (h / 2) & 1) ? static_cast<int>(next++) : -1;
+      if (fpr_local_[h] >= 0) ++n_fpr_locals;
+    }
+  }
+  const u32 n_f64 = (uses_fp_ ? 6 : 0) + n_fpr_locals;
+  body.uleb(n_f64 ? 3 : 2);
   body.uleb(n_i32);
   body.byte(kI32);
   body.uleb(3);
   body.byte(kI64);
-  if (uses_fp_) {
-    body.uleb(6);
+  if (n_f64) {
+    body.uleb(n_f64);
     body.byte(kF64);
   }
 
@@ -2490,6 +2914,7 @@ bool FuncGen::run(Fn& body, std::string* error) {
       return;
     }
     p_ = 0;
+    fp_reset();  // Q4: a label: other paths arrive here
     std::size_t k = (seg_start_[static_cast<std::size_t>(s)] - f_.start) / 4;
     std::size_t end = s + 1 < nseg ? (seg_start_[static_cast<std::size_t>(s) + 1] - f_.start) / 4 : n;
     // A segment that branches back to its own start (a loop without inner
@@ -2662,9 +3087,283 @@ Fn helper_read(int bytes, u32 slow) {
   return h;
 }
 
+// Q4: fp::single_to_double of the word in `word` (an i32 local) as an i64 on
+// the stack: f64.promote_f32 is exact for every non-NaN single; a NaN takes
+// h.s2d (its bit formula).
+void single_to_double_inline(Fn& h, u32 word) {
+  h.get(word);
+  h.i32c(0x7FFFFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x7F800000);
+  h.op(op::i32_gt_u);
+  h.if_i64();
+  h.get(word);
+  h.call(hS2D);
+  h.else_();
+  h.get(word);
+  h.op(op::f32_reinterpret_i32);
+  h.op(op::f64_promote_f32);
+  h.op(op::i64_reinterpret_f64);
+  h.end();
+}
+
+// Q4: fp::double_to_single_ftz (psq_st, float types) of the bits in the i64 local
+// `bits`, as an i32 on the stack: the bit formula, or the sign alone below the
+// single normal range.
+void double_to_single_ftz_inline(Fn& h, u32 bits) {
+  h.get(bits);
+  h.i64c(32);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0xC0000000u);
+  h.op(op::i32_and);
+  h.get(bits);
+  h.i64c(29);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x3FFFFFFF);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.get(bits);
+  h.i64c(32);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x80000000u);
+  h.op(op::i32_and);
+  h.get(bits);
+  h.i64c(52);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x7FF);
+  h.op(op::i32_and);
+  h.i32c(896);
+  h.op(op::i32_gt_u);
+  h.get(bits);
+  h.i64c(0x7FFFFFFFFFFFFFFFll);
+  h.op(op::i64_and);
+  h.op(op::i64_eqz);
+  h.op(op::i32_or);
+  h.op(op::select);
+}
+
+// Q4: lfs: (cpu, ea, pc, ticks) -> the double's bits: read32 (a mapped page
+// without crossing: a plain load; else h.rd32) and fp::single_to_double, in one call.
+Fn helper_load_single() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 4: the page pointer; 5: the word
+  page_ptr(h, 4);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 4);
+  h.op(op::i32_le_u);
+  h.if_();
+  host_addr(h, 4);
+  h.mem(op::i32_load, 0, 0);
+  h.tee(5);
+  swap32_from_local(h, 5);
+  h.set(5);
+  single_to_double_inline(h, 5);
+  h.op(op::return_);
+  h.end();
+  h.end();
+  h.get(0);
+  h.get(1);
+  h.get(2);
+  h.get(3);
+  h.call(hRd32);
+  h.set(5);
+  single_to_double_inline(h, 5);
+  h.byte(op::end);
+  return h;
+}
+
+// Q4: stfs: (cpu, ea, double bits, pc, ticks): fp::double_to_single (the bit
+// formula, or h.d2s where the result is a single denormal, exponents 874-896)
+// and write32 (a mapped page without crossing: a plain store after the threaded
+// engine's check; else h.wr32), in one call.
+Fn helper_store_single() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 5: the page pointer; 6: the word
+  h.get(2);
+  h.i64c(52);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x7FF);
+  h.op(op::i32_and);
+  h.i32c(874);
+  h.op(op::i32_sub);
+  h.i32c(896 - 874);
+  h.op(op::i32_le_u);
+  h.if_i32();
+  h.get(2);
+  h.call(hD2S);
+  h.else_();
+  h.get(2);
+  h.i64c(32);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0xC0000000u);
+  h.op(op::i32_and);
+  h.get(2);
+  h.i64c(29);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x3FFFFFFF);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.end();
+  h.set(6);
+  page_ptr(h, 5);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 4);
+  h.op(op::i32_le_u);
+  h.if_();
+  gp_check(h, [&] { h.get(1); }, [&] {
+    h.get(1);
+    h.i32c(3);
+    h.op(op::i32_add);
+  });
+  host_addr(h, 5);
+  h.get(6);
+  swap32_from_local(h, 6);
+  h.mem(op::i32_store, 0, 0);
+  h.op(op::return_);
+  h.end();
+  h.end();
+  h.get(0);
+  h.get(1);
+  h.get(6);
+  h.get(3);
+  h.get(4);
+  h.call(hWr32);
+  h.byte(op::end);
+  return h;
+}
+
+// Q4: (cpu, ea, pc, ticks) -> the big-endian doubleword (lfd, psq_l of float
+// pairs): read64, the high word then the low word. Both in one mapped page:
+// plain loads; otherwise two h.rd32 (which take the runtime's path where needed).
+Fn helper_read64() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 4: the page pointer; 5: a word
+  page_ptr(h, 4);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 8);
+  h.op(op::i32_le_u);
+  h.if_();
+  for (u32 off : {0u, 4u}) {
+    host_addr(h, 4);
+    h.mem(op::i32_load, 0, off);
+    h.tee(5);
+    swap32_from_local(h, 5);
+    h.op(op::i64_extend_i32_u);
+    if (!off) {
+      h.i64c(32);
+      h.op(op::i64_shl);
+    }
+  }
+  h.op(op::i64_or);
+  h.op(op::return_);
+  h.end();
+  h.end();
+  for (u32 off : {0u, 4u}) {
+    h.get(0);
+    h.get(1);
+    if (off) {
+      h.i32c(off);
+      h.op(op::i32_add);
+    }
+    h.get(2);
+    h.get(3);
+    h.call(hRd32);
+    h.op(op::i64_extend_i32_u);
+    if (!off) {
+      h.i64c(32);
+      h.op(op::i64_shl);
+    }
+  }
+  h.op(op::i64_or);
+  h.byte(op::end);
+  return h;
+}
+
+// Q4: (cpu, ea, value, pc, ticks), write64 (stfd, psq_st of float pairs): the
+// high word, then the low word. Both in one mapped page: plain stores (after the
+// threaded engine's check of the 8 bytes); otherwise two h.wr32.
+Fn helper_write64() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 5: the page pointer; 6: a word
+  page_ptr(h, 5);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 8);
+  h.op(op::i32_le_u);
+  h.if_();
+  gp_check(h, [&] { h.get(1); }, [&] {
+    h.get(1);
+    h.i32c(7);
+    h.op(op::i32_add);
+  });
+  for (u32 off : {0u, 4u}) {
+    host_addr(h, 5);
+    h.get(2);
+    if (!off) {
+      h.i64c(32);
+      h.op(op::i64_shr_u);
+    }
+    h.op(op::i32_wrap_i64);
+    h.tee(6);
+    swap32_from_local(h, 6);
+    h.mem(op::i32_store, 0, off);
+  }
+  h.op(op::return_);
+  h.end();
+  h.end();
+  for (u32 off : {0u, 4u}) {
+    h.get(0);
+    h.get(1);
+    if (off) {
+      h.i32c(off);
+      h.op(op::i32_add);
+    }
+    h.get(2);
+    if (!off) {
+      h.i64c(32);
+      h.op(op::i64_shr_u);
+    }
+    h.op(op::i32_wrap_i64);
+    h.get(3);
+    h.get(4);
+    h.call(hWr32);
+  }
+  h.byte(op::end);
+  return h;
+}
+
 // (cpu, ea, value, pc, ticks), as helper_read. P2: a store to the write-gather
-// pipe that does not complete a burst is appended to the runtime's buffer
-// directly (WasmWgpLayout), as Hardware::write would append it.
+// pipe that leaves fewer than 32 bytes gathered is appended to the runtime's
+// buffer directly (WasmWgpLayout), as Hardware::write would append it; Q4: one
+// that completes the burst (or reaches into the next) goes to rt.wgp_store, which
+// gathers it as Hardware::write would, burst included, without the rest of the
+// MMIO path (the module counts it and ends the poll detector's run here too).
 Fn helper_write(int bytes, u32 slow) {
   Fn h;
   h.uleb(1);
@@ -2710,16 +3409,29 @@ Fn helper_write(int bytes, u32 slow) {
   h.op(op::return_);
   if (bytes != 1) h.end();
   h.end();
-  // The write-gather pipe (an unmapped page, so the runtime's path otherwise).
+  // The write-gather pipe (an unmapped page, so the runtime's path otherwise):
+  // any address in its 4 KiB block, as Hardware::write takes them (Q4: a psq_st
+  // writes its second element to 0xCC008004).
   using L = WasmWgpLayout;
   h.get(1);
   h.i32c(0xCC008000u);
-  h.op(op::i32_eq);
+  h.op(op::i32_sub);
+  h.i32c(0x1000);
+  h.op(op::i32_lt_u);
   h.if_();
   h.global(gWgp);
   h.tee(6);
   h.mem(op::i32_load, 2, L::kFast);
   h.if_();
+  h.get(6);
+  h.i32c(0);
+  h.mem(op::i32_store, 2, L::kLastRead);
+  h.get(6);
+  h.get(6);
+  h.mem(op::i64_load, 3, L::kFastStores);
+  h.i64c(1);
+  h.op(op::i64_add);
+  h.mem(op::i64_store, 3, L::kFastStores);
   h.get(6);
   h.mem(op::i32_load, 2, L::kN);
   h.tee(7);
@@ -2753,17 +3465,15 @@ Fn helper_write(int bytes, u32 slow) {
   h.i32c(static_cast<u32>(bytes));
   h.op(op::i32_add);
   h.mem(op::i32_store, 2, L::kN);
-  h.get(6);
-  h.i32c(0);
-  h.mem(op::i32_store, 2, L::kLastRead);
-  h.get(6);
-  h.get(6);
-  h.mem(op::i64_load, 3, L::kFastStores);
-  h.i64c(1);
-  h.op(op::i64_add);
-  h.mem(op::i64_store, 3, L::kFastStores);
   h.op(op::return_);
   h.end();
+  h.get(0);  // Q4: it completes the burst (or reaches into the next)
+  h.get(2);
+  h.i32c(static_cast<u32>(bytes));
+  h.get(3);
+  h.get(4);
+  h.call(iWgpStore);
+  h.op(op::return_);
   h.end();
   h.end();
   h.get(0);
@@ -3104,6 +3814,50 @@ Fn helper_psq_load() {
   h.op(op::i32_add);
   h.mem(op::i32_load, 2, kGqr);
   h.set(6);
+  // Q4: the common case first: a float pair (load type 0-3, W clear) in one
+  // mapped page; both raw words are read, then both halves written.
+  h.get(6);
+  h.i32c(0x40000);
+  h.op(op::i32_and);
+  h.get(3);
+  h.i32c(8);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.op(op::i32_eqz);
+  h.if_();
+  page_ptr(h, 7);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 8);
+  h.op(op::i32_le_u);
+  h.if_();
+  host_addr(h, 7);
+  h.set(9);
+  for (u32 half : {0u, 1u}) {
+    h.get(9);
+    h.mem(op::i32_load, 0, 4 * half);
+    h.tee(8);
+    swap32_from_local(h, 8);
+    h.set(8);
+    single_to_double_inline(h, 8);
+    h.set(half ? 11 : 10);
+  }
+  h.get(0);
+  h.get(2);
+  h.op(op::i32_add);
+  h.get(10);
+  h.mem(op::i64_store, 3, 0);
+  h.get(0);
+  h.get(2);
+  h.op(op::i32_add);
+  h.get(11);
+  h.mem(op::i64_store, 3, 8);
+  h.op(op::return_);
+  h.end();
+  h.end();
+  h.end();
   // Element size: 4 (float types), 2 (types 5, 7) or 1 (types 4, 6); the access
   // covers one element with W set, else two.
   h.i32c(4);
@@ -3283,6 +4037,110 @@ Fn helper_psq_store() {
   h.op(op::i32_add);
   h.mem(op::i32_load, 2, kGqr);
   h.set(6);
+  // Q4: the common case first: a float pair (store type 0-3, W clear). Both
+  // words (ps0's first) to one mapped page, or appended to the write-gather pipe
+  // while they leave its burst unfinished (as two h.wr32 would append them);
+  // otherwise through h.wr32.
+  h.get(6);
+  h.i32c(4);
+  h.op(op::i32_and);
+  h.get(3);
+  h.i32c(8);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.op(op::i32_eqz);
+  h.if_();
+  for (u32 half : {0u, 1u}) {
+    h.get(0);
+    h.get(2);
+    h.op(op::i32_add);
+    h.mem(op::i64_load, 3, 8 * half);
+    h.set(12);
+    double_to_single_ftz_inline(h, 12);
+    h.set(half ? 8 : 9);
+  }
+  page_ptr(h, 7);
+  h.if_();
+  h.get(1);
+  h.i32c(0xFFFF);
+  h.op(op::i32_and);
+  h.i32c(0x10000 - 8);
+  h.op(op::i32_le_u);
+  h.if_();
+  gp_check(h, [&] { h.get(1); }, [&] {
+    h.get(1);
+    h.i32c(7);
+    h.op(op::i32_add);
+  });
+  for (u32 half : {0u, 1u}) {
+    host_addr(h, 7);
+    h.get(half ? 8 : 9);
+    swap32_from_local(h, half ? 8 : 9);
+    h.mem(op::i32_store, 0, 4 * half);
+  }
+  h.op(op::return_);
+  h.end();
+  h.else_();
+  {
+    using L = WasmWgpLayout;
+    h.get(1);
+    h.i32c(0xCC008000u);
+    h.op(op::i32_sub);
+    h.i32c(0x1000);
+    h.op(op::i32_lt_u);
+    h.if_();
+    h.global(gWgp);
+    h.tee(10);
+    h.mem(op::i32_load, 2, L::kFast);
+    h.if_();
+    h.get(10);
+    h.mem(op::i32_load, 2, L::kN);
+    h.tee(11);
+    h.i32c(32 - 8);
+    h.op(op::i32_lt_u);
+    h.if_();
+    for (u32 half : {0u, 1u}) {
+      h.get(10);
+      h.get(11);
+      h.op(op::i32_add);
+      h.get(half ? 8 : 9);
+      swap32_from_local(h, half ? 8 : 9);
+      h.mem(op::i32_store, 0, L::kBuf + 4 * half);
+    }
+    h.get(10);
+    h.get(11);
+    h.i32c(8);
+    h.op(op::i32_add);
+    h.mem(op::i32_store, 2, L::kN);
+    h.get(10);
+    h.i32c(0);
+    h.mem(op::i32_store, 2, L::kLastRead);
+    h.get(10);
+    h.get(10);
+    h.mem(op::i64_load, 3, L::kFastStores);
+    h.i64c(2);
+    h.op(op::i64_add);
+    h.mem(op::i64_store, 3, L::kFastStores);
+    h.op(op::return_);
+    h.end();
+    h.end();
+    h.end();
+  }
+  h.end();
+  for (u32 half : {0u, 1u}) {
+    h.get(0);
+    h.get(1);
+    if (half) {
+      h.i32c(4);
+      h.op(op::i32_add);
+    }
+    h.get(half ? 8 : 9);
+    h.get(4);
+    h.get(5);
+    h.call(hWr32);
+  }
+  h.op(op::return_);
+  h.end();
   h.i32c(4);
   h.i32c(2);
   h.i32c(1);
@@ -3522,7 +4380,7 @@ const std::vector<std::string>& wasm_import_names() {
   static const std::vector<std::string> names = {
       "on_entry", "safepoint", "read8",    "read16",     "read32", "write8", "write16",     "write32", "exec",
       "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap",   "rfi",    "system_call", "tw",
-      "fp_unavailable", "gp_wait"};
+      "fp_unavailable", "gp_wait", "wgp_store"};
   return names;
 }
 
@@ -3609,6 +4467,10 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
   put(helper_multiple(true));
   put(helper_psq_load());
   put(helper_psq_store());
+  put(helper_read64());
+  put(helper_write64());
+  put(helper_load_single());
+  put(helper_store_single());
   struct BodyInfo {  // per Body: its entries' dispatcher indices, and whether it has resume labels
     std::vector<std::pair<u32, u32>> entry_seg;
     bool resume = false;
@@ -3706,6 +4568,8 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
     functype(t, {kI32}, {kI64});                      // tL_I
     functype(t, {kI64}, {kI32});                      // tI_L
     functype(t, {kI32, kI32, kI32, kI32, kI32, kI64}, {});  // tV_IIIIIL
+    functype(t, {kI32, kI32, kI32, kI64}, {kI64});          // tL_IIIL
+    functype(t, {kI32, kI32, kI64, kI32, kI64}, {});        // tV_IILIL
     m.section(1, t);
   }
   {

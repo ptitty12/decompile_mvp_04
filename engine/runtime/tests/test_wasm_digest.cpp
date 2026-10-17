@@ -28,6 +28,7 @@
 
 #include "../../ppc/tests/digest_gen.h"
 #include "common/bytes.h"
+#include "ppc/fp.h"
 #include "ppc/interp.h"
 #include "runtime/native.h"
 #include "runtime/wasm_host.h"
@@ -57,7 +58,7 @@ bool is_plain(Op op) {
 
 // Translates `word; blr` for every word into one module, loads it, and returns
 // each function (rt::g_native).
-std::vector<rt::GuestFn> translate(const std::vector<u32>& words, std::size_t* module_bytes) {
+std::vector<rt::GuestFn> translate(const std::vector<u32>& words, std::size_t* module_bytes, bool fp_exact = true) {
   std::vector<u32> text;
   text.reserve(2 * words.size());
   std::string syms;
@@ -86,6 +87,7 @@ std::vector<rt::GuestFn> translate(const std::vector<u32>& words, std::size_t* m
   REQUIRE(cfg.errors == 0);
   xlat::WasmEmitOptions opt;
   opt.fpu_checks = false;  // execute_plain(), the reference, has no MSR[FP] check
+  opt.fp_exact = fp_exact;  // Q4: the emitter's model must be the interpreter's (fp::g_model)
   xlat::WasmModule mod;
   std::string err;
   REQUIRE_MESSAGE(xlat::emit_wasm(cfg, opt, &mod, &err), err);
@@ -177,6 +179,7 @@ std::string op_word(u32 w) {
 }  // namespace
 
 TEST_CASE("semantics digest through the WebAssembly emitter's translated code") {
+  ppc::fp::g_model = ppc::fp::Model::Exact;  // the digest is the exact model's
   // Plan: replay test_digest's sequence to collect the words it executes.
   std::vector<u32> words;
   {
@@ -396,7 +399,11 @@ void construct(Rng& r, Cpu& c, Op op, Insn i) {
 
 }  // namespace
 
-TEST_CASE("floating point, paired singles, psq and lmw/stmw: translated code vs interpreter on edge cases") {
+// Q4, F1: both models, each against the interpreter with the same model: the
+// exact one (E2d's proofs), and the fast one, where the translated code must be
+// the semantics library bit for bit (the same on every host).
+static void fp_edges(bool exact) {
+  ppc::fp::g_model = exact ? ppc::fp::Model::Exact : ppc::fp::Model::Fast;
   const Op ops[] = {
       Op::fadd,    Op::fsub,    Op::fmul,    Op::fdiv,     Op::fadds,    Op::fsubs,    Op::fmuls,   Op::fdivs,
       Op::fmadd,   Op::fmsub,   Op::fnmadd,  Op::fnmsub,   Op::fmadds,   Op::fmsubs,   Op::fnmadds, Op::fnmsubs,
@@ -427,7 +434,7 @@ TEST_CASE("floating point, paired singles, psq and lmw/stmw: translated code vs 
     }
   }
   std::size_t bytes = 0;
-  std::vector<rt::GuestFn> fns = translate(words, &bytes);
+  std::vector<rt::GuestFn> fns = translate(words, &bytes, exact);
   MESSAGE(words.size(), " words translated into a ", bytes, "-byte module");
 
   Pair p;
@@ -484,4 +491,11 @@ TEST_CASE("floating point, paired singles, psq and lmw/stmw: translated code vs 
   }
   MESSAGE(executions, " executions (", constructed, " with constructed operands), ", differences, " differences");
   CHECK_MESSAGE(differences == 0, "first: ", first);
+  ppc::fp::g_model = ppc::fp::Model::Fast;
 }
+
+TEST_CASE("floating point, paired singles, psq and lmw/stmw: translated code vs interpreter on edge cases") {
+  fp_edges(true);
+}
+
+TEST_CASE("Q4: the same in the fast floating-point model (F1)") { fp_edges(false); }

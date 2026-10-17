@@ -23,8 +23,28 @@
 // - Single-precision instructions multiply by frC rounded to a 25-bit significand
 //   (force25), as the Gekko multiplier does.
 // - fmadd-family results are fused: one rounding of a*c+b.
+//
+// Q4, F1 (owner, 2026-10-16: the engine must be the same on every host, not
+// bit-exact to the Gekko): the **fast model**, the default, replaces the
+// arithmetic above whenever FPSCR[RN] = 0 and FPSCR[NI] = 1 (round to nearest
+// with NI, the game's setting; anything else keeps the exact model):
+// - a, b, c are used as the doubles they are; one IEEE double operation per
+//   step, in the order written: a*c, then +-b (no fused multiply-add), then the
+//   negation of the nm forms; no force25;
+// - a single-precision result is that double rounded to single (round to
+//   nearest), as a double; a result below the normal range of its precision
+//   (single: 2^-126, double: 2^-1022) flushes to a signed zero (NI);
+// - a NaN result is the default NaN 0x7FF8000000000000 (operand payloads do not
+//   propagate: hosts differ there);
+// - reciprocal and reciprocal square root estimates: 1/b rounded to single, and
+//   1/sqrt(b) in double.
+// Every step is IEEE round to nearest without flush to zero, so the results are
+// the same on every host (x86, ARM; WebAssembly, native without contraction).
+// The WebAssembly emitter computes the same inline (translator/wasm_emit.cpp);
+// the exact model stays for tests and as the fallback (g_model = Model::Exact).
 #pragma once
 
+#include <bit>
 #include <cstdint>
 
 namespace mvp::ppc::fp {
@@ -34,11 +54,31 @@ using u64 = std::uint64_t;
 
 enum class Prec { Single, Double };
 
+enum class Model : std::uint8_t { Exact, Fast };
+extern Model g_model;  // the interpreter's and C++-emitted code's (default: Fast)
+// Whether an instruction with this FPSCR uses the fast model.
+inline bool fast_model(u32 fpscr) { return g_model == Model::Fast && (fpscr & 7) == 4; }
+
 inline constexpr u64 kSign = 0x8000000000000000ull;
 inline constexpr u64 kExpMask = 0x7FF0000000000000ull;
 inline constexpr u64 kFracMask = 0x000FFFFFFFFFFFFFull;
 inline constexpr u64 kQuietBit = 0x0008000000000000ull;
 inline constexpr u64 kDefaultNaN = 0x7FF8000000000000ull;
+
+// Q4, F1: the fast model's last step for the double r one IEEE operation gave
+// (fp.cpp's arithmetic, and host code that runs a game function natively,
+// runtime/hle_game.cpp): rounded to single for Single, a result below the normal
+// range of its precision flushed to a signed zero, a NaN made the default NaN.
+inline double to_f64(u64 x) { return std::bit_cast<double>(x); }
+inline u64 to_bits(double d) { return std::bit_cast<u64>(d); }
+inline u64 fast_result(double r, Prec p) {
+  if (r != r) return kDefaultNaN;
+  if (p == Prec::Single) r = static_cast<double>(static_cast<float>(r));
+  u64 b = to_bits(r);
+  const u64 min_normal = p == Prec::Single ? 0x3810000000000000ull : 0x0010000000000000ull;  // 2^-126, 2^-1022
+  if ((b & ~kSign) < min_normal) b &= kSign;  // a signed zero
+  return b;
+}
 
 inline bool is_nan(u64 x) { return (x & ~kSign) > kExpMask; }
 inline bool is_snan(u64 x) { return is_nan(x) && !(x & kQuietBit); }
@@ -49,11 +89,20 @@ inline bool is_zero(u64 x) { return (x & ~kSign) == 0; }
 // format (PowerPC Programming Environments Manual, "Floating-Point Load" and
 // "Floating-Point Store" conversion algorithms). Exact bit manipulation.
 u64 single_to_double(u32 s);  // lfs, psq_l type 0
+// The same, with a normal single (the common case) converted inline.
+inline u64 single_to_double_inline(u32 s) {
+  const u32 e = (s >> 23) & 0xFF;
+  if (e - 1 < 254)  // the exponent rebiased by 1023 - 127
+    return (static_cast<u64>(s & 0x80000000u) << 32) | ((static_cast<u64>(s & 0x7FFFFFFFu) << 29) + (896ull << 52));
+  return single_to_double(s);
+}
 u32 double_to_single(u64 d);  // stfs (no rounding: truncates; denormalizes small values)
 u32 double_to_single_ftz(u64 d);  // psq_st type 0: below the single normal range -> signed zero
 
 // The Gekko's rounding of a multiplier operand to a 25-bit significand.
 u64 force25(u64 x);
+// force25 for an instruction with this FPSCR: the fast model does not apply it.
+inline u64 force25(u64 x, u32 fpscr) { return fast_model(fpscr) ? x : force25(x); }
 
 // Arithmetic. `fpscr` supplies the rounding mode and NI.
 u64 add(u64 a, u64 b, Prec p, u32 fpscr);

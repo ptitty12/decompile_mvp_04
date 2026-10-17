@@ -66,6 +66,11 @@ struct WasmEmitOptions {
   // to guest memory against env.gp_pages first (WasmGpLayout): only there can a
   // render thread still have to read what the store overwrites.
   bool shared_memory = false;
+  // Q4, F1: floating-point arithmetic in the exact Gekko model (ppc/fp.h) with
+  // the fast paths E2d proved equal to it. Off (the default): the fast model of
+  // ppc/fp.h, which the runtime's semantics library must use too
+  // (ppc::fp::g_model); on, it must be Model::Exact.
+  bool fp_exact = false;
 };
 
 // A guest address and the table slot (relative to the module's table base) of
@@ -100,10 +105,14 @@ const std::vector<std::string>& wasm_import_names();
 
 // P2: the write-gather pipe's state the module's store helpers append to
 // directly (env.wgp, the address of runtime/hw.h's WgpState): a store of 1, 2
-// or 4 bytes to 0xCC008000 that leaves fewer than 32 bytes gathered, while
+// or 4 bytes to 0xCC008000 (Q4: to its 4 KiB block, as Hardware::write takes
+// them) that fits in the 32-byte burst being gathered, while
 // `fast` is set, is appended big-endian at buf + n without calling the runtime,
 // which then counts it (fast_stores) and ends the poll detector's run
-// (last_read = 0), as Hardware::write would. Offsets (the runtime checks them):
+// (last_read = 0), as Hardware::write would. Q4: a store that completes the
+// burst (or reaches into the next one) is counted and ends the run the same way,
+// then goes to rt.wgp_store, which gathers it as Hardware::write would (the burst
+// included). Offsets (the runtime checks them):
 struct WasmWgpLayout {
   static constexpr std::uint32_t kBuf = 0, kN = 32, kFast = 36, kLastRead = 40, kFastStores = 48;
 };
