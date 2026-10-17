@@ -48,9 +48,11 @@ constexpr Setting kSettings[] = {
 // half-size, built by repeated multiplication with exp(-1/(256 sigma)) in Q32 so
 // every build computes the same table. sigma = 0.5, 0.25, 0.12, 0.06 for edge 1-4.
 constexpr u32 kDecayQ32[5] = {0, 4261543595u, 4228380000u, 4157408227u, 4024254894u};
-// Mean of w over called pitches for each edge level, Q16 (calibration from
-// called pitches in traced games; docs/mods/ABS_CHALLENGE.md §4.1).
-constexpr u32 kMeanWQ16[5] = {65536, 26000, 15000, 8500, 4500};
+// Mean of w over called pitches for each edge level, Q16: 96 called pitches of
+// traced games (84 CPU vs CPU, 12 with a batter who never swings), 2026-10-17
+// (docs/mods/ABS_CHALLENGE.md §4.1). Over that sample the miss rate then equals
+// the setting, except where P_miss saturates at 1 (edge 4 above about 10 %).
+constexpr u32 kMeanWQ16[5] = {65536, 38421, 26156, 15363, 8729};
 
 struct State {
   u32 started;
