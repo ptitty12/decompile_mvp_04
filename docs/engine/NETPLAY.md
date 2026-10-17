@@ -42,8 +42,16 @@ session's 10 s timeout.
   engine never sees, whether the other player's is.
 - **Input delay D.** The local pad sampled when the game reaches frame F becomes
   the input of frame F + D. Frames 0 .. D-1 have neutral input on both ports. Each
-  player proposes D (2, 3 or 4 in the lobby; the creator's choice is shown to the
-  joiner); the session uses the larger proposal.
+  player proposes D and the session uses the larger proposal. The lobby's choice
+  (the creator's, shown to the joiner) is **Auto** by default (Q5): once the data
+  channel is open, each page sends 20 small text pings (50 ms apart, answered at
+  once by the other page) and picks D from the round trips (`web/src/delay.ts`):
+  D x 18 ms must cover half the median round trip, about 10 ms for the Worker hop
+  and a field's run, and the one-way jitter (half the spread from the fastest to
+  the 90th-percentile round trip), with D between 2 and 6. A local link gives 2,
+  E5's simulated 40-50 ms one way gives 4. A manual choice (2 to 6) overrides it.
+  D is agreed before the game starts (HELLO), so how it was chosen cannot change
+  what the guest computes.
 - **The gate.** A frame runs only when both ports' inputs for it are known. The
   engine's run loop is unchanged except for this check (`net/driver.h`):
   `rt::run()` returns at every VI field (host yields, `runtime/host_yield.h`), and
@@ -80,6 +88,44 @@ session's 10 s timeout.
 Host time decides only *when* datagrams are sent and when a frame becomes ready,
 never what a frame's input is: both peers' guests see exactly the same inputs at
 the same frame polls, whatever the network does.
+
+### Pacing between unequal machines (Q5)
+
+Lockstep holds the faster machine to the slower one's pace. Before Q5 each page
+paced itself to the wall clock at full speed: the slower machine ran flat out and
+chased (two-field batches, every other frame shown), and the faster one ran
+ahead, waited for the other's input (35 times a second, a third of the time, at
+a simulated 1.6x slower partner), ran again: stop and go. Now (`web/src/pacer.ts`,
+the Worker's paced loop):
+
+- **Capacity.** Each side measures what a field costs its machine (the Worker's
+  busy time per field: the run, its waits for the render thread, the present),
+  averaged per 15 fields and smoothed over about 30 fields (the game's scenes
+  change their cost within seconds; the pace follows them both ways); its
+  capacity is a field's time (16.7 ms) over that cost.
+- **One pace.** Each side proposes its capacity times 0.98, in steps of 0.01, at
+  most full speed (lowered at once, raised once it has had room for two steps for
+  half a second); both run at the lower of the two proposals. The proposals travel four times
+  a second as text messages on the data channel (`{"mvp":"pace", ...}`), which
+  the page relays to its Worker; the engine never sees them. When the slower
+  machine keeps up again its proposal rises and both return to full speed.
+- **Even fields.** The paced loop's schedule runs at that pace: one field per
+  slot, started at the slot's own time (a timer, not the next animation frame),
+  presented as it ends. A wait for the other player's input moves the
+  schedule on rather than being caught up; a side that fell behind (a heavy
+  field) catches up one field at a time, at most two fields' worth, so no batch
+  runs two fields and every frame is shown.
+- **Phase.** Each side measures its *input lead* (`net/driver.h`: how long before
+  it needed the other's input of a frame that input arrived, the median of the
+  last 24 frames; negative when it waited) and reports it with its proposal. The
+  side with the smaller lead runs early; each side moves its schedule by half the
+  difference (60 % of it a second, at most 3 % of the elapsed time), so both leads
+  settle equal: as far from waiting as the delay allows on both sides.
+- **Sound.** The Worker tells the AudioWorklet the pace, so Q2's time-stretch
+  plays at it from the start instead of finding it from a buffer that runs low.
+
+All of it is host timing: it decides when fields run, never what they compute.
+The two games' guest lines and state hashes stay identical (Q5_LOG.md).
 
 ## 2. Wire protocol (version 1)
 
@@ -194,7 +240,7 @@ required). Types: `engine/server/src/lobby_protocol.d.ts` (shared with the page)
 | Direction | Message |
 |---|---|
 | server -> page | `{t:"welcome", v:1, iceServers:[{urls:[...]}, {urls:[...], username, credential}]}` |
-| page -> server | `{t:"create", name?, delay?}`: a new room, the creator is player 1 |
+| page -> server | `{t:"create", name?, delay?}`: a new room, the creator is player 1 (Q5: `delay` 0 is Auto, measured by both pages) |
 | page -> server | `{t:"join", room}`: join as player 2 (the invite link is `/?room=<id>`) |
 | server -> page | `{t:"room", room, player, invite, delay, peer}` |
 | server -> page | `{t:"peer", present}`: the other player joined or left the lobby |
@@ -203,6 +249,11 @@ required). Types: `engine/server/src/lobby_protocol.d.ts` (shared with the page)
 
 Player 1 makes the WebRTC offer when player 2 is present; both create the same
 negotiated data channel. Once the channel is open the lobby is no longer needed.
+Besides the engine's binary datagrams, the pages send each other small JSON text
+messages on that channel, which the engine never sees: `pad` (controller
+readiness, Q3), `ping`/`pong` (the link measured for an Auto delay), `pace` (four
+times a second: capacity, proposed pace, input lead) and `stats` (once a second:
+the overlay's numbers) (Q5).
 
 ## 5. The server (`engine/server/`)
 
@@ -450,8 +501,11 @@ guest state on every machine and browser. It relies on:
 - **Rollback** (hiding the delay) needs fast save states (K5); lockstep pays D frames
   of input latency (D x 16.7 ms when a frame is one field).
 - **No rejoin** after a disconnect, and no jump into a match from a save state (K5).
-- **Pacing:** a player whose browser cannot keep up slows both games to its speed
-  (lockstep). The intro movie runs below real time in every browser today (E2).
+- **Pacing:** a player whose browser cannot keep up still slows both games to its
+  speed (lockstep); since Q5 both run evenly at that pace (section 1, "Pacing
+  between unequal machines"), a little below what the slower machine reaches flat
+  out (the 2 % margin, the steps, and fields run one at a time). The page's Stats
+  overlay shows both machines and which one sets the pace (WEB.md).
 - **Browsers:** Chrome x2 and Chrome + Firefox (headless, so without rendering) were
   run; Edge is Chromium; Safari is untested (no Mac).
 - **Not yet over the internet:** the server, TURN and the two-network exit need the

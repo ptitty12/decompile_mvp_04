@@ -90,7 +90,15 @@ Everything below is run by agents; the owner never runs commands.
    times their working time and DevTools throttles the main thread, `hostSlow=N`,
    `hostSlowFrom=F`), `--affinity HEXMASK` (the browser on chosen logical processors)
    and `--load N` (busy processes), and the worklet's gap, stretch and target
-   statistics in every window; `netplay_check.mjs
+   statistics in every window (Q5: also the GPU's time, the scale and the frames
+   shown, and the summary's `hint`, `autoScale` and picture log);
+   `netplay_check.mjs` (Q5) takes `--params1/2`, `--host-slow1/2 N[@F]` (one
+   player's machine slower), `--audio`, `--trace-present`, `--fast-until F`,
+   `--measure-from/to`, `--separate` (two browser instances, each with its own GPU
+   process), `--affinity HEXMASK` and `--delay auto`, and its summary's `measured`
+   gives each page's game speed, emulation ms per field, new frames per second, the
+   new-frame interval p95 and share over 25 ms, waits per second and the share of
+   time waiting, underruns per minute and the pace; `netplay_check.mjs
    --server-disc` runs E5's two-page check the deployment's way. It starts the server, opens the page with Playwright,
    and writes `summary-BROWSER[-TAG].json` and the screenshots to `--out`
    (default `build/engine/web-check`; screenshots are game-derived and stay under
@@ -195,7 +203,14 @@ Everything below is run by agents; the owner never runs commands.
   whole field or more, every batch is one field with its present, back to back, and
   the clock runs at most two fields ahead: on a machine that cannot keep up the game
   runs evenly in slow motion with every frame shown (the sound stretches to match)
-  instead of in two-field jumps. `fast=1` runs
+  instead of in two-field jumps. (Q5) In an online game the schedule runs at the
+  two players' common pace (`src/pacer.ts`; NETPLAY.md section 1, "Pacing between
+  unequal machines"): 1 when both machines keep up, else the slower machine's
+  sustainable pace, one field per slot on both sides (each started at its slot's
+  time by a timer, not at the next animation frame), a wait for the other player
+  moving the schedule on instead of being caught up, and the schedule nudged
+  toward equal input leads so neither side waits. A batch that ran no field (an
+  online game waiting at a frame poll) ends without presenting again. `fast=1` runs
   fields back to back for 40 ms per task instead (measurements). **Wall time
   decides only how many fields run, never what happens inside one**: guest state
   depends on the disc and the per-frame pad inputs alone.
@@ -391,9 +406,34 @@ Everything below is run by agents; the owner never runs commands.
   pixels as the canvas shows, up to 3x, and follows fullscreen; a software
   adapter stays at 1x), shows the 640 x 448 frame at 4:3 (the game's 3D
   cameras are 4:3), scales it to the canvas with an area filter (larger) or
-  sharp bilinear (smaller), and samples textures with the game's LOD bias. URL
-  parameters: `scale=1|2|3` (instead of the setting), `gpview=0` (no
-  data-cache model, for comparisons).
+  sharp bilinear (smaller), and samples textures with the game's LOD bias. (Q5)
+  Auto also respects the GPU: the renderer times its render passes on the GPU
+  with timestamp queries where the browser has them (`gfx/wgpu/gpu_timer.h`;
+  Chrome does, rounded to 100 us), and while the GPU is busy more than 85 % of
+  the time for two seconds Auto steps one scale down (`src/autoscale.ts`); it
+  steps up again only after a hold (20 s, doubling when a step up had to be
+  undone within a minute) and while the next scale should fit (the busy share
+  times the pixel ratio under 60 %) for five seconds. A fixed setting is never
+  changed. URL parameters: `scale=1|2|3` (instead of the setting), `gpview=0` (no
+  data-cache model, for comparisons), `gpuLoad=N` (development: N extra render
+  passes per present over a texture of the picture's internal size, 25 samples
+  a pixel, as a GPU that cannot keep up).
+- **The statistics overlay** (Q5; `src/netstats.ts`). The **Stats** button in the
+  toolbar or the backquote key (left of 1; refused as a game binding) shows,
+  over the picture, live numbers for this computer and, online, for the other
+  player's: game speed, emulation ms per field and the speed the machine could
+  run at, frames shown per second, the share of time waiting for the other player
+  (and waits per second), sound underruns per minute, the picture's scale and the
+  GPU's ms per frame; online also the round trip and its jitter, the input delay,
+  and which computer sets the pace. Off by default; the choice is kept per
+  browser (`localStorage["mvp.overlay.v1"]`; `stats=1` in the URL shows it).
+  **Copy stats** puts the same as text on the clipboard, with both machines'
+  threads, GPU and browser, for the owner to paste into a chat. Online each page
+  sends its numbers once a second as a text message on the data channel; the
+  engine never sees them. A dismissible note under the toolbar appears when this
+  computer runs the game below 0.93x for a while (solo), or sets an online pace
+  below it: "This computer is running the game at 0.85x speed. On a laptop,
+  plugging in and choosing the Best performance power mode helps."
 - **Errors** say what to do: no WebGPU (which browsers have it), a GPU that
   cannot be used, the wrong disc (above), not logged in, a server that does not
   answer Range requests, a failed engine Worker.
