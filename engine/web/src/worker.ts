@@ -667,11 +667,25 @@ function runPaced(now: number): void {
   noteWork(ran, performance.now() - t0);
   if (!ok || rafOnly || gated) return;
   // Still behind: the next batch now, in its own task (this one's frame is presented when it ends).
-  if (!chasePending && sched.due(performance.now()) >= 1) {
+  const after = performance.now();
+  if (!chasePending && sched.due(after) >= 1) {
     chasePending = true;
     chase.port2.postMessage(0);
+    return;
+  }
+  // Q5, online: the next field at its own time, not at the next animation frame (up to a refresh
+  // later): a machine running near its capacity loses no time waiting for one, and fields start evenly.
+  if (net && !slotTimer) {
+    const wait = sched.start + (sched.fields + 1) * sched.period() - after;
+    if (wait > 0 && wait < FIELD_MS) {
+      slotTimer = setTimeout(() => {
+        slotTimer = 0;
+        runPaced(performance.now());
+      }, wait) as unknown as number;
+    }
   }
 }
+let slotTimer = 0;
 
 function frame(now: number): void {
   runPaced(now);
