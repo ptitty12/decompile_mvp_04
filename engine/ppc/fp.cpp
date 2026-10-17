@@ -659,16 +659,8 @@ inline bool product_exact(u64 a, u64 c) {
   return sa + sc <= 53;
 }
 
-// Q4, F1: the fast model's result for the double r (fp.h): rounded to single for
-// Single, flushed below the normal range, a NaN made the default NaN.
-inline u64 fast_finish(double r, Prec p) {
-  if (r != r) return kDefaultNaN;
-  if (p == Prec::Single) r = static_cast<double>(static_cast<float>(r));
-  u64 b = as_bits(r);
-  const u64 min_normal = p == Prec::Single ? 0x3810000000000000ull : 0x0010000000000000ull;  // 2^-126, 2^-1022
-  if ((b & ~kSign) < min_normal) b &= kSign;  // a signed zero
-  return b;
-}
+// Q4, F1: the fast model's result for the double r (fp.h).
+inline u64 fast_finish(double r, Prec p) { return fast_result(r, p); }
 
 }  // namespace
 

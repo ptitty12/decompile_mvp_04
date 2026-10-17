@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "ppc/mem_access.h"
+#include "runtime/hle_game.h"
 #include "runtime/input.h"
 #include "runtime/machine.h"
 
@@ -238,6 +239,9 @@ const std::vector<HleEntry>& hle_table() {
        HleKind::Before},
       {"DCStoreRangeNoSync", &hle_dc_flush, "tells the renderer which lines reach memory for the GP", 0,
        HleKind::Before},
+      // Q4: the hottest game functions, natively (runtime/hle_game.h).
+      {"fn_803EB000", &hle_fn_803EB000, "blends skinning matrices and loads the result into XF (natively)",
+       0x803EB000u, HleKind::Native},
   };
   return t;
 }
@@ -266,7 +270,9 @@ int hle_site(u32 address) {
 bool hle_interpret(Cpu& c) {
   int k = hle_site(c.pc);
   if (k < 0) return false;
-  hle_table()[static_cast<std::size_t>(k)].fn(c, nullptr);
+  const HleEntry& e = hle_table()[static_cast<std::size_t>(k)];
+  if (e.kind == HleKind::Native) return false;  // the interpreter runs the original
+  e.fn(c, nullptr);
   c.pc = c.lr & ~3u;
   return true;
 }
