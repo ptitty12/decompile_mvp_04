@@ -12,7 +12,19 @@ constexpr u32 kUmpireCall = 0x801BB338u;  // entered with the call in r5 and at 
 constexpr u32 kCircleDraw = 0x802F893Cu;  // r3 = HUD; draws the circle while hud+0x90 != 0
 constexpr u32 kNewPitch = 0x801BAFA4u;    // umpire reset for the next pitch
 constexpr u32 kRelease = 0x801896E8u;     // posts event 0x3D (release)
-constexpr u32 kSites[] = {kUmpireCall, kCircleDraw, kNewPitch, kRelease};
+constexpr u32 kWindup = 0x802321BCu;      // the pitch is chosen and the delivery starts (posts event 0x5A)
+constexpr u32 kSites[] = {kUmpireCall, kCircleDraw, kNewPitch, kRelease, kWindup};
+
+// The late snapshot (docs/mods/ABS_CHALLENGE.md §7.2): a review rewinds to a
+// snapshot just before its replay's first frame (release - pre), so the headless
+// run to it is short. The delivery, windup to release, repeats pitch after pitch
+// over long runs (T: 143-145, 135-137, 74-75 and 62-63 frame polls; §3.10), so it
+// is learned per fielding team from the team's last pitch. kDefaultDelivery is
+// the shortest seen, for a team's first pitch: a longer delivery only lengthens
+// the rewind. kLateMargin covers the jitter of one or two polls. A delivery
+// shorter than learned drops the late snapshot, and the review rewinds from the
+// pitch's first one.
+constexpr u32 kDefaultDelivery = 62, kLateMargin = 3;
 
 // Guest layout (§3.1-§3.6). Umpire A: +0x10 play coordinator T, +0x14 game context
 // P. T+0x3B0 the pitch, whose +0x4 points at the plate crossing (+0x28 x, +0x2C y,
@@ -60,11 +72,17 @@ struct State {
   u32 challenges_made, upheld, overturned;
   u32 last_frame, release_frame;
   u32 last_x, last_y;  // raw float bits of the last called pitch's location
-  u32 umpire;          // the umpire object of the last call (A)
+  u32 umpire;          // the umpire object (A) of the last new pitch or call
   u32 window_ticks;    // game ticks left to challenge the last call
+  u32 pitch_frame;     // the frame poll of this pitch's first snapshot (new pitch)
+  u32 windup_frame;    // this pitch's delivery start (kWindup), 0 before it
+  u32 late_due;        // the frame at which to ask for the late snapshot, 0: none pending
+  u32 delivery[2];     // windup to release in frames, learned per fielding team; 0: not yet
   u16 prev_buttons[4];
   u8 challenges[2];    // per team (0 home, 1 away)
   u8 window_open, last_truth, last_call, last_miss;
+  u8 pitch_team;       // this pitch's fielding team (2: unknown)
+  u8 late_asked;       // this pitch's late snapshot is scheduled (one per pitch)
 };
 static_assert(sizeof(State) <= 256);
 
@@ -117,10 +135,20 @@ class AbsMod final : public Mod {
         break;
       case kNewPitch:
         s.window_open = 0;
+        s.umpire = c.gpr[3];  // the umpire object the call is made on (T)
+        s.pitch_frame = static_cast<u32>(h.frame()) + 1;
+        s.windup_frame = s.late_due = 0;
+        s.late_asked = 0;
+        s.pitch_team = 2;
         h.request_snapshot();  // the rewind point for a challenge of this pitch (Live only)
+        break;
+      case kWindup:
+        windup(h);
         break;
       case kRelease:
         s.release_frame = static_cast<u32>(h.frame());
+        s.late_due = 0;  // too late to help a review, and it would stall the pitch in flight
+        if (s.windup_frame && s.pitch_team < 2) s.delivery[s.pitch_team] = s.release_frame - s.windup_frame;
         break;
       default:
         break;
@@ -129,6 +157,10 @@ class AbsMod final : public Mod {
 
   void frame(Host& h, ppc::Cpu&) override {
     State& s = h.state_as<State>();
+    if (s.late_due && h.frame() >= s.late_due) {
+      s.late_due = 0;
+      h.request_snapshot();  // taken at the next frame poll (Live only)
+    }
     if (s.window_open) {
       const u32 ticks = h.r32(kFrameTicks);
       if (ticks >= s.window_ticks) s.window_open = 0;
@@ -174,6 +206,40 @@ class AbsMod final : public Mod {
   }
 
  private:
+  // The delivery starts: schedule the late snapshot to land kLateMargin polls
+  // before the replay's first frame (release - pre), with the delivery learned
+  // for this fielding team. A snapshot asked for at frame F is taken at poll F + 1.
+  void windup(Host& h) {
+    State& s = h.state_as<State>();
+    const u32 frame = static_cast<u32>(h.frame());
+    s.windup_frame = frame;
+    if (s.late_asked) return;
+    s.late_asked = 1;
+    const int team = fielding_team(h, s.umpire);
+    s.pitch_team = static_cast<u8>(team < 0 ? 2 : team);
+    const u32 delivery = team >= 0 && s.delivery[team] ? s.delivery[team] : kDefaultDelivery;
+    const u32 before = static_cast<u32>(h.setting("pre")) + 1 + kLateMargin;
+    if (delivery > before) {
+      s.late_due = frame + delivery - before;
+    } else {
+      h.request_snapshot();  // the replay starts before the delivery is under way
+    }
+  }
+
+  // The fielding team (0 home, 1 away) from umpire A, or -1 while the chain is
+  // not set up (§3.5): A+0x14 -> P, P+0x6F8 -> G, G+0x14 -> count, +0x1CD0 batting.
+  static int fielding_team(Host& h, u32 a) {
+    auto ram = [](u32 p) { return p >= 0x80000000u && p < 0x81800000u; };
+    if (!ram(a)) return -1;
+    const u32 p = h.r32(a + kAGame);
+    if (!ram(p)) return -1;
+    const u32 g = h.r32(p + kPState);
+    if (!ram(g)) return -1;
+    const u32 count = h.r32(g + kGCount);
+    if (!ram(count)) return -1;
+    return h.r32(count + kCountBatting) ? 0 : 1;  // away (1) batting: home (0) fields
+  }
+
   void umpire_call(Host& h, ppc::Cpu& c) {
     State& s = h.state_as<State>();
     const u32 a = c.gpr[3];
@@ -242,7 +308,7 @@ class AbsMod final : public Mod {
       return;
     }
     Review r;
-    const u64 snap = h.snapshot_frame();
+    const u64 snap = s.pitch_frame;  // the pitch's first snapshot; the host picks the nearest one kept
     const u64 pre = static_cast<u64>(h.setting("pre"));
     const u64 from = s.release_frame >= snap + pre ? s.release_frame - pre : snap;
     r.present_from = from;

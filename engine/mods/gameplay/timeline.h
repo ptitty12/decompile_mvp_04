@@ -4,14 +4,19 @@
 // calls after_poll() from its frame hook, and after every rt::run() that returns,
 // calls step() while due() is true.
 //
-// A review, requested at poll K (mods::Host::request_review):
-// 1. at poll K+1 the run stops; restore the pitch snapshot (poll P);
+// Two save-state slots. Live, they hold the mods' two latest snapshots (a
+// request replaces the older). A review, requested at poll K
+// (mods::Host::request_review):
+// 1. at poll K+1 the run stops; restore the latest snapshot at or before
+//    `present_from` (poll P);
 // 2. Seeking: run headless to `present_from`, replaying the recorded inputs;
-//    save a second snapshot there;
+//    save the replay's first frame into the slot just restored (nothing to do
+//    when P is `present_from`);
 // 3. Presenting: run to `present_to` with the tool presenting (frames shown,
 //    guest audio muted); inputs past K repeat K's;
-// 4. restore the second snapshot; Rerunning: run headless to poll K+1;
+// 4. restore that slot; Rerunning: run headless to poll K+1;
 // 5. the requesting mod's review_done(), and play continues live.
+// Both slots stay valid afterwards: they precede the call the review changed.
 // The guest state at the end of 4 is what live play would have reached had the
 // mods decided differently on purpose (the umpire's call); when nothing was
 // changed it is exactly the state before the review (logged for checking).
@@ -60,11 +65,19 @@ class Timeline {
   std::uint64_t snapshots = 0, reviews = 0, restores = 0;
   double snapshot_ms_max = 0, restore_ms_max = 0;
 
+  // The slots by the polls of their snapshots (~0: empty). A live snapshot
+  // replaces an empty slot, else the older; a review restores the latest at or
+  // before `from` (-1: none).
+  static int slot_to_replace(const u64 polls[2]);
+  static int slot_for_review(const u64 polls[2], u64 from);
+
  private:
   static constexpr std::size_t kRing = 4096;  // frame polls of inputs kept for re-runs
   void push_inputs(u64 from, u64 to);  // queue the recorded inputs of polls [from, to)
   void save(int slot);
   void load(int slot);
+  void slot_polls(u64 out[2]) const;
+  void publish_snapshots();  // tells the mods' host which polls the slots hold
   void begin_leg(Phase phase, u64 target);  // starts a review leg (and times the one before)
   void log(const std::string& s);
   std::string mem1_sha1();
@@ -88,6 +101,7 @@ class Timeline {
   double leg_t0_ = 0;     // and the host time (ms), for the review's timing line
   double leg_ms_[4] = {};  // host ms per phase (Seeking, Presenting, Rerunning) in this review
   u64 resume_ = 0;      // review: the poll after the request
+  int review_slot_ = 0;  // review: the slot restored, then holding the replay's first frame
   std::string live_sha1_;
 };
 

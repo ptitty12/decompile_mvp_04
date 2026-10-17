@@ -102,7 +102,7 @@ bool GameplayHost::start(ppc::Cpu& c, std::string* err) {
   frame_ = 0;
   phase_ = Phase::Live;
   want_snapshot_ = want_review_ = in_review_ = false;
-  snapshot_frame_ = ~0ull;
+  snapshot_frame_ = earliest_snapshot_ = ~0ull;
   for (std::size_t k = 0; k < active_.size(); ++k) {
     Active& a = active_[k];
     const ModInfo& info = a.mod->info();
@@ -253,7 +253,7 @@ void GameplayHost::request_snapshot() {
 
 bool GameplayHost::request_review(const Review& r) {
   if (phase_ != Phase::Live || want_review_ || in_review_ || !cur_) return false;
-  if (snapshot_frame_ == ~0ull || r.present_from < snapshot_frame_ || r.present_from > frame_ ||
+  if (earliest_snapshot_ == ~0ull || r.present_from < earliest_snapshot_ || r.present_from > frame_ ||
       r.present_to < r.present_from)
     return false;
   requested_ = r;

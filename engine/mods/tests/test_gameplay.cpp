@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "mods/gameplay/host.h"
+#include "mods/gameplay/timeline.h"
 #include "runtime/hle.h"
 #include "runtime/mod_hooks.h"
 #include "runtime/save_state.h"
@@ -38,6 +39,21 @@ class TestMod final : public Mod {
     ++s.frames;
     s.last_draw = h.rng(0);
   }
+
+ private:
+  ModInfo info_;
+};
+
+// Asks for the review in `want` at its next frame and keeps the host's answer.
+class ReviewMod final : public Mod {
+ public:
+  ReviewMod() { info_ = ModInfo{"review", "Review", 1, {}, {}, 4}; }
+  const ModInfo& info() const override { return info_; }
+  void start(Host&) override {}
+  void site(Host&, ppc::Cpu&, u32) override {}
+  void frame(Host& h, ppc::Cpu&) override { accepted = h.request_review(want); }
+  Review want;
+  bool accepted = false;
 
  private:
   ModInfo info_;
@@ -131,6 +147,58 @@ TEST_CASE("the site registry: one handler per site, registry addresses only") {
   REQUIRE(h.enable("two", "", &err));
   CHECK_FALSE(h.start(cpu, &err));
   CHECK(err.find("already bound") != std::string::npos);
+}
+
+TEST_CASE("timeline slots: a live snapshot replaces the older; a review restores the latest that fits") {
+  const u64 none = ~0ull;
+  {
+    const u64 p[2] = {none, none};
+    CHECK(Timeline::slot_to_replace(p) == 0);
+    CHECK(Timeline::slot_for_review(p, 100) == -1);
+  }
+  {
+    const u64 p[2] = {600, none};  // the pitch's first snapshot only
+    CHECK(Timeline::slot_to_replace(p) == 1);
+    CHECK(Timeline::slot_for_review(p, 950) == 0);
+    CHECK(Timeline::slot_for_review(p, 599) == -1);
+  }
+  {
+    const u64 p[2] = {600, 940};  // and the late one, near the release
+    CHECK(Timeline::slot_to_replace(p) == 0);
+    CHECK(Timeline::slot_for_review(p, 943) == 1);  // a short rewind
+    CHECK(Timeline::slot_for_review(p, 940) == 1);  // none: the snapshot is the replay's first frame
+    CHECK(Timeline::slot_for_review(p, 939) == 0);  // the late one came too late: the long rewind
+  }
+  {
+    const u64 p[2] = {1400, 940};  // the next pitch's first snapshot replaced the older
+    CHECK(Timeline::slot_to_replace(p) == 1);
+    CHECK(Timeline::slot_for_review(p, 1600) == 0);
+  }
+}
+
+TEST_CASE("reviews: accepted from the earliest snapshot kept up to the current frame") {
+  ppc::Cpu cpu;
+  GameplayHost h;
+  h.add(std::make_unique<ReviewMod>());
+  auto* mod = static_cast<ReviewMod*>(h.available().back().get());
+  std::string err;
+  REQUIRE(h.enable("review", "", &err));
+  REQUIRE(h.start(cpu, &err));
+  auto ask = [&](u64 from, u64 frame) {
+    mod->want.present_from = from;
+    mod->want.present_to = from + 10;
+    h.on_frame(cpu, frame);
+    if (mod->accepted) h.drop_review();
+    return mod->accepted;
+  };
+  CHECK_FALSE(ask(100, 200));  // no snapshot yet
+  h.set_snapshots(940, 600);
+  CHECK(h.snapshot_frame() == 940);
+  CHECK(ask(943, 1000));
+  CHECK(ask(700, 1000));        // before the late snapshot: from the pitch's first one
+  CHECK_FALSE(ask(599, 1000));  // before both
+  CHECK_FALSE(ask(1001, 1000)); // not played yet
+  h.stop();
 }
 
 TEST_CASE("save states: a machine round-trips (CPU, MEM1, devices, clock, input)") {

@@ -64,9 +64,12 @@ class GameplayHost final : public Host {
 
   // ---- For the timeline (mods/gameplay/timeline.h) ----
   bool snapshot_requested() const { return want_snapshot_; }
-  void snapshot_taken(u64 frame) {
-    want_snapshot_ = false;
-    snapshot_frame_ = frame;
+  void snapshot_taken() { want_snapshot_ = false; }
+  // The polls of the snapshots the timeline keeps: the latest (snapshot_frame())
+  // and the earliest (how far back a review can start). ~0 when none.
+  void set_snapshots(u64 latest, u64 earliest) {
+    snapshot_frame_ = latest;
+    earliest_snapshot_ = earliest;
   }
   const Review* review_requested() const { return want_review_ ? &requested_ : nullptr; }
   // The timeline starts the requested review (it is then review()) or drops it.
@@ -126,7 +129,7 @@ class GameplayHost final : public Host {
   std::function<void(const std::string&)> log_, notify_, publish_;
   Phase phase_ = Phase::Live;
   bool want_snapshot_ = false, want_review_ = false, in_review_ = false;
-  u64 snapshot_frame_ = ~0ull;
+  u64 snapshot_frame_ = ~0ull, earliest_snapshot_ = ~0ull;
   Review requested_{}, review_{};
   std::size_t requested_mod_ = 0, active_mod_ = 0;
 };

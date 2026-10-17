@@ -85,6 +85,35 @@ void Timeline::load(int slot) {
   if (ms > restore_ms_max) restore_ms_max = ms;
 }
 
+int Timeline::slot_to_replace(const u64 polls[2]) {
+  if (polls[0] == ~0ull) return 0;
+  if (polls[1] == ~0ull) return 1;
+  return polls[1] < polls[0] ? 1 : 0;
+}
+
+int Timeline::slot_for_review(const u64 polls[2], u64 from) {
+  int k = -1;
+  for (int j = 0; j < 2; ++j)
+    if (polls[j] != ~0ull && polls[j] <= from && (k < 0 || polls[j] > polls[k])) k = j;
+  return k;
+}
+
+void Timeline::slot_polls(u64 out[2]) const {
+  for (int k = 0; k < 2; ++k) out[k] = slot_[k].valid ? slot_[k].frame_polls : ~0ull;
+}
+
+void Timeline::publish_snapshots() {
+  u64 polls[2];
+  slot_polls(polls);
+  u64 latest = ~0ull, earliest = ~0ull;
+  for (u64 p : polls) {
+    if (p == ~0ull) continue;
+    if (latest == ~0ull || p > latest) latest = p;
+    if (p < earliest) earliest = p;
+  }
+  mods_.set_snapshots(latest, earliest);
+}
+
 std::string Timeline::mem1_sha1() {
   Sha1 h;
   h.update(m_.mem1(), rt::Machine::kMem1Size);
@@ -104,17 +133,22 @@ void Timeline::step() {
     case Phase::Live: {
       if (const Review* req = mods_.review_requested()) {
         const Review r = *req;
-        if (recorded_to_ > kRing && slot_[0].frame_polls < recorded_to_ - kRing) {
-          // The pitch began longer ago than the recorded inputs reach: no review.
+        u64 polls[2];
+        slot_polls(polls);
+        const int k = slot_for_review(polls, r.present_from);
+        if (k < 0 || (recorded_to_ > kRing && polls[k] < recorded_to_ - kRing)) {
+          // No snapshot before the replay, or it is older than the recorded inputs reach: no review.
           mods_.drop_review();
-          log("review dropped: the snapshot is older than the recorded inputs");
+          log(k < 0 ? "review dropped: no snapshot before the replay"
+                    : "review dropped: the snapshot is older than the recorded inputs");
           break;
         }
         resume_ = poll;
         live_sha1_ = mem1_sha1();
         mods_.begin_review();
         ++reviews;
-        load(0);
+        review_slot_ = k;
+        load(k);
         const u64 p = rt::g_frame_polls;
         char b[200];
         std::snprintf(b, sizeof b, "review: back to poll %llu, replay %llu-%llu, continue at %llu",
@@ -127,26 +161,29 @@ void Timeline::step() {
           push_inputs(p, r.present_from);
           begin_leg(Phase::Seeking, r.present_from);
         } else {
-          save(1);
-          push_inputs(p, r.present_to);
+          push_inputs(p, r.present_to);  // the slot holds the replay's first frame already
           begin_leg(Phase::Presenting, r.present_to);
         }
       } else if (mods_.snapshot_requested()) {
-        save(0);
-        mods_.snapshot_taken(poll);
+        u64 polls[2];
+        slot_polls(polls);
+        save(slot_to_replace(polls));
+        mods_.snapshot_taken();
+        publish_snapshots();
       }
       break;
     }
     case Phase::Seeking: {
       const Review& r = *mods_.review();
-      save(1);
+      save(review_slot_);  // the snapshot restored is not needed again
+      publish_snapshots();
       push_inputs(r.present_from, r.present_to);
       begin_leg(Phase::Presenting, r.present_to);
       break;
     }
     case Phase::Presenting: {
       const Review& r = *mods_.review();
-      load(1);
+      load(review_slot_);
       push_inputs(r.present_from, resume_);
       begin_leg(Phase::Rerunning, resume_);
       break;

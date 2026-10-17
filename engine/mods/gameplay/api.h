@@ -24,7 +24,9 @@
 
 namespace mvp::mods {
 
-inline constexpr std::uint32_t kHookApiMajor = 1, kHookApiMinor = 0;
+// 1.1: the host keeps the two latest snapshots, and a review restores the later one
+// that fits (Host::request_snapshot).
+inline constexpr std::uint32_t kHookApiMajor = 1, kHookApiMinor = 1;
 
 using u8 = std::uint8_t;
 using u16 = std::uint16_t;
@@ -49,8 +51,8 @@ struct ModInfo {
 };
 
 // Where the guest timeline is (docs/mods/ABS_CHALLENGE.md §7.2). A review
-// restores the snapshot taken at the start of the pitch, runs headless to the
-// replay's first frame (Seeking), shows the replay (Presenting: the only phase
+// restores a snapshot taken before the replay's first frame, runs headless to
+// that frame (Seeking), shows the replay (Presenting: the only phase
 // whose guest state is thrown away afterwards), goes back to the replay's first
 // frame and runs headless to the frame poll after the request (Rerunning), then
 // play continues (Live). Outside Presenting a mod must behave exactly as it did
@@ -130,12 +132,14 @@ class Host {
 
   // ---- The timeline: frame-boundary services, carried out at the next frame poll ----
   virtual Phase phase() const = 0;
-  // Saves the machine and every mod's state at the next frame poll (Live only;
-  // replaces the previous one). snapshot_frame(): that poll, ~0 before any.
+  // Saves the machine and every mod's state at the next frame poll (Live only).
+  // The host keeps the two latest snapshots (1.1; 1.0 kept one): a request
+  // replaces the older. snapshot_frame(): the latest one's poll, ~0 before any.
   virtual void request_snapshot() = 0;
   virtual u64 snapshot_frame() const = 0;
-  // Reviews from the snapshot (Live only; needs snapshot_frame() <= present_from
-  // <= the current frame). False when it cannot be done.
+  // Reviews from the latest kept snapshot at or before present_from (Live only;
+  // needs one, and present_from <= the current frame). The nearer the snapshot,
+  // the shorter the headless run to present_from. False when it cannot be done.
   virtual bool request_review(const Review& r) = 0;
   // The review in progress, or null when live.
   virtual const Review* review() const = 0;
