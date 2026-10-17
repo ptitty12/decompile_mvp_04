@@ -41,6 +41,7 @@ export class ChallengeScene {
   private challenge: Challenge | null = null;
   private phase = 'live';
   private fadeTimer = 0;
+  private cardTimer = 0;
   private verdictShown = false;
 
   constructor(stage: HTMLElement) {
@@ -117,11 +118,20 @@ export class ChallengeScene {
     this.phase = phase;
     switch (phase) {
       case 'seeking':
-        if (prev !== 'seeking') this.showReview();
+        // From a snapshot near the release the rewind is over in a few frames
+        // (ABS_CHALLENGE.md §7.2): the card waits so that it does not flash.
+        if (prev !== 'seeking') {
+          window.clearTimeout(this.cardTimer);
+          this.cardTimer = window.setTimeout(() => {
+            if (this.phase === 'seeking') this.showReview();
+          }, 200);
+        }
         this.setProgress(progress);
         break;
       case 'presenting':
+        window.clearTimeout(this.cardTimer);
         this.root.hidden = true;
+        this.tag.textContent = this.challenge ? `Replay · ${cap(this.challenge.team)} challenge` : 'Replay';
         this.tag.hidden = false;
         break;
       case 'rerunning':

@@ -1198,6 +1198,16 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_status() {
                   static_cast<unsigned long long>(g.audio.dropped()));
     s += b;
   }
+  if (g.timeline) {  // gameplay mods: snapshots and reviews, with the longest host time of each
+    const auto& t = *g.timeline;
+    std::snprintf(b, sizeof b,
+                  ",\"timeline\":{\"snapshots\":%llu,\"snapshot_ms_max\":%.2f,\"reviews\":%llu,\"restores\":%llu,"
+                  "\"restore_ms_max\":%.2f}",
+                  static_cast<unsigned long long>(t.snapshots), t.snapshot_ms_max,
+                  static_cast<unsigned long long>(t.reviews), static_cast<unsigned long long>(t.restores),
+                  t.restore_ms_max);
+    s += b;
+  }
   s += ",\"wgp_fast\":" + std::to_string(wasm_wgp_state()->fast_stores);  // P2: stores the translated code gathered itself
   s += ",\"pad_last\":" + std::to_string(g.live.last_buttons) +
        ",\"pad_polls\":" + std::to_string(g.live.polls_with_buttons);
