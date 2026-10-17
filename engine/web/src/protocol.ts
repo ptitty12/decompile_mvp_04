@@ -95,6 +95,7 @@ export interface PackInput {
   label: string;             // the folder's or the zip's name, for messages
   kind: 'files' | 'zip';
   files: PackFile[];
+  server?: string;           // the server pack's file, when it came from the server's list (packs.ts)
 }
 export interface PackIssue {
   severity: 'error' | 'warning';

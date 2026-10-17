@@ -404,6 +404,12 @@ function onWorker(msg: FromWorker): void {
 
 function startEngine(disc: DiscSource): void {
   if (worker) return;
+  if (packPanel?.busy()) {
+    // A roster pack from the server is still downloading: start with it, not without it.
+    setStatus('Waiting for the roster pack download...');
+    void packPanel.settled().then(() => startEngine(disc));
+    return;
+  }
   const stored = disc.kind === 'file' && !!disc.stored;
   state.source = stored ? 'stored' : disc.kind;
   state.startedAt = performance.now();
@@ -805,6 +811,8 @@ async function init(): Promise<void> {
     $<HTMLAnchorElement>('server-disc-link').href = found.discPage;
     $<HTMLElement>('operator').hidden = false;
   }
+  // The roster packs the server offers: a dropdown in the panel (packs.ts), before the game starts.
+  if (found.kind !== 'error' && found.packs && packPanel) void packPanel.addServerList(found.packs);
   if (found.kind === 'error') {
     pickerBox.hidden = true;
     showError('server', found.message);
