@@ -42,9 +42,9 @@ const BUTTON_BITS: Partial<Record<KeyAction, number>> = {
   UP: PAD.UP, DOWN: PAD.DOWN, LEFT: PAD.LEFT, RIGHT: PAD.RIGHT, L: PAD.L, R: PAD.R,
 };
 
-// The keys the page itself uses (F fullscreen, M sound, P pause), and keys a
+// The keys the page itself uses (F fullscreen, M sound, P pause, ` statistics: Q5), and keys a
 // page cannot take from the browser or that would be a trap.
-const RESERVED = new Set(['KeyF', 'KeyM', 'KeyP', 'Escape', 'Tab', 'ContextMenu', 'MetaLeft', 'MetaRight', 'OS',
+const RESERVED = new Set(['KeyF', 'KeyM', 'KeyP', 'Backquote', 'Escape', 'Tab', 'ContextMenu', 'MetaLeft', 'MetaRight', 'OS',
                           'ControlLeft', 'ControlRight', 'AltLeft', 'AltRight', 'PrintScreen', 'CapsLock',
                           'NumLock', 'ScrollLock', 'Pause', 'Insert', 'Delete', 'Home', 'End', 'PageUp', 'PageDown']);
 
@@ -53,6 +53,7 @@ export function bindable(code: string): { ok: true } | { ok: false; why: string 
   if (code === 'KeyF' || code === 'KeyM' || code === 'KeyP') {
     return { ok: false, why: `${code.slice(3)} is the page's own key (fullscreen, sound, pause)` };
   }
+  if (code === 'Backquote') return { ok: false, why: "that is the page's own key (statistics)" };
   if (code === 'Escape') return { ok: false, why: 'Escape cancels' };
   if (RESERVED.has(code) || /^F\d{1,2}$/.test(code)) return { ok: false, why: 'the browser keeps that key' };
   return { ok: true };

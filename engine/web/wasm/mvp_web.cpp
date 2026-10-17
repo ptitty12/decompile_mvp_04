@@ -834,6 +834,9 @@ EMSCRIPTEN_KEEPALIVE void mvp_host_slow(double factor) {
 // once stopped (mvp_status() says why).
 EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
   if (!g.m || g.stopped) return -1;
+  // Netplay (Q5): the next frame's input is not here yet: nothing runs, so no
+  // batch starts (the render thread is not woken for nothing).
+  if (web::net_active() && !web::net_may_run()) return 0;
   const std::uint64_t start = g.hw->vi_fields(), target = start + static_cast<std::uint64_t>(n);
   if (g_tracing) g_trace.push_back({~0ull, static_cast<std::uint32_t>(start)});
   double t0 = now_ms();
@@ -893,6 +896,31 @@ EMSCRIPTEN_KEEPALIVE int mvp_present() {
   const bool shown = g.rs.present(g_frame_polls, t0);
   host_slow_spin(now_ms() - t0);
   return shown ? 1 : 0;
+}
+
+// Q5: ends a batch that made no new field (mvp_run_fields returned 0: a netplay
+// run that waited at a frame poll) without presenting the same picture again.
+EMSCRIPTEN_KEEPALIVE void mvp_batch_end() {
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) web::render_batch_end();
+#endif
+}
+
+// Q5 (development): 0 = the render passes are not timed on the GPU (gpuTimer=0;
+// for comparisons). Call before mvp_gfx_init.
+EMSCRIPTEN_KEEPALIVE void mvp_gpu_timing(int on) { web::g_gpu_timing = on != 0; }
+
+// Q5 (development): extra GPU work at every present, in proportion to the
+// picture's internal size (`gpuLoad=N`: N passes; gfx::Window::burn), to try the
+// picture's Auto setting on a GPU that cannot keep up.
+EMSCRIPTEN_KEEPALIVE void mvp_gpu_load(int passes) {
+#ifdef MVP_WEB_THREADS
+  if (g.threaded) {
+    if (web::render_thread_running()) web::render_gpu_load(passes);
+    return;
+  }
+#endif
+  g.rs.set_gpu_load(passes);
 }
 
 // Development (P1): the presentation trace on or off, and its records since

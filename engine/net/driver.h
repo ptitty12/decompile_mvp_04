@@ -77,6 +77,19 @@ class NetplayDriver : public rt::InputSource {
   // Statistics.
   std::uint64_t stall_ms = 0, stalls = 0, gate_misses = 0, early_yields = 0, longest_stall_ms = 0;
   std::uint64_t poll_stops = 0;  // runs stopped at a poll whose input was missing (before_poll)
+
+  // Q5, the input lead (host timing for the browser's pacing, never the guest's):
+  // at each frame poll, how long before the run needed it the peer's input for it
+  // arrived. "Needed": when the run reached the poll, or earlier, when the host
+  // loop wanted to run on to it and may_run() said no. Negative: it waited that long.
+  // When both players run at the same pace, each side's lead is the delay's span
+  // minus the latency; the side whose lead is smaller is ahead in time, and the
+  // pacing moves it back until both leads are equal. lead_ms() is the median of
+  // the last kLeadSamples frames' leads (0 before any).
+  static constexpr std::size_t kLeadSamples = 24;
+  double lead_ms() const;
+  std::uint64_t lead_samples = 0;
+  double lead_last = 0;
   // Optional: corrupt the hash of the window closing at this frame (tests of
   // the desync path only).
   std::uint64_t corrupt_window_at = ~0ull;
@@ -98,6 +111,11 @@ class NetplayDriver : public rt::InputSource {
   std::vector<HashRecord> windows_;
   bool stalled_ = false;
   std::uint64_t stall_start_ = 0;
+  // Q5: the input lead (lead_ms()).
+  void note_lead(std::uint64_t frame, std::uint64_t now_ms);
+  std::uint64_t need_frame_ = ~0ull, need_ms_ = 0;  // the poll that waited, and when the run reached it
+  std::uint64_t lead_frame_ = ~0ull;                // the last poll whose lead was taken (a repeated poll is not)
+  double leads_[kLeadSamples] = {};
 };
 
 }  // namespace mvp::net

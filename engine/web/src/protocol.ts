@@ -1,3 +1,5 @@
+import type { PaceReport } from './pacer.js';
+
 // Messages between the page (main.ts) and the engine Worker (worker.ts), and
 // between the Worker and the AudioWorklet (audio-worklet.ts). A picked disc
 // image travels as a File object (a handle the Worker reads from locally); on
@@ -19,7 +21,8 @@ export interface Pad {
 // Netplay (E5): this page's role in an online game (engine/net, docs/engine/NETPLAY.md).
 export interface NetOptions {
   player: 1 | 2;      // drives controller port 1 or 2
-  delay: number;      // proposed input delay in frames (the session uses the larger proposal)
+  delay: number;      // proposed input delay in frames (the session uses the larger proposal); Q5: 0 = Auto,
+                      // the page measures the link and gives the delay with 'net-open'
   hashEvery: number;  // frames per state-hash window (desync detection)
 }
 
@@ -56,6 +59,26 @@ export interface NetStatus {
   windows: number;
   lastWindow: string;
   desync: boolean;
+  // Q5: the recent round trip (smoothed over about 8 samples), its jitter (RFC 3550's estimator on the
+  // round trips), and the input lead (ms: how long before this side needed the other's input it arrived,
+  // the median of the last frames; negative when it waited) with its sample count.
+  rttRecent?: number;
+  rttJitter?: number;
+  leadMs?: number;
+  leadSamples?: number;
+}
+
+// Q5: the pace (pacer.ts), as the Worker reports it a few times a second.
+export interface PaceState {
+  rate: number;            // the pace the game runs at (1 = full speed)
+  prop: number;            // this side's proposal
+  cost: number;            // host ms one field costs this machine (smoothed)
+  cap: number;             // the speed this machine could run at
+  lead: number | null;     // this side's input lead (ms)
+  peerProp: number | null; // the other side's proposal, capacity and lead, while its reports are fresh
+  peerCap: number | null;
+  peerLead: number | null;
+  shifted: number;         // ms the schedule was moved in all (phase)
 }
 
 // Roster packs (E6, docs/MODDING.md): what the player picked on the page, in set
@@ -115,6 +138,9 @@ export interface RunOptions {
   hostSlow?: number;   // development (Q2): simulate a machine this many times slower (mvp_host_slow) ...
   hostSlowFrom?: number;  // ... from this VI field on
   gpView?: boolean;    // development (Q1): false = the renderer reads guest memory as it is (gfx/gp_memory.h)
+  gpuLoad?: number;    // development (Q5): extra GPU work per present, in proportion to the picture's pixels
+  gpuTimer?: boolean;  // development (Q5): false = the render passes are not timed on the GPU
+  paceMargin?: number; // development (Q5): the online pace's margin (pacer.ts; default 0.98)
   scale?: number;      // Q1: the internal resolution, 1-3 times the console's (the Picture setting)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }
@@ -134,7 +160,8 @@ export type ToWorker =
   | { type: 'scale'; scale: number }  // Q1: the internal resolution (the Picture setting)
   | { type: 'pause'; paused: boolean }
   | { type: 'audio-port'; port: MessagePort }  // the AudioWorklet's channel (after the first user gesture)
-  | { type: 'net-open' }                    // the data channel to the other player is open
+  | { type: 'net-open'; delay?: number }    // the data channel to the other player is open (Q5: the delay chosen)
+  | { type: 'pace-peer'; report: PaceReport }  // Q5: the other player's pace report
   | { type: 'net-recv'; data: ArrayBuffer }  // a datagram from the other player
   | { type: 'net-quit' };                   // the page is leaving the game
 
@@ -173,6 +200,12 @@ export interface Status {
           prefetch_wasted: number; blocked_ms: number };  // the server's image (block cache)
   audio?: { frames: number; rate: number; voice_ms: number; aux_returns: number; nonsilent: number; peak: number;
             dropped: number };  // the mixer, while attached
+  presents_new?: number;  // Q5: presents that showed a new picture (frames shown)
+  // Q5: the GPU's time (wasm/render_side.h, gfx/wgpu/gpu_timer.h): whether passes are timed (timestamp
+  // queries), the frames timed and their GPU ms in all, the passes timed, untimed and dropped, the last frame's
+  // ms; the host ms spent presenting; the development load.
+  gpu?: { timed: boolean; n: number; ms: number; passes: number; untimed: number; dropped: number; last: number;
+          present_ms: number; load: number };
   pad_last?: number;   // port 1's buttons at the last frame poll (live input)
   pad_polls?: number;  // frame polls that returned a pressed button
 }
@@ -200,10 +233,13 @@ export type FromWorker =
   | { type: 'stats'; status: Status;
       window: { fields: number; ms: number; wallMs: number; trace?: unknown[]; digest?: string;
                 saturatedMs?: number;  // Q2: wall ms so far with the machine saturated (one-field batches)
-                fieldCost?: number } }  // ... the smoothed host time per field, as a share of a field
+                fieldCost?: number;  // ... the smoothed host time per field, as a share of a field
+                cap?: number;        // Q5: the speed this machine could run at (pacer.ts)
+                rate?: number } }    // Q5: the pace the paced loop runs at
   | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string; ioLog?: string; inputLog?: string }
   | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
-  | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string };
+  | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string }
+  | { type: 'pace'; report: PaceReport; state: PaceState };  // Q5: for the other player (text message), and the overlay
 
 // Worker (or page) -> AudioWorklet.
 export type WorkletIn =
@@ -213,7 +249,8 @@ export type WorkletIn =
   // header of int32s at byte `header` of `sab`, the frames where the header says), not as 'pcm'
   | { type: 'ring'; sab: SharedArrayBuffer; header: number }
   | { type: 'reset' }
-  | { type: 'target'; ms: number };
+  | { type: 'target'; ms: number }
+  | { type: 'pace'; speed: number };  // Q5: the game's planned pace (1 = full speed): the stretch starts there
 
 // AudioWorklet -> page, about four times a second.
 export interface WorkletStats {

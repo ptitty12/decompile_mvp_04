@@ -171,6 +171,13 @@ void Gpu::create_async(Ready done) {
         g.describe_adapter();
         wgpu::DeviceDescriptor ddesc{};
         g.set_device_callbacks(&ddesc);
+        // Q5: timestamp queries, for the GPU's time per frame (gpu_timer.h), where the adapter has them.
+        static const wgpu::FeatureName kTimestamps[] = {wgpu::FeatureName::TimestampQuery};
+        if (g.adapter_.HasFeature(wgpu::FeatureName::TimestampQuery)) {
+          ddesc.requiredFeatureCount = 1;
+          ddesc.requiredFeatures = kTimestamps;
+          g.timestamps_ = true;
+        }
         g.adapter_.RequestDevice(
             &ddesc, wgpu::CallbackMode::AllowSpontaneous,
             [st](wgpu::RequestDeviceStatus status, wgpu::Device device, wgpu::StringView message) {

@@ -1,5 +1,6 @@
 #include "net/driver.h"
 
+#include <algorithm>
 #include <cstdio>
 
 #include "runtime/hle.h"
@@ -27,6 +28,12 @@ bool NetplayDriver::may_run(std::uint64_t now_ms) {
     end_stall(now_ms);
     return true;
   }
+  // Q5: the host loop wants to run on to the poll of this frame and cannot: that
+  // poll's input is needed from now on (its lead will be negative).
+  if (need_frame_ != rt::g_frame_polls) {
+    need_frame_ = rt::g_frame_polls;
+    need_ms_ = now_ms;
+  }
   if (!stalled_) {
     stalled_ = true;
     stall_start_ = now_ms;
@@ -36,7 +43,15 @@ bool NetplayDriver::may_run(std::uint64_t now_ms) {
 }
 
 bool NetplayDriver::before_poll(ppc::Cpu& c, std::uint64_t frame) {
-  if (s_.ready(frame, clock_())) return true;
+  const std::uint64_t now = clock_();
+  if (s_.ready(frame, now)) {
+    note_lead(frame, now);
+    return true;
+  }
+  if (need_frame_ != frame) {  // Q5: when the run reached this poll (its lead is negative)
+    need_frame_ = frame;
+    need_ms_ = now;
+  }
   // Not here yet: the run stops before this poll; the host loop waits in
   // may_run() and runs the guest again, from this poll, once the input is known.
   if (yh_ && yh_->stop_before(c)) {
@@ -49,6 +64,10 @@ bool NetplayDriver::before_poll(ppc::Cpu& c, std::uint64_t frame) {
 rt::FrameInput NetplayDriver::input_for(std::uint64_t frame) {
   std::uint64_t now = clock_();
   if (!s_.ready(frame, now)) {
+    if (need_frame_ != frame) {
+      need_frame_ = frame;
+      need_ms_ = now;
+    }
     if (!blocking_) {
       ++gate_misses;
       throw rt::StopRun{"netplay: frame " + std::to_string(frame) + " was polled before its input arrived (gate missed)"};
@@ -69,7 +88,30 @@ rt::FrameInput NetplayDriver::input_for(std::uint64_t frame) {
     }
     end_stall(now);
   }
+  note_lead(frame, now);
   return s_.take(frame, now);
+}
+
+// Q5: the lead of the poll of `frame`, once per frame (a poll the run stopped at
+// is made again when its input is there; that repeat is not a new sample).
+void NetplayDriver::note_lead(std::uint64_t frame, std::uint64_t now_ms) {
+  if (frame == lead_frame_) return;
+  const auto arrived = s_.remote_arrival_ms(frame);
+  if (!arrived) return;  // a neutral frame (before the delay)
+  lead_frame_ = frame;
+  const std::uint64_t need = need_frame_ == frame ? need_ms_ : now_ms;
+  lead_last = static_cast<double>(need) - static_cast<double>(*arrived);
+  leads_[lead_samples % kLeadSamples] = lead_last;
+  ++lead_samples;
+}
+
+double NetplayDriver::lead_ms() const {
+  const std::size_t n = static_cast<std::size_t>(lead_samples < kLeadSamples ? lead_samples : kLeadSamples);
+  if (!n) return 0;
+  double v[kLeadSamples];
+  std::copy(leads_, leads_ + n, v);
+  std::nth_element(v, v + n / 2, v + n);
+  return v[n / 2];
 }
 
 void NetplayDriver::after_poll(std::uint64_t frame) {
