@@ -906,6 +906,10 @@ EMSCRIPTEN_KEEPALIVE void mvp_batch_end() {
 #endif
 }
 
+// Q5 (development): 0 = the render passes are not timed on the GPU (gpuTimer=0;
+// for comparisons). Call before mvp_gfx_init.
+EMSCRIPTEN_KEEPALIVE void mvp_gpu_timing(int on) { web::g_gpu_timing = on != 0; }
+
 // Q5 (development): extra GPU work at every present, in proportion to the
 // picture's internal size (`gpuLoad=N`: N passes; gfx::Window::burn), to try the
 // picture's Auto setting on a GPU that cannot keep up.

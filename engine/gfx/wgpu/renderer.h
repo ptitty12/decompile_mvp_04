@@ -33,6 +33,8 @@ namespace mvp::gfx {
 
 class Gpu;
 
+class GpuTimer;
+
 class Renderer : public Backend {
  public:
   Renderer(Gpu& gpu, const std::uint8_t* mem, std::uint32_t mem_size, std::uint32_t scale = 1);
@@ -44,6 +46,9 @@ class Renderer : public Backend {
 
   // Q1: read guest memory as the GP sees it (gfx/gp_memory.h). Null: directly.
   void set_gp_memory(GpMemory* g) { gpm_ = g; }
+
+  // Q5: time the render passes on the GPU (gpu_timer.h); null: not timed.
+  void set_timer(GpuTimer* t) { timer_ = t; }
 
   // Q1: the internal resolution, 1-3 times the console's in each direction. A
   // change applies at the next XFB copy that clears the EFB (the game clears it
@@ -136,6 +141,7 @@ class Renderer : public Backend {
   const std::uint8_t* mem_;
   std::uint32_t mem_size_;
   GpMemory* gpm_ = nullptr;
+  GpuTimer* timer_ = nullptr;  // Q5
   std::uint32_t scale_ = 1, want_scale_ = 1;
 
   wgpu::Texture efb_color_, efb_depth_;

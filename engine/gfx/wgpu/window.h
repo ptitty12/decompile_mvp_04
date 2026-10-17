@@ -20,6 +20,8 @@ namespace mvp::gfx {
 
 class Gpu;
 
+class GpuTimer;
+
 class Window {
  public:
 #ifndef __EMSCRIPTEN__
@@ -59,7 +61,9 @@ class Window {
   // footprint), so nothing shimmers. Smaller: sharp bilinear (each source pixel
   // a block of whole window pixels, blended only along the block edges), so a
   // 1x picture stays crisp at any size without uneven pixels.
-  void present(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height);
+  // Q5: `timer` times the pass on the GPU (gpu_timer.h).
+  void present(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height,
+               GpuTimer* timer = nullptr);
 
   // Q1: the picture's aspect ratio on screen. The game draws a 640 x 448 frame
   // for a 4:3 television (its 3D cameras use a 4:3 aspect), so 4:3 by default;
@@ -68,9 +72,11 @@ class Window {
 
   // Development (Q5, `gpuLoad=N` in the browser): makes the GPU work in
   // proportion to the picture's pixels, as a heavier scene or a weaker GPU
-  // would: `passes` render passes over a scratch texture of `src`'s own size,
-  // each sampling `src` 25 times per pixel. Nothing reads the result.
-  void burn(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height, int passes);
+  // would: one render pass over a scratch texture of `src`'s own size that
+  // covers it `passes` times, each time sampling `src` 25 times per pixel.
+  // Nothing reads the result.
+  void burn(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height, int passes,
+            GpuTimer* timer = nullptr);
 
   // Configures the surface again (P2: a canvas whose picture was taken as an
   // ImageBitmap may have lost its configuration).

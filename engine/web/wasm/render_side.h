@@ -16,10 +16,15 @@
 #include "gfx/gp_memory.h"
 #include "gfx/gx_processor.h"
 #include "gfx/wgpu/gpu.h"
+#include "gfx/wgpu/gpu_timer.h"
 #include "gfx/wgpu/renderer.h"
 #include "gfx/wgpu/window.h"
 
 namespace mvp::web {
+
+// Q5: time the render passes on the GPU where the device can (gfx/wgpu/gpu_timer.h); false
+// (`gpuTimer=0`, development) leaves them untimed. Set before the renderer is created.
+extern bool g_gpu_timing;
 
 // Presentation trace (P1, development): every VI field's frame buffer address,
 // every XFB copy and what each present showed, as JSON records. The tap sits
@@ -111,19 +116,9 @@ class RenderSide {
   std::uint32_t xfb_ = 0;
   std::uint64_t presents_ = 0, last_presented_ = 0, copies_at_present_ = 0, resizes_ = 0;
   int scale_ = 1;
-  // Q5: the GPU's time. After a present's submit, how long until the queue has
-  // finished everything submitted so far (WebGPU's onSubmittedWorkDone), one
-  // probe at a time: about a field's GPU work when the GPU keeps up, growing
-  // when it does not. Shared with the callback, which may outlive a present.
-  struct GpuProbe {
-    bool pending = false;
-    double at = 0;                          // when the probe's present was submitted
-    std::uint64_t n = 0, over = 0;          // probes done; of them over kGpuSlowMs
-    double sum_ms = 0, last_ms = 0;
-  };
-  static constexpr double kGpuSlowMs = 14.0;  // most of a field (16.7 ms)
-  void probe_gpu(double now_ms);
-  std::shared_ptr<GpuProbe> probe_ = std::make_shared<GpuProbe>();
+  // Q5: the GPU's time per presented frame, from timestamp queries (gfx/wgpu/gpu_timer.h),
+  // where the device has them.
+  std::unique_ptr<gfx::GpuTimer> timer_;
   std::uint64_t presents_new_ = 0;
   double present_ms_ = 0;  // host time in present() (the canvas's draw and the frame's hand-over), in all
   int gpu_load_ = 0;

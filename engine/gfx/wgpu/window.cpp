@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "gfx/wgpu/gpu.h"
+#include "gfx/wgpu/gpu_timer.h"
 
 namespace mvp::gfx {
 
@@ -230,7 +231,8 @@ bool Window::pump() {
 #endif
 }
 
-void Window::present(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height) {
+void Window::present(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height,
+                     GpuTimer* timer) {
   if (!configured_ || src_width == 0 || src_height == 0) return;
   wgpu::SurfaceTexture st{};
   surface_.GetCurrentTexture(&st);
@@ -271,6 +273,7 @@ void Window::present(const wgpu::TextureView& src, std::uint32_t src_width, std:
   wgpu::RenderPassDescriptor rp{};
   rp.colorAttachmentCount = 1;
   rp.colorAttachments = &ca;
+  if (timer) rp.timestampWrites = timer->pass();  // Q5
   wgpu::CommandEncoder enc = gpu_->device().CreateCommandEncoder();
   wgpu::RenderPassEncoder pass = enc.BeginRenderPass(&rp);
   pass.SetPipeline(blit_);
@@ -284,7 +287,8 @@ void Window::present(const wgpu::TextureView& src, std::uint32_t src_width, std:
 #endif
 }
 
-void Window::burn(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height, int passes) {
+void Window::burn(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height, int passes,
+                  GpuTimer* timer) {
   if (!gpu_ || passes <= 0 || src_width == 0 || src_height == 0) return;
   if (!burn_params_) {
     wgpu::BufferDescriptor bd{};
@@ -321,21 +325,20 @@ void Window::burn(const wgpu::TextureView& src, std::uint32_t src_width, std::ui
   wgpu::BindGroup bg = gpu_->device().CreateBindGroup(&bgd);
   wgpu::TextureView view = burn_target_.CreateView();
   wgpu::CommandEncoder enc = gpu_->device().CreateCommandEncoder();
-  for (int k = 0; k < passes; ++k) {
-    wgpu::RenderPassColorAttachment ca{};
-    ca.view = view;
-    ca.loadOp = wgpu::LoadOp::Clear;
-    ca.storeOp = wgpu::StoreOp::Store;
-    ca.clearValue = {0, 0, 0, 1};
-    wgpu::RenderPassDescriptor rp{};
-    rp.colorAttachmentCount = 1;
-    rp.colorAttachments = &ca;
-    wgpu::RenderPassEncoder pass = enc.BeginRenderPass(&rp);
-    pass.SetPipeline(blit_);
-    pass.SetBindGroup(0, bg);
-    pass.Draw(3);
-    pass.End();
-  }
+  wgpu::RenderPassColorAttachment ca{};
+  ca.view = view;
+  ca.loadOp = wgpu::LoadOp::Clear;
+  ca.storeOp = wgpu::StoreOp::Store;
+  ca.clearValue = {0, 0, 0, 1};
+  wgpu::RenderPassDescriptor rp{};
+  rp.colorAttachmentCount = 1;
+  rp.colorAttachments = &ca;
+  if (timer) rp.timestampWrites = timer->pass();  // one pass, so one timestamp pair covers it all
+  wgpu::RenderPassEncoder pass = enc.BeginRenderPass(&rp);
+  pass.SetPipeline(blit_);
+  pass.SetBindGroup(0, bg);
+  for (int k = 0; k < passes; ++k) pass.Draw(3);
+  pass.End();
   wgpu::CommandBuffer cb = enc.Finish();
   gpu_->queue().Submit(1, &cb);
 }
