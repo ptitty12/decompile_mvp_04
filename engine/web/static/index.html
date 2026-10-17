@@ -29,13 +29,22 @@
     <p id="status" role="status"></p>
     <progress id="progress" max="1" hidden></progress>
     <p id="error" class="error" role="alert" hidden></p>
+    <p id="slow-hint" class="slow-hint" role="status" hidden><span id="slow-hint-text"></span>
+      <button type="button" id="slow-hint-close" title="Hide this note" aria-label="Hide this note">&times;</button></p>
     <div id="stage">
       <canvas id="screen" width="640" height="480" tabindex="0" aria-label="Game screen"></canvas>
+      <div id="overlay" class="overlay" hidden>
+        <table id="overlay-table"></table>
+        <div id="overlay-notes"></div>
+        <button type="button" id="overlay-copy" title="Copy these numbers as text, to paste into a chat">Copy stats</button>
+        <span id="overlay-copied" class="overlay-copied" hidden>Copied.</span>
+      </div>
     </div>
     <div class="toolbar">
       <button type="button" id="fullscreen" title="Fullscreen (F, or double-click the game)">Fullscreen</button>
       <button type="button" id="sound" title="Turn the sound on or off (M)">Sound: off</button>
       <button type="button" id="pause" title="Pause or resume (P); hiding the tab pauses too">Pause</button>
+      <button type="button" id="stats-toggle" title="Show or hide the statistics over the game (the ` key, left of 1)" aria-pressed="false">Stats</button>
       <label class="picture" title="Internal resolution: how many times the console's pixels the game is drawn at. Auto picks by the size of the picture on screen.">Picture
         <select id="picture">
           <option value="auto">Auto</option>
