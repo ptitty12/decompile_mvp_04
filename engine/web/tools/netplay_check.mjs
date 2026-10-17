@@ -288,7 +288,8 @@ try {
              packs: s.packs?.mounted ? { ok: s.packs.mounted.ok, set: s.packs.mounted.set_hash,
                                          result: s.packs.mounted.result_hash, files: s.packs.mounted.files } : null,
              net: s.net && { ...s.net, windows: undefined, diagnostic: s.net.diagnostic } , windows: s.net?.windows,
-             worklet: s.audio?.worklet ?? null, pace: s.pace ?? null, gfx: s.gfx ?? null };
+             worklet: s.audio?.worklet ?? null, pace: s.pace ?? null, gfx: s.gfx ?? null,
+             overlay: s.overlay?.text ?? null, hint: s.hint ?? null, link: s.net?.link ?? null };
   });
   const deadline = t0 + timeoutS * 1000;
   let states = [];
@@ -363,6 +364,9 @@ try {
     error: st.error ?? null,
     packs: st.packs,
     gfx: st.gfx,
+    overlayText: st.overlay,  // Q5: what Copy stats gives (with stats=1)
+    hint: st.hint,
+    link: st.link,            // Q5: the link measured for an Auto delay
     guestLine: st.stopped?.guestLine ?? null,
     why: st.stopped?.status.why ?? null,
     threaded: st.stopped?.status.threaded ?? null,  // P2: the render thread drew (the threaded engine)

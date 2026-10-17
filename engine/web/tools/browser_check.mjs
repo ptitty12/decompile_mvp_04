@@ -404,7 +404,9 @@ async function runOnce(context, run) {
              firstFrameMs: s.firstFrameMs, firstFrameField: s.firstFrameField, stats: s.stats, stopped: s.stopped,
              error: s.error, cache: s.cache, audio: s.audio, audioAttachedAtField: s.audioAttachedAtField,
              paused: s.paused, pad: s.pad, probe: s.audioProbe(), discTrace: s.discTrace,
-             packs: s.packs?.mounted ?? null, ioLog: s.ioLog, digest: s.digest };
+             packs: s.packs?.mounted ?? null, ioLog: s.ioLog, digest: s.digest,
+             hint: s.hint ?? null, autoScale: s.autoScale ?? null,
+             log: s.log.filter((l) => /^picture: |WebGPU error/.test(l)).slice(0, 20) };
   });
   const windows = [];
   const audioSamples = { n: 0, nonsilent: 0, maxRms: 0, maxPeak: 0, firstNonsilentField: null };
@@ -477,6 +479,7 @@ async function runOnce(context, run) {
                                   inFrames: w.inFrames } : undefined,
                      // P2, threaded: the render thread's working time and the emulation's fence waits so far (ms)
                      renderBusyMs: st.render?.busy_ms, fenceMs: st.thread?.fence_ms, fences: st.thread?.fences,
+                     gpu: st.gpu, scale: st.scale, presentsNew: st.presents_new,  // Q5
                      writeWaitMs: st.thread?.write_wait_ms, writeWaits: st.thread?.write_waits });
     }
     const field = state.stats?.status.fields ?? 0;
@@ -575,6 +578,7 @@ async function runOnce(context, run) {
     windows, final: state.stopped?.status ?? state.stats?.status ?? null, guestLine: state.stopped?.guestLine ?? null,
     packs: state.packs,
     error: state.error ?? null, consoleErrors: consoleErrors.slice(0, 20), hidden,
+    hint: state.hint, autoScale: state.autoScale, pictureLog: state.log,  // Q5
     audio: { page: state.audio, attachedAtField: state.audioAttachedAtField, samples: audioSamples },
   });
   const origin = new URL(base).origin;
@@ -610,7 +614,8 @@ try {
   } else {
     browser = await launchers[browserName]();
     all.version = browser.version();
-    context = await browser.newContext({ viewport: { width: vw, height: vh } });
+    // --dpr N (Q5): the display's device pixel ratio (a high-DPI laptop screen: Auto picks a higher scale)
+    context = await browser.newContext({ viewport: { width: vw, height: vh }, deviceScaleFactor: Number(opt('--dpr', '1')) });
   }
   for (let run = 1; run <= runs; ++run) {
     const s = await runOnce(context, run);
