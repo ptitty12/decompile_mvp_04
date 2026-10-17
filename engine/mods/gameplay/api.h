@@ -122,6 +122,8 @@ class Host {
 
   // A line for the developer log (never game state).
   virtual void log(const std::string& line) = 0;
+  // A short message for the player, shown over the game (never game state).
+  virtual void notify(const std::string& text) = 0;
 
   // ---- The timeline: frame-boundary services, carried out at the next frame poll ----
   virtual Phase phase() const = 0;

@@ -272,6 +272,11 @@ void GameplayHost::end_review(ppc::Cpu& c) {
   cur_ = nullptr;
 }
 
+void GameplayHost::notify(const std::string& text) {
+  if (notify_) notify_(text);
+  else std::printf("notify: %s\n", text.c_str());
+}
+
 void GameplayHost::log(const std::string& line) {
   std::string s = std::string("mod ") + (cur_ ? cur_->mod->info().id : "?") + ": " + line;
   if (log_) log_(s);

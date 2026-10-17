@@ -147,18 +147,23 @@ class AbsMod final : public Mod {
     const u8 verdict = r.payload[0], original = r.payload[1], team = r.payload[2];
     s.window_open = 0;
     ++s.challenges_made;
-    char line[160];
+    char line[160], note[96];
     if (verdict == original) {
       if (s.challenges[team]) --s.challenges[team];
       ++s.upheld;
       std::snprintf(line, sizeof line, "challenge by %s: the call stands (%s); %u challenge(s) left",
                     team ? "away" : "home", original ? "strike" : "ball", s.challenges[team]);
+      std::snprintf(note, sizeof note, "The call stands: %s. %s: %u challenge%s left", original ? "strike" : "ball",
+                    team ? "Away" : "Home", s.challenges[team], s.challenges[team] == 1 ? "" : "s");
     } else {
       ++s.overturned;
       std::snprintf(line, sizeof line, "challenge by %s: overturned, %s; %u challenge(s) left",
                     team ? "away" : "home", verdict ? "strike" : "ball", s.challenges[team]);
+      std::snprintf(note, sizeof note, "Overturned: %s. %s keeps the challenge (%u left)", verdict ? "strike" : "ball",
+                    team ? "Away" : "Home", s.challenges[team]);
     }
     h.log(line);
+    h.notify(note);
   }
 
  private:
@@ -226,6 +231,7 @@ class AbsMod final : public Mod {
     if (!s.challenges[team]) {
       std::snprintf(line, sizeof line, "challenge by %s refused: no challenges left", team ? "away" : "home");
       h.log(line);
+      h.notify(team ? "Away has no challenges left" : "Home has no challenges left");
       return;
     }
     Review r;
@@ -245,6 +251,7 @@ class AbsMod final : public Mod {
     std::snprintf(line, sizeof line, "challenge by %s (port %d) of a called %s: reviewing", team ? "away" : "home",
                   port + 1, s.last_call ? "strike" : "ball");
     h.log(line);
+    h.notify(s.last_call ? "ABS challenge: reviewing the strike call" : "ABS challenge: reviewing the ball call");
   }
 
   ModInfo info_;

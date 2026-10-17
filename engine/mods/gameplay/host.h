@@ -57,6 +57,8 @@ class GameplayHost final : public Host {
   bool load_state(std::span<const u8> bytes);
 
   void set_log(std::function<void(const std::string&)> f) { log_ = std::move(f); }
+  // Where notify() goes (the page's banner, mvp-play's output).
+  void set_notify(std::function<void(const std::string&)> f) { notify_ = std::move(f); }
 
   // ---- For the timeline (mods/gameplay/timeline.h) ----
   bool snapshot_requested() const { return want_snapshot_; }
@@ -90,6 +92,7 @@ class GameplayHost final : public Host {
   u64 frame() const override { return frame_; }
   const rt::FrameInput& input() const override;
   void log(const std::string& line) override;
+  void notify(const std::string& text) override;
   Phase phase() const override { return phase_; }
   void request_snapshot() override;
   u64 snapshot_frame() const override { return snapshot_frame_; }
@@ -117,7 +120,7 @@ class GameplayHost final : public Host {
   Active* cur_ = nullptr;  // the mod whose callback runs
   ppc::Cpu* cpu_ = nullptr;
   u64 seed_ = 1, frame_ = 0;
-  std::function<void(const std::string&)> log_;
+  std::function<void(const std::string&)> log_, notify_;
   Phase phase_ = Phase::Live;
   bool want_snapshot_ = false, want_review_ = false, in_review_ = false;
   u64 snapshot_frame_ = ~0ull;
