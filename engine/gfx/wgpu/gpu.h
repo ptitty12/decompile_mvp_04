@@ -40,6 +40,9 @@ class Gpu {
   const wgpu::Device& device() const { return device_; }
   const wgpu::Queue& queue() const { return queue_; }
   const std::string& adapter_name() const { return adapter_name_; }
+  // Q5: the device can time render passes (TimestampQuery; gpu_timer.h). Requested in the
+  // browser when the adapter has it.
+  bool timestamps() const { return timestamps_; }
 
   // Validation errors reported by the device since creation (printed too).
   std::uint64_t errors() const { return *errors_; }
@@ -66,6 +69,7 @@ class Gpu {
   wgpu::Device device_;
   wgpu::Queue queue_;
   std::string adapter_name_;
+  bool timestamps_ = false;
   std::shared_ptr<std::uint64_t> errors_ = std::make_shared<std::uint64_t>(0);
 };
 

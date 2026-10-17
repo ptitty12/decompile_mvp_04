@@ -311,3 +311,39 @@ TEST_CASE("bandwidth: a few KB/s per direction") {
   MESSAGE("player 1 sends " << a_bps << " payload bytes/s, " << sim.a.s.stats().packets_sent / seconds << " packets/s");
   CHECK(a_bps < 8000);
 }
+
+TEST_CASE("Q5: when the peer's inputs arrived, and the round trip's jitter") {
+  // A steady link: the round trips barely change, so the jitter stays small.
+  Sim steady({15, 0, 0.0, 0.0, 21}, 3, 3);
+  steady.run(600, 60000);
+  const SessionStats& st = steady.a.s.stats();
+  CHECK(st.rtt_recent >= 30.0);
+  CHECK(st.rtt_recent <= 50.0);
+  CHECK(st.rtt_jitter < 10.0);
+  // A jittery link: up to 40 ms more one way, at random.
+  Sim jittery({15, 40, 0.0, 0.0, 22}, 3, 3);
+  jittery.run(600, 120000);
+  CHECK(jittery.a.s.stats().rtt_jitter > st.rtt_jitter + 5.0);
+  // The arrival times of the inputs still held: in frame order, none in the future, none for the
+  // neutral frames before the delay or for inputs not here yet.
+  Session& s = steady.b.s;
+  CHECK_FALSE(s.remote_arrival_ms(0));
+  CHECK_FALSE(s.remote_arrival_ms(s.remote_horizon()));
+  u64 last = 0;
+  int known = 0;
+  for (u64 f = s.next_frame(); f < s.remote_horizon(); ++f) {
+    auto t = s.remote_arrival_ms(f);
+    REQUIRE(t);
+    CHECK(*t >= last);
+    CHECK(*t <= steady.link.now());
+    last = *t;
+    ++known;
+  }
+  CHECK(known >= 0);
+  // Early in a session the first inputs after the delay have their times.
+  Sim fresh({10, 0, 0.0, 0.0, 23}, 2, 2);
+  fresh.b.frame_ms = 1000;  // b barely runs, so a holds its inputs
+  fresh.run(2, 400);  // a takes frames 0 and 1 (neutral) and holds b's input of frame 2
+  CHECK(fresh.a.s.remote_arrival_ms(2));
+  CHECK_FALSE(fresh.a.s.remote_arrival_ms(1));
+}

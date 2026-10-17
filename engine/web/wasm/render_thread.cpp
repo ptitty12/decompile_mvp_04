@@ -103,6 +103,7 @@ enum : u32 {
   kGpDrop,      // Q1: {addr, len}: memory written without the cache
   kScale,       // Q1: {internal resolution}
   kGxBatch,     // Q4: {count n, n lengths, the n commands' bytes one after the other}
+  kGpuLoad,     // Q5 (development): {passes}
 };
 
 constexpr u32 kRingBytes = 16u << 20;
@@ -514,6 +515,12 @@ void handle(const gfx::RenderRing::Record& r) {
       S->side.set_scale(static_cast<int>(v));
       return;
     }
+    case kGpuLoad: {
+      u32 v;
+      std::memcpy(&v, r.data, sizeof v);
+      S->side.set_gpu_load(static_cast<int>(v));
+      return;
+    }
     case kGpDrop: {
       Pair v;
       std::memcpy(&v, r.data, sizeof v);
@@ -820,6 +827,15 @@ bool render_present(std::uint64_t frame_polls) {
   return S->presents.load() > 0;
 }
 
+// Q5: the batch ends with no new field to show (a netplay run that waited at a
+// frame poll before it finished one): the render thread stops looking for
+// records, and nothing is presented again.
+void render_batch_end() {
+  S->ring.publish();
+  S->emu_active.store(0, std::memory_order_seq_cst);
+  kick();
+}
+
 void render_flush() {
   put(kFlush, u32{0});
   publish_and_kick();
@@ -833,6 +849,11 @@ void render_resize(int width, int height) {
 
 void render_scale(int scale) {
   put(kScale, static_cast<u32>(scale));
+  publish_and_kick();
+}
+
+void render_gpu_load(int passes) {
+  put(kGpuLoad, static_cast<u32>(passes < 0 ? 0 : passes));
   publish_and_kick();
 }
 

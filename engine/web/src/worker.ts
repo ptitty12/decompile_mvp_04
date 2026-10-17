@@ -24,6 +24,7 @@ import type { MvpEngine, MvpEngineOptions } from './mvp-web.js';
 import { probeDiscUrl } from './disc.js';
 import { cacheKey, clearCache, readCached, writeCached } from './module-cache.js';
 import { feedPacks, readReport, summarize } from './packs-core.js';
+import { FIELD_MS, Pacer, Schedule } from './pacer.js';
 import type {
   CacheReport, DiscSource, FromWorker, NetOptions, NetStatus, Pad, RunOptions, Status, ToWorker, WorkletIn,
 } from './protocol.js';
@@ -35,7 +36,6 @@ interface WorkerScope {
 }
 const scope = self as unknown as WorkerScope;
 
-const FIELD_MS = 1000 / 59.94;   // NTSC field rate
 const MAX_FIELDS_PER_FRAME = 4;  // catch-up limit per animation frame
 const FAST_BUDGET_MS = 40;       // unpaced mode: run this long, then let the canvas present
 const MAX_PREFETCH = 2;          // read-ahead requests in flight (server image)
@@ -46,7 +46,9 @@ let vsync: SharedArrayBuffer | null = null;  // the page's display refreshes (P2
 let frames: MessagePort | null = null;       // P2: the page shows the frames sent here (instead of a canvas)
 let opts: RunOptions | null = null;
 let running = false, paused = false, firstFrame = false, booted = false;
-let pacedStart = 0, pacedFields = 0;
+// The paced loop's schedule (pacer.ts): fields due at 59.94 a second times the pace, which is
+// 1 except in an online game whose players' machines cannot both run at full speed (Q5).
+const sched = new Schedule();
 let fieldsRun = 0, slowApplied = false;  // Q2 (development): hostSlow from hostSlowFrom on
 // Stats window (reported about twice a second).
 let winFields = 0, winMs = 0, winWall = performance.now();
@@ -74,8 +76,10 @@ let gated = false;
 let netTimer = 0;
 let netLastReport = 0;
 let netReportedEnd = false;
-let channelOpen!: () => void;
-const channelOpened = new Promise<void>((resolve) => (channelOpen = resolve));
+// The data channel is open; with the input delay the page chose for it (Q5: in an Auto game, from
+// its measurement of the link; else the room's).
+let channelOpen!: (delay?: number) => void;
+const channelOpened = new Promise<number | undefined>((resolve) => (channelOpen = resolve));
 
 function netStatus(): NetStatus {
   return JSON.parse(cstr(M!._mvp_net_status())) as NetStatus;
@@ -127,10 +131,11 @@ async function startNetplay(o: NetOptions, symbols: Uint8Array): Promise<boolean
     const copy = d.slice().buffer;
     post({ type: 'net-send', data: copy }, [copy]);
   };
-  await channelOpened;
+  const chosen = await channelOpened;
+  const delay = chosen ?? o.delay;
   const r = crypto.getRandomValues(new Uint32Array(2));
   const nonce = r[0]! * 2 ** 21 + (r[1]! & 0x1fffff);  // 53 bits, exact in a double
-  const ok = withBytes(new TextEncoder().encode(build), (p, n) => M!._mvp_net_begin(o.player, o.delay, o.hashEvery, p, n, nonce));
+  const ok = withBytes(new TextEncoder().encode(build), (p, n) => M!._mvp_net_begin(o.player, delay, o.hashEvery, p, n, nonce));
   if (!ok) return false;
   netTimer = setInterval(pumpNet, 4) as unknown as number;
   for (;;) {
@@ -259,6 +264,8 @@ function enableAudio(): void {
   M._mvp_audio_enable(1);
   audioAttached = true;
   audioRing();
+  audioPace = 1;
+  paceAudio();  // Q5: an online game already below full speed
   post({ type: 'audio', attachedAtField: status().fields });
 }
 
@@ -335,6 +342,7 @@ function pumpDisc(): void {
 async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: number, height: number,
                      options: RunOptions): Promise<void> {
   opts = options;
+  if (options.paceMargin) pacer = new Pacer({ margin: options.paceMargin });  // Q5 (development): tuning
   const phase = (name: string, t0: number, detail?: unknown) =>
     post({ type: 'phase', name, ms: performance.now() - t0, detail });
 
@@ -376,6 +384,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
         resolve(!!ok);
       };
     });
+    if (options.gpuTimer === false) M._mvp_gpu_timing(0);  // Q5 (development)
     withBytes(new TextEncoder().encode('#mvp-canvas\0'), (p) => M!._mvp_gfx_init(p, width, height));
   } else {
     post({ type: 'gfx', ok: false, message: options.render ? 'WebGPU is not available in this browser' : 'rendering off' });
@@ -461,6 +470,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   }
   booted = true;
   M._mvp_render_scale(options.scale ?? 1);  // Q1: the Picture setting
+  if (options.gpuLoad) M._mvp_gpu_load(options.gpuLoad);  // Q5 (development): a GPU that cannot keep up
   if (options.tracePresent) M._mvp_trace(1);
   if (options.digest) M._mvp_digest(1, options.digestDetail?.[0] ?? 1, options.digestDetail?.[1] ?? 0);
   enableAudio();
@@ -472,8 +482,8 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   phase('gpu-wait', t);
 
   running = true;
-  pacedStart = performance.now();
-  pacedFields = 0;
+  sched.fields = 0;
+  sched.reset(performance.now());
   winWall = performance.now();
   if (options.fast || options.fastUntil) setTimeout(fastLoop, 0);
   else if (scope.requestAnimationFrame) scope.requestAnimationFrame(frame);
@@ -490,7 +500,10 @@ function afterRun(ran: number, ms: number): boolean {
   }
   pumpAudio();
   pumpDisc();
-  if (M!._mvp_present() && !firstFrame) {
+  // Q5: a batch that made no new field (an online game waiting at a frame poll for the other
+  // player's input) shows nothing new: it ends without presenting the same picture again.
+  const shown = ran > 0 || !firstFrame ? M!._mvp_present() : (M!._mvp_batch_end(), 0);
+  if (shown && !firstFrame) {
     firstFrame = true;
     post({ type: 'first-frame', fields: status().fields });
     if (storeKey) {
@@ -506,7 +519,7 @@ function afterRun(ran: number, ms: number): boolean {
     const sat = saturatedMs + (saturated ? now - saturatedSince : 0);
     post({ type: 'stats', status: status(),
            window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace, digest, saturatedMs: sat,
-                     fieldCost } });
+                     fieldCost, cap: pacer.capacity(), rate: sched.rate } });
     winFields = 0;
     winMs = 0;
     winWall = now;
@@ -525,6 +538,51 @@ function afterRun(ran: number, ms: number): boolean {
     return false;
   }
   return true;
+}
+
+// ---- Q5: the pace (pacer.ts) ----
+// Every paced batch's busy time (the run, the waits for the render thread, the present) feeds
+// the measure of what a field costs this machine; a batch that ran no field (waiting for the
+// other player) adds its time to the next one. Online, a few times a second, the pacer sets
+// the common pace and moves the schedule toward the phase where neither player waits, and its
+// report goes to the other player (through the page: a text message on the data channel); the
+// worklet's time-stretch is told the pace, so the sound slows with the game at once.
+let pacer = new Pacer();
+const PACE_TICK_MS = 250;
+let pendingWork = 0, lastPace = -Infinity, audioPace = 1;
+
+function noteWork(ran: number, ms: number): void {
+  if (ran > 0) {
+    pacer.noteWork(ran, ms + pendingWork);
+    pendingWork = 0;
+  } else if (ran === 0) {
+    pendingWork += ms;
+  }
+}
+
+function paceTick(now: number): void {
+  if (now - lastPace < PACE_TICK_MS || !M) return;
+  lastPace = now;
+  const raw = M._mvp_net_lead();
+  const lead = Number.isFinite(raw) ? raw : null;
+  const step = pacer.tick(now, lead);
+  if (step.rate !== sched.rate) sched.setRate(step.rate, now);
+  if (step.shiftMs) sched.shift(step.shiftMs);
+  paceAudio();
+  const peer = pacer.peerFresh(now) ? pacer.peer : null;
+  post({ type: 'pace', report: pacer.report(lead),
+         state: { rate: pacer.rate, prop: pacer.prop, cost: pacer.cost, cap: pacer.capacity(), lead,
+                  peerProp: peer?.prop ?? null, peerCap: peer?.cap ?? null, peerLead: peer?.lead ?? null,
+                  shifted: pacer.shifted } });
+}
+
+// The worklet plays the sound at the game's pace from the start of a slower stretch, instead
+// of finding it from a buffer that runs low (Q2's stretch then only trims it).
+function paceAudio(): void {
+  if (!audioPort || !audioAttached || Math.abs(pacer.rate - audioPace) < 0.005) return;
+  audioPace = pacer.rate;
+  const msg: WorkletIn = { type: 'pace', speed: audioPace };
+  audioPort.postMessage(msg);
 }
 
 // Paced: run the fields the wall clock asks for, then present once.
@@ -551,6 +609,13 @@ function afterRun(ran: number, ms: number): boolean {
 // per field cost it about 10 % of its speed). Under 90 % it chases again.
 // Guest state is the same either way (wall time decides only how many fields
 // run per batch).
+//
+// Q5 (online games): the schedule runs at the two players' common pace (pacer.ts;
+// 1 when both machines keep up), so both games make and show their fields evenly
+// at the slower machine's sustainable pace instead of stop and go. A wait for
+// the other player's input moves the schedule on instead of being caught up,
+// and a few times a second the pacer moves it toward the phase where neither
+// player waits. Solo games keep the full-speed schedule.
 const CHASE_FIELDS = 2;
 const SATURATED_ON = 1.0, SATURATED_OFF = 0.9, SATURATED_S = 1.0;
 let fieldCost = 0;          // smoothed host ms per field, as a share of a field
@@ -566,11 +631,18 @@ chase.port1.onmessage = () => {
 
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
-  let due = Math.floor((now - pacedStart) / FIELD_MS) - pacedFields;
+  if (net) {
+    // Q5: an online game runs at the two players' common pace (pacer.ts). After a wait for the
+    // other player's input the schedule moves on from now instead of catching up, and a side that
+    // fell behind catches up one field at a time (never two-field batches: every frame is shown).
+    sched.limitDebt(now, gated ? 1 : 2);
+    paceTick(now);
+  }
+  let due = sched.due(now);
   const slowMotion = saturated && mt && opts?.slowMotion === true;  // opt-in (slowMotion=1), threaded only
   if (due > (slowMotion ? 2 : MAX_FIELDS_PER_FRAME * 2)) {
     // Too far behind (a slow stretch, a background tab, a slow machine): drop the debt.
-    pacedStart = now - pacedFields * FIELD_MS;
+    sched.limitDebt(now, 1);
     due = 1;
   }
   const rafOnly = opts?.pacing === 'raf';
@@ -579,7 +651,7 @@ function runPaced(now: number): void {
   const t0 = performance.now();
   const ran = M._mvp_run_fields(due);
   const ms = performance.now() - t0;
-  pacedFields += Math.max(0, ran);
+  sched.fields += Math.max(0, ran);
   if (ran > 0) {
     fieldCost += (1 - Math.exp(-(ran * FIELD_MS) / (1000 * SATURATED_S))) * (ms / ran / FIELD_MS - fieldCost);
     if (!saturated && fieldCost >= SATURATED_ON) {
@@ -591,13 +663,29 @@ function runPaced(now: number): void {
     }
   }
   gated = !!net && ran >= 0 && ran < due;
-  if (!afterRun(ran, ms) || rafOnly || gated) return;
+  const ok = afterRun(ran, ms);
+  noteWork(ran, performance.now() - t0);
+  if (!ok || rafOnly || gated) return;
   // Still behind: the next batch now, in its own task (this one's frame is presented when it ends).
-  if (!chasePending && Math.floor((performance.now() - pacedStart) / FIELD_MS) - pacedFields >= 1) {
+  const after = performance.now();
+  if (!chasePending && sched.due(after) >= 1) {
     chasePending = true;
     chase.port2.postMessage(0);
+    return;
+  }
+  // Q5, online: the next field at its own time, not at the next animation frame (up to a refresh
+  // later): a machine running near its capacity loses no time waiting for one, and fields start evenly.
+  if (net && !slotTimer) {
+    const wait = sched.start + (sched.fields + 1) * sched.period() - after;
+    if (wait > 0 && wait < FIELD_MS) {
+      slotTimer = setTimeout(() => {
+        slotTimer = 0;
+        runPaced(performance.now());
+      }, wait) as unknown as number;
+    }
   }
 }
+let slotTimer = 0;
 
 function frame(now: number): void {
   runPaced(now);
@@ -626,8 +714,8 @@ function fastLoop(): void {
   if (!afterRun(ran, performance.now() - t0)) return;
   if (!opts?.fast && opts?.fastUntil && status().fields >= opts.fastUntil) {
     // Development (fastUntil): from here on paced, as a player runs it.
-    pacedStart = performance.now();
-    pacedFields = 0;
+    sched.fields = 0;
+    sched.reset(performance.now());
     if (scope.requestAnimationFrame) scope.requestAnimationFrame(frame);
     return;
   }
@@ -658,7 +746,7 @@ scope.onmessage = (ev: MessageEvent<ToWorker>) => {
       if (opts) opts.scale = msg.scale;
       break;
     case 'net-open':
-      channelOpen();
+      channelOpen(msg.delay);
       break;
     case 'net-recv':
       if (M) {
@@ -677,9 +765,10 @@ scope.onmessage = (ev: MessageEvent<ToWorker>) => {
       break;
     case 'pause':
       paused = msg.paused;
-      if (!paused) {
-        pacedStart = performance.now() - pacedFields * FIELD_MS;
-      }
+      if (!paused) sched.reset(performance.now());
+      break;
+    case 'pace-peer':
+      pacer.onPeer(msg.report, performance.now());  // Q5: the other player's pace report
       break;
     case 'audio-port':
       audioPort = msg.port;

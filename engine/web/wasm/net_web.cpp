@@ -6,6 +6,7 @@
 //   mvp_net_status()             JSON for the page
 //   mvp_net_diagnostic()         the local desync diagnostic (text, no game data)
 //   mvp_net_quit()               says goodbye to the peer
+//   mvp_net_lead()               Q5: the input lead (ms, the median of the last frames; net/driver.h)
 #include "net_web.h"
 
 #include <array>
@@ -146,23 +147,33 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_net_status() {
   }
   auto ull = [](std::uint64_t v) { return static_cast<unsigned long long>(v); };
   const net::NetplayDriver* d = n.driver.get();
-  char b[1280];
+  char b[1600];
   std::snprintf(
       b, sizeof b,
       "{\"state\":\"%s\",\"reason\":\"%s\",\"player\":%d,\"delay\":%u,\"frame\":%llu,\"peerFrame\":%u,"
       "\"localHorizon\":%llu,\"remoteHorizon\":%llu,\"rttLast\":%u,\"rttMin\":%u,\"rttAvg\":%.1f,\"rttMax\":%u,"
       "\"packetsSent\":%llu,\"bytesSent\":%llu,\"packetsReceived\":%llu,\"bytesReceived\":%llu,\"badPackets\":%llu,"
       "\"hashesCompared\":%llu,\"stalls\":%llu,\"stallMs\":%llu,\"longestStallMs\":%llu,\"gateMisses\":%llu,"
-      "\"earlyYields\":%llu,\"pollStops\":%llu,\"latencyAvg\":%.1f,\"latencyMax\":%llu,\"latencySum\":%llu,\"latencySamples\":%llu,\"windows\":%llu,\"lastWindow\":\"%s\",\"desync\":%s}",
+      "\"earlyYields\":%llu,\"pollStops\":%llu,\"latencyAvg\":%.1f,\"latencyMax\":%llu,\"latencySum\":%llu,\"latencySamples\":%llu,\"windows\":%llu,\"lastWindow\":\"%s\",\"desync\":%s,"
+      "\"rttRecent\":%.1f,\"rttJitter\":%.1f,\"leadMs\":%.1f,\"leadSamples\":%llu}",
       net::state_name(s.state()), reason.c_str(), s.config().player, s.delay(), ull(s.next_frame()), s.peer_frame(),
       ull(s.local_horizon()), ull(s.remote_horizon()), st.rtt_last, st.rtt_min, st.rtt_avg(), st.rtt_max,
       ull(st.packets_sent), ull(st.bytes_sent), ull(st.packets_received), ull(st.bytes_received), ull(st.bad_packets),
       ull(st.hashes_compared), ull(d ? d->stalls : 0), ull(d ? d->stall_ms : 0), ull(d ? d->longest_stall_ms : 0),
       ull(d ? d->gate_misses : 0), ull(d ? d->early_yields : 0), ull(d ? d->poll_stops : 0), st.latency_avg(), ull(st.latency_max), ull(st.latency_sum), ull(st.latency_samples),
       ull(d ? d->windows().size() : 0), last,
-      s.state() == net::State::Desynced ? "true" : "false");
+      s.state() == net::State::Desynced ? "true" : "false", st.rtt_recent, st.rtt_jitter, d ? d->lead_ms() : 0.0,
+      ull(d ? d->lead_samples : 0));
   n.text = b;
   return n.text.c_str();
+}
+
+// Q5: the input lead (net/driver.h lead_ms()): the median, over the last frames, of how
+// long before this side needed the peer's input it arrived. The Worker's pacing reads it
+// several times a second; NaN before any sample.
+EMSCRIPTEN_KEEPALIVE double mvp_net_lead() {
+  if (!n.driver || !n.driver->lead_samples) return __builtin_nan("");
+  return n.driver->lead_ms();
 }
 
 // Every window hash this side computed, "frame:hash" per line (tests compare two pages).

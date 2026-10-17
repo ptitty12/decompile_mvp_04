@@ -16,10 +16,15 @@
 #include "gfx/gp_memory.h"
 #include "gfx/gx_processor.h"
 #include "gfx/wgpu/gpu.h"
+#include "gfx/wgpu/gpu_timer.h"
 #include "gfx/wgpu/renderer.h"
 #include "gfx/wgpu/window.h"
 
 namespace mvp::web {
+
+// Q5: time the render passes on the GPU where the device can (gfx/wgpu/gpu_timer.h); false
+// (`gpuTimer=0`, development) leaves them untimed. Set before the renderer is created.
+extern bool g_gpu_timing;
 
 // Presentation trace (P1, development): every VI field's frame buffer address,
 // every XFB copy and what each present showed, as JSON records. The tap sits
@@ -91,6 +96,11 @@ class RenderSide {
   // ",\"draws\":..." members for mvp_status (empty without a renderer).
   std::string status_json() const;
   std::uint64_t presents() const { return presents_; }
+  // Q5: presents that showed a new picture (frames shown).
+  std::uint64_t presents_new() const { return presents_new_; }
+  // Q5 (development, `gpuLoad=N`): extra GPU work at every present, in proportion
+  // to the picture's internal size (gfx::Window::burn).
+  void set_gpu_load(int passes) { gpu_load_ = passes < 0 ? 0 : passes; }
   std::uint64_t resizes() const { return resizes_; }
 
  private:
@@ -106,6 +116,12 @@ class RenderSide {
   std::uint32_t xfb_ = 0;
   std::uint64_t presents_ = 0, last_presented_ = 0, copies_at_present_ = 0, resizes_ = 0;
   int scale_ = 1;
+  // Q5: the GPU's time per presented frame, from timestamp queries (gfx/wgpu/gpu_timer.h),
+  // where the device has them.
+  std::unique_ptr<gfx::GpuTimer> timer_;
+  std::uint64_t presents_new_ = 0;
+  double present_ms_ = 0;  // host time in present() (the canvas's draw and the frame's hand-over), in all
+  int gpu_load_ = 0;
 };
 
 }  // namespace mvp::web

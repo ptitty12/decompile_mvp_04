@@ -182,6 +182,15 @@ void Session::on_input(const Input& m, u64 now_ms) {
   if (m.echo_ms != 0) {
     const u32 rtt = static_cast<u32>(now_ms) - m.echo_ms - m.echo_hold_ms;
     if (rtt < 60000) {
+      // Q5: the recent round trip and its jitter (RFC 3550, section 6.4.1: J += (|D| - J) / 16,
+      // D the change from the previous sample).
+      if (stats_.rtt_samples == 0) {
+        stats_.rtt_recent = rtt;
+      } else {
+        const double d = static_cast<double>(rtt) - static_cast<double>(stats_.rtt_last);
+        stats_.rtt_jitter += ((d < 0 ? -d : d) - stats_.rtt_jitter) / 16.0;
+        stats_.rtt_recent += (static_cast<double>(rtt) - stats_.rtt_recent) / 8.0;
+      }
       stats_.rtt_last = rtt;
       stats_.rtt_min = stats_.rtt_samples ? std::min(stats_.rtt_min, rtt) : rtt;
       stats_.rtt_max = std::max(stats_.rtt_max, rtt);
@@ -208,6 +217,7 @@ void Session::on_input(const Input& m, u64 now_ms) {
       }
     } else if (f == remote_horizon()) {
       remote_.push_back(p);
+      remote_ms_.push_back(now_ms);
       ++stats_.inputs_new;
     } else {
       ++stats_.inputs_gap;
@@ -305,6 +315,11 @@ rt::FrameInput Session::take(u64 frame, std::optional<u64> now_ms) {
   return in;
 }
 
+std::optional<u64> Session::remote_arrival_ms(u64 frame) const {
+  if (frame < remote_base_ || frame >= remote_horizon()) return std::nullopt;
+  return remote_ms_[static_cast<std::size_t>(frame - remote_base_)];
+}
+
 void Session::submit_hash(u32 frame, u64 hash, u64 now_ms) {
   if (state_ != State::Running) return;
   unacked_hashes_.push_back(HashRecord{frame, hash});
@@ -335,6 +350,7 @@ void Session::prune() {
   }
   while (remote_base_ < next_take_ && !remote_.empty()) {
     remote_.pop_front();
+    remote_ms_.pop_front();
     ++remote_base_;
   }
 }

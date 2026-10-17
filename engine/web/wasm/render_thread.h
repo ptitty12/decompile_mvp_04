@@ -74,9 +74,11 @@ void render_field(std::uint64_t field, std::uint32_t xfb);
 void render_sync();          // the fence: returns when the render thread finished every record so far
 void render_batch_begin();   // a run batch starts (the render thread waits in place for records)
 bool render_present(std::uint64_t frame_polls);  // ends the batch; true once a frame has reached the canvas
+void render_batch_end();     // Q5: ends the batch without a present (the run made no new field: nothing new to show)
 void render_flush();
 void render_resize(int width, int height);
 void render_scale(int scale);  // Q1: the internal resolution (render_side.h)
+void render_gpu_load(int passes);  // Q5 (development): extra GPU work per present (render_side.h)
 void render_trace(bool on);
 void render_digest(bool on, std::uint64_t detail_from, std::uint64_t detail_to);
 // Q1: what the GP sees of memory (gfx/gp_memory.h). The game wrote the data

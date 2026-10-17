@@ -31,7 +31,7 @@ export interface RoomInfo {
 
 // ---- page -> server ----
 export type ClientMsg =
-  | { t: 'create'; name?: string; delay?: number }  // a new room; the creator is player 1
+  | { t: 'create'; name?: string; delay?: number }  // a new room; the creator is player 1 (delay 0: Auto, Q5)
   | { t: 'join'; room: string }                     // join as player 2
   | { t: 'signal'; data: SignalData }               // relayed to the other player in the room
   | { t: 'leave' }

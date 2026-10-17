@@ -33,16 +33,26 @@
 //                   threads spin N - 1 times their working time; host timing only)
 //   gpview=0        the renderer reads guest memory as it is, without the data-cache model (Q1 comparisons)
 //   scale=1|2|3     the internal resolution, instead of the Picture setting (Q1)
+//   gpuLoad=N       development (Q5): extra GPU work per present, in proportion to the picture's pixels
+//                   (N passes), to try the Picture setting's Auto on a GPU that cannot keep up
+//   gpuTimer=0      development (Q5): the render passes are not timed on the GPU (Auto then goes by size alone)
+//   paceMargin=X    development (Q5): the online pace's margin over this machine's capacity (default 0.98)
+//   stats=1         the statistics overlay shown from the start (Q5; otherwise the Stats button or `)
 // The page publishes its state as `window.mvp` for the browser check.
 
 import { AudioOut, type AudioState } from './audio.js';
+import { AutoScale } from './autoscale.js';
 import { findServerDisc } from './disc.js';
 import { DownloadError, canStore, downloadDisc, progressText, storedDisc, type DiscOffer } from './disc-store.js';
 import { ControlsPanel } from './controls.js';
 import { HostInput } from './input.js';
 import { Online, type OnlineState } from './netplay.js';
+import {
+  StatsTracker, copyText, describeMachine, overlayNotes, overlayRows, parsePeerStats, type OverlayContext,
+  type StatsSummary,
+} from './netstats.js';
 import { PackPanel, type PacksState } from './packs.js';
-import type { CacheReport, DiscSource, FromWorker, Pad, RunOptions, Status, ToWorker } from './protocol.js';
+import type { CacheReport, DiscSource, FromWorker, NetStatus, Pad, PaceState, RunOptions, Status, ToWorker } from './protocol.js';
 
 // The server's image in this browser's storage (P1): found there, or downloaded now.
 interface DownloadState {
@@ -86,6 +96,10 @@ interface PageState {
   audioProbe: () => { rms: number; peak: number } | null;
   net?: OnlineState;  // online play (E5, netplay.ts)
   packs?: PacksState; // roster packs (E6, packs.ts)
+  pace?: PaceState;   // Q5: the pace (pacer.ts), as the Worker reports it
+  overlay?: { shown: boolean; local: StatsSummary; peer: StatsSummary | null; text: string };  // Q5 (netstats.ts)
+  hint?: { shown: boolean; text: string; dismissed: boolean };  // Q5: the note for a machine that cannot keep up
+  autoScale?: { ceiling: number; steps: unknown[]; lastBusy: number | null };  // Q5: the Picture's Auto and the GPU
 }
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -132,6 +146,9 @@ const options: RunOptions = {
   hostSlow: Number(params.get('hostSlow') ?? 0) || undefined,
   hostSlowFrom: Number(params.get('hostSlowFrom') ?? 0) || 0,
   gpView: params.get('gpview') !== '0',
+  gpuLoad: Number(params.get('gpuLoad') ?? 0) || undefined,
+  gpuTimer: params.get('gpuTimer') !== '0',
+  paceMargin: Number(params.get('paceMargin') ?? 0) || undefined,
   discCache: {
     blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
     maxRun: Number(params.get('discRun') ?? 0) || undefined,
@@ -335,6 +352,7 @@ function onWorker(msg: FromWorker): void {
       if (msg.window.digest) state.digest = (state.digest ?? '') + msg.window.digest;
       const { digest: _d, ...win } = msg.window;
       state.stats = { status: msg.status, window: win };
+      onStats(msg.status, msg.window);
       const s = msg.status, w = msg.window;
       const perField = w.fields ? w.ms / w.fields : 0;
       const a = state.audio?.worklet;
@@ -363,7 +381,12 @@ function onWorker(msg: FromWorker): void {
       online?.send(msg.data);
       break;
     case 'net':
+      netStatus = msg.status;
       online?.engineStatus(msg.status, msg.windows, msg.diagnostic);
+      break;
+    case 'pace':  // Q5: for the other player, and the overlay
+      state.pace = msg.state;
+      online?.sendPace(msg.report, msg.state);
       break;
   }
 }
@@ -426,7 +449,8 @@ function startEngine(disc: DiscSource): void {
   }
   if (online && netplay) {
     online.onDatagram = (data) => send({ type: 'net-recv', data }, [data]);
-    online.whenOpen().then(() => send({ type: 'net-open' })).catch(() => {});
+    online.onPace = (report) => send({ type: 'pace-peer', report });  // Q5
+    online.whenOpen().then((delay) => send({ type: 'net-open', delay })).catch(() => {});
     window.addEventListener('pagehide', () => send({ type: 'net-quit' }));
   }
   input.poll();
@@ -451,6 +475,7 @@ picker.addEventListener('change', () => {
 // a software adapter stays at 1x. The choice is kept in this browser.
 const PICTURE_KEY = 'mvp.picture.v1';
 let sentScale = 0;
+const autoScale = new AutoScale();  // Q5: Auto's ceiling from the GPU's time
 let softwareAdapter = false;
 void (async () => {
   try {
@@ -478,6 +503,10 @@ function pictureScale(): number {
   const v = pictureSetting();
   if (v !== 'auto') return Number(v);
   if (softwareAdapter) return 1;
+  return Math.min(autoScale.ceiling, sizeScale());  // Q5: no higher than the GPU keeps up with
+}
+// Q1: Auto by the picture's size alone: at least as many pixels as the canvas shows, up to 3x.
+function sizeScale(): number {
   const dprNow = Math.min(window.devicePixelRatio || 1, 2);
   const h = canvas.clientHeight * dprNow;  // the picture's height on screen, in device pixels
   return Math.min(3, Math.max(1, Math.ceil(h / 448 - 0.1)));
@@ -500,6 +529,182 @@ if (pictureSel) {
     applyPicture();
     canvas.focus();
   });
+}
+
+// ---- Q5: the statistics overlay, the note for a slow machine, Auto and the GPU ----
+//
+// netstats.ts measures this side from the Worker's reports; online, the summary goes to the other player
+// once a second (a text message on the data channel) and theirs comes back. The overlay shows both, live,
+// over the picture (the Stats button or the ` key; off by default, the choice kept in this browser), and
+// Copy stats puts the same as text on the clipboard for a chat. Display only.
+const OVERLAY_KEY = 'mvp.overlay.v1';
+const overlayEl = $<HTMLElement>('overlay');
+const overlayBtn = $<HTMLButtonElement>('stats-toggle');
+const tracker = new StatsTracker();
+let netStatus: NetStatus | null = null;
+let peerStats: StatsSummary | null = null, peerStatsAt = 0;
+let lastStatsSent = 0;
+let gpuName: string | null = null;
+const isolated = (self as unknown as { crossOriginIsolated?: boolean }).crossOriginIsolated === true;
+
+function overlayWanted(): boolean {
+  if (params.get('stats') === '1') return true;
+  try {
+    return window.localStorage.getItem(OVERLAY_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+function showOverlay(on: boolean): void {
+  overlayEl.hidden = !on;
+  overlayBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  if (on) renderOverlay();
+}
+function toggleOverlay(): void {
+  const on = overlayEl.hidden !== false;
+  try {
+    window.localStorage.setItem(OVERLAY_KEY, on ? '1' : '0');
+  } catch {
+    // storage blocked: this visit only
+  }
+  showOverlay(on);
+}
+overlayBtn.addEventListener('click', toggleOverlay);
+showOverlay(overlayWanted());
+
+function overlayContext(): OverlayContext {
+  const local = tracker.summary(describeMachine(gpuName));
+  const n = netStatus;
+  return {
+    online: !!online?.state.player, player: online?.state.player ?? null, local, peer: peerStats,
+    peerAgeMs: peerStats ? performance.now() - peerStatsAt : null,
+    rttMs: n ? (n.rttRecent ?? n.rttAvg) : null, jitterMs: n?.rttJitter ?? null, delay: n ? n.delay : null,
+    pace: state.pace ?? null, isolated,
+  };
+}
+
+function renderOverlay(): void {
+  const c = overlayContext();
+  const table = $<HTMLTableElement>('overlay-table');
+  const head = c.online ? ['', `You (P${c.player})`, `P${c.player === 1 ? 2 : 1}`] : ['', 'This computer'];
+  const rows = overlayRows(c);
+  const tr = (cells: string[], th: boolean) => {
+    const r = document.createElement('tr');
+    cells.forEach((v, i) => {
+      const cell = document.createElement(th || i === 0 ? 'th' : 'td');
+      cell.textContent = v;
+      r.append(cell);
+    });
+    return r;
+  };
+  const thead = document.createElement('thead');
+  thead.append(tr(head, true));
+  const tbody = document.createElement('tbody');
+  for (const r of rows) tbody.append(tr(c.online ? [...r] : [r[0], r[1]], false));
+  table.replaceChildren(thead, tbody);
+  $<HTMLElement>('overlay-notes').textContent = overlayNotes(c).join(' ');
+  state.overlay = { shown: !overlayEl.hidden, local: c.local, peer: c.peer, text: copyText(c, new Date()) };
+}
+
+$<HTMLButtonElement>('overlay-copy').addEventListener('click', () => {
+  const text = copyText(overlayContext(), new Date());
+  const done = () => {
+    const el = $<HTMLElement>('overlay-copied');
+    el.hidden = false;
+    setTimeout(() => (el.hidden = true), 1500);
+  };
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done));
+  else fallbackCopy(text, done);
+});
+function fallbackCopy(text: string, done: () => void): void {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.append(ta);
+  ta.select();
+  try {
+    if (document.execCommand('copy')) done();
+  } finally {
+    ta.remove();
+  }
+}
+
+// The note for a machine that cannot keep up: once the game has run a while (not paused) below full speed
+// because of this computer (solo: slower than the game; online: this side sets a pace below full speed).
+// Dismissed, it stays away for this visit.
+const HINT_AFTER_MS = 15000, HINT_SPEED = 0.93, HINT_HOLD_MS = 5000;
+const hintBox = $<HTMLElement>('slow-hint');
+let hintDismissed = false, hintShownSince = 0, hintSlowSince = -1;
+$<HTMLButtonElement>('slow-hint-close').addEventListener('click', () => {
+  hintDismissed = true;
+  hintBox.hidden = true;
+  if (state.hint) state.hint.dismissed = true;
+});
+function updateSlowHint(local: StatsSummary): void {
+  if (hintDismissed || state.firstFrameMs === undefined || state.paused || tracker.seconds() < 2.5) return;
+  const now = performance.now();
+  if (now - state.startedAt - (state.firstFrameMs ?? 0) < HINT_AFTER_MS) return;
+  // Slow over the last seconds (the overlay's numbers, not one moment's pace), and because of this computer:
+  // solo when it could not run faster; online when it sets the pace (its proposal is the lower one).
+  const p = state.pace;
+  const online = !!p && !!online0?.state.player;
+  const speed = local.speed;
+  const ours = online ? !(p!.peerProp !== null && p!.peerProp < p!.prop) : local.cap !== null && local.cap < 1;
+  const slow = speed !== null && speed < HINT_SPEED && ours;
+  if (!slow) {
+    hintSlowSince = -1;
+    if (!hintBox.hidden && now - hintShownSince > 10000) hintBox.hidden = true;
+    return;
+  }
+  if (hintSlowSince < 0) hintSlowSince = now;
+  if (now - hintSlowSince < HINT_HOLD_MS && hintBox.hidden) return;  // a few seconds, not a heavy moment
+  const text = `This computer is running the game at ${speed!.toFixed(2)}× speed` +
+               (online ? ', so the online game runs at that pace for both players' : '') +
+               '. On a laptop, plugging in and choosing the Best performance power mode helps.';
+  $<HTMLElement>('slow-hint-text').textContent = text;
+  if (hintBox.hidden) hintShownSince = now;
+  hintBox.hidden = false;
+  state.hint = { shown: true, text, dismissed: false };
+}
+const online0 = online;
+
+function onStats(s: Status, w: { fields: number; ms: number; wallMs: number; cap?: number }): void {
+  const audioW = state.audio?.worklet;
+  tracker.push({
+    t: performance.now(), fields: s.fields, windowFields: w.fields, windowMs: w.ms, presentsNew: s.presents_new ?? null,
+    gpu: s.gpu ? { n: s.gpu.n, ms: s.gpu.ms } : null, cap: w.cap ?? null, scale: s.scale ?? null,
+    threaded: s.threaded ?? null, stalls: netStatus?.stalls ?? null, stallMs: netStatus?.stallMs ?? null,
+    underruns: audioW ? audioW.underruns : null, paused: state.paused,
+  });
+  gpuName ??= state.gfx?.ok ? state.gfx.message : null;
+  const local = tracker.summary(describeMachine(gpuName));
+  // Online: this side's numbers for the other player, once a second.
+  const now = performance.now();
+  if (online?.state.channel === 'open' && now - lastStatsSent >= 1000) {
+    lastStatsSent = now;
+    online.sendStats({ ...local, player: online.state.player ?? null } as unknown as Record<string, unknown>);
+  }
+  if (!overlayEl.hidden) renderOverlay();
+  updateSlowHint(local);
+  // Auto and the GPU: a ceiling for the picture's scale while the GPU cannot keep up.
+  // Only with the GPU's time from timestamp queries, and only for the Auto setting.
+  if (s.gpu?.timed && s.scale && pictureSetting() === 'auto' && !state.paused) {
+    const before = autoScale.ceiling;
+    autoScale.update(now, { n: s.gpu.n, ms: s.gpu.ms, dropped: s.gpu.dropped }, s.scale, sizeScale());
+    state.autoScale = { ceiling: autoScale.ceiling, steps: autoScale.steps, lastBusy: autoScale.lastBusy };
+    if (autoScale.ceiling !== before) {
+      log(`picture: Auto ${autoScale.ceiling < before ? 'lowered' : 'raised'} to at most ${autoScale.ceiling}x ` +
+          `(the GPU was busy ${(100 * (autoScale.lastBusy ?? 0)).toFixed(0)}% of the time at ${s.scale}x)`);
+      applyPicture();
+    }
+  }
+}
+if (online) {
+  online.onPeerStats = (m) => {
+    const p = parsePeerStats(m);
+    if (!p) return;
+    peerStats = p;
+    peerStatsAt = performance.now();
+  };
 }
 
 // ---- pause, fullscreen, sound ----
@@ -541,7 +746,8 @@ soundBtn.addEventListener('click', () => {
 window.addEventListener('keydown', (e) => {
   if (e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLButtonElement) return;
-  if (e.code === 'KeyF') toggleFullscreen();
+  if (e.code === 'Backquote') toggleOverlay();
+  else if (e.code === 'KeyF') toggleFullscreen();
   else if (e.code === 'KeyM' && audio && audio.info.state !== 'waiting-for-gesture' && audio.info.state !== 'starting')
     audio.setMuted(!audio.isMuted());
   else if (e.code === 'KeyP') {

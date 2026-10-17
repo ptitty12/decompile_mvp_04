@@ -191,3 +191,32 @@ TEST_CASE("a poll whose input is missing stops the run right there (E5c)") {
   CHECK(a.d.poll_stops == 1);
   rt::g_frame_polls = 0;
 }
+
+TEST_CASE("Q5: the input lead: negative on the side that waits, positive on the other") {
+  rt::Machine m;
+  rt::YieldingHooks ha(&m), hb(&m);
+  SimLink link({10, 0, 0.0, 0.0, 9});
+  Side a(link.end(0), 1, m, ha), b(link.end(1), 2, m, hb);
+  g_now = 0;
+  CHECK(a.d.lead_samples == 0);
+  CHECK(a.d.lead_ms() == 0.0);
+  while (g_now < 20000 && (a.polls < 200 || b.polls < 200)) {
+    if (a.polls < 200) a.step();                    // a runs whenever it may: it waits for b
+    if (b.polls < 200 && g_now % 16 == 0) b.step();  // b runs a frame every 16 ms
+    link.advance(1);
+    ++g_now;
+  }
+  REQUIRE(a.d.lead_samples > 150);
+  REQUIRE(b.d.lead_samples > 150);
+  // a wants each frame as soon as b has sampled its input, before that input has crossed the link:
+  // it waits for it every frame (up to the link's latency).
+  CHECK(a.d.lead_ms() < 0.0);
+  CHECK(a.d.lead_ms() > -40.0);
+  // b gets a's inputs (sampled as soon as a could run) long before it needs them: the delay's span
+  // (2 frames of 16 ms) less the latency, and more.
+  CHECK(b.d.lead_ms() > 10.0);
+  // The repeated poll after a stop is not a second sample, and neutral frames have none.
+  const std::uint64_t n = b.d.lead_samples;
+  CHECK(n <= b.polls - 2);
+  rt::g_frame_polls = 0;
+}

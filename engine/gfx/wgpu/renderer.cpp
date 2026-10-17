@@ -1,5 +1,7 @@
 #include "gfx/wgpu/renderer.h"
 
+#include "gfx/wgpu/gpu_timer.h"
+
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -384,6 +386,7 @@ void Renderer::begin_pass() {
   rp.colorAttachmentCount = 1;
   rp.colorAttachments = &ca;
   rp.depthStencilAttachment = &da;
+  if (timer_) rp.timestampWrites = timer_->pass();  // Q5: the GPU's time
   pass_ = encoder_.BeginRenderPass(&rp);
   pass_open_ = true;
   ++pass_serial_;
@@ -1024,6 +1027,7 @@ void Renderer::copy_to_texture(const EfbCopy& c) {
   wgpu::RenderPassDescriptor rp{};
   rp.colorAttachmentCount = 1;
   rp.colorAttachments = &ca;
+  if (timer_) rp.timestampWrites = timer_->pass();  // Q5
   wgpu::RenderPassEncoder pass = enc.BeginRenderPass(&rp);
   pass.SetPipeline(convert_pipe_);
   pass.SetBindGroup(0, bg);
@@ -1210,6 +1214,7 @@ const Renderer::Frame* Renderer::scanout() {
   wgpu::RenderPassDescriptor rp{};
   rp.colorAttachmentCount = 1;
   rp.colorAttachments = &ca;
+  if (timer_) rp.timestampWrites = timer_->pass();  // Q5
   wgpu::RenderPassEncoder pass = enc.BeginRenderPass(&rp);
   pass.SetPipeline(mix_pipe_);
   pass.SetBindGroup(0, bg);

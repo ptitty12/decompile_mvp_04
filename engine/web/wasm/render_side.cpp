@@ -22,6 +22,8 @@ EM_JS(int, mvp_js_send_frame, (const char* sel), {
 
 namespace mvp::web {
 
+bool g_gpu_timing = true;
+
 void XfbTap::efb_copy(const gfx::EfbCopy& c) {
   if (c.to_xfb) {
     ++copies;
@@ -48,6 +50,10 @@ void RenderSide::attach() {
   if (!gpu || !window || !mem_ || renderer_) return;
   renderer_ = std::make_unique<gfx::Renderer>(*gpu, mem_, mem_size_, static_cast<std::uint32_t>(scale_));
   renderer_->set_gp_memory(&gp_);
+  if (g_gpu_timing) {
+    timer_ = std::make_unique<gfx::GpuTimer>(*gpu);  // Q5: the GPU's time (off without timestamp queries)
+    if (timer_->on()) renderer_->set_timer(timer_.get());
+  }
   tap_.next = renderer_.get();
   digest_.next = &tap_;
   digest_.set_memory(mem_, mem_size_);
@@ -112,12 +118,22 @@ bool RenderSide::present(std::uint64_t frame_polls, double now_ms) {
     tap_.log += b;
   }
   copies_at_present_ = tap_.copies;
-  window->present(f->view, f->width, f->height);
+  const double t0 = emscripten_get_now();
+  gfx::GpuTimer* timer = timer_ && timer_->on() ? timer_.get() : nullptr;
+  // A pass still open (the render thread may present in the middle of a field) is submitted first,
+  // so the frame's timestamps are all written before they are read (the pass is only split in two).
+  if (timer) renderer_->flush();
+  if (gpu_load_) window->burn(f->view, f->width, f->height, gpu_load_, timer);  // Q5 (development)
+  window->present(f->view, f->width, f->height, timer);
+  if (timer) timer->end_frame();  // this frame's passes, timed on the GPU
   if (mvp_js_send_frame("#mvp-canvas")) window->reconfigure();
+  present_ms_ += emscripten_get_now() - t0;
   ++presents_;
+  if (f->serial != last_presented_) ++presents_new_;
   last_presented_ = f->serial;
   return true;
 }
+
 
 void RenderSide::set_scale(int s) {
   scale_ = s < 1 ? 1 : s > static_cast<int>(gfx::Renderer::kMaxScale) ? static_cast<int>(gfx::Renderer::kMaxScale) : s;
@@ -161,6 +177,17 @@ std::string RenderSide::status_json() const {
                   static_cast<unsigned long long>(gpu->errors()), static_cast<unsigned long long>(rs.copies_dropped),
                   static_cast<unsigned long long>(rs.copy_size_misses), static_cast<unsigned long long>(rs.copy_tall),
                   static_cast<unsigned long long>(renderer_->scan_stats().mixed), renderer_->scale());
+    s += b;
+    // Q5: frames shown; the GPU's time (frames timed, their GPU ms, passes timed, untimed and dropped, the
+    // last frame's ms), the host ms in present(), the development load.
+    const gfx::GpuTimer::Stats ts = timer_ ? timer_->stats() : gfx::GpuTimer::Stats{};
+    std::snprintf(b, sizeof b,
+                  ",\"presents_new\":%llu,\"gpu\":{\"timed\":%s,\"n\":%llu,\"ms\":%.1f,\"passes\":%llu,"
+                  "\"untimed\":%llu,\"dropped\":%llu,\"last\":%.2f,\"present_ms\":%.1f,\"load\":%d}",
+                  static_cast<unsigned long long>(presents_new_), timer_ && timer_->on() ? "true" : "false",
+                  static_cast<unsigned long long>(ts.frames), ts.ms, static_cast<unsigned long long>(ts.passes),
+                  static_cast<unsigned long long>(ts.untimed), static_cast<unsigned long long>(ts.dropped), ts.last_ms,
+                  present_ms_, gpu_load_);
     s += b;
     const auto& gs = gp_.stats();  // Q1: the GP's view of memory
     std::snprintf(b, sizeof b, ",\"gp_memory\":{\"flushes\":%llu,\"flushed_mb\":%.1f,\"overlays\":%llu,\"lines\":%llu,\"drops\":%llu}",
