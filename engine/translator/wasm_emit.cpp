@@ -271,6 +271,12 @@ class FuncGen {
   void fp_put_i64(u32 off, u32 local);   // ... from an i64 local
   void fp_reload(std::uint64_t halves);  // after rt.exec wrote them in memory
   void fpscr_ok();                       // pushes FPSCR[RN, NI] == (0, 1)
+  // Q4: an integer compare whose CR field only the conditional branch right
+  // after it reads (the field is dead after the branch): the compare sets no CR
+  // bits, the branch tests the operands (cond_expr). fuse_[k] marks the compare.
+  std::vector<bool> fuse_;
+  int fused_ = -1;  // the compare at the node before the one being emitted, when fused
+  void cr_liveness();
   int regloc_[reg::kCount];
 
   bool classify(std::string* error);
@@ -592,6 +598,95 @@ void FuncGen::dataflow() {
   }
 }
 
+// Q4: which CR fields are live after each node (8 bits, field f = bit f), and
+// so which integer compares can feed the next conditional branch directly.
+// Conservative: calls, returns, helpers, safe points and the MSR[FP] check read
+// every field; an instruction that changes CR in a way not listed here reads
+// and keeps them all.
+void FuncGen::cr_liveness() {
+  const std::size_t n = f_.insns.size();
+  constexpr unsigned kAll = 0xFF;
+  std::vector<unsigned> R(n + 1, 0), W(n + 1, 0), in(n + 1, 0), out(n + 1, 0);
+  R[n] = kAll;  // running off the end: the next function
+  for (std::size_t k = 0; k < n; ++k) {
+    if (!f_.reachable[k]) continue;
+    const Node& N = nodes_[k];
+    const InsnInfo& x = f_.insns[k];
+    const Insn i{x.word};
+    unsigned r = 0, w = 0;
+    switch (N.kind) {
+      case kJump: case kNop: case kMemH: case kJTab: break;
+      case kCJump:
+        if (!(i.bo() & 16)) r = 1u << (i.bi() >> 2);
+        break;
+      case kInline: case kFp: {
+        const Op o = x.op;
+        if (o == Op::cmp || o == Op::cmpi || o == Op::cmpl || o == Op::cmpli || o == Op::fcmpu || o == Op::fcmpo ||
+            o == Op::ps_cmpu0 || o == Op::ps_cmpo0 || o == Op::ps_cmpu1 || o == Op::ps_cmpo1) {
+          w = 1u << i.crfD();
+        } else if (o == Op::mtcrf) {
+          for (u32 f = 0; f < 8; ++f)
+            if (i.crm() & (0x80u >> f)) w |= 1u << f;
+        } else if (o == Op::mcrf) {
+          r = 1u << i.crfS();
+          w = 1u << i.crfD();
+        } else if (N.R & ppc::bit(reg::CR)) {
+          r = kAll;  // mfcr, the CR logical ops, ...
+        } else if (N.W & ppc::bit(reg::CR)) {
+          const bool int_rc = o == Op::andi_rc || o == Op::andis_rc || o == Op::addic_rc ||
+                              (N.kind == kInline && i.rc() && o != Op::addi && o != Op::addis);
+          if (int_rc && N.kind == kInline) w = 1u;  // CR0 of a record form
+          else r = kAll;
+        }
+        break;
+      }
+      default: r = kAll; break;  // calls, returns, rt.exec, sc, traps, ...
+    }
+    if (N.pre != pNone || N.fpchk) r = kAll;  // an interrupt or the FPU exception sees CR
+    R[k] = r;
+    W[k] = w & ~r;
+  }
+  auto each_succ = [&](const Node& N, auto&& fn) {
+    if (N.s0 >= 0) fn(N.s0);
+    if (N.s1 >= 0) fn(N.s1);
+    if (N.jt >= 0)
+      for (int s : jt_succ_[static_cast<std::size_t>(N.jt)]) fn(s);
+  };
+  in[n] = kAll;
+  for (bool changed = true; changed;) {
+    changed = false;
+    for (std::size_t k = n; k-- > 0;) {
+      if (!f_.reachable[k]) continue;
+      unsigned o = 0;
+      each_succ(nodes_[k], [&](int s) { o |= in[static_cast<std::size_t>(s)]; });
+      const unsigned v = (o & ~W[k]) | R[k];
+      if (v != in[k] || o != out[k]) changed = true;
+      in[k] = v;
+      out[k] = o;
+    }
+  }
+  fuse_.assign(n, false);
+  for (std::size_t k = 0; k + 1 < n; ++k) {
+    if (!f_.reachable[k] || !f_.reachable[k + 1]) continue;
+    const Node& N = nodes_[k];
+    const Node& B = nodes_[k + 1];
+    const InsnInfo& x = f_.insns[k];
+    const InsnInfo& y = f_.insns[k + 1];
+    const Op o = x.op;
+    if (N.kind != kInline || !(o == Op::cmp || o == Op::cmpi || o == Op::cmpl || o == Op::cmpli)) continue;
+    if (N.pre != pNone || B.pre != pNone || B.fpchk) continue;
+    if (seg_at_[k + 1] != seg_at_[k]) continue;  // a label: other paths reach the branch
+    const Insn bi{y.word};
+    const bool uses_cond = B.kind == kCJump || (B.cond && (B.kind == kCall || B.kind == kTail || B.kind == kRet ||
+                                                           B.kind == kIJump));
+    if (!uses_cond || y.op == Op::b) continue;
+    if (!(bi.bo() & 4) || (bi.bo() & 16)) continue;  // CTR counted, or no CR test
+    const u32 f = Insn{x.word}.crfD();
+    if ((bi.bi() >> 2) != f || (out[k + 1] >> f & 1)) continue;
+    fuse_[k] = true;
+  }
+}
+
 void FuncGen::flush(RegSet s) {
   for (int r = 0; r < reg::kCount; ++r) {
     if (!(s & ppc::bit(r)) || regloc_[r] < 0) continue;
@@ -651,6 +746,24 @@ void FuncGen::cond_expr(const InsnInfo& x) {
   Insn i{x.word};
   if (x.op == Op::b) {
     body_->i32c(1);
+    return;
+  }
+  if (fused_ >= 0) {  // Q4: the compare before this branch, tested directly
+    const InsnInfo& cx = f_.insns[static_cast<std::size_t>(fused_)];
+    const Insn ci{cx.word};
+    fused_ = -1;
+    const bool sgn = cx.op == Op::cmp || cx.op == Op::cmpi;
+    const u32 bit = i.bi() & 3;  // LT GT EQ SO
+    if (bit == 3) {
+      reg_get(reg::SO);
+    } else {
+      reg_get(static_cast<int>(ci.rA()));
+      if (cx.op == Op::cmp || cx.op == Op::cmpl) reg_get(static_cast<int>(ci.rB()));
+      else body_->i32c(cx.op == Op::cmpi ? static_cast<u32>(ci.simm()) : ci.uimm());
+      body_->op(bit == 0 ? (sgn ? op::i32_lt_s : op::i32_lt_u)
+                         : bit == 1 ? (sgn ? op::i32_gt_s : op::i32_gt_u) : op::i32_eq);
+    }
+    if (!((i.bo() >> 3) & 1)) body_->op(op::i32_eqz);
     return;
   }
   u32 bo = i.bo();
@@ -2212,6 +2325,10 @@ void FuncGen::emit_node(std::size_t k) {
     case kInline:
       ++ctx_.out->stats.inline_insns;
       if (ctx_.opt.precise_io && N.mem) flush(D);
+      if (fuse_[k]) {  // Q4: the next node's branch tests it
+        fused_ = static_cast<int>(k);
+        return;
+      }
       emit_inline(x);
       return;
     case kFp:
@@ -2520,6 +2637,7 @@ bool FuncGen::run(Fn& body, std::string* error) {
       if (f_.reachable[k] && is_fpu(k) && !(known_in[k] && nodes_[k].pre == pNone)) nodes_[k].fpchk = true;
   }
   dataflow();
+  cr_liveness();
   dispatch_ = has_resume_ || mode_ == Mode::Body || !f_.tables.empty();
   for (std::size_t k = 0; k < n && !dispatch_; ++k) {
     if (!f_.reachable[k]) continue;
