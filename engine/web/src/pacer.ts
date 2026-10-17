@@ -81,7 +81,7 @@ export const DEFAULT_PACER: PacerOptions = {
   margin: 0.98, step: 0.01, raiseAfterMs: 500, raiseSteps: 2, windowFields: 15, attackFields: 30, releaseFields: 30,
   phaseGain: 0.6, slew: 0.03, staleMs: 2000, minPace: 0.25,
   roles: 1, boost: 1.15, roleMargin: 0.03, roleHoldMs: 500, trimGain: 3e-4, trimMax: 0.04,
-  followEarlyMs: 12, decide: 1,
+  followEarlyMs: 0, decide: 1,
 };
 
 /** One step of the pacing: the pace to run at and how far to move the schedule. */

@@ -314,14 +314,27 @@ test('roles: the clearly slower side sets the pace and runs free; the other foll
   assert.equal(sb.shiftMs, 0);
   assert.equal(sa.sched, 0.695);  // the setter's capacity, as it reports it
   assert.equal(sa.rate, 0.68);    // the pace the overlay and the sound go by: as before
-  // The follower corrects the whole lead difference itself, and trims its pace by it. It aims to
-  // run 12 ms earlier than the setter; its lead is 40 ms smaller (it runs 20 ms early): 8 ms more
-  // than it aims to, so it moves later and runs a little slower.
+  // The follower corrects the whole lead difference itself, and trims its pace by it: its lead is
+  // 40 ms smaller (it runs 20 ms early), so it moves later and runs a little slower.
   a.onPeer({ ...b.report(50), n: 99 }, 1600);
   const st = a.tick(1750, 10);
-  assert.ok(Math.abs(st.shiftMs - 8 * 2 * 0.6 * 0.25) < 1e-9, `shift ${st.shiftMs}`);
-  assert.ok(Math.abs(a.trim + 3e-4 * 8 * 0.25) < 1e-12, `trim ${a.trim}`);
-  assert.ok(Math.abs(st.sched - 0.695 * (1 - 3e-4 * 8 * 0.25)) < 1e-12, `sched ${st.sched}`);
+  assert.ok(Math.abs(st.shiftMs - 20 * 2 * 0.6 * 0.25) < 1e-9, `shift ${st.shiftMs}`);
+  assert.ok(Math.abs(a.trim + 3e-4 * 20 * 0.25) < 1e-12, `trim ${a.trim}`);
+  assert.ok(Math.abs(st.sched - 0.695 * (1 - 3e-4 * 20 * 0.25)) < 1e-12, `sched ${st.sched}`);
+  // followEarlyMs (development): it aims to run that much earlier than the setter.
+  const early = new Pacer({ followEarlyMs: 12 }), setter = new Pacer({ decide: 0 });
+  for (let k = 0; k < 300; ++k) {
+    early.noteWork(1, 11);
+    setter.noteWork(1, 24);
+  }
+  setter.tick(0, null);  // its proposal: below full speed
+  let sf;
+  for (let t = 0; t <= 1500; t += 250) {
+    early.onPeer({ ...setter.report(50), n: t + 1 }, t);
+    sf = early.tick(t, 10);
+  }
+  assert.equal(early.role, -1);
+  assert.ok(Math.abs(sf.shiftMs - 8 * 2 * 0.6 * 0.25) < 1e-9, `shift ${sf.shiftMs}`);
   // Close capacities: no roles (both alike, as in Q5); and none at full speed.
   const c = new Pacer(), d = new Pacer();
   for (let k = 0; k < 300; ++k) {
