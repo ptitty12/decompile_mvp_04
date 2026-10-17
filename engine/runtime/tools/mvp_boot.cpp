@@ -35,7 +35,9 @@
 //                       memory (hex, at most 256 bytes each) at the end of the
 //                       run (for investigations). --time-at prints (on stderr)
 //                       the host seconds spent in the run when the polls of the
-//                       listed frames come (Q4: the cost of a stretch of play).
+//                       listed frames come (Q4: the cost of a stretch of play),
+//                       and under Node the main thread's CPU seconds too (the
+//                       cost on a busy machine).
 //
 // Needs the disc (MVP_DISC) and a build with the translated code. Prints register
 // values, names and addresses only; the log stays under build/ (only its hash may
@@ -47,6 +49,10 @@
 #include <map>
 #include <string>
 #include <vector>
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "audio/mixer.h"
 #include "audio/wav.h"
@@ -157,12 +163,26 @@ struct FrameTrace {
 };
 FrameTrace* g_frames = nullptr;
 
+// Q4: the calling thread's CPU seconds where the host reports them (Node), else -1.
+double thread_cpu_seconds() {
+#ifdef __EMSCRIPTEN__
+  return EM_ASM_DOUBLE({
+    if (typeof process == 'undefined' || !process.threadCpuUsage) return -1;
+    var u = process.threadCpuUsage();
+    return (u.user + u.system) / 1e6;
+  });
+#else
+  return -1;
+#endif
+}
+
 void frame_hook(ppc::Cpu& c, std::uint64_t frame) {
   FrameTrace& f = *g_frames;
   if (frame >= f.stop_at) throw StopRun{"ran " + std::to_string(f.stop_at) + " frames (--frames)"};
   if (std::find(f.time_at.begin(), f.time_at.end(), frame) != f.time_at.end())
-    std::fprintf(stderr, "time-at frame %llu: %.3f s\n", static_cast<unsigned long long>(frame),
-                 std::chrono::duration<double>(std::chrono::steady_clock::now() - f.start).count());
+    std::fprintf(stderr, "time-at frame %llu: %.3f s, thread cpu %.3f s\n", static_cast<unsigned long long>(frame),
+                 std::chrono::duration<double>(std::chrono::steady_clock::now() - f.start).count(),
+                 thread_cpu_seconds());
   char b[160];
   int n = std::snprintf(b, sizeof b, "frame %llu tb %llu calls %llu in ", static_cast<unsigned long long>(frame),
                         static_cast<unsigned long long>(f.hooks->time_base(c)),
@@ -439,6 +459,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   // stderr: host time differs between runs; the reports on stdout must not (local_boot_twice).
   std::fprintf(stderr, "host: %.3f s in rt::run, %.0f million guest instructions executed per second\n", run_seconds,
                run_seconds > 0 ? static_cast<double>(m.cpu().ticks - hooks.idle_ticks_skipped) / run_seconds / 1e6 : 0.0);
+  if (const double cpu = thread_cpu_seconds(); cpu >= 0) std::fprintf(stderr, "thread cpu: %.3f s\n", cpu);
   std::printf("clock: %llu instructions, time base %llu (%.3f s of guest time), %llu VI fields\n", ull(m.cpu().ticks),
               ull(hooks.time_base(m.cpu())), static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0,
               ull(hw.vi_fields()));
