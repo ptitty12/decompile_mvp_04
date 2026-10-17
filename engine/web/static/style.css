@@ -38,6 +38,11 @@ h1 span { color: var(--muted); font-weight: normal; font-size: 0.95rem; margin-l
 .error { background: var(--error-bg); color: var(--error-fg); padding: 0.6rem 0.8rem; border-radius: 6px; }
 progress { display: block; width: 100%; max-width: 960px; height: 6px; margin: 0 0 0.5rem; accent-color: var(--accent); }
 #stage { max-width: 960px; background: var(--screen); border-radius: 4px; position: relative; }
+.mod-banner { position: absolute; left: 50%; top: 12%; transform: translateX(-50%); max-width: 90%;
+  padding: 0.4rem 0.9rem; border-radius: 6px; background: rgba(0, 0, 0, 0.72); color: #fff;
+  font-weight: 600; text-align: center; pointer-events: none; }
+.mod-row { display: block; margin: 0.35rem 0; }
+.mod-title { font-weight: 600; }
 canvas { display: block; width: 100%; aspect-ratio: 4 / 3; background: var(--screen); border-radius: 4px; outline: none; }
 #stage:fullscreen { max-width: none; width: 100vw; height: 100vh; border-radius: 0;
   display: flex; align-items: center; justify-content: center; }

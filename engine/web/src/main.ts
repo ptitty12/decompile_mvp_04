@@ -44,6 +44,7 @@
 import { AudioOut, type AudioState } from './audio.js';
 import { AutoScale } from './autoscale.js';
 import { findServerDisc } from './disc.js';
+import { ModsPanel } from './mods-panel.js';
 import { DownloadError, canStore, downloadDisc, progressText, storedDisc, type DiscOffer } from './disc-store.js';
 import { ControlsPanel } from './controls.js';
 import { HostInput } from './input.js';
@@ -124,6 +125,9 @@ const streamBox = $<HTMLElement>('stream-box');
 const playBtn = $<HTMLButtonElement>('play');
 
 const params = new URLSearchParams(location.search);
+// Gameplay mods (docs/mods/): the panel's ABS challenge settings, or mod= in the address.
+const modsPanel = new ModsPanel(document.getElementById('mods'), document.getElementById('mod-banner'),
+                                document.getElementById('mods-summary'), params.getAll('mod'));
 const options: RunOptions = {
   script: params.get('script') ?? '',
   stopFields: Number(params.get('fields') ?? 0) || 0,
@@ -337,6 +341,10 @@ function onWorker(msg: FromWorker): void {
     case 'audio':
       state.audioAttachedAtField = msg.attachedAtField;
       break;
+    case 'mod':
+      for (const line of msg.log) log(line);
+      modsPanel.show(msg.phase, msg.notify);
+      break;
     case 'gfx':
       state.gfx = { ok: msg.ok, message: msg.message };
       log(`WebGPU: ${msg.ok ? 'ready on ' : ''}${msg.message}`, !msg.ok);
@@ -443,6 +451,9 @@ function startEngine(disc: DiscSource): void {
   if (frames) transfer.unshift(frames);
   options.scale = pictureScale();
   sentScale = options.scale;
+  options.mods = modsPanel.specs();
+  if (params.has('modSeed')) options.modSeed = Number(params.get('modSeed'));
+  modsPanel.lock();
   send({ type: 'start', disc, canvas: off, width, height, options: { ...options, netplay, packs },
          vsync: vsync ? (vsync.buffer as SharedArrayBuffer) : undefined, frames }, transfer);
   if (pendingAudioPort) {

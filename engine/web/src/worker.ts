@@ -42,6 +42,7 @@ const MAX_PREFETCH = 2;          // read-ahead requests in flight (server image)
 
 let M: MvpEngine | null = null;
 let mt = false;  // the threaded engine (P2)
+let modsOn = false, modPhase = 'live';  // gameplay mods (mvp_mod_status)
 let vsync: SharedArrayBuffer | null = null;  // the page's display refreshes (P2), for the render thread
 let frames: MessagePort | null = null;       // P2: the page shows the frames sent here (instead of a canvas)
 let opts: RunOptions | null = null;
@@ -351,7 +352,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
 
   let t = performance.now();
   post({ type: 'progress', text: 'Loading the engine', step: 0, steps: 0 });
-  M = await loadEngine(options.threads !== false, {
+  M = await loadEngine(options.threads !== false && !options.mods?.length, {  // mods: single-threaded
     print: (text) => post({ type: 'log', text, error: false }),
     printErr: (text) => post({ type: 'log', text, error: true }),
   });
@@ -464,6 +465,17 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
   if (options.ioLog) M._mvp_io_log_enable();
   if (options.gpView === false) M._mvp_gp_view(0);  // Q1 (development): no data-cache model for the renderer
   if (options.inputLog) M._mvp_input_log_enable();
+  for (const spec of options.mods ?? []) {
+    if (!withBytes(new TextEncoder().encode(spec + '\0'), (p) => M!._mvp_mod_enable(p))) {
+      post({ type: 'error', stage: 'mods', message: `${spec}: ${cstr(M._mvp_last_error())}` });
+      return;
+    }
+  }
+  if (options.mods?.length) {
+    modsOn = true;
+    M._mvp_mod_seed(options.modSeed ?? crypto.getRandomValues(new Uint32Array(1))[0]);
+    post({ type: 'log', text: `mods: ${cstr(M._mvp_mod_settings())}`, error: false });
+  }
   const script = new TextEncoder().encode(options.script);
   const ok = withBytes(script, (p, n) => M!._mvp_boot(p, options.script ? n : 0, options.stopFields,
                                                       options.stopFrames));
@@ -503,6 +515,13 @@ function afterRun(ran: number, ms: number): boolean {
   }
   pumpAudio();
   pumpDisc();
+  if (modsOn) {
+    const st = JSON.parse(cstr(M!._mvp_mod_status())) as { phase: string; log: string[]; notify: string[] };
+    if (st.phase !== modPhase || st.log.length || st.notify.length) {
+      modPhase = st.phase;
+      post({ type: 'mod', phase: st.phase, log: st.log, notify: st.notify });
+    }
+  }
   // Q5: a batch that made no new field (an online game waiting at a frame poll for the other
   // player's input) shows nothing new: it ends without presenting the same picture again.
   const shown = ran > 0 || !firstFrame ? M!._mvp_present() : (M!._mvp_batch_end(), 0);
