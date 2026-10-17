@@ -9,8 +9,8 @@ An optional gameplay mod for the browser engine: one toggle that
    ball within a short window (ABS style: 2 per team, kept when the challenge succeeds),
 4. cuts to a replay of the pitch with the circle shown, then upholds or overturns the call.
 
-This is a design document. Nothing here changes gameplay code, the translator or the
-runtime. Written 2026-10-17 against `main` at `0bfab3ac` by `claude-side-abs`.
+Written 2026-10-17 by `claude-side-abs`: the design (§1-§12) against `main` at `0bfab3ac`,
+then the native implementation (§0). No decomp source changes.
 
 **Owner decision (2026-10-17):** the replay uses route B, rewinding with engine save states
 (§7). It is recorded here as a proposed DECISIONS entry (§12), because only the lead edits
@@ -26,6 +26,37 @@ Names stay `fn_`/`lbl_` placeholders. The roles given here are claims with their
 not renames.
 
 ---
+
+## 0. Implementation status (2026-10-17)
+
+Stages S1-S4 run natively in `mvp-play`; the browser (S5) and netplay (S6) are not done.
+
+| Stage | State | Evidence |
+|---|---|---|
+| S1 hook API core, hide the circle | **Done (native)** | Mod off: the guest line after 12,000 frames equals a build without the sites (84,818,557,199 instructions, MEM1 `c1bccfad...`). Mod on: at frame 7062 the circle is gone and the rest of the frame is identical (captures, §3.10 setup) |
+| S2 umpire model | **Done; calibration provisional** | Calls rewritten at `fn_801BB338`; misses reproduce an independent model of the RNG exactly. The edge constants come from 12 called pitches so far; a CPU-vs-CPU calibration run is pending |
+| S3 save states | **Done (native)** | `mvp-play --rewind-test`: poll 3000 -> 3300 (menus) and 8000 -> 8900 (in play) replay to identical guest lines. Snapshot 7-8 ms, restore 2.6-6 ms native |
+| S4 challenge and review | **Done (native)** | See below |
+| S5 browser, S6 netplay, S7 polish | Not started | |
+
+**S4 test runs** (miss 30, edge 0, seed 1, P1 batting and never swinging):
+- **Upheld.** A correct called strike (frame 6063) was challenged. The re-run ended with a
+  MEM1 hash identical to live play, so the whole rewind is deterministic. One challenge left.
+- **Overturned.** A ball (x = 1.46) called strike three (frame 7036) was challenged:
+  - the replay shows the circle outside the zone under "STRIKEOUT!";
+  - the re-run made the call a ball;
+  - the plate appearance continued, and both challenges were kept.
+
+**Code:**
+- `engine/runtime/mod_hooks.{h,cpp}`: the site registry.
+- `engine/runtime/save_state.{h,cpp}`: save states, with snapshot hooks in `Machine`,
+  `Hardware`, `SystemHooks` and `YieldingHooks`.
+- `rt::g_poll_gate` in `hle`.
+- `engine/mods/gameplay/`: `api.h`, `host`, `timeline`, `abs`, plus `tests/test_gameplay.cpp`.
+- `mvp-play` options:
+  - `--mod abs[:k=v,...]` and `--mod-seed`;
+  - `--capture-review DIR`;
+  - `--rewind-test F:N`.
 
 ## 1. Verdict
 
@@ -53,20 +84,26 @@ The game also ships **its own umpire-error machinery** (§3.8):
 None of it gives a challenge or a replay, and the variable zone has no rate control. So the
 mod brings its own miss model and can optionally reuse the game's zone as the "umpire" (§4.1).
 
-## 2. Settings (proposed)
+## 2. Settings
 
-All are match settings: they join the netplay handshake (§5.6).
+All are match settings: they join the netplay handshake (§5.6). As built, `mvp-play`
+takes them as `--mod abs:key=value,...`, for example `--mod abs:miss=20,edge=0`.
 
 | Key | Values | Default | Notes |
 |---|---|---|---|
-| `abs` | off / on | off | The toggle; everything below needs it |
-| `abs.miss` | 0-30 % of called pitches | 8 (playtest) | The owner floated 20 %. With edge focus the rate is the *mean* over called pitches (calibrated in S2) |
-| `abs.edge` | 0 (uniform) to 4 (edges only) | 3 | 0 gives the owner's flat model; higher values concentrate misses near the boundary (§4.1) |
-| `abs.umpire` | engine / game | engine | `game` uses the game's own variable zone (§3.8) as the umpire, and the slider is ignored |
-| `abs.challenges` | 0-5 per team | 2 | Kept when successful |
-| `abs.window` | 0.5-3.0 s of game time | 1.5 | Must close before the next pitch begins (about 1.7 s after the call, T: §3.10) |
-| `abs.replay` | 1.0x / 0.5x | 0.5x | Presentation speed only, not game state |
-| `abs.cpu` | off / on | off | Lets the CPU side challenge in games against the CPU (S7) |
+| (enabled) | `--mod abs` | off | The toggle |
+| `hide` | 0 / 1 | 1 | Hide the post-pitch circle in play (shown in reviews) |
+| `miss` | 0-30 % of called pitches | 8 | The owner floated 20 %. With edge weighting it is the *mean* over called pitches (§4.1) |
+| `edge` | 0 (uniform) to 4 (edges only) | 3 | 0 gives the owner's flat model |
+| `umpire` | 0 engine / 1 game | 0 | 1 uses the game's own variable zone (§3.8) as the umpire; `miss` and `edge` are then unused |
+| `challenges` | 0-5 per team | 2 | Kept when the call is overturned |
+| `window` | 30-180 ticks (1/60 s of game time) | 90 | Must close before the next pitch begins (about 1.7 s after the call, T: §3.10) |
+| `pre` | 0-60 frame polls | 15 | Replay lead-in before the release |
+| `post` | 15-120 frame polls | 45 | How long the replay holds after the call |
+
+Planned, not built:
+- a replay speed (presentation only);
+- CPU challenges in games against the CPU (S7).
 
 ## 3. Code map (retail `main.dol`, GV4E69 rev 0)
 
@@ -334,41 +371,51 @@ fields for every called pitch in runs B, C and E (10 pitches).
 ### 4.1 Truth and the umpire model
 
 **Truth** is the game's rulebook test, `|x| <= 1 && |y| <= 1` on the location of §3.3, which
-is exactly what ABS means. The **umpire's call** is computed in an after-hook on
-`fn_801BBC9C`:
+is exactly what ABS means.
+
+**The umpire's call** is rewritten in a before-hook on `fn_801BB338`, the function
+`fn_801BB1E0` calls right after the decision (as built, `engine/mods/gameplay/abs.cpp`):
+- `fn_801BB338` has exactly one caller (`0x801BB258`).
+- It is entered with the game's call in r5. `fn_801BB1E0` keeps that call in its stack slot
+  `r1+8` and reads it again after the swing test (`0x801BB244`, `0x801BB270`, V).
 
 ```
-on fn_801BBC9C(A, out):                      # Replace-hook that calls the original
-  p = r4;  call_original()                   # the game's own call, PRNG draws included
-  if mod off or presenting: return
-  swing = word(T->m3A4 + 0x28C + 4) in {1,2,4,6,7}     # = fn_801D0294
+on fn_801BB338(A, flag, r):                  # before its first instruction
+  swing = word(T->m3A4 + 0x28C + 4) in {1,2,4,6,7}     # = fn_801D0294, T = A+0x10
   if swing: return                           # swinging strikes are not umpire calls
   truth = |x| <= 1 && |y| <= 1               # x, y = (T->m3B0)->m4 + 0x28 / +0x2C
-  if abs.umpire == game: call = *p           # the game's variable zone, if enabled
+  if abs.umpire == game: call = r5           # the game's own call (its variable zone, if on)
   else:
     d = max(|x|, |y|) - 1                    # signed L-inf distance to the boundary
-    call = truth XOR (rng(STREAM_UMP) < P_miss(|d|))
-  if forced_call != none: call = forced_call # review re-run (§7.2)
-  *p = call; record {frame, x, y, truth, call} in mod state
+    call = truth XOR (rng(0) < P_miss(|d|))
+  if a review is re-running: call = its verdict          # §7.2 (the draw still happens)
+  r5 = call; [r1+8] = call; record {frame, x, y, truth, call} in mod state
 ```
 
 **The miss probability** is `P_miss(|d|) = min(1, k * w(|d|))`:
 - `w = exp(-|d|/sigma)`, with sigma from `abs.edge`; edge 0 gives w = 1, the owner's flat
   model.
 - `k` is calibrated per sigma so that the mean of `P_miss` over called pitches equals
-  `abs.miss`. S2 measures it from the traced locations of CPU-vs-CPU called pitches.
+  `abs.miss`, using the locations of called pitches in traced games.
 - One unit of x is half the zone width and one unit of y half the zone height, so "near the
   edge" scales with the batter's zone.
-- **It is computed in integers:** `w` is a 256-entry table of 16-bit fixed-point values,
-  compared against a 32-bit RNG draw. That avoids libm `exp`, whose last bits differ
-  between the native and wasm builds.
+- **It is computed in integers:**
+  - `w` is a 256-entry Q16 table built by repeated Q32 multiplication with
+    `exp(-1/(256 sigma))`, compared against a 32-bit RNG draw.
+  - That avoids libm `exp`, whose last bits differ between the native and wasm builds.
+  - The location arithmetic is exact in double.
 
-**Why an after-hook rather than a replacement:**
-- The original still draws from the gameplay PRNG when the variable zone is on, so the
-  game's random stream is unchanged up to the first call that differs.
-- `fn_801BB338` and the strike/ball handlers then see the umpire's call exactly as if the
-  game had made it, including strikeouts, walks and the dropped-third-strike rule.
-- `B->m20` is left as the original set it. No reader outside the umpire was found (U4).
+**Why a before-hook on the callee rather than wrapping `fn_801BBC9C`:**
+- **Unwinds.** A guest thread switch inside a hooked function unwinds the host frames
+  (runtime/native.h). Code placed after `call_original` in a replace-hook would then be
+  skipped for that pitch. A before-hook never calls the original, so nothing can be skipped.
+- **The game's random stream.** The game still makes its own decision first, drawing from the
+  gameplay PRNG when the variable zone is on. So the game's random stream is unchanged up to
+  the first call that differs.
+- **The game sees the call as its own.** `fn_801BB338` and the strike/ball handlers see the
+  umpire's call exactly as if the game had made it, including strikeouts, walks and the
+  dropped-third-strike rule.
+- **`B->m20`** is left as the game set it. No reader outside the umpire was found (U4).
 
 ### 4.2 Hiding the circle
 
@@ -452,8 +499,9 @@ It is not game state.
 - The engine ships a registry of hook sites, `engine/mods/sites.h` (proposed). Each entry
   has a retail address, kind (`before` | `replace`), a label (the decomp name, informative
   only) and the API version that introduced it.
-- The translator emits an HLE-style stub at each site. It reuses the existing mechanism with
-  appended `HleEntry`s that point at one dispatcher, `mod_site(Cpu&, GuestFn original)`.
+- The translator emits an HLE-style stub at each site. It reuses the existing mechanism:
+  `hle_table()` appends one Before entry per registry site, each calling the handler bound
+  there (`runtime/mod_hooks.{h,cpp}`).
 - The registry is part of the engine build, so the build id covers it and translated-code
   caches stay valid.
 - **With no mod bound,** a replace site calls `original` and a before site returns: one host
@@ -471,11 +519,14 @@ It is not game state.
 
 | Address | Kind | Use |
 |---|---|---|
-| `0x801BBC9C` | replace (after) | the umpire's call (§4.1) |
+| `0x801BB338` | before | the umpire's call: rewrite r5 and the caller's `r1+8` (§4.1) |
 | `0x802F893C` | before | hide the circle: `hud+0x90 = 0` (§4.2) |
 | `0x801BAFA4` | before | new pitch: request snapshot S_P |
 | `0x801896E8` | before | release: record R |
-| `0x802321BC` | before | (optional) events 0x59/0x5A, about 1 s before release: re-take S_P after a long pitch selection (§7.2) |
+
+v1 needs only before sites, so no mod code runs "after" the original (see §4.1 on unwinds).
+`0x802321BC` (events 0x59/0x5A, about 1 s before release) is a candidate for re-taking S_P
+after a long pitch selection (§7.2); it is not in the registry yet.
 
 **Third-party code mods** bind only registry sites in v1. A site is added by an engine minor
 release. v2 can add **runtime binding of any function**. The translator would emit a
@@ -486,49 +537,43 @@ call overhead even when unused, so it should be measured before it is promised.
 **Binding is by address.** The label is decoration: a manifest that names a decomp symbol
 but no address is rejected.
 
-### 5.3 Host API (sketch, `engine/mods/hook_api.h`, version 1.0)
+### 5.3 Host API (as built: `engine/mods/gameplay/api.h`, version 1.0)
 
-```cpp
-namespace mvp::mod::v1 {
-constexpr u32 kApiVersion = 0x0001'0000;          // major.minor
+**A mod implements `mods::Mod`:**
+- `info()`: id, name, version, the registry sites it binds, typed settings and the size of
+  its state block.
+- `start(Host&)`: once, when the match starts.
+- `site(Host&, Cpu&, address)`: at a bound site, before the function's first instruction.
+- `frame(Host&, Cpu&)`: at every frame poll, after the poll's input was consumed.
+- `review_done(Host&, Cpu&, const Review&)`: when a review it requested has finished.
 
-struct Call {                                     // one intercepted call
-  u32  site() const;                              // retail address
-  u32  gpr(int n) const;  void set_gpr(int n, u32);   // r3..r10 args, r3 result
-  f64  fpr(int n) const;  void set_fpr(int n, f64);   // f1..f8
-  u32  lr() const;
-  void call_original();                           // replace sites only; runs the retail body now
-};
+**The engine gives it `mods::Host`:**
 
-struct Host {                                     // services, valid during callbacks
-  // guest memory: MEM1 (0x80000000/0xC0000000 views) and the VM region only; MMIO and
-  // unmapped addresses fail the mod (it is unloaded and the match stops with a reason)
-  u8  r8(u32 ea);  u16 r16(u32 ea);  u32 r32(u32 ea);  f32 rf32(u32 ea);  f64 rf64(u32 ea);
-  void w8(u32 ea, u8);  void w16(u32 ea, u16);  void w32(u32 ea, u32);  void wf32(u32 ea, f32);
-  // deterministic randomness: per-mod streams seeded from the match seed (5.5)
-  u32 rng_u32(u32 stream);
-  // settings declared in the manifest, already validated and canonical (5.6)
-  i32 setting_i(const char* key);  bool setting_b(const char* key);
-  // timeline
-  u64 frame_poll();  u32 game_tick();  const FrameInput& input(u64 poll);   // ring, >= 1024 polls
-  // frame-boundary services, carried out at the next frame poll (6.1)
-  void request_snapshot(u32 slot);  void request_restore(u32 slot);
-  void present(PresentMode);       // live | headless (no render, no audio) | presentation (render, guest audio muted, pace x)
-  void publish_ui(const void* rec, u32 n);        // overlay record, not game state
-  void log(const char* fmt, ...);
-};
+| Service | What it does |
+|---|---|
+| guest memory | `r8/r16/r32/rf32`, `w8/w16/w32`. MEM1 and the VM region only; anything else stops the run with a reason |
+| `rng(stream)` | 4 streams of xoshiro128\*\* per mod, seeded from the match seed (§5.5) |
+| `setting(key)` | Validated values |
+| `state()` / `state_as<T>()` | The mod's plain-data block |
+| `frame()`, `input()` | The poll count and this poll's controller input |
+| `log()` | A developer log line |
+| timeline | `phase()`, `request_snapshot()`, `snapshot_frame()`, `request_review(Review)`, `review()` (§7.2) |
 
-struct Mod {                                      // what a mod exports
-  const char* id;  u32 version;  u32 api;         // api = kApiVersion it was built for
-  const Site* sites;  u32 n_sites;                // {address, kind}, must be registry sites
-  const Setting* settings;  u32 n_settings;       // {key, type, min, max, default}
-  u32 state_size;                                 // plain block owned by the engine (<= 4 KiB)
-  void (*on_load)(Host&, void* state);
-  void (*on_call)(Host&, Call&, void* state);
-  void (*on_frame)(Host&, void* state);           // each frame poll, after its input is consumed
-};
-}
-```
+**`mods::GameplayHost` (`host.h`) is the engine side:**
+- It enables mods with `id:key=value,...` settings.
+- It produces the canonical handshake string (`mod.<id>=<version>;mod.<id>.<key>=<value>;...`,
+  sorted).
+- It binds sites through `runtime/mod_hooks.h`.
+- It saves and loads every mod's state and RNG streams as one blob, for save states and the
+  netplay state hash.
+
+**`mods::Timeline` (`timeline.h`) carries out snapshots and reviews at frame polls.** A tool
+gives it three callbacks:
+- presenting on or off;
+- saving its host-side views with a slot;
+- restoring them.
+
+`mvp-play` implements those; the browser shell will too.
 
 **Rules:**
 - **Deterministic code only:** no host clock, no host randomness, no floating point that can
