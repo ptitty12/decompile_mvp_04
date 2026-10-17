@@ -522,7 +522,7 @@ function afterRun(ran: number, ms: number): boolean {
     const sat = saturatedMs + (saturated ? now - saturatedSince : 0);
     post({ type: 'stats', status: status(),
            window: { fields: winFields, ms: winMs, wallMs: now - winWall, trace, digest, saturatedMs: sat,
-                     fieldCost, cap: pacer.capacity(), rate: sched.rate, lost: { ...lost }, spinMs } });
+                     fieldCost, cap: pacer.capacity(), rate: sched.rate, lost: { ...lost }, spinMs, lateMs } });
     winFields = 0;
     winMs = 0;
     winWall = now;
@@ -561,8 +561,9 @@ interface LoopOptions {
   gateDebt: number;  // ... after a wait for the other player's input
   spin: number;      // ms: the next slot, when this close, is waited for by spinning (0: a timer)
   fixed: number;     // development: one field per slot at this fixed pace, solo too (0: off)
+  chase: number;     // development: 1 = online games pace as solo ones (the chase, before Q5), for comparisons
 }
-const loop: LoopOptions = { debt: 2, gateDebt: 1, spin: 0, fixed: 0 };
+const loop: LoopOptions = { debt: 2, gateDebt: 1, spin: 0, fixed: 0, chase: 0 };
 const lost: PaceLoss = { gate: 0, debt: 0, far: 0 };
 let spinMs = 0;
 
@@ -659,7 +660,7 @@ chase.port1.onmessage = () => {
 
 function runPaced(now: number): void {
   if (!running || paused || !M) return;
-  const even = !!net || loop.fixed > 0;
+  const even = (!!net && !loop.chase) || loop.fixed > 0;
   if (even) {
     // Q5: an online game runs at the two players' common pace (pacer.ts). After a wait for the
     // other player's input the schedule moves on from now instead of catching up, and a side that
@@ -667,7 +668,7 @@ function runPaced(now: number): void {
     const gave = sched.limitDebt(now, gated ? loop.gateDebt : loop.debt);
     if (gated) lost.gate += gave;
     else lost.debt += gave;
-    if (net) paceTick(now);
+    if (net && !loop.chase) paceTick(now);
   }
   let due = sched.due(now);
   const slowMotion = saturated && mt && opts?.slowMotion === true;  // opt-in (slowMotion=1), threaded only
@@ -680,6 +681,11 @@ function runPaced(now: number): void {
   due = Math.min(due, rafOnly ? MAX_FIELDS_PER_FRAME : slowMotion || even ? 1 : due >= 3 ? CHASE_FIELDS : 1);
   if (due <= 0) return;
   const t0 = performance.now();
+  // Q5b (statistics): how long a due field waited for the loop itself (after the last batch, not
+  // after a wait for the other player): task hops and the Worker's other messages.
+  if (even && !gated && lastEnd > 0) {
+    lateMs += Math.min(FIELD_MS, Math.max(0, t0 - Math.max(lastEnd, sched.start + (sched.fields + 1) * sched.period())));
+  }
   const ran = M._mvp_run_fields(due);
   const ms = performance.now() - t0;
   sched.fields += Math.max(0, ran);
@@ -696,6 +702,7 @@ function runPaced(now: number): void {
   gated = !!net && ran >= 0 && ran < due;
   const ok = afterRun(ran, ms);
   noteWork(ran, performance.now() - t0);
+  lastEnd = performance.now();
   if (!ok || rafOnly || gated) return;
   // Still behind: the next batch now, in its own task (this one's frame is presented when it ends).
   const after = performance.now();
@@ -731,6 +738,8 @@ function runPaced(now: number): void {
   }
 }
 let slotTimer = 0;
+let lastEnd = 0;     // Q5b: when the paced loop's last batch ended
+let lateMs = 0;      // Q5b (statistics): the time due fields waited for the loop itself
 
 function frame(now: number): void {
   runPaced(now);

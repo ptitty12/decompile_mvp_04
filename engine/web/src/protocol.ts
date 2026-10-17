@@ -241,7 +241,8 @@ export type FromWorker =
                 cap?: number;        // Q5: the speed this machine could run at (pacer.ts)
                 rate?: number;       // Q5: the pace the paced loop runs at
                 lost?: PaceLoss;     // Q5b: schedule time given up so far (worker.ts)
-                spinMs?: number } }  // Q5b: wall ms so far spent spinning to a field's slot
+                spinMs?: number;     // Q5b: wall ms so far spent spinning to a field's slot
+                lateMs?: number } }  // Q5b: wall ms so far due fields waited for the loop itself
   | { type: 'stopped'; status: Status; guestLine: string; discTrace?: string; ioLog?: string; inputLog?: string }
   | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
   | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string }
