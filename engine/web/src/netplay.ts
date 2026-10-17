@@ -11,12 +11,14 @@
 // URL parameters (tests, invite links):
 //   room=ID         join this game (the invite link)
 //   online=create   create a game at once
-//   delay=N         the input delay to propose (frames, default 3)
+//   delay=N|auto    the input delay to create the game with (frames; default auto: measured, Q5)
 //   netsim=L,J,P    tests only: delay this page's outgoing datagrams by L ms plus
 //                   up to J ms of jitter, and drop a fraction P of them
 
 import type { ClientMsg, IceServer, ServerMsg, SignalData } from '../../server/src/lobby_protocol.js';
-import type { NetOptions, NetStatus } from './protocol.js';
+import { chooseDelay, type DelayChoice } from './delay.js';
+import type { PaceReport } from './pacer.js';
+import type { NetOptions, NetStatus, PaceState } from './protocol.js';
 
 export interface OnlineState {
   available: boolean;
@@ -31,6 +33,9 @@ export interface OnlineState {
   transport?: { bytesSent: number; bytesReceived: number; packetsSent: number; packetsReceived: number; at: number };
   controller?: { connected: boolean; name?: string; ready: boolean };  // this player's controller (Q3)
   peerController?: { connected: boolean; ready: boolean };  // the other player's, as they announced it (Q3)
+  link?: DelayChoice & { pings: number };  // Q5: the link as measured before an Auto game, and the delay chosen
+  pace?: PaceState;    // Q5: the pace, as this page's Worker reports it
+  peerStats?: Record<string, unknown>;  // Q5: the other player's statistics (netstats.ts), as they sent them
   status?: NetStatus;  // the engine's session, as the Worker reports it
   windows?: string;
   diagnostic?: string;
@@ -38,6 +43,8 @@ export interface OnlineState {
 }
 
 const HASH_EVERY = 60;
+// Q5: the link probe before an Auto game: this many pings, this far apart, and how long to wait for the last.
+const PINGS = 20, PING_MS = 50, PING_WAIT_MS = 600;
 
 export class Online {
   readonly state: OnlineState = { available: false, peer: false, channel: 'none' };
@@ -54,12 +61,20 @@ export class Online {
   private readonly inviteEl: HTMLInputElement;
   private readonly createBtn: HTMLButtonElement;
   private readonly delayEl: HTMLSelectElement;
-  private openWaiters: (() => void)[] = [];
+  private openWaiters: ((delay?: number) => void)[] = [];
+  private chosenDelay: number | undefined;
+  private ready = false;
+  private pings = new Map<number, number>();  // Q5: ping id -> when sent
+  private rtts: number[] = [];
   // A simulated slow network for tests (?netsim=latency,jitter,loss).
   private readonly sim: { latency: number; jitter: number; loss: number } | null;
 
   /** Datagrams from the other player (to the Worker). */
   onDatagram: (data: ArrayBuffer) => void = () => {};
+  /** Q5: the other player's pace report (to the Worker). */
+  onPace: (report: PaceReport) => void = () => {};
+  /** Q5: the other player's statistics (to the overlay). */
+  onPeerStats: (stats: Record<string, unknown>) => void = () => {};
   /** Something changed (the page refreshes its own status line). */
   onChange: () => void = () => {};
 
@@ -77,14 +92,16 @@ export class Online {
     this.createBtn.type = 'button';
     this.createBtn.textContent = 'Create a game';
     this.delayEl = document.createElement('select');
-    this.delayEl.title = 'Input delay in frames: 3 suits a round trip up to about 90 ms; take 4 or more for longer distances';
-    for (const d of [2, 3, 4, 5, 6]) {
+    this.delayEl.title = 'Input delay in frames. Auto measures the connection when the game starts and picks the ' +
+                         'smallest delay that keeps the game smooth; or choose one (3 suits a round trip up to about 90 ms).';
+    for (const d of [0, 2, 3, 4, 5, 6]) {
       const o = document.createElement('option');
       o.value = String(d);
-      o.textContent = `delay ${d}`;
+      o.textContent = d ? `delay ${d}` : 'delay: auto';
       this.delayEl.append(o);
     }
-    this.delayEl.value = String(Number(params.get('delay') ?? 3) || 3);
+    const asked = params.get('delay');
+    this.delayEl.value = asked && asked !== 'auto' && [2, 3, 4, 5, 6].includes(Number(asked)) ? asked : '0';
     this.inviteEl = document.createElement('input');
     this.inviteEl.readOnly = true;
     this.inviteEl.placeholder = 'invite link';
@@ -151,14 +168,62 @@ export class Online {
     if (c && this.dc?.readyState === 'open') this.dc.send(JSON.stringify({ mvp: 'pad', v: 1, connected: c.connected, ready: c.ready }));
   }
 
+  // Text messages to the other player (Q3, Q5): small JSON objects on the data channel next to the engine's
+  // binary datagrams, which the engine never sees. Display and host timing only.
+  sendText(m: Record<string, unknown>): void {
+    const text = JSON.stringify(m);
+    const sim = this.sim;
+    if (!sim) {
+      if (this.dc?.readyState === 'open') this.dc.send(text);
+      return;
+    }
+    if (Math.random() < sim.loss) return;
+    setTimeout(() => {
+      if (this.dc?.readyState === 'open') this.dc.send(text);
+    }, sim.latency + Math.random() * sim.jitter);
+  }
+
+  /** Q5: this page's pace report (from its Worker), for the other player. */
+  sendPace(report: PaceReport, state: PaceState): void {
+    this.state.pace = state;
+    this.sendText({ mvp: 'pace', ...report });
+  }
+
+  /** Q5: this page's statistics (netstats.ts), for the other player's overlay. */
+  sendStats(stats: Record<string, unknown>): void {
+    this.sendText({ mvp: 'stats', v: 1, ...stats });
+  }
+
   private onPeerText(text: string): void {
-    let m: { mvp?: unknown; v?: unknown; connected?: unknown; ready?: unknown };
+    let m: { mvp?: unknown; v?: unknown; connected?: unknown; ready?: unknown; id?: unknown };
     try {
       m = JSON.parse(text);
     } catch {
       return;
     }
-    if (m?.mvp !== 'pad' || m.v !== 1 || typeof m.connected !== 'boolean' || typeof m.ready !== 'boolean') return;
+    if (m?.v !== 1) return;
+    if (m.mvp === 'ping' && typeof m.id === 'number') {  // Q5: the other page measures the link
+      this.sendText({ mvp: 'pong', v: 1, id: m.id });
+      return;
+    }
+    if (m.mvp === 'pong' && typeof m.id === 'number') {
+      const at = this.pings.get(m.id);
+      if (at !== undefined) {
+        this.pings.delete(m.id);
+        this.rtts.push(performance.now() - at);
+      }
+      return;
+    }
+    if (m.mvp === 'pace') {
+      this.onPace(m as unknown as PaceReport);
+      return;
+    }
+    if (m.mvp === 'stats') {
+      this.state.peerStats = m as Record<string, unknown>;
+      this.onPeerStats(this.state.peerStats);
+      return;
+    }
+    if (m.mvp !== 'pad' || typeof m.connected !== 'boolean' || typeof m.ready !== 'boolean') return;
     this.state.peerController = { connected: m.connected, ready: m.ready };
     const who = this.state.player ? `Player ${this.state.player === 1 ? 2 : 1}` : 'The other player';
     this.peerPadEl.hidden = false;
@@ -173,11 +238,51 @@ export class Online {
     return { player: this.state.player, delay: this.state.delay ?? 3, hashEvery: HASH_EVERY };
   }
 
-  /** Resolves when the data channel is open. */
-  whenOpen(): Promise<void> {
-    if (this.dc?.readyState === 'open') return Promise.resolve();
+  /**
+   * Resolves when the data channel is open and the game may start, with the input delay this page proposes
+   * when the game is Auto (Q5: measured on the link first), else undefined (the room's delay).
+   */
+  whenOpen(): Promise<number | undefined> {
+    if (this.ready) return Promise.resolve(this.chosenDelay);
     return new Promise((resolve) => this.openWaiters.push(resolve));
   }
+
+  // Q5: an Auto game: about a second of pings over the data channel (the other page answers each at once),
+  // then the delay for the round trips measured (delay.ts). Without answers it takes 3.
+  private async measureLink(): Promise<number> {
+    for (let k = 0; k < PINGS; ++k) {
+      this.pings.set(k, performance.now());
+      this.sendText({ mvp: 'ping', v: 1, id: k });
+      await new Promise((r) => setTimeout(r, PING_MS));
+    }
+    await new Promise((r) => setTimeout(r, PING_WAIT_MS));
+    const choice = chooseDelay(this.rtts);
+    if (!choice) {
+      this.say('Could not measure the connection; using input delay 3.');
+      return 3;
+    }
+    this.state.link = { ...choice, pings: PINGS };
+    this.say(`Measured the connection: round trip ${choice.rttMs.toFixed(0)} ms, jitter ${choice.jitterMs.toFixed(0)} ms: ` +
+             `input delay ${choice.delay}.`);
+    return choice.delay;
+  }
+
+  private channelReady(): void {
+    if (this.ready || this.measuring) return;
+    const done = (delay?: number) => {
+      this.ready = true;
+      this.chosenDelay = delay;
+      for (const w of this.openWaiters.splice(0)) w(delay);
+    };
+    if (this.state.delay === 0) {
+      this.measuring = true;
+      this.say('Connected. Measuring the connection...');
+      this.measureLink().then(done, () => done(3));
+    } else {
+      done(undefined);
+    }
+  }
+  private measuring = false;
 
   /** A datagram from the Worker to the other player. */
   send(data: ArrayBuffer): void {
@@ -200,9 +305,14 @@ export class Online {
     if (diagnostic !== undefined) this.state.diagnostic = diagnostic;
     const s = status;
     if (s.state === 'running') {
+      // Q5: below full speed, which computer sets the pace.
+      const p = this.state.pace, other = s.player === 1 ? 2 : 1;
+      const pace = p && p.rate < 0.995
+        ? ` Both games run at ${p.rate.toFixed(2)}x speed to match ${p.peerProp !== null && p.peerProp < p.prop
+            ? `player ${other}'s computer` : 'this computer'}.` : '';
       this.say(`Playing online as player ${s.player} (delay ${s.delay}, ${this.state.route ?? 'connected'}): ` +
-               `frame ${s.frame}, round trip ${s.rttAvg.toFixed(0)} ms, waited ${s.stallMs} ms, ` +
-               `${s.hashesCompared} sync checks passed.`);
+               `frame ${s.frame}, round trip ${(s.rttRecent ?? s.rttAvg).toFixed(0)} ms, waited ${s.stallMs} ms, ` +
+               `${s.hashesCompared} sync checks passed.${pace}`);
     } else if (s.state === 'handshake') {
       this.say('Checking that both players have the same game and settings...');
     } else {
@@ -231,8 +341,9 @@ export class Online {
     this.onChange();
   }
 
+  // Q5: delay 0 is Auto (the server keeps the room's number, 0 to 10; both pages then measure the link).
   private create(): void {
-    this.connect({ t: 'create', delay: Number(this.delayEl.value) || 3 });
+    this.connect({ t: 'create', delay: Number(this.delayEl.value) || 0 });
   }
 
   private connect(first: ClientMsg): void {
@@ -270,7 +381,7 @@ export class Online {
         this.state.delay = m.delay;
         this.state.peer = m.peer;
         this.inviteEl.value = m.invite;
-        this.delayEl.value = String(m.delay);
+        this.delayEl.value = [0, 2, 3, 4, 5, 6].includes(m.delay) ? String(m.delay) : '0';
         this.delayEl.disabled = true;
         this.say(m.peer ? 'The other player is here. Connecting...' :
                  'Game created. Send the invite link to the other player.');
@@ -325,7 +436,7 @@ export class Online {
       this.announcePad();
       window.clearInterval(this.padTimer);
       this.padTimer = window.setInterval(() => this.announcePad(), 3000);
-      for (const w of this.openWaiters.splice(0)) w();
+      this.channelReady();
     });
     dc.addEventListener('close', () => {
       this.state.channel = 'closed';
