@@ -445,6 +445,25 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | Guest lines unchanged; 48 two-page games with mismatched machines, 0 desyncs; msvc 46/47 (+1 skip), emscripten 39/40 (+1 skip), web shell 87/87. | merge of engine/q5-netpace
 
+- 2026-10-17 | **Q4: emulation-thread speed** (lead, under the owner's delegation; docs/engine/Q4_LOG.md).
+  - **Results:**
+    - Emulation per field: 11.4-12.5 → 9.2-10.0 ms on this PC.
+    - The laptop stand-in (hostSlow 1.3): 0.93-0.95× → 1.000×, 58-59 new frames/s.
+    - hostSlow 2: 0.61-0.70× → 0.78-0.86×. 4 efficiency cores: 0.83× → 0.93×.
+  - **Q4-G1:** translated code appends GX pipe stores to the pipe's 4 KiB block itself and calls the runtime only to complete a burst. `Hardware::write` stays the reference.
+  - **Q4-W1:** GPU-read write tracking by epoch; slightly more write waits accepted.
+  - **Q4-H1:** in translated WebAssembly, fuller in-module helpers are preferred over inline expansion (confirms Q2-S1).
+  - **Q4-F1:** the fast FP model (under F1) is the default.
+    - One IEEE double op per step, no FMA, single results rounded through f32, NaNs canonical.
+    - The exact model stays selectable (`fp::g_model`, `WasmEmitOptions::fp_exact`).
+    - Native builds keep `/fp:precise` or `-ffp-contract=off`.
+  - **Q4-N1:** native implementations of game functions (`HleKind::Native`) must match the original in all guest state: PC and ticks at each hardware access, and the instruction count.
+    - Outside their assumptions they fall back to the original, and the interpreter always runs the original.
+    - Each needs a disc test against the interpreter. The first is `fn_803EB000`, the skinning-matrix load.
+  - **Q4-M1:** on a shared PC, compare before and after with paired Node runs pinned to separate E-core clusters, swapping clusters between pairs.
+
+  | WEB.md checkpoints unchanged; match-session lines equal native; netplay_check passes; a full CPU vs CPU game ran to Game Over. | merge of engine/q4-speed
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
