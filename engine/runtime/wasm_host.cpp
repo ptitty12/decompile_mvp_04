@@ -141,6 +141,14 @@ EMSCRIPTEN_KEEPALIVE void mvp_rt_fp_unavailable(Cpu* c, u32 at) { fp_unavailable
 EMSCRIPTEN_KEEPALIVE void mvp_rt_gp_wait(Cpu*, u32 first, u32 last) {
   if (ppc::g_gp_wait_hook) ppc::g_gp_wait_hook(first, last);
 }
+// Q4: a store to the write-gather pipe that completes a burst (or reaches into the
+// next), counted by the module (xlat::WasmWgpLayout): gathered as Hardware::write
+// would gather it, without the rest of its path.
+EMSCRIPTEN_KEEPALIVE void mvp_rt_wgp_store(Cpu* c, u32 v, u32 size, u32 pc, std::uint64_t t) {
+  c->pc = pc;
+  c->ticks = t;
+  g_wgp.owner->wgp_store_counted(size == 4 ? v : v & ((1u << (8 * size)) - 1), static_cast<int>(size));
+}
 EMSCRIPTEN_KEEPALIVE void mvp_rt_tw(Cpu* c, u32 w, u32 pc) {
   ppc::Insn i{w};
   bool is_tw = ppc::decode(w) == ppc::Op::tw;
@@ -157,7 +165,7 @@ EM_JS(int, mvp_js_instantiate,
       {
         var names = ["on_entry", "safepoint", "read8", "read16", "read32", "write8", "write16", "write32", "exec",
                      "call_indirect", "absolute_call", "resume", "hle_call", "hle_before", "trap", "rfi",
-                     "system_call", "tw", "fp_unavailable", "gp_wait"];
+                     "system_call", "tw", "fp_unavailable", "gp_wait", "wgp_store"];
         try {
           var table = (typeof wasmTable != 'undefined') ? wasmTable : __indirect_function_table;
           var t0 = performance.now();

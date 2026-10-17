@@ -2,9 +2,11 @@
 //
 //   mvp-xlat cfg [--errors] [--tables]   recover functions and CFGs, print a summary
 //   mvp-xlat emit-cpp <dir> [--shards N]  translate the whole DOL to C++ in <dir> (under build/)
-//   mvp-xlat emit-wasm <file> [--precise] [--helpers] [--runs N]
+//   mvp-xlat emit-wasm <file> [--precise] [--helpers] [--names] [--shared] [--runs N]
 //                                        translate the whole DOL to a WebAssembly module (E2) and print
-//                                        how long it took; <file> under build/ only
+//                                        how long it took; <file> under build/ only (--names: function
+//                                        names for profilers and disassemblers; --shared: the threaded
+//                                        engine's module)
 //
 // Reads the disc from MVP_DISC (or the build's default) and config/GV4E69/symbols.txt.
 // Output describes the retail binary's structure only; it stays in the terminal
@@ -108,6 +110,8 @@ int main(int argc, char** argv) {
     for (int k = 3; k < argc; ++k) {
       if (!std::strcmp(argv[k], "--precise")) opt.precise_io = true;
       if (!std::strcmp(argv[k], "--helpers")) opt.inline_ops = false;
+      if (!std::strcmp(argv[k], "--names")) opt.names = true;            // a name section (profilers, disassembly)
+      if (!std::strcmp(argv[k], "--shared")) opt.shared_memory = true;   // the threaded engine's module (P2)
       if (!std::strcmp(argv[k], "--runs") && k + 1 < argc) runs = std::atoi(argv[k + 1]);
     }
     using clock = std::chrono::steady_clock;

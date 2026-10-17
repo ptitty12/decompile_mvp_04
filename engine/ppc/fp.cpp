@@ -1,6 +1,7 @@
 #include "ppc/fp.h"
 
 #include <bit>
+#include <cmath>
 #include <cstring>
 
 namespace mvp::ppc::fp {
@@ -280,6 +281,8 @@ u32 double_to_single_ftz(u64 d) {
   return static_cast<u32>((d >> 32) & 0x80000000u);
 }
 
+Model g_model = Model::Fast;
+
 u64 force25(u64 x) { return (x & 0xFFFFFFFFF8000000ull) + (x & 0x8000000ull); }
 
 // ---- arithmetic ----
@@ -512,7 +515,10 @@ u64 sqrt_rn(u64 x) {
 
 u64 reciprocal_estimate(u64 b, u32 fpscr) { return div(0x3FF0000000000000ull, b, Prec::Single, fpscr); }
 
+u64 fast_rsqrt(u64 b);  // Q4: the fast model's (below)
+
 u64 rsqrt_estimate(u64 b, u32 fpscr) {
+  if (fast_model(fpscr)) return fast_rsqrt(b);
   if (is_nan(b)) return nan_result(b, Prec::Double);
   if (is_zero(b)) return signed_inf((b & kSign) != 0);
   if (b & kSign) return kDefaultNaN;
@@ -653,33 +659,51 @@ inline bool product_exact(u64 a, u64 c) {
   return sa + sc <= 53;
 }
 
+// Q4, F1: the fast model's result for the double r (fp.h).
+inline u64 fast_finish(double r, Prec p) { return fast_result(r, p); }
+
 }  // namespace
 
+u64 fast_rsqrt(u64 b) {
+  const double s = std::sqrt(as_double(b));
+  return fast_finish(1.0 / s, Prec::Double);
+}
+
 u64 add(u64 a, u64 b, Prec p, u32 fpscr) {
+  if (fast_model(fpscr)) return fast_finish(as_double(a) + as_double(b), p);
   u64 r;
   if (!(fpscr & 3) && finite(a) && finite(b) && finish(as_double(a) + as_double(b), p, &r)) return r;
   return ref::add(a, b, p, fpscr);
 }
 
 u64 sub(u64 a, u64 b, Prec p, u32 fpscr) {
+  if (fast_model(fpscr)) return fast_finish(as_double(a) - as_double(b), p);
   u64 r;
   if (!(fpscr & 3) && finite(a) && finite(b) && finish(as_double(a) - as_double(b), p, &r)) return r;
   return ref::sub(a, b, p, fpscr);
 }
 
 u64 mul(u64 a, u64 c, Prec p, u32 fpscr) {
+  if (fast_model(fpscr)) return fast_finish(as_double(a) * as_double(c), p);
   u64 r;
   if (!(fpscr & 3) && finite(a) && finite(c) && finish(as_double(a) * as_double(c), p, &r)) return r;
   return ref::mul(a, c, p, fpscr);
 }
 
 u64 div(u64 a, u64 b, Prec p, u32 fpscr) {
+  if (fast_model(fpscr)) return fast_finish(as_double(a) / as_double(b), p);
   u64 r;
   if (!(fpscr & 3) && finite(a) && finite(b) && finish(as_double(a) / as_double(b), p, &r)) return r;
   return ref::div(a, b, p, fpscr);
 }
 
 u64 madd(u64 a, u64 c, u64 b, bool negate_b, bool negate_result, Prec p, u32 fpscr) {
+  if (fast_model(fpscr)) {  // two roundings: the product, then the sum
+    const double prod = as_double(a) * as_double(c);
+    double r = negate_b ? prod - as_double(b) : prod + as_double(b);
+    if (negate_result) r = -r;
+    return fast_finish(r, p);
+  }
   if (!(fpscr & 3) && finite(a) && finite(c) && finite(b) && product_exact(a, c)) {
     const double prod = as_double(a) * as_double(c);
     const u64 pb = as_bits(prod);
@@ -695,6 +719,7 @@ u64 madd(u64 a, u64 c, u64 b, bool negate_b, bool negate_result, Prec p, u32 fps
 }
 
 u64 round_to_single(u64 x, u32 fpscr) {
+  if (fast_model(fpscr)) return fast_finish(as_double(x), Prec::Single);
   u64 r;
   if (!(fpscr & 3) && finite(x) && finish(as_double(x), Prec::Single, &r)) return r;
   return ref::round_to_single(x, fpscr);

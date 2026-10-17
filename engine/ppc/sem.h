@@ -551,7 +551,7 @@ inline void fsub(Cpu& c, Insn i) { fresult(c, i, fp::sub(A(c, i), B(c, i), Prec:
 inline void fsubs(Cpu& c, Insn i) { sresult(c, i, fp::sub(A(c, i), B(c, i), Prec::Single, c.fpscr)); }
 inline void fmul(Cpu& c, Insn i) { fresult(c, i, fp::mul(A(c, i), C(c, i), Prec::Double, c.fpscr)); }
 inline void fmuls(Cpu& c, Insn i) {
-  sresult(c, i, fp::mul(A(c, i), fp::force25(C(c, i)), Prec::Single, c.fpscr));
+  sresult(c, i, fp::mul(A(c, i), fp::force25(C(c, i), c.fpscr), Prec::Single, c.fpscr));
 }
 inline void fdiv(Cpu& c, Insn i) { fresult(c, i, fp::div(A(c, i), B(c, i), Prec::Double, c.fpscr)); }
 inline void fdivs(Cpu& c, Insn i) { sresult(c, i, fp::div(A(c, i), B(c, i), Prec::Single, c.fpscr)); }
@@ -568,16 +568,16 @@ inline void fnmsub(Cpu& c, Insn i) {
   fresult(c, i, fp::madd(A(c, i), C(c, i), B(c, i), true, true, Prec::Double, c.fpscr));
 }
 inline void fmadds(Cpu& c, Insn i) {
-  sresult(c, i, fp::madd(A(c, i), fp::force25(C(c, i)), B(c, i), false, false, Prec::Single, c.fpscr));
+  sresult(c, i, fp::madd(A(c, i), fp::force25(C(c, i), c.fpscr), B(c, i), false, false, Prec::Single, c.fpscr));
 }
 inline void fmsubs(Cpu& c, Insn i) {
-  sresult(c, i, fp::madd(A(c, i), fp::force25(C(c, i)), B(c, i), true, false, Prec::Single, c.fpscr));
+  sresult(c, i, fp::madd(A(c, i), fp::force25(C(c, i), c.fpscr), B(c, i), true, false, Prec::Single, c.fpscr));
 }
 inline void fnmadds(Cpu& c, Insn i) {
-  sresult(c, i, fp::madd(A(c, i), fp::force25(C(c, i)), B(c, i), false, true, Prec::Single, c.fpscr));
+  sresult(c, i, fp::madd(A(c, i), fp::force25(C(c, i), c.fpscr), B(c, i), false, true, Prec::Single, c.fpscr));
 }
 inline void fnmsubs(Cpu& c, Insn i) {
-  sresult(c, i, fp::madd(A(c, i), fp::force25(C(c, i)), B(c, i), true, true, Prec::Single, c.fpscr));
+  sresult(c, i, fp::madd(A(c, i), fp::force25(C(c, i), c.fpscr), B(c, i), true, true, Prec::Single, c.fpscr));
 }
 inline void frsp(Cpu& c, Insn i) { sresult(c, i, fp::round_to_single(B(c, i), c.fpscr)); }
 inline void fres(Cpu& c, Insn i) { sresult(c, i, fp::reciprocal_estimate(B(c, i), c.fpscr)); }
@@ -647,21 +647,21 @@ inline void ps_div(Cpu& c, Insn i) {
        fp::div(PA(c, i).ps1, PB(c, i).ps1, Prec::Single, c.fpscr));
 }
 inline void ps_mul(Cpu& c, Insn i) {
-  pset(c, i, fp::mul(PA(c, i).ps0, fp::force25(PC(c, i).ps0), Prec::Single, c.fpscr),
-       fp::mul(PA(c, i).ps1, fp::force25(PC(c, i).ps1), Prec::Single, c.fpscr));
+  pset(c, i, fp::mul(PA(c, i).ps0, fp::force25(PC(c, i).ps0, c.fpscr), Prec::Single, c.fpscr),
+       fp::mul(PA(c, i).ps1, fp::force25(PC(c, i).ps1, c.fpscr), Prec::Single, c.fpscr));
 }
 inline void ps_muls0(Cpu& c, Insn i) {
-  u64 m = fp::force25(PC(c, i).ps0);
+  u64 m = fp::force25(PC(c, i).ps0, c.fpscr);
   pset(c, i, fp::mul(PA(c, i).ps0, m, Prec::Single, c.fpscr), fp::mul(PA(c, i).ps1, m, Prec::Single, c.fpscr));
 }
 inline void ps_muls1(Cpu& c, Insn i) {
-  u64 m = fp::force25(PC(c, i).ps1);
+  u64 m = fp::force25(PC(c, i).ps1, c.fpscr);
   pset(c, i, fp::mul(PA(c, i).ps0, m, Prec::Single, c.fpscr), fp::mul(PA(c, i).ps1, m, Prec::Single, c.fpscr));
 }
 inline void ps_madd_impl(Cpu& c, Insn i, u64 c0, u64 c1, bool neg_b, bool neg_r) {
   const Fpr a = PA(c, i), b = PB(c, i);
-  pset(c, i, fp::madd(a.ps0, fp::force25(c0), b.ps0, neg_b, neg_r, Prec::Single, c.fpscr),
-       fp::madd(a.ps1, fp::force25(c1), b.ps1, neg_b, neg_r, Prec::Single, c.fpscr));
+  pset(c, i, fp::madd(a.ps0, fp::force25(c0, c.fpscr), b.ps0, neg_b, neg_r, Prec::Single, c.fpscr),
+       fp::madd(a.ps1, fp::force25(c1, c.fpscr), b.ps1, neg_b, neg_r, Prec::Single, c.fpscr));
 }
 inline void ps_madd(Cpu& c, Insn i) { ps_madd_impl(c, i, PC(c, i).ps0, PC(c, i).ps1, false, false); }
 inline void ps_msub(Cpu& c, Insn i) { ps_madd_impl(c, i, PC(c, i).ps0, PC(c, i).ps1, true, false); }

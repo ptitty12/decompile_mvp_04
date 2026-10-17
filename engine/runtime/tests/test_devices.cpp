@@ -112,6 +112,82 @@ TEST_CASE("GX stream: display lists run from memory and may change the vertex fo
   CHECK(gx.display_list_errors() == 1);
 }
 
+// Q4: the observer gets the commands of each push at once (one gx_commands
+// call), in order and with their bytes, display lists' commands included; an
+// observer that takes them one by one (the default) sees the same sequence.
+namespace {
+struct Seen : GfxObserver {
+  std::vector<std::vector<u8>> cmds;
+  int batches = 0;
+  void gx_command(const u8* c, std::size_t n) override { cmds.emplace_back(c, c + n); }
+  void gx_commands(const GxCommand* c, std::size_t n) override {
+    ++batches;
+    GfxObserver::gx_commands(c, n);
+  }
+  void vi_field(std::uint64_t, std::uint32_t) override {}
+};
+struct OneByOne : GfxObserver {
+  std::vector<std::vector<u8>> cmds;
+  void gx_command(const u8* c, std::size_t n) override { cmds.emplace_back(c, c + n); }
+  void vi_field(std::uint64_t, std::uint32_t) override {}
+};
+}  // namespace
+
+TEST_CASE("GX stream: the observer gets each push's commands at once, in order") {
+  std::vector<u8> mem(0x1000, 0);
+  std::vector<u8> list;
+  cp_load(list, 0x50, 0x200);
+  bp_load(list, 0x66001234);
+  while (list.size() % 32) list.push_back(0);
+  std::memcpy(&mem[0x400], list.data(), list.size());
+  std::vector<u8> s;
+  cp_load(s, 0x50, 0x200);              // position direct
+  cp_load(s, 0x70, 0x1 | 4u << 1);      // XYZ f32: 12 bytes a vertex
+  s.push_back(0x90);                    // triangles, format 0, 7 vertices (84 bytes: over three bursts)
+  s.push_back(0);
+  s.push_back(7);
+  for (int k = 0; k < 84; ++k) s.push_back(static_cast<u8>(k));
+  s.push_back(0x40);  // a display list
+  put32(s, 0x400);
+  put32(s, static_cast<u32>(list.size()));
+  bp_load(s, 0x45000002);
+  while (s.size() % 32) s.push_back(0);
+  Seen seen;
+  OneByOne one;
+  GxFifo a, b;
+  a.set_memory(mem.data(), static_cast<u32>(mem.size()));
+  b.set_memory(mem.data(), static_cast<u32>(mem.size()));
+  a.set_observer(&seen);
+  b.set_observer(&one);
+  int pushes_with_commands = 0;
+  for (std::size_t at = 0; at < s.size(); at += 32) {
+    const std::size_t before = seen.cmds.size();
+    a.push(s.data() + at, 32);
+    b.push(s.data() + at, 32);
+    if (seen.cmds.size() > before) ++pushes_with_commands;
+  }
+  CHECK(seen.batches == pushes_with_commands);
+  CHECK(seen.cmds == one.cmds);
+  REQUIRE(seen.cmds.size() >= 6);
+  CHECK(seen.cmds[2].size() == 3 + 84);  // the primitive, whole
+  CHECK(seen.cmds[2][3 + 83] == 83);
+  CHECK(seen.cmds[3] == std::vector<u8>(list.begin(), list.begin() + 6));  // the list's first command
+}
+
+TEST_CASE("GX stream: a lost stream's report shows the last commands' first bytes") {
+  GxFifo gx;
+  std::vector<u8> s;
+  cp_load(s, 0x50, 0x200);
+  bp_load(s, 0x47001234);
+  s.push_back(0x77);  // starts no command
+  gx.push(s.data(), s.size());
+  REQUIRE(gx.broken());
+  const std::string r = gx.broken_context();
+  CHECK(r.find("len 6: 08 50 00 00 02 00") != std::string::npos);
+  CHECK(r.find("len 5: 61 47 00 12 34") != std::string::npos);
+  CHECK(r.find("lost at: 77") != std::string::npos);
+}
+
 TEST_CASE("GX FIFO: bursts to memory, the GP follows, and stops at a breakpoint") {
   Rig g;
   constexpr u32 kBase = 0x00100000, kEnd = 0x00100FFC;
@@ -348,4 +424,56 @@ TEST_CASE("AI DMA: a block every 5 ms at 32 kHz, AIDINT at each block start") {
   g.w(0xCC005036, 0x280 / 32, 2);  // stop
   g.hw.advance(1000000);
   CHECK(g.hw.ai_dma_blocks() == 2);
+}
+
+TEST_CASE("Q4: Hardware::wgp_store does what write does for the write-gather pipe") {
+  // Two machines with a CPU FIFO in memory (the GP unlinked): one gets every
+  // store through write(), the other through wgp_store(); before and after the
+  // access log is full (wgp_store's inline path only applies then).
+  Rig a, b;
+  constexpr u32 kBase = 0x00100000, kEnd = 0x0010FFE0;
+  for (Rig* g : {&a, &b}) {
+    g->w(0xCC00300C, kBase);
+    g->w(0xCC003010, kEnd);
+    g->w(0xCC003014, kBase);
+  }
+  std::uint64_t seed = 0x9E3779B97F4A7C15ull;
+  auto next = [&] {
+    seed ^= seed << 13;
+    seed ^= seed >> 7;
+    seed ^= seed << 17;
+    return static_cast<u32>(seed >> 16);
+  };
+  u32 pc = 0x80003000;
+  std::uint64_t ticks = 1000;
+  auto stores = [&](int n) {
+    for (int k = 0; k < n; ++k) {
+      const u32 r = next();
+      const int size = (r & 3) == 0 ? 1 : (r & 3) == 1 ? 2 : 4;
+      const u32 v = size == 4 ? next() : next() & ((1u << (8 * size)) - 1);
+      const u32 addr = 0xCC008000u + ((r >> 2) & 1) * 4;
+      pc += 4;
+      ticks += 1 + (r >> 3 & 7);
+      a.cpu.pc = pc;
+      a.cpu.ticks = ticks;
+      a.hw.write(addr, v, size);
+      b.cpu.pc = 0;  // wgp_store sets them where write() would read them
+      b.cpu.ticks = 0;
+      b.hw.wgp_store(addr, v, size, pc, ticks);
+    }
+  };
+  stores(300);
+  for (Rig* g : {&a, &b})
+    for (int k = 0; k < 100000; ++k) g->r(0xCC003000);
+  stores(20000);
+  CHECK(a.hw.gp_bursts() > 1000);
+  CHECK(a.hw.gp_bursts() == b.hw.gp_bursts());
+  CHECK(a.hw.write_counts() == b.hw.write_counts());
+  CHECK(a.r(0xCC003014) == b.r(0xCC003014));
+  // The partial burst under way: the next 32 bytes complete it the same way.
+  std::vector<u8> fill(32, 0x5A);
+  a.wgp(fill);
+  b.wgp(fill);
+  CHECK(a.r(0xCC003014) == b.r(0xCC003014));
+  CHECK(std::memcmp(&a.mem[kBase], &b.mem[kBase], kEnd - kBase) == 0);
 }

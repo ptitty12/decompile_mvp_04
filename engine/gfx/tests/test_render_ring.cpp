@@ -105,3 +105,22 @@ TEST_CASE("a producer and a consumer thread, with fences") {
   CHECK(ring.records() == total);
   MESSAGE("full-ring waits: " << ring.full_waits());
 }
+
+TEST_CASE("Q4: the publishes are counted, and what each made visible is kept") {
+  RenderRing ring(4096);
+  CHECK(ring.publishes() == 0);
+  ring.publish();  // nothing new: not a publish
+  CHECK(ring.publishes() == 0);
+  fill(ring.reserve(1, 10), 10, 1);
+  ring.commit();
+  const std::uint32_t first = ring.end();
+  ring.publish();
+  CHECK(ring.publishes() == 1);
+  CHECK(ring.published_at(1) == first);
+  fill(ring.reserve(1, 20), 20, 2);
+  ring.commit();
+  ring.publish_if(1);
+  CHECK(ring.publishes() == 2);
+  CHECK(ring.published_at(2) == ring.end());
+  CHECK(ring.published_at(1) == first);
+}

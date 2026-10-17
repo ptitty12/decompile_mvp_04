@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 
 namespace mvp::rt {
 
@@ -118,7 +119,10 @@ void GxFifo::call_list(std::uint32_t addr, std::uint32_t size, Effects& fx) {
 
 void GxFifo::execute(const std::uint8_t* cmd, std::size_t len, Effects& fx, bool in_list) {
   ++commands_;
-  if (observer_ && cmd[0] != 0x40) observer_->gx_command(cmd, len);
+  if (observer_ && cmd[0] != 0x40) {  // Q4: collected, handed over together (flush_commands)
+    if (batch_n_ == batch_.size()) flush_commands();
+    batch_[batch_n_++] = {cmd, static_cast<std::uint32_t>(len)};
+  }
   switch (cmd[0]) {
     case 0x08: {
       std::uint8_t reg = cmd[1];
@@ -164,15 +168,21 @@ std::string GxFifo::broken_context() const {
   std::string out;
   char b[64];
   const std::uint64_t n = recent_n_ < recent_.size() ? recent_n_ : recent_.size();
+  constexpr std::uint32_t kHead = 24;  // bytes shown per command
   for (std::uint64_t k = recent_n_ - n; k < recent_n_; ++k) {
-    const Recent& r = recent_[k % recent_.size()];
+    const Recent& r = recent_[k & (recent_.size() - 1)];
     std::snprintf(b, sizeof b, "  @%llu len %u:", static_cast<unsigned long long>(r.offset), r.len);
     out += b;
-    for (std::size_t i = 0; i < r.head.size() && i < r.len; ++i) {
-      std::snprintf(b, sizeof b, " %02X", r.head[i]);
+    const std::uint32_t h = r.len < kHead ? r.len : kHead;
+    if (r.offset + kHistory < pushed_ || r.offset + h > pushed_) {
+      out += " (bytes no longer kept)\n";
+      continue;
+    }
+    for (std::uint32_t i = 0; i < h; ++i) {
+      std::snprintf(b, sizeof b, " %02X", history_[(r.offset + i) & (kHistory - 1)]);
       out += b;
     }
-    out += r.len > r.head.size() ? " ...\n" : "\n";
+    out += r.len > kHead ? " ...\n" : "\n";
   }
   out += "  lost at:";
   for (std::uint8_t v : broken_tail_) {
@@ -185,46 +195,75 @@ std::string GxFifo::broken_context() const {
 GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
   Effects fx;
   if (broken_) return fx;
+  // Q4: the stream's last bytes, for the report (broken_context).
+  if (n == 32 && !(pushed_ & 31)) {  // a burst: a copy of fixed size
+    std::memcpy(history_.data() + (pushed_ & (kHistory - 1)), bytes, 32);
+  } else {
+    for (std::size_t k = n > kHistory ? n - kHistory : 0; k < n;) {
+      const std::size_t at = static_cast<std::size_t>((pushed_ + k) & (kHistory - 1));
+      const std::size_t run = std::min(n - k, kHistory - at);
+      std::memcpy(history_.data() + at, bytes + k, run);
+      k += run;
+    }
+  }
+  pushed_ += n;
   // Q2: with nothing pending (the usual case: a burst holds whole commands and
   // perhaps the start of one more), the commands are parsed where the bytes are
   // and only an incomplete tail is kept; otherwise the bytes join what is pending.
   const std::uint8_t* p = bytes;
   std::size_t avail = n;
-  if (!pending_.empty()) {
-    pending_.insert(pending_.end(), bytes, bytes + n);
-    if (need_ > pending_.size()) return fx;  // the command at the head is still incomplete
-    p = pending_.data();
-    avail = pending_.size();
+  if (pend_ != pbeg_) {
+    pending_append(bytes, n);
+    if (need_ > pend_ - pbeg_) return fx;  // the command at the head is still incomplete
+    p = pending_.data() + pbeg_;
+    avail = pend_ - pbeg_;
   }
   need_ = 0;
   std::size_t at = 0;
   while (at < avail) {
     std::size_t len = command_length(p + at, avail - at);
     if (len == ~std::size_t(0)) {
+      if (observer_) flush_commands();  // the ones before it, while their bytes are still there
       broken_ = true;
       broken_opcode_ = p[at];
       broken_offset_ = consumed_;
       broken_tail_.assign(p + at, p + std::min(avail, at + 64));
-      pending_.clear();
+      pbeg_ = pend_ = 0;
       return fx;
     }
     if (len == 0 || len > avail - at) {  // the rest of the command is still to come
-      if (len) need_ = len;  // its length, from the head of pending_ after the erase below
+      if (len) need_ = len;  // its length, from the head of the pending bytes kept below
       break;
     }
-    Recent& r = recent_[recent_n_++ % recent_.size()];
+    Recent& r = recent_[recent_n_++ & (recent_.size() - 1)];
     r.offset = consumed_;
     r.len = static_cast<std::uint32_t>(len);
-    const std::size_t h = std::min(len, r.head.size());
-    std::copy(p + at, p + at + h, r.head.begin());
-    std::fill(r.head.begin() + static_cast<std::ptrdiff_t>(h), r.head.end(), std::uint8_t{0});
     execute(p + at, len, fx, false);
     consumed_ += len;
     at += len;
   }
-  if (p == bytes) pending_.assign(bytes + at, bytes + n);
-  else pending_.erase(pending_.begin(), pending_.begin() + static_cast<std::ptrdiff_t>(at));
+  if (observer_) flush_commands();  // before the pending bytes change: some of them point into them
+  if (p == bytes) {
+    pbeg_ = pend_ = 0;
+    if (at < n) pending_append(bytes + at, n - at);
+  } else {
+    pbeg_ += at;
+    if (pbeg_ == pend_) pbeg_ = pend_ = 0;
+  }
   return fx;
+}
+
+void GxFifo::pending_append(const std::uint8_t* bytes, std::size_t n) {
+  if (pend_ + n > pending_.size()) {
+    if (pbeg_) {  // move what is pending to the front first
+      std::memmove(pending_.data(), pending_.data() + pbeg_, pend_ - pbeg_);
+      pend_ -= pbeg_;
+      pbeg_ = 0;
+    }
+    if (pend_ + n > pending_.size()) pending_.resize(std::max(2 * pending_.size(), pend_ + n));
+  }
+  std::memcpy(pending_.data() + pend_, bytes, n);
+  pend_ += n;
 }
 
 }  // namespace mvp::rt

@@ -21,6 +21,13 @@
 //
 // Replacements read their arguments from the guest registers and memory and
 // must change guest state only as the original would (determinism invariant).
+//
+// Native implementations (kind Native, Q4, runtime/hle_game.h): replacements of
+// game functions, keyed by address, equal to the original in all guest state
+// (registers, memory, hardware accesses and their guest times), for speed. They
+// call the original when the state they are written for does not hold. The
+// interpreter (hle_interpret) runs the original instead, so the lockstep checker
+// compares the two.
 #pragma once
 
 #include <cstdint>
@@ -35,7 +42,7 @@ class InputQueue;
 
 using HleFn = void (*)(Cpu& c, GuestFn original);
 
-enum class HleKind { Replace, Before };
+enum class HleKind { Replace, Before, Native };
 
 struct HleEntry {
   const char* name;  // symbols.txt name (a label only, when `address` is set)

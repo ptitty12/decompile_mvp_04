@@ -53,6 +53,9 @@ void GpReads::command(const u8* c, std::size_t len) {
 }
 
 void GpReads::load_cp(u8 reg, u32 v) {
+  if (reg == cp::kVcdLo || reg == cp::kVcdHi || (reg & 0xF8) == cp::kVatA || (reg & 0xF8) == cp::kVatB ||
+      (reg & 0xF8) == cp::kVatC)
+    for (Layout& l : layouts_) l.valid = false;  // Q4: the formats' layouts
   if (reg == cp::kVcdLo) vcd_lo_ = v;
   else if (reg == cp::kVcdHi) vcd_hi_ = v;
   else if ((reg & 0xF8) == cp::kVatA) vat_a_[reg & 7] = v;
@@ -111,27 +114,22 @@ void GpReads::load_bp(u32 value) {
   }
 }
 
-void GpReads::primitive(u8 op, const u8* data, u32 count) {
-  ++stats_.primitives;
-  if (tex_dirty_) textures();
-  if (!count) return;
-  const int fmt = op & 7;
+// The vertex layout of format `fmt`: where each indexed attribute's index is,
+// and what an element of its array is (as GxProcessor::vertex_format /
+// load_vertex read it). Q4: kept until the VCD or a VAT changes.
+const GpReads::Layout& GpReads::layout(int fmt) {
+  Layout& layout = layouts_[static_cast<std::size_t>(fmt)];
+  if (layout.valid) return layout;
   const u32 a = vat_a_[fmt], b = vat_b_[fmt], c = vat_c_[fmt];
-  // The vertex layout: where each indexed attribute's index is, and what an
-  // element of its array is (as GxProcessor::vertex_format / load_vertex read it).
-  struct Indexed {
-    u32 at, isize, array, elem, n;  // index offset, index bytes, array, element bytes, indices (3: NBT3)
-    u32 lo, hi;
-  };
-  Indexed ix[12];
-  int nix = 0;
+  Indexed* ix = layout.ix;
+  u32 nix = 0;
   u32 at = 0;
   for (int k = 0; k < 9; ++k) at += bits(vcd_lo_, k, 1);
   auto attr = [&](u32 type, u32 array, u32 direct, u32 elem, u32 n) {
     if (type == 1) at += direct;
     else if (type >= 2) {
       const u32 is = type == 2 ? 1 : 2;
-      ix[nix++] = {at, is, array, elem, n, ~0u, 0};
+      ix[nix++] = {at, is, array, elem, n};
       at += is * n;
     }
   };
@@ -154,12 +152,23 @@ void GpReads::primitive(u8 op, const u8* data, u32 count) {
     const u32 size = (bits(reg, p, 1) ? 2 : 1) * comp_size(bits(reg, p + 1, 3));
     attr(bits(vcd_hi_, 2 * k, 2), 4 + k, size, size, 1);
   }
-  if (!nix) return;
+  layout.vsize = at;
+  layout.nix = nix;
+  layout.valid = true;
+  return layout;
+}
+
+void GpReads::primitive(u8 op, const u8* data, u32 count) {
+  ++stats_.primitives;
+  if (tex_dirty_) textures();
+  if (!count) return;
+  const Layout& layout = this->layout(op & 7);
+  if (!layout.nix) return;
   ++stats_.indexed;
-  const std::size_t vsize = at;
-  for (int k = 0; k < nix; ++k) {  // each index of each vertex (attribute by attribute: the loops stay simple)
-    Indexed& x = ix[k];
-    u32 lo = x.lo, hi = x.hi;
+  const std::size_t vsize = layout.vsize;
+  for (u32 k = 0; k < layout.nix; ++k) {  // each index of each vertex (attribute by attribute: the loops stay simple)
+    const Indexed& x = layout.ix[k];
+    u32 lo = ~0u, hi = 0;
     for (u32 j = 0; j < x.n; ++j) {
       const u8* q = data + x.at + j * x.isize;
       if (x.isize == 1) {
@@ -175,14 +184,30 @@ void GpReads::primitive(u8 op, const u8* data, u32 count) {
         }
       }
     }
-    x.lo = lo;
-    x.hi = hi;
+    vertex_range(x.array, lo, hi, x.elem);
   }
-  for (int k = 0; k < nix; ++k) {
-    const Indexed& x = ix[k];
-    const u32 base = array_base_[x.array], stride = array_stride_[x.array];
-    range(base + x.lo * stride, (x.hi - x.lo) * stride + x.elem, ReadKind::kVertex);
+}
+
+// Q4: the elements [lo, hi] of an array, unless this epoch has reported them
+// already; only what is new when it reported some of them (a superset is fine:
+// a mark only makes a write wait).
+void GpReads::vertex_range(u32 array, u32 lo, u32 hi, u32 elem) {
+  const u32 base = array_base_[array], stride = array_stride_[array];
+  Reported& r = reported_[array];
+  if (once_ && r.epoch == epoch_ && r.gen == gen_ && r.base == base && r.stride == stride && r.elem == elem &&
+      lo <= r.hi + 1 && hi + 1 >= r.lo) {  // overlaps or adjoins what this epoch reported
+    if (lo >= r.lo && hi <= r.hi) {
+      ++stats_.skipped;
+      return;
+    }
+    if (lo < r.lo) range(base + lo * stride, (r.lo - 1 - lo) * stride + elem, ReadKind::kVertex);
+    if (hi > r.hi) range(base + (r.hi + 1) * stride, (hi - r.hi - 1) * stride + elem, ReadKind::kVertex);
+    r.lo = std::min(lo, r.lo);
+    r.hi = std::max(hi, r.hi);
+    return;
   }
+  range(base + lo * stride, (hi - lo) * stride + elem, ReadKind::kVertex);
+  r = {epoch_, gen_, base, stride, elem, lo, hi};
 }
 
 // The textures the next draws sample, as GxProcessor::snapshot finds them: the
