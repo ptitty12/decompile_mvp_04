@@ -342,6 +342,7 @@ function pumpDisc(): void {
 async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: number, height: number,
                      options: RunOptions): Promise<void> {
   opts = options;
+  if (options.paceMargin) pacer = new Pacer({ margin: options.paceMargin });  // Q5 (development): tuning
   const phase = (name: string, t0: number, detail?: unknown) =>
     post({ type: 'phase', name, ms: performance.now() - t0, detail });
 
@@ -383,6 +384,7 @@ async function start(disc: DiscSource, canvas: OffscreenCanvas | null, width: nu
         resolve(!!ok);
       };
     });
+    if (options.gpuTimer === false) M._mvp_gpu_timing(0);  // Q5 (development)
     withBytes(new TextEncoder().encode('#mvp-canvas\0'), (p) => M!._mvp_gfx_init(p, width, height));
   } else {
     post({ type: 'gfx', ok: false, message: options.render ? 'WebGPU is not available in this browser' : 'rendering off' });
@@ -545,7 +547,7 @@ function afterRun(ran: number, ms: number): boolean {
 // the common pace and moves the schedule toward the phase where neither player waits, and its
 // report goes to the other player (through the page: a text message on the data channel); the
 // worklet's time-stretch is told the pace, so the sound slows with the game at once.
-const pacer = new Pacer();
+let pacer = new Pacer();
 const PACE_TICK_MS = 250;
 let pendingWork = 0, lastPace = -Infinity, audioPace = 1;
 
@@ -631,8 +633,9 @@ function runPaced(now: number): void {
   if (!running || paused || !M) return;
   if (net) {
     // Q5: an online game runs at the two players' common pace (pacer.ts). After a wait for the
-    // other player's input the schedule moves on from now instead of catching up.
-    if (gated) sched.limitDebt(now, 1);
+    // other player's input the schedule moves on from now instead of catching up, and a side that
+    // fell behind catches up one field at a time (never two-field batches: every frame is shown).
+    sched.limitDebt(now, gated ? 1 : 2);
     paceTick(now);
   }
   let due = sched.due(now);

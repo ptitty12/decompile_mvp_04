@@ -11,12 +11,14 @@
 // - Capacity. Each side measures what one field costs its machine: the Worker's
 //   busy time per field (the run, the waits for its render thread, the present),
 //   averaged over windows of 15 fields (single fields vary a lot: a mean per
-//   field, not its peaks), then smoothed: up quickly (a heavier scene must lower
-//   the pace at once), down slowly. Its capacity is the speed it could run at: a
-//   field's time (16.7 ms) over that cost.
-// - The common pace. Each side proposes its capacity times a margin (3 %),
-//   capped at full speed, in steps of 0.02 (lowered at once, raised only once it
-//   has had room for a step more for 1.5 seconds). Both sides run at the
+//   field, not its peaks), then smoothed over about 30 fields either way (the
+//   game's scenes change their cost within seconds, and the pace should follow
+//   them up as soon as down; the cost does not depend on the pace, so this
+//   cannot oscillate). Its capacity is the speed it could run at: a field's time
+//   (16.7 ms) over that cost.
+// - The common pace. Each side proposes its capacity times a margin (2 %),
+//   capped at full speed, in steps of 0.01 (lowered at once, raised once it has
+//   had room for two steps more for half a second). Both sides run at the
 //   lower of the two proposals, which they tell each other several times a
 //   second. When the slower machine keeps up again, its proposal rises, and the
 //   pace returns to full speed.
@@ -24,7 +26,8 @@
 //   pace (59.94 fields/s times the pace), so frames are made and shown evenly.
 //   A side that had to wait for the other does not catch up afterwards (the wait
 //   moves its schedule later); a side that fell behind its own schedule (a heavy
-//   field) catches up as before.
+//   field) catches up one field at a time and at most two fields (no two-field
+//   batches, which would show every other frame).
 // - Phase. Equal paces are not enough: a side that runs a little earlier than
 //   the other reaches each frame just as (or before) the other's input arrives,
 //   and waits. Each side measures its input lead (net/driver.h: how long before
@@ -66,7 +69,7 @@ export interface PacerOptions {
 }
 
 export const DEFAULT_PACER: PacerOptions = {
-  margin: 0.97, step: 0.02, raiseAfterMs: 1500, raiseSteps: 1, windowFields: 15, attackFields: 30, releaseFields: 120,
+  margin: 0.98, step: 0.01, raiseAfterMs: 500, raiseSteps: 2, windowFields: 15, attackFields: 30, releaseFields: 30,
   phaseGain: 0.6, slew: 0.03, staleMs: 2000, minPace: 0.25,
 };
 

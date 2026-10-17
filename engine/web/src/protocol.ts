@@ -139,6 +139,8 @@ export interface RunOptions {
   hostSlowFrom?: number;  // ... from this VI field on
   gpView?: boolean;    // development (Q1): false = the renderer reads guest memory as it is (gfx/gp_memory.h)
   gpuLoad?: number;    // development (Q5): extra GPU work per present, in proportion to the picture's pixels
+  gpuTimer?: boolean;  // development (Q5): false = the render passes are not timed on the GPU
+  paceMargin?: number; // development (Q5): the online pace's margin (pacer.ts; default 0.98)
   scale?: number;      // Q1: the internal resolution, 1-3 times the console's (the Picture setting)
   discCache?: { blockKib?: number; maxBlocks?: number; maxRun?: number; ahead?: number };  // the server image's cache
 }
@@ -199,9 +201,11 @@ export interface Status {
   audio?: { frames: number; rate: number; voice_ms: number; aux_returns: number; nonsilent: number; peak: number;
             dropped: number };  // the mixer, while attached
   presents_new?: number;  // Q5: presents that showed a new picture (frames shown)
-  // Q5: the GPU's time (wasm/render_side.h): probes of how long the queue took to finish a present's work,
-  // their total ms, how many took over 14 ms, the last; the host ms spent presenting; the development load.
-  gpu?: { n: number; ms: number; over: number; last: number; present_ms: number; load: number };
+  // Q5: the GPU's time (wasm/render_side.h, gfx/wgpu/gpu_timer.h): whether passes are timed (timestamp
+  // queries), the frames timed and their GPU ms in all, the passes timed, untimed and dropped, the last frame's
+  // ms; the host ms spent presenting; the development load.
+  gpu?: { timed: boolean; n: number; ms: number; passes: number; untimed: number; dropped: number; last: number;
+          present_ms: number; load: number };
   pad_last?: number;   // port 1's buttons at the last frame poll (live input)
   pad_polls?: number;  // frame polls that returned a pressed button
 }

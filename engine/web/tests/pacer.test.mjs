@@ -12,7 +12,7 @@ import { load } from './site.mjs';
 
 const { Pacer, Schedule, FIELD_MS } = await load('pacer.js');
 
-test('capacity: a field\'s time over the smoothed cost, its mean per window; quick to rise, slow to fall', () => {
+test('capacity: a field\'s time over the smoothed cost, its mean per window, following the scene either way', () => {
   const p = new Pacer();
   assert.equal(p.capacity(), 1);
   for (let k = 0; k < 14; ++k) p.noteWork(1, 12);
@@ -22,8 +22,8 @@ test('capacity: a field\'s time over the smoothed cost, its mean per window; qui
   assert.ok(Math.abs(p.capacity() - FIELD_MS / 12) < 1e-9);
   for (let k = 0; k < 45; ++k) p.noteWork(1, 24);  // a heavier scene: most of the way in 45 fields
   assert.ok(p.cost > 20 && p.cost < 23, `cost ${p.cost}`);
-  for (let k = 0; k < 45; ++k) p.noteWork(1, 12);  // lighter again: slowly
-  assert.ok(p.cost > 17, `cost ${p.cost}`);
+  for (let k = 0; k < 45; ++k) p.noteWork(1, 12);  // lighter again: as quickly
+  assert.ok(p.cost > 13 && p.cost < 15, `cost ${p.cost}`);
   // Fields that vary a lot from one to the next count by their mean, not their peaks.
   const q = new Pacer();
   for (let k = 0; k < 600; ++k) q.noteWork(1, k % 2 ? 30 : 18);
@@ -38,43 +38,47 @@ test('proposal: the capacity with the margin, in steps, lowered at once and rais
   const p = new Pacer();
   for (let k = 0; k < 300; ++k) p.noteWork(1, 24);  // capacity 0.695
   let st = p.tick(0, null);
-  assert.equal(p.prop, 0.66);  // 0.695 * 0.97 = 0.674 -> 0.66
-  assert.equal(st.rate, 0.66);
+  assert.equal(p.prop, 0.68);  // 0.695 * 0.98 = 0.681 -> 0.68
+  assert.equal(st.rate, 0.68);
   assert.equal(st.shiftMs, 0);
   for (let k = 0; k < 2000; ++k) p.noteWork(1, 12);  // capacity 1.39: back to full speed, after the hold
   st = p.tick(1000, null);
-  assert.equal(p.prop, 0.66);
-  st = p.tick(2400, null);
-  assert.equal(p.prop, 0.66);
-  st = p.tick(2600, null);
+  assert.equal(p.prop, 0.68);
+  st = p.tick(1400, null);
+  assert.equal(p.prop, 0.68);
+  st = p.tick(1600, null);
   assert.equal(p.prop, 1);
   assert.equal(st.rate, 1);
-  // Lower at once; a step up only after it has had room for 1.5 s.
+  // Lower at once; up only with room for two steps, after half a second.
   const q = new Pacer();
-  for (let k = 0; k < 400; ++k) q.noteWork(1, 20.5);  // 0.814 * 0.97 = 0.789 -> 0.78
+  for (let k = 0; k < 400; ++k) q.noteWork(1, 20.5);  // 0.814 * 0.98 = 0.797 -> 0.79
   q.tick(0, null);
-  assert.equal(q.prop, 0.78);
-  for (let k = 0; k < 2000; ++k) q.noteWork(1, 20);  // 0.834 * 0.97 = 0.809 -> 0.80: one step
+  assert.equal(q.prop, 0.79);
+  for (let k = 0; k < 2000; ++k) q.noteWork(1, 20.2);  // 0.826 * 0.98 = 0.809 -> 0.80: one step, not enough
   q.tick(100, null);
-  q.tick(1500, null);
-  assert.equal(q.prop, 0.78);
-  q.tick(1700, null);
-  assert.equal(q.prop, 0.8);
-  for (let k = 0; k < 2000; ++k) q.noteWork(1, 25);  // heavier: 0.667 * 0.97 = 0.647 -> 0.64 at once
-  q.tick(1800, null);
-  assert.equal(q.prop, 0.64);
-  // Back and forth around a step does not raise it: the room has to last.
-  for (let k = 0; k < 2000; ++k) q.noteWork(1, 24);  // 0.695 * 0.97 = 0.674 -> 0.66
-  q.tick(1900, null);
-  for (let k = 0; k < 2000; ++k) q.noteWork(1, 25.5);  // 0.654 * 0.97 = 0.634 -> 0.62: below, the wait restarts
-  q.tick(2800, null);
-  assert.equal(q.prop, 0.62);
-  for (let k = 0; k < 2000; ++k) q.noteWork(1, 24);
   q.tick(3000, null);
-  q.tick(4000, null);
-  assert.equal(q.prop, 0.62);
-  q.tick(4600, null);
-  assert.equal(q.prop, 0.66);
+  assert.equal(q.prop, 0.79);
+  for (let k = 0; k < 2000; ++k) q.noteWork(1, 20);  // 0.834 * 0.98 = 0.817 -> 0.81: two steps
+  q.tick(3100, null);
+  q.tick(3500, null);
+  assert.equal(q.prop, 0.79);
+  q.tick(3700, null);
+  assert.equal(q.prop, 0.81);
+  for (let k = 0; k < 2000; ++k) q.noteWork(1, 25);  // heavier: 0.667 * 0.98 = 0.654 -> 0.65 at once
+  q.tick(3800, null);
+  assert.equal(q.prop, 0.65);
+  // Back and forth: the room has to last.
+  for (let k = 0; k < 2000; ++k) q.noteWork(1, 24);  // 0.695 * 0.98 = 0.681 -> 0.68
+  q.tick(3900, null);
+  for (let k = 0; k < 2000; ++k) q.noteWork(1, 25.5);  // 0.654 * 0.98 = 0.641 -> 0.64: below, the wait restarts
+  q.tick(4300, null);
+  assert.equal(q.prop, 0.64);
+  for (let k = 0; k < 2000; ++k) q.noteWork(1, 24);
+  q.tick(4400, null);
+  q.tick(4800, null);
+  assert.equal(q.prop, 0.64);
+  q.tick(5000, null);
+  assert.equal(q.prop, 0.68);
 });
 
 test('the common pace is the lower proposal while the other side\'s reports are fresh', () => {
@@ -87,12 +91,12 @@ test('the common pace is the lower proposal while the other side\'s reports are 
   b.tick(0, null);
   a.onPeer(b.report(null), 10);
   b.onPeer(a.report(null), 10);
-  assert.equal(a.tick(250, null).rate, 0.66);
-  assert.equal(b.tick(250, null).rate, 0.66);
+  assert.equal(a.tick(250, null).rate, 0.68);
+  assert.equal(b.tick(250, null).rate, 0.68);
   // An older report (the channel is unordered) is ignored; a stale one no longer counts.
   const old = { v: 1, n: 0, cap: 2, prop: 1, lead: null };
   a.onPeer(old, 300);
-  assert.equal(a.peer.prop, 0.66);
+  assert.equal(a.peer.prop, 0.68);
   assert.equal(a.tick(2500, null).rate, 1);  // 2.49 s without a report: the other side is gone
   a.onPeer({ v: 1, n: 99, cap: 0.5, prop: 0.46, lead: null }, 2600);
   assert.equal(a.tick(2700, null).rate, 0.46);
@@ -165,6 +169,7 @@ function simulate({ costA, costB, latency = 5, jitter = 0, delay = 3, seconds = 
         q.reports.push({ at: t + latency, r: p.pacer.report(lead) });
       }
       if (t < p.busyUntil) continue;
+      if (pacing) p.sched.limitDebt(t, p.waiting ? 1 : 2);  // as the Worker's paced loop online
       let due = p.sched.due(t);
       if (due > 8) {
         p.sched.limitDebt(t, 1);
@@ -179,7 +184,6 @@ function simulate({ costA, costB, latency = 5, jitter = 0, delay = 3, seconds = 
           p.waitFrom = t;
           ++p.waits;
         }
-        if (pacing) p.sched.limitDebt(t, 1);
         continue;
       }
       const need = p.waiting ? p.waitFrom : t;
@@ -220,8 +224,8 @@ test('lockstep: a 1.0x and a 0.7x machine run evenly at the slower one\'s pace, 
   const before = simulate({ costA: fast, costB: slow, seconds: 30, pacing: false });
   const [a, b] = after;
   const rate = a.pacer.rate;
-  assert.equal(rate, 0.66);
-  assert.equal(b.pacer.rate, 0.66);
+  assert.equal(rate, 0.68);
+  assert.equal(b.pacer.rate, 0.68);
   const sa = stats(a, 10000, 30000), sb = stats(b, 10000, 30000);
   const period = FIELD_MS / rate;
   for (const s of [sa, sb]) {
@@ -262,7 +266,7 @@ test('lockstep: back to full speed when the slower machine keeps up again; down 
   // A heavier stretch: the pace drops within about a second.
   const heavyFrom = (ms) => (t) => (t < ms ? 12 : 26);
   const [c, d] = simulate({ costA: () => 11, costB: heavyFrom(8000), seconds: 12 });
-  assert.ok(d.pacer.rate <= 0.62 && c.pacer.rate <= 0.62, `rates ${c.pacer.rate} ${d.pacer.rate}`);
+  assert.ok(d.pacer.rate <= 0.63 && c.pacer.rate <= 0.63, `rates ${c.pacer.rate} ${d.pacer.rate}`);  // 0.641 * 0.98
   const t = stats(d, 10000, 12000);
   assert.ok(t.p95 < FIELD_MS / d.pacer.rate + 3, JSON.stringify(t));
 });

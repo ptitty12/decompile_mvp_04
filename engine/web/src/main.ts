@@ -35,6 +35,8 @@
 //   scale=1|2|3     the internal resolution, instead of the Picture setting (Q1)
 //   gpuLoad=N       development (Q5): extra GPU work per present, in proportion to the picture's pixels
 //                   (N passes), to try the Picture setting's Auto on a GPU that cannot keep up
+//   gpuTimer=0      development (Q5): the render passes are not timed on the GPU (Auto then goes by size alone)
+//   paceMargin=X    development (Q5): the online pace's margin over this machine's capacity (default 0.98)
 //   stats=1         the statistics overlay shown from the start (Q5; otherwise the Stats button or `)
 // The page publishes its state as `window.mvp` for the browser check.
 
@@ -97,7 +99,7 @@ interface PageState {
   pace?: PaceState;   // Q5: the pace (pacer.ts), as the Worker reports it
   overlay?: { shown: boolean; local: StatsSummary; peer: StatsSummary | null; text: string };  // Q5 (netstats.ts)
   hint?: { shown: boolean; text: string; dismissed: boolean };  // Q5: the note for a machine that cannot keep up
-  autoScale?: { ceiling: number; steps: unknown[]; lastMean: number | null };  // Q5: the Picture's Auto and the GPU
+  autoScale?: { ceiling: number; steps: unknown[]; lastBusy: number | null };  // Q5: the Picture's Auto and the GPU
 }
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -145,6 +147,8 @@ const options: RunOptions = {
   hostSlowFrom: Number(params.get('hostSlowFrom') ?? 0) || 0,
   gpView: params.get('gpview') !== '0',
   gpuLoad: Number(params.get('gpuLoad') ?? 0) || undefined,
+  gpuTimer: params.get('gpuTimer') !== '0',
+  paceMargin: Number(params.get('paceMargin') ?? 0) || undefined,
   discCache: {
     blockKib: Number(params.get('discBlock') ?? 0) || undefined, maxBlocks: Number(params.get('discBlocks') ?? 0) || undefined,
     maxRun: Number(params.get('discRun') ?? 0) || undefined,
@@ -472,7 +476,6 @@ picker.addEventListener('change', () => {
 const PICTURE_KEY = 'mvp.picture.v1';
 let sentScale = 0;
 const autoScale = new AutoScale();  // Q5: Auto's ceiling from the GPU's time
-const GPU_AUTO = false;  // TEMP (Q5): off until the GPU's time is measured with timestamp queries
 let softwareAdapter = false;
 void (async () => {
   try {
@@ -628,9 +631,9 @@ function fallbackCopy(text: string, done: () => void): void {
 // The note for a machine that cannot keep up: once the game has run a while (not paused) below full speed
 // because of this computer (solo: slower than the game; online: this side sets a pace below full speed).
 // Dismissed, it stays away for this visit.
-const HINT_AFTER_MS = 15000, HINT_SPEED = 0.93;
+const HINT_AFTER_MS = 15000, HINT_SPEED = 0.93, HINT_HOLD_MS = 5000;
 const hintBox = $<HTMLElement>('slow-hint');
-let hintDismissed = false, hintShownSince = 0;
+let hintDismissed = false, hintShownSince = 0, hintSlowSince = -1;
 $<HTMLButtonElement>('slow-hint-close').addEventListener('click', () => {
   hintDismissed = true;
   hintBox.hidden = true;
@@ -638,21 +641,27 @@ $<HTMLButtonElement>('slow-hint-close').addEventListener('click', () => {
 });
 function updateSlowHint(local: StatsSummary): void {
   if (hintDismissed || state.firstFrameMs === undefined || state.paused || tracker.seconds() < 2.5) return;
-  if (performance.now() - state.startedAt - (state.firstFrameMs ?? 0) < HINT_AFTER_MS) return;
+  const now = performance.now();
+  if (now - state.startedAt - (state.firstFrameMs ?? 0) < HINT_AFTER_MS) return;
+  // Slow over the last seconds (the overlay's numbers, not one moment's pace), and because of this computer:
+  // solo when it could not run faster; online when it sets the pace (its proposal is the lower one).
   const p = state.pace;
   const online = !!p && !!online0?.state.player;
-  const mine = online ? p!.rate < HINT_SPEED && !(p!.peerProp !== null && p!.peerProp < p!.prop) : false;
-  const speed = online ? p!.rate : local.speed;
-  const slow = online ? mine : speed !== null && speed < HINT_SPEED && local.cap !== null && local.cap < 1;
+  const speed = local.speed;
+  const ours = online ? !(p!.peerProp !== null && p!.peerProp < p!.prop) : local.cap !== null && local.cap < 1;
+  const slow = speed !== null && speed < HINT_SPEED && ours;
   if (!slow) {
-    if (!hintBox.hidden && performance.now() - hintShownSince > 10000) hintBox.hidden = true;
+    hintSlowSince = -1;
+    if (!hintBox.hidden && now - hintShownSince > 10000) hintBox.hidden = true;
     return;
   }
-  const text = `This computer is running the game at ${speed!.toFixed(2)}x speed` +
+  if (hintSlowSince < 0) hintSlowSince = now;
+  if (now - hintSlowSince < HINT_HOLD_MS && hintBox.hidden) return;  // a few seconds, not a heavy moment
+  const text = `This computer is running the game at ${speed!.toFixed(2)}× speed` +
                (online ? ', so the online game runs at that pace for both players' : '') +
                '. On a laptop, plugging in and choosing the Best performance power mode helps.';
   $<HTMLElement>('slow-hint-text').textContent = text;
-  if (hintBox.hidden) hintShownSince = performance.now();
+  if (hintBox.hidden) hintShownSince = now;
   hintBox.hidden = false;
   state.hint = { shown: true, text, dismissed: false };
 }
@@ -677,13 +686,14 @@ function onStats(s: Status, w: { fields: number; ms: number; wallMs: number; cap
   if (!overlayEl.hidden) renderOverlay();
   updateSlowHint(local);
   // Auto and the GPU: a ceiling for the picture's scale while the GPU cannot keep up.
-  if (s.gpu && s.scale && GPU_AUTO) {
+  // Only with the GPU's time from timestamp queries, and only for the Auto setting.
+  if (s.gpu?.timed && s.scale && pictureSetting() === 'auto' && !state.paused) {
     const before = autoScale.ceiling;
-    autoScale.update(now, s.gpu, s.scale, sizeScale());
-    state.autoScale = { ceiling: autoScale.ceiling, steps: autoScale.steps, lastMean: autoScale.lastMean };
+    autoScale.update(now, { n: s.gpu.n, ms: s.gpu.ms, dropped: s.gpu.dropped }, s.scale, sizeScale());
+    state.autoScale = { ceiling: autoScale.ceiling, steps: autoScale.steps, lastBusy: autoScale.lastBusy };
     if (autoScale.ceiling !== before) {
       log(`picture: Auto ${autoScale.ceiling < before ? 'lowered' : 'raised'} to at most ${autoScale.ceiling}x ` +
-          `(the GPU took ${(autoScale.lastMean ?? 0).toFixed(1)} ms a frame at ${s.scale}x)`);
+          `(the GPU was busy ${(100 * (autoScale.lastBusy ?? 0)).toFixed(0)}% of the time at ${s.scale}x)`);
       applyPicture();
     }
   }
