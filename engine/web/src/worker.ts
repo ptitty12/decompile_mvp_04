@@ -520,10 +520,12 @@ function afterRun(ran: number, ms: number): boolean {
   pumpAudio();
   pumpDisc();
   if (modsOn) {
-    const st = JSON.parse(cstr(M!._mvp_mod_status())) as { phase: string; log: string[]; notify: string[] };
-    if (st.phase !== modPhase || st.log.length || st.notify.length) {
+    const st = JSON.parse(cstr(M!._mvp_mod_status())) as
+      { phase: string; progress: number; log: string[]; notify: string[]; ui: Record<string, unknown>[] };
+    // Every batch while a review runs (the page's challenge scene shows its progress), else on news.
+    if (st.phase !== modPhase || st.phase !== 'live' || st.log.length || st.notify.length || st.ui.length) {
       modPhase = st.phase;
-      post({ type: 'mod', phase: st.phase, log: st.log, notify: st.notify });
+      post({ type: 'mod', phase: st.phase, progress: st.progress, log: st.log, notify: st.notify, ui: st.ui });
     }
   }
   // Q5: a batch that made no new field (an online game waiting at a frame poll for the other

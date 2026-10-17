@@ -124,6 +124,9 @@ class Host {
   virtual void log(const std::string& line) = 0;
   // A short message for the player, shown over the game (never game state).
   virtual void notify(const std::string& text) = 0;
+  // A small JSON object for the mod's own part of the page (its challenge scene,
+  // a scoreboard): the page knows the mod's records by their keys. Never game state.
+  virtual void publish(const std::string& json) = 0;
 
   // ---- The timeline: frame-boundary services, carried out at the next frame poll ----
   virtual Phase phase() const = 0;

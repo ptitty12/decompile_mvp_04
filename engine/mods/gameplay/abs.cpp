@@ -166,6 +166,11 @@ class AbsMod final : public Mod {
     }
     h.log(line);
     h.notify(note);
+    char ui[160];
+    std::snprintf(ui, sizeof ui, "{\"abs\":\"verdict\",\"team\":\"%s\",\"overturned\":%s,\"call\":\"%s\",\"left\":%u}",
+                  team ? "away" : "home", verdict == original ? "false" : "true", verdict ? "strike" : "ball",
+                  s.challenges[team]);
+    h.publish(ui);
   }
 
  private:
@@ -253,6 +258,14 @@ class AbsMod final : public Mod {
     std::snprintf(line, sizeof line, "challenge by %s (port %d) of a called %s: reviewing", team ? "away" : "home",
                   port + 1, s.last_call ? "strike" : "ball");
     h.log(line);
+    // The page's challenge scene (mods-panel.ts): who, which call, and (shown after the
+    // replay) where the pitch crossed, zone-normalized (|x|, |y| <= 1 is a strike).
+    char ui[200];
+    std::snprintf(ui, sizeof ui,
+                  "{\"abs\":\"challenge\",\"team\":\"%s\",\"call\":\"%s\",\"truth\":\"%s\",\"x\":%.3f,\"y\":%.3f}",
+                  team ? "away" : "home", s.last_call ? "strike" : "ball", s.last_truth ? "strike" : "ball",
+                  static_cast<double>(bits_to_float(s.last_x)), static_cast<double>(bits_to_float(s.last_y)));
+    h.publish(ui);
     h.notify(s.last_call ? "ABS challenge: reviewing the strike call" : "ABS challenge: reviewing the ball call");
   }
 

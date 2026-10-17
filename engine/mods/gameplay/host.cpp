@@ -277,6 +277,11 @@ void GameplayHost::notify(const std::string& text) {
   else std::printf("notify: %s\n", text.c_str());
 }
 
+void GameplayHost::publish(const std::string& json) {
+  if (publish_) publish_(json);
+  else std::printf("ui: %s\n", json.c_str());
+}
+
 void GameplayHost::log(const std::string& line) {
   std::string s = std::string("mod ") + (cur_ ? cur_->mod->info().id : "?") + ": " + line;
   if (log_) log_(s);

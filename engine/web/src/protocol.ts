@@ -249,7 +249,8 @@ export type FromWorker =
   | { type: 'net-send'; data: ArrayBuffer }  // a datagram for the other player
   | { type: 'net'; status: NetStatus; windows?: string; diagnostic?: string }
   | { type: 'pace'; report: PaceReport; state: PaceState }  // Q5: for the other player (text message), and the overlay
-  | { type: 'mod'; phase: string; log: string[]; notify: string[] };  // gameplay mods (mvp_mod_status)
+  | { type: 'mod'; phase: string; progress: number; log: string[]; notify: string[];  // gameplay mods (mvp_mod_status)
+      ui: Record<string, unknown>[] };  // ... the review leg's progress (0-1) and the mods' UI records
 
 // Q5b: the paced loop's schedule time given up so far (ms), by reason: after a wait for the
 // other player (`gate`), behind by more fields than the loop catches up (`debt`), far behind (`far`).

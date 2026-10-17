@@ -2,7 +2,10 @@
 // settings (kept in this browser: a per-viewer convenience), the mod specs the
 // engine takes before boot ("abs:miss=8,edge=3,challenges=2"), and the banner
 // over the game: "Reviewing the call" while a review runs, then the verdict.
-// The URL's mod= parameters, when present, win over the panel.
+// The URL's mod= parameters, when present, win over the panel. While a review runs,
+// the ABS challenge scene (abs-scene.ts) covers the game instead of a frozen picture.
+
+import { ChallengeScene } from './abs-scene.js';
 
 const KEY = 'mvp.mods.abs';
 
@@ -53,9 +56,11 @@ export class ModsPanel {
   private locked = false;
   private bannerTimer = 0;
   private reviewing = false;
+  private scene: ChallengeScene | null;
 
   constructor(private root: HTMLElement | null, private banner: HTMLElement | null,
-              private summary: HTMLElement | null, private fromUrl: string[]) {
+              private summary: HTMLElement | null, private fromUrl: string[], stage: HTMLElement | null) {
+    this.scene = stage ? new ChallengeScene(stage) : null;
     this.build();
   }
 
@@ -72,10 +77,19 @@ export class ModsPanel {
     this.root?.querySelectorAll('input, select').forEach((e) => ((e as HTMLInputElement).disabled = true));
   }
 
-  // The engine's report (mvp_mod_status): the timeline's phase and messages for the player.
-  show(phase: string, notes: string[]): void {
+  // The engine's report (mvp_mod_status): the timeline's phase, the review leg's
+  // progress, messages for the player and the mod's UI records.
+  show(phase: string, notes: string[], progress = 1, ui: Record<string, unknown>[] = []): void {
+    if (this.scene) {
+      this.scene.update(phase, progress, ui);
+      // The scene tells the story of a review; the banner keeps the other messages.
+      if (this.scene.active() || phase !== 'live') {
+        notes = notes.filter((n) => !/^(ABS challenge|Overturned|The call stands)/.test(n));
+        if (!notes.length) return;
+      }
+    }
     if (!this.banner) return;
-    const reviewing = phase !== 'live';
+    const reviewing = phase !== 'live' && !this.scene;
     if (reviewing && !this.reviewing) this.say('Reviewing the call...', 0);
     this.reviewing = reviewing;
     for (const n of notes) this.say(n, reviewing ? 0 : 4000);

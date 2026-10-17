@@ -127,7 +127,8 @@ const playBtn = $<HTMLButtonElement>('play');
 const params = new URLSearchParams(location.search);
 // Gameplay mods (docs/mods/): the panel's ABS challenge settings, or mod= in the address.
 const modsPanel = new ModsPanel(document.getElementById('mods'), document.getElementById('mod-banner'),
-                                document.getElementById('mods-summary'), params.getAll('mod'));
+                                document.getElementById('mods-summary'), params.getAll('mod'),
+                                document.getElementById('stage'));
 const options: RunOptions = {
   script: params.get('script') ?? '',
   stopFields: Number(params.get('fields') ?? 0) || 0,
@@ -343,7 +344,7 @@ function onWorker(msg: FromWorker): void {
       break;
     case 'mod':
       for (const line of msg.log) log(line);
-      modsPanel.show(msg.phase, msg.notify);
+      modsPanel.show(msg.phase, msg.notify, msg.progress, msg.ui);
       break;
     case 'gfx':
       state.gfx = { ok: msg.ok, message: msg.message };

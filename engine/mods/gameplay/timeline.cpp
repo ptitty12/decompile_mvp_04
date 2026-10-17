@@ -14,6 +14,10 @@ double ms_since(std::chrono::steady_clock::time_point t0) {
   return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
 }
 
+double now_ms() {
+  return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
 }  // namespace
 
 Timeline::Timeline(rt::Machine& m, rt::YieldingHooks& hooks, rt::Hardware& hw, rt::InputQueue& input,
@@ -27,6 +31,23 @@ bool Timeline::gate(ppc::Cpu& c) {
   if (!stop || !hooks_.stop_before(c)) return true;
   due_ = true;
   return false;
+}
+
+double Timeline::progress() const {
+  if (mods_.phase() == Phase::Live || target_ == ~0ull || target_ <= leg_start_) return 1.0;
+  const double done = static_cast<double>(rt::g_frame_polls - leg_start_) / static_cast<double>(target_ - leg_start_);
+  return done < 0 ? 0 : done > 1 ? 1 : done;
+}
+
+void Timeline::begin_leg(Phase phase, u64 target) {
+  const double now = now_ms();
+  const Phase was = mods_.phase();
+  if (was != Phase::Live) leg_ms_[static_cast<int>(was)] += now - leg_t0_;
+  leg_t0_ = now;
+  leg_start_ = rt::g_frame_polls;
+  target_ = target;
+  mods_.set_phase(phase);
+  tool_.present(phase == Phase::Presenting || phase == Phase::Live, phase);
 }
 
 void Timeline::after_poll(u64 frame) {
@@ -100,17 +121,15 @@ void Timeline::step() {
                       static_cast<unsigned long long>(p), static_cast<unsigned long long>(r.present_from),
                       static_cast<unsigned long long>(r.present_to), static_cast<unsigned long long>(resume_));
         log(b);
+        for (double& ms : leg_ms_) ms = 0;
+        leg_t0_ = now_ms();
         if (r.present_from > p) {
           push_inputs(p, r.present_from);
-          mods_.set_phase(Phase::Seeking);
-          tool_.present(false, Phase::Seeking);
-          target_ = r.present_from;
+          begin_leg(Phase::Seeking, r.present_from);
         } else {
           save(1);
           push_inputs(p, r.present_to);
-          mods_.set_phase(Phase::Presenting);
-          tool_.present(true, Phase::Presenting);
-          target_ = r.present_to;
+          begin_leg(Phase::Presenting, r.present_to);
         }
       } else if (mods_.snapshot_requested()) {
         save(0);
@@ -122,26 +141,26 @@ void Timeline::step() {
       const Review& r = *mods_.review();
       save(1);
       push_inputs(r.present_from, r.present_to);
-      mods_.set_phase(Phase::Presenting);
-      tool_.present(true, Phase::Presenting);
-      target_ = r.present_to;
+      begin_leg(Phase::Presenting, r.present_to);
       break;
     }
     case Phase::Presenting: {
       const Review& r = *mods_.review();
       load(1);
       push_inputs(r.present_from, resume_);
-      mods_.set_phase(Phase::Rerunning);
-      tool_.present(false, Phase::Rerunning);
-      target_ = resume_;
+      begin_leg(Phase::Rerunning, resume_);
       break;
     }
     case Phase::Rerunning: {
       const std::string rerun = mem1_sha1();
       log("review: re-ran to poll " + std::to_string(poll) + ": MEM1 sha1 " + rerun +
           (rerun == live_sha1_ ? " (same as live)" : " (live was " + live_sha1_ + ")"));
-      target_ = ~0ull;
-      tool_.present(true, Phase::Live);
+      begin_leg(Phase::Live, ~0ull);
+      char b[160];
+      std::snprintf(b, sizeof b, "review: host time seek %.0f ms, replay %.0f ms, re-run %.0f ms",
+                    leg_ms_[static_cast<int>(Phase::Seeking)], leg_ms_[static_cast<int>(Phase::Presenting)],
+                    leg_ms_[static_cast<int>(Phase::Rerunning)]);
+      log(b);
       mods_.end_review(m_.cpu());
       break;
     }

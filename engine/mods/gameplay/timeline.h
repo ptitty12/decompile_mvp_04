@@ -53,6 +53,8 @@ class Timeline {
   void step();
 
   Phase phase() const { return mods_.phase(); }
+  // How far the current review leg is, 0-1 (1 when live): for the page's challenge scene.
+  double progress() const;
   void set_log(std::function<void(const std::string&)> f) { log_ = std::move(f); }
 
   std::uint64_t snapshots = 0, reviews = 0, restores = 0;
@@ -63,6 +65,7 @@ class Timeline {
   void push_inputs(u64 from, u64 to);  // queue the recorded inputs of polls [from, to)
   void save(int slot);
   void load(int slot);
+  void begin_leg(Phase phase, u64 target);  // starts a review leg (and times the one before)
   void log(const std::string& s);
   std::string mem1_sha1();
 
@@ -80,7 +83,10 @@ class Timeline {
   u64 recorded_to_ = 0;  // polls [recorded_to_ - kRing, recorded_to_) are in the ring
 
   bool due_ = false;
-  u64 target_ = ~0ull;  // the poll that ends the current review leg
+  u64 target_ = ~0ull;    // the poll that ends the current review leg
+  u64 leg_start_ = 0;     // the poll it started at
+  double leg_t0_ = 0;     // and the host time (ms), for the review's timing line
+  double leg_ms_[4] = {};  // host ms per phase (Seeking, Presenting, Rerunning) in this review
   u64 resume_ = 0;      // review: the poll after the request
   std::string live_sha1_;
 };

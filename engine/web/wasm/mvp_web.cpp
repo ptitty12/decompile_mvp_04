@@ -312,6 +312,7 @@ struct Engine {
   bool hold = false;  // a review runs without presenting
   std::uint64_t fields_run = 0;
   std::vector<std::string> mod_log, mod_notes;  // lines and player messages for the page (mvp_mod_status)
+  std::vector<std::string> mod_ui;              // the mods' UI records (JSON objects) for the page
   bool mod_seed_set = false;                     // mvp_mod_seed was called (netplay: overrides the session's)
 };
 Engine g;
@@ -758,6 +759,9 @@ EMSCRIPTEN_KEEPALIVE int mvp_boot(const char* script, int len, double stop_field
     g.mods.set_notify([](const std::string& s) {
       if (g.mod_notes.size() < 64) g.mod_notes.push_back(s);
     });
+    g.mods.set_publish([](const std::string& s) {
+      if (g.mod_ui.size() < 64) g.mod_ui.push_back(s);
+    });
     if (!g.mods.start(g.m->cpu(), &g.error)) return 0;
     g.timeline = std::make_unique<mods::Timeline>(*g.m, *g.hooks, *g.hw, *g.input, g.mods, g_timeline_tool);
     g.timeline->set_log([to_page](const std::string& s) { to_page("timeline: " + s); });
@@ -797,20 +801,27 @@ EMSCRIPTEN_KEEPALIVE const char* mvp_mod_settings() {
   return g_text.c_str();
 }
 
-// {"phase":"live|seeking|presenting|rerunning","log":[...],"notify":[...]}: the
-// timeline's phase, the mods' log lines and their messages for the player since the
-// last call.
+// {"phase":"live|seeking|presenting|rerunning","progress":0-1,"log":[...],"notify":[...],
+// "ui":[{...}]}: the timeline's phase and how far its current review leg is, the
+// mods' log lines, their messages for the player and their UI records (JSON
+// objects, mods::Host::publish) since the last call.
 EMSCRIPTEN_KEEPALIVE const char* mvp_mod_status() {
   static const char* kPhase[] = {"live", "seeking", "presenting", "rerunning"};
-  g_text = std::string("{\"phase\":\"") + kPhase[static_cast<int>(g.mods.phase())] + "\",\"log\":[";
+  char progress[32];
+  std::snprintf(progress, sizeof progress, "%.3f", g.timeline ? g.timeline->progress() : 1.0);
+  g_text = std::string("{\"phase\":\"") + kPhase[static_cast<int>(g.mods.phase())] + "\",\"progress\":" + progress +
+           ",\"log\":[";
   for (std::size_t k = 0; k < g.mod_log.size(); ++k)
     g_text += (k ? ",\"" : "\"") + json_escape(g.mod_log[k]) + "\"";
   g_text += "],\"notify\":[";
   for (std::size_t k = 0; k < g.mod_notes.size(); ++k)
     g_text += (k ? ",\"" : "\"") + json_escape(g.mod_notes[k]) + "\"";
+  g_text += "],\"ui\":[";
+  for (std::size_t k = 0; k < g.mod_ui.size(); ++k) g_text += (k ? "," : "") + g.mod_ui[k];
   g_text += "]}";
   g.mod_log.clear();
   g.mod_notes.clear();
+  g.mod_ui.clear();
   return g_text.c_str();
 }
 

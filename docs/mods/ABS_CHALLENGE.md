@@ -61,8 +61,8 @@ The mod runs natively (`mvp-play --mod abs`), in the browser (the Gameplay mods 
   - `--capture-review DIR`;
   - `--rewind-test F:N`.
 - Browser: `engine/web/wasm/mvp_web.cpp` and `net_web.cpp` (the `mvp_mod_*` exports, mod
-  settings in the handshake, the session seed), `engine/web/src/mods-panel.ts`, and the
-  Worker and page.
+  settings in the handshake, the session seed), `engine/web/src/mods-panel.ts`,
+  `engine/web/src/abs-scene.ts` (the challenge scene, §4.6), and the Worker and page.
 - Netplay: `net/protocol.cpp` names the differing settings in a refusal.
 
 **Known limits:**
@@ -73,6 +73,17 @@ The mod runs natively (`mvp-play --mod abs`), in the browser (the Gameplay mods 
 - **Netplay pauses:** a review pauses the netplay frames (both pages re-run locally).
   The netplay test's longest input latency was 12 s. Whether that came from the review or
   from start-up was not measured (R2).
+- **Review length:** the rewind runs from the snapshot taken at the new-pitch site, so it
+  covers the whole pitch before the replay starts. The overturn test needed 320 frame polls,
+  and the timeline's line "review: host time" gave:
+
+  | Run | Rewind (seek) | Replay | Re-run |
+  |---|---|---|---|
+  | Native, headless | 3.3 s | 1.2 s | 0.8 s |
+  | Chrome, `--fast` | 4.8 s | 1.6 s | 1.2 s |
+
+  The challenge scene covers the rewind and the re-run. A snapshot nearer the release would
+  shorten the rewind, at the cost of a second snapshot per pitch.
 - **Not judged by feel:** reviews have not been played by a human in a paced browser game.
 
 ## 1. Verdict
@@ -483,10 +494,31 @@ Save states copy the block, and the netplay state hash includes it (§5.7, §6.2
 
 ### 4.6 UI
 
-The overlay is engine-drawn: challenges left per team, a "Challenge?" prompt during the
-window, the review banner, and "Call stands" or "Overturned: strike". In the browser it is
-an HTML layer driven by a per-frame UI record the mod publishes; `mvp-play` prints log lines.
-It is not game state.
+**As built (browser):** an HTML layer over the game, never game state.
+
+**The challenge scene** (`engine/web/src/abs-scene.ts`, 2026-10-17). During the headless
+legs the canvas holds its last frame. Instead of that frozen picture, a card covers the game:
+- **While the review rewinds (Seeking):**
+  - "ABS challenge" and who challenged which call;
+  - a strike zone being scanned;
+  - the leg's progress, from `Timeline::progress()`.
+- **During the replay (Presenting):** only a small "Replay" tag shows.
+- **During the re-run (Rerunning):**
+  - the verdict, "Overturned" ("It was a ball") or "Call stands";
+  - where the pitch crossed, drawn in the zone.
+
+  It fades out 2.2 s after play resumes.
+
+The mod feeds the scene through `Host::publish` with two records:
+- at the challenge: `{"abs":"challenge",team,call,truth,x,y}`;
+- when the review ends: `{"abs":"verdict",team,overturned,call,left}`.
+
+The page holds the truth back until after the replay. The banner keeps the other messages.
+`mvp-play` prints the records as `ui:` lines.
+
+**Not built:**
+- challenges left per team on screen;
+- a "Challenge?" prompt during the window.
 
 ## 5. Engine hook API v1
 
@@ -574,6 +606,8 @@ but no address is rejected.
 | `state()` / `state_as<T>()` | The mod's plain-data block |
 | `frame()`, `input()` | The poll count and this poll's controller input |
 | `log()` | A developer log line |
+| `notify()` | A short message for the player (the page's banner; `mvp-play` prints it) |
+| `publish()` | A small JSON record for the mod's own part of the page, such as the ABS challenge scene (§4.6); `mvp-play` prints it. Never game state |
 | timeline | `phase()`, `request_snapshot()`, `snapshot_frame()`, `request_review(Review)`, `review()` (§7.2) |
 
 **`mods::GameplayHost` (`host.h`) is the engine side:**
@@ -590,7 +624,7 @@ gives it three callbacks:
 - saving its host-side views with a slot;
 - restoring them.
 
-`mvp-play` implements those; the browser shell will too.
+`mvp-play` and the browser engine (`mvp_web.cpp`) implement those.
 
 **Rules:**
 - **Deterministic code only:** no host clock, no host randomness, no floating point that can
