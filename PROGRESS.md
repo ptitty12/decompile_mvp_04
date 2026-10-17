@@ -472,3 +472,13 @@
     - Integration: `git merge --no-ff engine/<x>` onto origin/main in decompile_mvp_04-docs, record decisions, then `python tools/coord.py run-locked claude-side-goals ... -- python tools/team/integrate.py --push --head-only`.
     - Engine merges that conflict are delegated to a merge agent, which builds and tests both toolchains.
   | Owner: deployments only at milestones (owner, 2026-10-15). Optional: the verify.py fix for OSInit/DVDInit names.
+- 2026-10-15 (evening) | lead + agents | engine: quality pass after owner play tests | On main:
+  - **Q1 (menu/intro flashing, picture):**
+    - The renderer now reads memory as the CPU cache wrote it back (Q1-G1). Menu flicker went to 0.
+    - The picture: 2×/3× resolution (Auto), 4:3, better scaling (Q1-G2).
+  - **Q2 (sound, weaker machines):**
+    - The sound goes through a shared-memory ring and is time-stretched instead of going silent. Underruns per minute: 7.2 → 0.7 on this PC, 251 → 0.5 at a simulated 2× slower machine.
+    - Weaker machines are limited by the emulation thread: 0.69× speed at 2× slower.
+  - **Q3 (controllers):** Xbox, PlayStation, Switch Pro, GameCube adapters (guided setup) and generic pads; a Controls panel with remapping; per-player controllers online. Rumble from the game is not done.
+  - **Running:** Q4, emulation-thread speed for weaker machines (worktree decompile_mvp_04-e2, branch engine/q4-speed).
+  | Owner: redeploy once in Dokploy to get Q1–Q3 (players re-translate once). Optional: the other computer's CPU and browser, to target Q4.

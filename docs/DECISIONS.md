@@ -412,6 +412,24 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | Guest lines equal to native threaded, single-threaded and in Firefox; netplay_check passes. | merge of engine/q2-perf
 
+- 2026-10-16 | **Owner: the engine no longer has to be bit-exact to the GameCube** (owner: "I don't really care about byte identical to the gamecube, as long as it runs").
+  - **F1:** the engine's requirement is now:
+    - deterministic across every player's machine: native == wasm == every browser, on x86 and ARM hosts (Apple Silicon included);
+    - the game plays correctly.
+
+    Reproducing the console's exact floating-point results or timing is no longer required.
+  - **What it changes:**
+    - E3a-FP2 ("host FP only where provably equal to the exact model") becomes "host FP wherever its results are the same on every host".
+    - NaN results are canonicalized wherever their bits can reach memory or integer code; x86 and ARM produce different default NaNs.
+    - The same applies to paired singles, fused multiply-add, FPSCR flag tracking and timing details.
+    - The reference hashes in WEB.md are re-recorded when the semantics change.
+  - **What it doesn't change:**
+    - The determinism invariant (docs/DETERMINISM.md): host nondeterminism enters only through the input queue and the virtual clock.
+    - The checks: native and wasm agree at every checkpoint, netplay_check passes, a full CPU vs CPU game plays out.
+    - The knowledge track: decomp matching stays byte-identical under the verifier, because that is what makes names and contracts trustworthy for mods.
+
+  | Unlocks faster FP, paired-single and memory paths (Q4) and native versions of hot game functions. | owner, in chat
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
