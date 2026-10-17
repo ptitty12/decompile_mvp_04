@@ -20,6 +20,7 @@ export interface MvpEngine {
   _mvp_canvas_resize(width: number, height: number): void;
   _mvp_run_fields(n: number): number;
   _mvp_present(): number;
+  _mvp_batch_end(): void;  // Q5: ends a batch that made no new field, without a present
   _mvp_trace(on: number): void;   // P1: the presentation trace (development)
   _mvp_trace_take(): number;
   // P2: the render thread (the threaded build), and the renderer digest (development).
@@ -31,7 +32,8 @@ export interface MvpEngine {
   _mvp_host_slow(factor: number): void;  // Q2 (development): a slower machine, simulated
   _mvp_digest_take(): number;
   _mvp_gp_view(on: number): void;
-  _mvp_render_scale(scale: number): void;  // Q1: the internal resolution, 1-3  // Q1 (development): the renderer's model of the data cache on or off
+  _mvp_render_scale(scale: number): void;  // Q1: the internal resolution, 1-3
+  _mvp_gpu_load(passes: number): void;  // Q5 (development): extra GPU work per present
   _mvp_set_pad(port: number, connected: number, buttons: number, sx: number, sy: number, cx: number, cy: number,
                tl: number, tr: number): void;
   _mvp_status(): number;
@@ -72,6 +74,7 @@ export interface MvpEngine {
   _mvp_net_status(): number;
   _mvp_net_windows(): number;
   _mvp_net_diagnostic(): number;
+  _mvp_net_lead(): number;  // Q5: the input lead, ms (NaN before any)
 
   // Roster packs (E6, wasm/packs_web.cpp; the same exports as mvp-packs.js).
   _mvp_packs_reset(): void;

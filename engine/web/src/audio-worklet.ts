@@ -109,6 +109,8 @@ class MvpAudioProcessor extends AudioWorkletProcessor {
       this.rs.reset();
     } else if (msg.type === 'target') {
       this.rs.setTarget((msg.ms / 1000) * this.rs.inRate);
+    } else if (msg.type === 'pace') {
+      this.rs.setPace(msg.speed);  // Q5: an online game's planned pace
     }
   }
 

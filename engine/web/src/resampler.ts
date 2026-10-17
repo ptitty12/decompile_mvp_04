@@ -35,6 +35,11 @@
 //   (up to 200 ms; not when the stretch was already at its slowest, where more
 //   buffer would not help), and every 30 s without one lowers it by 10 ms again
 //   (down to the base). The first start waits for the whole base target.
+// - The pace (Q5): an online game whose players' machines cannot both keep up
+//   runs at a planned pace below full speed (pacer.ts), and the Worker says so
+//   (setPace). The stretch then starts at that speed at once, instead of after
+//   the buffer has run low enough to find it; the fill keeps trimming it. Back
+//   at full speed the stretch ends by itself as the buffer fills.
 // - Far ahead (more than 4 x the target: the emulation ran ahead, the tab was in
 //   the background), it skips down to the target. A full buffer drops what the
 //   producer sends.
@@ -203,6 +208,20 @@ export class DriftResampler {
     this.fadeLeft = 0;
     this.xfFrom = -1;
     this.hopLeft = HOP;
+  }
+
+  // Q5: the game's planned pace (1 = full speed). Below full speed the stretch
+  // plays at it from now on (the controller's integral term holds it; the fill
+  // trims it); at full speed nothing is forced: the stretch ends as the input
+  // keeps up again.
+  setPace(speed: number): void {
+    const s = Math.max(MIN_SPEED, Math.min(1, speed));
+    if (!(s < 0.995)) return;
+    if (!this.stretching) {
+      this.stretching = true;
+      this.ideal = this.rd;
+    }
+    this.integ = s - 1;
   }
 
   // A new base target (the page's setting): the current one starts there again.

@@ -91,6 +91,11 @@ class RenderSide {
   // ",\"draws\":..." members for mvp_status (empty without a renderer).
   std::string status_json() const;
   std::uint64_t presents() const { return presents_; }
+  // Q5: presents that showed a new picture (frames shown).
+  std::uint64_t presents_new() const { return presents_new_; }
+  // Q5 (development, `gpuLoad=N`): extra GPU work at every present, in proportion
+  // to the picture's internal size (gfx::Window::burn).
+  void set_gpu_load(int passes) { gpu_load_ = passes < 0 ? 0 : passes; }
   std::uint64_t resizes() const { return resizes_; }
 
  private:
@@ -106,6 +111,22 @@ class RenderSide {
   std::uint32_t xfb_ = 0;
   std::uint64_t presents_ = 0, last_presented_ = 0, copies_at_present_ = 0, resizes_ = 0;
   int scale_ = 1;
+  // Q5: the GPU's time. After a present's submit, how long until the queue has
+  // finished everything submitted so far (WebGPU's onSubmittedWorkDone), one
+  // probe at a time: about a field's GPU work when the GPU keeps up, growing
+  // when it does not. Shared with the callback, which may outlive a present.
+  struct GpuProbe {
+    bool pending = false;
+    double at = 0;                          // when the probe's present was submitted
+    std::uint64_t n = 0, over = 0;          // probes done; of them over kGpuSlowMs
+    double sum_ms = 0, last_ms = 0;
+  };
+  static constexpr double kGpuSlowMs = 14.0;  // most of a field (16.7 ms)
+  void probe_gpu(double now_ms);
+  std::shared_ptr<GpuProbe> probe_ = std::make_shared<GpuProbe>();
+  std::uint64_t presents_new_ = 0;
+  double present_ms_ = 0;  // host time in present() (the canvas's draw and the frame's hand-over), in all
+  int gpu_load_ = 0;
 };
 
 }  // namespace mvp::web

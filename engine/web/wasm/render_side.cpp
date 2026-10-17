@@ -112,11 +112,33 @@ bool RenderSide::present(std::uint64_t frame_polls, double now_ms) {
     tap_.log += b;
   }
   copies_at_present_ = tap_.copies;
+  const double t0 = emscripten_get_now();
+  if (gpu_load_) window->burn(f->view, f->width, f->height, gpu_load_);  // Q5 (development)
   window->present(f->view, f->width, f->height);
   if (mvp_js_send_frame("#mvp-canvas")) window->reconfigure();
+  const double t1 = emscripten_get_now();
+  present_ms_ += t1 - t0;
+  probe_gpu(t1);
   ++presents_;
+  if (f->serial != last_presented_) ++presents_new_;
   last_presented_ = f->serial;
   return true;
+}
+
+void RenderSide::probe_gpu(double now_ms) {
+  if (!gpu || probe_->pending) return;
+  probe_->pending = true;
+  probe_->at = now_ms;
+  gpu->queue().OnSubmittedWorkDone(wgpu::CallbackMode::AllowSpontaneous,
+                                    [p = probe_](wgpu::QueueWorkDoneStatus status, wgpu::StringView) {
+                                      p->pending = false;
+                                      if (status != wgpu::QueueWorkDoneStatus::Success) return;
+                                      const double ms = emscripten_get_now() - p->at;
+                                      p->last_ms = ms;
+                                      p->sum_ms += ms;
+                                      ++p->n;
+                                      if (ms > kGpuSlowMs) ++p->over;
+                                    });
 }
 
 void RenderSide::set_scale(int s) {
@@ -161,6 +183,13 @@ std::string RenderSide::status_json() const {
                   static_cast<unsigned long long>(gpu->errors()), static_cast<unsigned long long>(rs.copies_dropped),
                   static_cast<unsigned long long>(rs.copy_size_misses), static_cast<unsigned long long>(rs.copy_tall),
                   static_cast<unsigned long long>(renderer_->scan_stats().mixed), renderer_->scale());
+    s += b;
+    // Q5: frames shown, and the GPU's time (probes, their total and how many were slow, the last).
+    std::snprintf(b, sizeof b,
+                  ",\"presents_new\":%llu,\"gpu\":{\"n\":%llu,\"ms\":%.1f,\"over\":%llu,\"last\":%.2f,"
+                  "\"present_ms\":%.1f,\"load\":%d}",
+                  static_cast<unsigned long long>(presents_new_), static_cast<unsigned long long>(probe_->n),
+                  probe_->sum_ms, static_cast<unsigned long long>(probe_->over), probe_->last_ms, present_ms_, gpu_load_);
     s += b;
     const auto& gs = gp_.stats();  // Q1: the GP's view of memory
     std::snprintf(b, sizeof b, ",\"gp_memory\":{\"flushes\":%llu,\"flushed_mb\":%.1f,\"overlays\":%llu,\"lines\":%llu,\"drops\":%llu}",

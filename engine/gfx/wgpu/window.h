@@ -66,6 +66,12 @@ class Window {
   // 0 shows the frame's own pixel shape (square pixels, as before).
   void set_display_aspect(float a) { display_aspect_ = a; }
 
+  // Development (Q5, `gpuLoad=N` in the browser): makes the GPU work in
+  // proportion to the picture's pixels, as a heavier scene or a weaker GPU
+  // would: `passes` render passes over a scratch texture of `src`'s own size,
+  // each sampling `src` 25 times per pixel. Nothing reads the result.
+  void burn(const wgpu::TextureView& src, std::uint32_t src_width, std::uint32_t src_height, int passes);
+
   // Configures the surface again (P2: a canvas whose picture was taken as an
   // ImageBitmap may have lost its configuration).
   void reconfigure() {
@@ -87,6 +93,9 @@ class Window {
   wgpu::RenderPipeline blit_;
   wgpu::Sampler sampler_;
   wgpu::Buffer params_;
+  wgpu::Buffer burn_params_;   // Q5 (development): burn()'s own parameters
+  wgpu::Texture burn_target_;  // ... and its scratch target
+  std::uint32_t burn_w_ = 0, burn_h_ = 0;
   int width_ = 0, height_ = 0;
   float display_aspect_ = 4.0f / 3.0f;
   bool configured_ = false;
