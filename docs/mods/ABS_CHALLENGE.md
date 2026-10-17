@@ -29,15 +29,18 @@ not renames.
 
 ## 0. Implementation status (2026-10-17)
 
-Stages S1-S4 run natively in `mvp-play`; the browser (S5) and netplay (S6) are not done.
+The mod runs natively (`mvp-play --mod abs`), in the browser (the Gameplay mods panel or
+`?mod=abs:...`) and in browser netplay. It is not deployed.
 
 | Stage | State | Evidence |
 |---|---|---|
-| S1 hook API core, hide the circle | **Done (native)** | Mod off: the guest line after 12,000 frames equals a build without the sites (84,818,557,199 instructions, MEM1 `c1bccfad...`). Mod on: at frame 7062 the circle is gone and the rest of the frame is identical (captures, §3.10 setup) |
-| S2 umpire model | **Done; calibration provisional** | Calls rewritten at `fn_801BB338`; misses reproduce an independent model of the RNG exactly. The edge constants come from 12 called pitches so far; a CPU-vs-CPU calibration run is pending |
-| S3 save states | **Done (native)** | `mvp-play --rewind-test`: poll 3000 -> 3300 (menus) and 8000 -> 8900 (in play) replay to identical guest lines. Snapshot 7-8 ms, restore 2.6-6 ms native |
-| S4 challenge and review | **Done (native)** | See below |
-| S5 browser, S6 netplay, S7 polish | Not started | |
+| S1 hook API core, hide the circle | **Done** | Mod off: the guest line after 12,000 frames equals a build without the sites (84,818,557,199 instructions, MEM1 `c1bccfad...`). Mod on: at frame 7062 the circle is gone and the rest of the frame is identical (captures) |
+| S2 umpire model | **Done** | Calls are rewritten at `fn_801BB338`, and the misses reproduce an independent model of the RNG exactly. The edge constants come from 96 called pitches (84 CPU vs CPU, 12 batter). Over that sample, 8/20/30 % give 8/20/29 % at edge 3, with 83 % of misses within 0.15 of the edge. An independent check over 300+ pitches is still to do |
+| S3 save states | **Done** | `mvp-play --rewind-test`: poll 3000 -> 3300 (menus) and 8000 -> 8900 (in play) replay to identical guest lines. Snapshot 7-9 ms, restore 2.6-6 ms native |
+| S4 challenge and review | **Done** | See below |
+| S5 browser | **Done; not yet judged by feel** | Chrome 155, `browser_check.mjs --fast`: the overturn run below ends at the native guest line (MEM1 `4d94b897...`); without the challenge it ends elsewhere (`6b141e63...`). The browser build forces the single-threaded engine while a mod is on |
+| S6 netplay | **Done (prototype input)** | Two Chrome pages through the local lobby (`netplay_check.mjs`, D = 3): with a challenge by player 1, both pages end at the native reference (MEM1 `b7363882...`), with all 116 hash windows equal and no desync. Different settings are refused at the handshake: "the players chose different gameplay mod settings (mod.abs.miss: player 1 30, player 2 20)". The challenge is still L+R+Z on the game pad (§7.6) |
+| S7 polish | Not started | CPU challenges, replay speed, commentary cue, the threaded browser engine |
 
 **S4 test runs** (miss 30, edge 0, seed 1, P1 batting and never swinging):
 - **Upheld.** A correct called strike (frame 6063) was challenged. The re-run ended with a
@@ -57,6 +60,20 @@ Stages S1-S4 run natively in `mvp-play`; the browser (S5) and netplay (S6) are n
   - `--mod abs[:k=v,...]` and `--mod-seed`;
   - `--capture-review DIR`;
   - `--rewind-test F:N`.
+- Browser: `engine/web/wasm/mvp_web.cpp` and `net_web.cpp` (the `mvp_mod_*` exports, mod
+  settings in the handshake, the session seed), `engine/web/src/mods-panel.ts`, and the
+  Worker and page.
+- Netplay: `net/protocol.cpp` names the differing settings in a refusal.
+
+**Known limits:**
+- **Threaded browser engine:** mods need the single-threaded engine. The render thread's
+  GX state is not saved yet.
+- **Challenge input:** L+R+Z on the game pad (keyboard Q+E+Space). The game sees it too;
+  no side effect was seen in the tests (U6).
+- **Netplay pauses:** a review pauses the netplay frames (both pages re-run locally).
+  The netplay test's longest input latency was 12 s. Whether that came from the review or
+  from start-up was not measured (R2).
+- **Not judged by feel:** reviews have not been played by a human in a paced browser game.
 
 ## 1. Verdict
 
