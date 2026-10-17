@@ -58,7 +58,7 @@ TEST_CASE("settings: defaults, overrides, ranges and the canonical handshake for
   CHECK_FALSE(h.any_enabled());
   REQUIRE(h.enable("test", "rate=20", &err));
   CHECK_FALSE(h.enable("test", "", &err));  // twice
-  CHECK(h.canonical_settings() == "mod.test.flag=1;mod.test.rate=20;mod.test=3;");
+  CHECK(h.canonical_settings() == "mod.test.flag=1;mod.test.rate=20;mod.test=3");
 }
 
 TEST_CASE("random streams: xoshiro128** seeded from the match seed, mod id and stream") {

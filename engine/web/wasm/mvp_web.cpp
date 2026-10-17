@@ -312,6 +312,7 @@ struct Engine {
   bool hold = false;  // a review runs without presenting
   std::uint64_t fields_run = 0;
   std::vector<std::string> mod_log, mod_notes;  // lines and player messages for the page (mvp_mod_status)
+  bool mod_seed_set = false;                     // mvp_mod_seed was called (netplay: overrides the session's)
 };
 Engine g;
 std::vector<TimedSource::Record> g_io_log;
@@ -414,7 +415,9 @@ void frame_hook(ppc::Cpu& c, std::uint64_t frame) {
   if (g.mods.any_enabled()) g.mods.on_frame(c, frame);
   if (g.input_log.on) g.input_log.record(frame, g.input->current());
   if (frame >= g.stop_frames) throw StopRun{"ran " + std::to_string(frame) + " frames"};
-  if (web::net_active()) web::net_after_poll(frame);  // netplay (E5): state hash, early yield
+  // Netplay (E5): state hash, early yield. A review's re-run polls are not hashed
+  // again (both players re-run them the same way; checking resumes after it).
+  if (web::net_active() && g.mods.phase() == mods::Phase::Live) web::net_after_poll(frame);
 }
 
 std::string json_escape(const std::string& s) {
@@ -750,6 +753,7 @@ EMSCRIPTEN_KEEPALIVE int mvp_boot(const char* script, int len, double stop_field
     auto to_page = [](const std::string& s) {
       if (g.mod_log.size() < 256) g.mod_log.push_back(s);
     };
+    if (net && !g.mod_seed_set) g.mods.set_seed(web::net_seed());  // both players draw the same numbers
     g.mods.set_log(to_page);
     g.mods.set_notify([](const std::string& s) {
       if (g.mod_notes.size() < 64) g.mod_notes.push_back(s);
@@ -775,11 +779,17 @@ EMSCRIPTEN_KEEPALIVE int mvp_mod_enable(const char* spec) {
     for (auto& mod : mods::builtin_mods()) g.mods.add(std::move(mod));
   const std::string s = spec ? spec : "";
   const auto colon = s.find(':');
-  return g.mods.enable(s.substr(0, colon), colon == std::string::npos ? "" : s.substr(colon + 1), &g.error) ? 1 : 0;
+  if (!g.mods.enable(s.substr(0, colon), colon == std::string::npos ? "" : s.substr(colon + 1), &g.error)) return 0;
+  web::net_set_mod_settings(g.mods.canonical_settings());  // netplay: part of the handshake (before mvp_net_begin)
+  return 1;
 }
 
-// The match seed of the mods' random streams (netplay: the handshake's).
-EMSCRIPTEN_KEEPALIVE void mvp_mod_seed(double seed) { g.mods.set_seed(static_cast<std::uint64_t>(seed)); }
+// The match seed of the mods' random streams. Netplay uses the session's shared
+// seed unless one is set here (tests: both pages must then pass the same).
+EMSCRIPTEN_KEEPALIVE void mvp_mod_seed(double seed) {
+  g.mods.set_seed(static_cast<std::uint64_t>(seed));
+  g.mod_seed_set = true;
+}
 
 // The mods' canonical settings (the netplay handshake's part), "" without mods.
 EMSCRIPTEN_KEEPALIVE const char* mvp_mod_settings() {
@@ -932,8 +942,9 @@ EMSCRIPTEN_KEEPALIVE void mvp_host_slow(double factor) {
 EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
   if (!g.m || g.stopped) return -1;
   // Netplay (Q5): the next frame's input is not here yet: nothing runs, so no
-  // batch starts (the render thread is not woken for nothing).
-  if (web::net_active() && !web::net_may_run()) return 0;
+  // batch starts (the render thread is not woken for nothing). A gameplay mod's
+  // review replays recorded inputs instead and is not held up.
+  if (web::net_active() && g.mods.phase() == mods::Phase::Live && !web::net_may_run()) return 0;
   const std::uint64_t start = g.hw->vi_fields();
   const std::uint64_t run_start = g.fields_run, want = static_cast<std::uint64_t>(n);
   if (g_tracing) g_trace.push_back({~0ull, static_cast<std::uint32_t>(start)});
@@ -944,7 +955,8 @@ EMSCRIPTEN_KEEPALIVE int mvp_run_fields(int n) {
   try {
     // A review's headless legs (g.hold) run unpaced, within a budget per batch.
     while (g.fields_run - run_start < want || (g.hold && now_ms() - t0 < 40)) {
-      if (web::net_active() && !web::net_may_run()) break;  // netplay: the next frame's input is not here yet
+      // Netplay: the next frame's input is not here yet (a review replays recorded inputs instead).
+      if (web::net_active() && g.mods.phase() == mods::Phase::Live && !web::net_may_run()) break;
       double f0 = now_ms();
 #ifdef MVP_WEB_THREADS
       const double waited0 = g.threaded ? web::render_waited_ms() : 0;

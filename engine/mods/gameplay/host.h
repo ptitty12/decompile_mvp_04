@@ -46,8 +46,8 @@ class GameplayHost final : public Host {
   // At every frame poll, after its input was consumed (the engine's frame hook).
   void on_frame(ppc::Cpu& c, u64 frame);
 
-  // "mod.<id>=<version>;mod.<id>.<key>=<value>;..." sorted, for the netplay
-  // handshake's settings string. Empty with no mod enabled.
+  // "mod.<id>.<key>=<value>;...;mod.<id>=<version>" sorted, in the form of the
+  // netplay handshake's settings string (net/identity.h). Empty with no mod enabled.
   std::string canonical_settings() const;
 
   // Every enabled mod's state block and random streams, in a fixed layout: what a

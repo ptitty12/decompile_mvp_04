@@ -159,8 +159,8 @@ std::string GameplayHost::canonical_settings() const {
     for (const auto& [k, v] : a.settings) kv.push_back(std::string("mod.") + info.id + "." + k + "=" + std::to_string(v));
   }
   std::sort(kv.begin(), kv.end());
-  std::string s;
-  for (const auto& e : kv) s += e + ";";
+  std::string s;  // "k=v;k=v", the form of the handshake's settings string (net/identity.h)
+  for (const auto& e : kv) s += (s.empty() ? "" : ";") + e;
   return s;
 }
 
