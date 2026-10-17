@@ -68,6 +68,10 @@ struct SessionStats {
   u32 rtt_last = 0, rtt_min = 0, rtt_max = 0;
   u64 rtt_sum = 0, rtt_samples = 0;
   double rtt_avg() const { return rtt_samples ? static_cast<double>(rtt_sum) / static_cast<double>(rtt_samples) : 0.0; }
+  // Q5: the recent round trip (exponential average over about 8 samples) and its
+  // jitter (RFC 3550's estimator applied to the round trips: the smoothed absolute
+  // change between consecutive samples). Host statistics for the page's overlay.
+  double rtt_recent = 0, rtt_jitter = 0;
   // Input latency: host time from sampling the local pad (ready()) to the frame
   // poll that uses it (take() with a time). The delay's cost, stalls included.
   u64 latency_sum = 0, latency_samples = 0, latency_max = 0;
@@ -116,6 +120,10 @@ class Session {
   // `now_ms`, the input latency statistics are updated.
   rt::FrameInput take(u64 frame, std::optional<u64> now_ms = std::nullopt);
   u64 next_frame() const { return next_take_; }
+  // Q5: when the peer's input of `frame` arrived (the now_ms of the update that
+  // received it), while it is still held (frames from next_frame() on); nothing
+  // for neutral frames or inputs not here yet. Host timing for the pacing only.
+  std::optional<u64> remote_arrival_ms(u64 frame) const;
 
   // The local state hash of a window that closed at `frame` (same frames on both
   // peers). Compared with the peer's when both are known.
@@ -164,6 +172,7 @@ class Session {
   // remote_horizon()-1.
   std::deque<PadState> local_, remote_;
   std::deque<u64> local_ms_;  // when each local input was sampled
+  std::deque<u64> remote_ms_; // when each peer input arrived (Q5)
   u64 local_base_ = 0, remote_base_ = 0;
   u64 next_take_ = 0;
   u32 peer_ack_frame_ = 0;  // the peer has our inputs before this
